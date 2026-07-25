@@ -26,6 +26,8 @@ After every 10 ingests, or when wiki stale/inconsistent, hoặc session_start b�
        - Field `invalid_at`/`invalidated_by` là optional, R9 (okf_frontmatter) không chặn khoá lạ — an toàn thêm mà không cần sửa validator.
    - Exit 2 (chưa có neo / neo mất hiệu lực): làm trọn lint rồi chốt neo ở bước 10.
 
+0c. **Recall-gap (0 token, mới)** — cờ `recall-gap` trong `stale.json` (khoá `action` khác `code-drift`) là file code vừa đổi mà **0 trang wiki nào** đang `touches` nó — suy tất định từ `wiki-graph.py::code_touched_by()`, không cần LLM nhớ lại. KHÔNG tự động sửa gì: đọc từng file bị cờ, tự quyết định có trang nào (nếu có) nên bổ sung mention `` `path/to/file.py` `` trong backtick — chỉ thêm khi thật sự liên quan, không thêm cho đủ số. File không liên quan tới bất kỳ trang wiki nào (vd script tiện ích không cần tài liệu hoá) thì bỏ qua có chủ ý, không phải nợ.
+
 1. **Orphans** — `RUN: grep -rL "wiki/" --include="*.md" llmwiki/wiki/concepts/ llmwiki/wiki/entities/` → files not referenced anywhere. Flag each.
 
 2. **Missing links** — scan pages for entity/concept names that exist as wiki files but not written as `[[wikilinks]]`. Fix in place.

@@ -82,7 +82,16 @@ def wikilink_targets(text: str) -> list:
 # LƯU Ý ngược với wikilink_targets: hàm này KHÔNG được strip_code, vì path nằm CHÍNH
 # TRONG inline-code. Điều kiện chống false-positive giữ nguyên bản gốc: phải có "/" và
 # phải TỒN TẠI trên đĩa.
-CODE_PATH_RE = re.compile(r"`([\w./-]+\.(?:py|js|ts|sh|yaml|yml|json|html))`")
+TOUCHABLE_EXTS = ("py", "js", "ts", "sh", "yaml", "yml", "json", "html")
+CODE_PATH_RE = re.compile(r"`([\w./-]+\.(?:" + "|".join(TOUCHABLE_EXTS) + r"))`")
+
+
+def is_touchable_path(code_path: str) -> bool:
+    """True nếu code_path CÓ THỂ là đích một cạnh touches — cùng phạm vi đuôi file với
+    CODE_PATH_RE. Dùng để lọc trước khi tính recall-gap: đuôi ngoài danh sách này (vd .md,
+    .css) thì touches_targets() không bao giờ sinh cạnh — không thể coi là "thiếu", nó nằm
+    ngoài khả năng đo của cơ chế, không phải nợ recall thật."""
+    return "." in code_path and code_path.rsplit(".", 1)[-1] in TOUCHABLE_EXTS
 
 # 2026-07-22: đây là nguồn CHUẨN cho câu hỏi "wiki nói về code nào" (content-based, tất
 # định). provenance-log.jsonl (đề xuất, xem llmwiki/wiki/concepts/log-model.md) KHÔNG được
@@ -99,6 +108,14 @@ def touches_targets(text: str, repo_root) -> list:
             seen.add(cp)
             out.append(cp)
     return out
+
+
+# Nguồn thứ 2 của touches — frontmatter khai tay `{rel: touches, path: X}` (dùng bởi
+# fdk/tools/build-wiki-graph.py::scan(), quy ước "frontmatter khai tay vẫn thắng"). Body
+# backtick không phủ được trường hợp một trang CHỈ khai touches qua frontmatter (đo được
+# 7 trang thật trong llmwiki/wiki/ 2026-07-25) — bỏ nguồn này sẽ sinh cờ recall-gap oan.
+FRONTMATTER_TOUCHES_RE = re.compile(
+    r"\{[ \t]*rel[ \t]*:[ \t]*touches[ \t]*,[ \t]*(?:to|path)[ \t]*:[ \t]*([^}\s]+)[ \t]*\}")
 
 
 def mdlink_targets(text: str) -> list:
@@ -183,12 +200,14 @@ class Graph:
         self.in_adj: dict = {}         # dst -> set(src)
         self.in_unresolved: dict = {}  # tên-đích-local-only -> {src: type} (cho backlinks draft vắng)
         self.broken: list = []         # list[{"from": relpath, "wikilink": name}]
+        self.touches_in: dict = {}     # code_path -> set(wiki relpath) — suy từ 2 nguồn, KHÔNG cất riêng
 
 
 def build_graph(wiki: Path) -> Graph:
     """Đọc mỗi trang đúng MỘT lần, dựng adjacency hai chiều + danh sách broken (git-aware)."""
     g = Graph()
     g.wiki = wiki
+    repo_root = wiki.parent.parent if wiki.name == "wiki" else wiki.parent
     content = content_files(wiki)
     allp = all_pages(wiki)
 
@@ -248,7 +267,19 @@ def build_graph(wiki: Path) -> Graph:
             g.out_adj[srel].add(dst)
             g.in_adj[dst].add(srel)
 
+        for cp in touches_targets(text, repo_root):
+            g.touches_in.setdefault(cp, set()).add(srel)
+        for cp in FRONTMATTER_TOUCHES_RE.findall(text):
+            cp = cp.strip()
+            if cp and (repo_root / cp).exists():
+                g.touches_in.setdefault(cp, set()).add(srel)
+
     return g
+
+
+def code_touched_by(g: Graph, code_path: str) -> set:
+    """Trang wiki nào đang touches code_path — tập rỗng nghĩa là 0 trang nào (dùng cho recall-gap)."""
+    return g.touches_in.get(code_path, set())
 
 
 def resolve_page(arg: str, g: Graph):

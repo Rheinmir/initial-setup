@@ -32,6 +32,16 @@ try:
 except ImportError:
     fcntl = None
 
+import importlib.util as _ilu
+
+_wg_spec = _ilu.spec_from_file_location(
+    "_wikigraph", pathlib.Path(__file__).with_name("wiki-graph.py"))
+try:
+    wiki_graph = _ilu.module_from_spec(_wg_spec)
+    _wg_spec.loader.exec_module(wiki_graph)
+except Exception:  # noqa: BLE001 — fail-open: recall-gap tắt, code-drift hiện có KHÔNG bị ảnh hưởng
+    wiki_graph = None
+
 # Cùng danh sách thư mục nội dung với wiki_ledger.py — đổi một nơi phải đổi nơi kia
 # (harness-lint bắt hằng-số-lệch giữa script).
 CONTENT_DIRS = ("concepts/", "entities/", "sources/", "draft/", "architecture/", "tours/")
@@ -158,6 +168,47 @@ def flag_stale(wiki_dir: pathlib.Path, suspects: dict[str, list[str]]) -> None:
                 fcntl.flock(lk.fileno(), fcntl.LOCK_UN)
 
 
+def find_recall_gaps(wiki_dir: pathlib.Path, changed: list[str]) -> list[str]:
+    """File code trong `changed` mà KHÔNG trang wiki nào touches — suy tất định từ
+    Graph.touches_in (wiki_graph.build_graph), không ghi gì, không gọi LLM. Chỉ xét path
+    nằm trong phạm vi touches_targets có thể phủ (is_touchable_path) — path ngoài phạm vi
+    (vd .css, .md) không thể có cạnh touches nên không tính là thiếu.
+    Fail-open: thiếu module wiki_graph → trả [] (recall-gap tắt, KHÔNG chặn cmd_check)."""
+    if wiki_graph is None:
+        return []
+    g = wiki_graph.build_graph(wiki_dir)
+    return [f for f in changed
+            if wiki_graph.is_touchable_path(f) and not wiki_graph.code_touched_by(g, f)]
+
+
+def flag_recall_gap(wiki_dir: pathlib.Path, gaps: list[str]) -> None:
+    """Ghi cờ recall-gap vào stale.json — key = CODE PATH (khác cờ "stale" dùng key = wiki
+    relpath), action="recall-gap" để /lint và --flags-for phân biệt. Cùng schema + flock
+    với flag_stale(). Không collision thật với key wiki relpath: recall-gap chỉ nhận path
+    kết thúc bằng TOUCHABLE_EXTS (.py/.js/.ts/.sh/.yaml/.yml/.json/.html), còn key "stale"
+    luôn kết thúc .md dưới CONTENT_DIRS."""
+    if not gaps:
+        return
+    stale_path = wiki_dir / "stale.json"
+    lock_path = wiki_dir / ".stale.lock"
+    ts = datetime.datetime.now().isoformat(timespec="seconds")
+    with open(lock_path, "w") as lk:
+        if fcntl is not None:
+            fcntl.flock(lk.fileno(), fcntl.LOCK_EX)
+        try:
+            try:
+                stale = json.loads(stale_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                stale = {}
+            for f in gaps:
+                stale[f] = {"action": "recall-gap", "ts": ts, "session": None}
+            stale_path.write_text(json.dumps(stale, ensure_ascii=False, indent=1) + "\n",
+                                  encoding="utf-8")
+        finally:
+            if fcntl is not None:
+                fcntl.flock(lk.fileno(), fcntl.LOCK_UN)
+
+
 def clear_code_drift(wiki_dir: pathlib.Path) -> int:
     stale_path = wiki_dir / "stale.json"
     lock_path = wiki_dir / ".stale.lock"
@@ -236,11 +287,15 @@ def cmd_check(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
     suspects = map_suspects(wiki_dir, changed)
     if suspects:
         flag_stale(wiki_dir, suspects)
+    gaps = find_recall_gaps(wiki_dir, changed)
+    if gaps:
+        flag_recall_gap(wiki_dir, gaps)
     if as_json:
         print(json.dumps({"status": "drift", "head": head, "anchor": anchor["gitHead"],
                           "changed": changed[:MAX_CHANGED_LIST],
                           "changed_total": len(changed),
-                          "suspects": suspects}, ensure_ascii=False, indent=1))
+                          "suspects": suspects,
+                          "recall_gaps": gaps}, ensure_ascii=False, indent=1))
     else:
         print(f"⟳ wiki-sync: {len(changed)} file code/nguồn đổi kể từ neo "
               f"{anchor['gitHead'][:10]} ({anchor.get('updatedAt', '?')}):")
@@ -257,6 +312,11 @@ def cmd_check(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
         else:
             print("  → không trang wiki nào nhắc trực tiếp tới file đổi — vẫn nên /lint "
                   "nếu thay đổi mang tính kiến trúc.")
+        if gaps:
+            print(f"  → {len(gaps)} file code đổi mà KHÔNG trang wiki nào touches — đã cờ "
+                  f"recall-gap vào stale.json:")
+            for f in sorted(gaps):
+                print(f"   ⚐ {f}")
         print("  Rà xong chạy: wiki-sync.py --mark-synced")
     log_sync_cost(root, "drift", int((time.perf_counter() - t0) * 1000), len(suspects))
     return 3

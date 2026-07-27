@@ -174,6 +174,18 @@ def run(frame_path, root=".", baseline=None, keep_worktree=True, revise_cmd=None
 
     baseline = baseline or _git(["rev-parse", "HEAD"], root).stdout.strip()
 
+    # loop-runner is a hard dependency (not advisory like qc-regression.py) — without this
+    # check, a missing file surfaces as a raw "python3: can't open file" from subprocess,
+    # not obviously about /br. Found bridging /br onto a project where it isn't merged yet
+    # (fdk-poc 24/07): manual sync copied fdk/tools/br-*.py but forgot harness/scripts/
+    # loop-runner.py, since the two normally travel together via install-harness.sh --global.
+    if not LOOP_RUNNER.is_file():
+        print(f"[br-run] THIẾU {LOOP_RUNNER} — engine loop-runner chưa cài. Cài qua "
+              f"harness/scripts/install-harness.sh --global, hoặc nếu đang bridge /br sang "
+              f"một project chưa merge skill này thì đồng bộ thêm harness/scripts/loop-runner.py "
+              f"(không chỉ fdk/tools/br-*.py).", file=sys.stderr)
+        return 1
+
     # 3. isolated worktree
     wt, branch = (create_worktree(root, fid, baseline) if use_worktree else (root, None))
     log_path = root / "br" / "frames" / f"{fid}.run.json"

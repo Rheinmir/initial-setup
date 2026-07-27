@@ -110,6 +110,27 @@ python3 fdk/tools/fdk-poc.py render --project <p>
 # soi một /br project CÓ SẴN bằng tool thật (không scaffold)
 python3 fdk/tools/fdk-poc.py probe --project br/payroll [--fresh]
 ```
+
+### Bẫy 3 — đồng bộ tay để bridge Bẫy 2 THIẾU `harness/scripts/loop-runner.py` (bài học 24/07/26)
+Khi bridge Bẫy 2 (đồng bộ `skills/br/` + `fdk/tools/br-*.py` từ canary vào project để vẫn chạy được
+`/br` dù chưa merge), **đừng chỉ copy `fdk/tools/`** — `br-run.py`/`br-queue.py` trỏ
+`LOOP_RUNNER = _REPO/"harness"/"scripts"/"loop-runner.py"` (đường TƯƠNG ĐỐI so với chính vị trí
+script). Trong kiến trúc thật (GH#51/U10 — engine GLOBAL-SHARED ở `~/.claude/harness`),
+`fdk/tools` và `harness/scripts` LUÔN đi cùng nhau qua `install-harness.sh --global`
+(xem `harness/scripts/install-harness.sh:135-137`) nên đường tương đối tự khớp; nhưng copy TAY
+riêng lẻ `fdk/tools/br-*.py` mà quên `harness/scripts/loop-runner.py` thì `/br run` chặn cứng vì
+thiếu file, dù frame/BR/frame-lint đều đã đúng. Đồng bộ tay phải copy CẢ HAI:
+```bash
+cp -r <canary>/skills/br "$PROJ/skills/"
+cp <canary>/fdk/tools/br-*.py <canary>/fdk/tools/frame-lint.py \
+   <canary>/fdk/tools/checkpoint.py <canary>/fdk/tools/build-line-status.py "$PROJ/fdk/tools/"
+mkdir -p "$PROJ/harness/scripts"
+cp <canary>/harness/scripts/loop-runner.py "$PROJ/harness/scripts/"   # THIẾU cái này ⇒ /br run chặn cứng
+```
+`harness/scripts/qc-regression.py` thì KHÔNG bắt buộc — `br-run.py` tự kiểm `qc.is_file()` và in
+`"(chưa có qc-regression.py)"` rồi bỏ qua (fail-open, advisory only), không chặn frame.
+`br-run.py` (từ 24/07/26) tự báo rõ nếu thiếu `loop-runner.py` thay vì để lộ lỗi
+`python3: can't open file` khó hiểu.
 `--ref` trỏ nhánh remote cho `curl` (mặc định `orca`; canary thì đưa tên nhánh — `bootstrap.sh` nhận
 `HARNESS_BASE`). `--skip-curl` CHỈ dùng khi offline/self-test — bỏ nó là bỏ mất phần chứng minh.
 

@@ -15,6 +15,8 @@ không có luồng thật ⇒ POC vô giá trị. Nay mọi bước trong trace 
 
 Dùng:
   fdk-poc.py new    --raw "<dir>" [--name <proj>] [--dest ~/orca/workspaces] [--no-orca]
+  fdk-poc.py drive  --project <p> --text "<gửi 1 lượt>" --label "<nhãn>" [--terminal term_...] [--must] [--llm]
+                    # lái /br TỪNG LƯỢT: send → wait tui-idle → read → record, không bắn mega-prompt
   fdk-poc.py record --project <p> --cmd "<lệnh>" [--rc N] [--log-file f|--log "..."] [--llm] [--note ..]
   fdk-poc.py render --project <p> [--out …]
   fdk-poc.py probe  --project <p> [--fresh]        # soi project /br có sẵn bằng tool thật
@@ -35,14 +37,25 @@ TRACE_REL = "br/.poc-trace.jsonl"
 DEFAULT_DEST = Path.home() / "orca" / "workspaces"
 
 
-def _run(cmd, cwd):
+def _run(cmd, cwd, timeout=120):
     t0 = time.perf_counter()
     try:
-        p = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=120)
+        p = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout)
         rc, out = p.returncode, (p.stdout or "") + (p.stderr or "")
     except Exception as e:
         rc, out = 1, str(e)
     return rc, out, round((time.perf_counter() - t0) * 1000)
+
+
+def _worktree_gate_ok(name, list_json_out):
+    """GATE CỨNG: True chỉ khi `name` THẬT SỰ có trong output JSON của `orca worktree list`
+    (không tin JSON echo của lệnh `create`). Tách hàm để test được bằng JSON giả, không cần orca thật."""
+    try:
+        d = json.loads(list_json_out)
+        names = [w.get("displayName") for w in d.get("result", {}).get("worktrees", [])]
+    except Exception:
+        names = []
+    return (name in names), names
 
 
 def _sentinel(proj, rel, needle=None):
@@ -125,12 +138,19 @@ def new_project(raw_dir, name=None, dest=None, use_orca=True, force=False, ref="
             d = json.loads(out)
             w = d.get("result", {}).get("worktree", {})
             wpath = w.get("path")
-            orca_ok = bool(d.get("ok")) and bool(wpath)
         except Exception:
             pass
         logs.append({"cmd": f"orca worktree create --name {name} --repo path:{repo_dir} --activate", "rc": rc,
-                     "out": (f"workspace: {wpath}\n→ HIỆN Ở PANEL WORKSPACES CỦA ORCA" if orca_ok
-                             else "worktree create THẤT BẠI:\n" + out.strip()[:600])})
+                     "out": (f"workspace: {wpath}" if wpath else "worktree create THẤT BẠI:\n" + out.strip()[:600])})
+
+        # GATE CỨNG: KHÔNG tin JSON echo của chính lệnh create — verify ĐỘC LẬP qua `worktree list`
+        # (bài học 17/07→24/07: filesystem/JSON "OK" không đồng nghĩa user THẤY được ở panel Workspaces).
+        rc2, out2, _ = _run(["orca", "worktree", "list", "--repo", f"path:{repo_dir}", "--json"], repo_dir)
+        gate_ok, seen_names = _worktree_gate_ok(name, out2)
+        orca_ok = bool(wpath) and gate_ok
+        logs.append({"cmd": f"orca worktree list --repo path:{repo_dir}  (gate assert độc lập)", "rc": rc2,
+                     "out": (f"✓ '{name}' CÓ trong worktree list — {seen_names}" if orca_ok
+                             else f"✗ GATE FAIL — '{name}' KHÔNG thấy trong worktree list: {seen_names}")})
         if orca_ok:
             proj = Path(wpath)
     ms = round((time.perf_counter() - t0) * 1000)
@@ -316,8 +336,10 @@ def drive_step(proj, handle, text, label, timeout_ms=600000, must=False, llm=Tru
     """Gửi 1 lượt → chờ agent rảnh → đọc output THẬT → record. Trả (rc, tail)."""
     t0 = time.perf_counter()
     _run(["orca", "terminal", "send", "--terminal", handle, "--text", text, "--enter"], proj)
+    # subprocess timeout PHẢI >= timeout_ms (ms) cộng buffer, nếu không _run tự cắt ở 120s mặc định
+    # và trả rc giả (bug thật gặp khi /br run cần nhiều vòng > 2 phút).
     _run(["orca", "terminal", "wait", "--terminal", handle, "--for", "tui-idle",
-          "--timeout-ms", str(timeout_ms)], proj)
+          "--timeout-ms", str(timeout_ms)], proj, timeout=timeout_ms / 1000 + 30)
     rc, out, _ = _run(["orca", "terminal", "read", "--terminal", handle, "--limit", "80", "--json"], proj)
     tail = ""
     try:
@@ -525,6 +547,13 @@ def selftest():
         h = out.read_text(encoding="utf-8")
         checks.append(("render: HTML có log THẬT + path", "LOG THẬT" in h and str(out.resolve()) in h))
         checks.append(("KHÔNG bịa bước: mọi bước có log thật", all(t.get("logs") for t in tr)))
+    # gate assert (JSON giả — không cần orca thật): tên KHỚP → pass, tên KHÁC/JSON vỡ → fail
+    ok_match, names_match = _worktree_gate_ok("poc-abc", '{"result":{"worktrees":[{"displayName":"poc-abc"}]}}')
+    checks.append(("gate: tên khớp trong worktree list → PASS", ok_match and names_match == ["poc-abc"]))
+    ok_miss, _ = _worktree_gate_ok("poc-abc", '{"result":{"worktrees":[{"displayName":"poc-khac"}]}}')
+    checks.append(("gate: tên KHÔNG khớp → FAIL (không im lặng cho qua)", not ok_miss))
+    ok_broken, _ = _worktree_gate_ok("poc-abc", "not json")
+    checks.append(("gate: JSON vỡ → FAIL an toàn (không crash)", not ok_broken))
     for label, cond in checks:
         print(f"  [{'PASS' if cond else 'FAIL'}] {label}")
         ok = ok and cond
@@ -534,7 +563,7 @@ def selftest():
 
 def main():
     ap = argparse.ArgumentParser(description="fdk-poc — POC luồng /br chạy THẬT + visualize")
-    ap.add_argument("mode", nargs="?", default="render", choices=["new", "record", "render", "probe"])
+    ap.add_argument("mode", nargs="?", default="render", choices=["new", "record", "render", "probe", "drive"])
     ap.add_argument("--raw", default=None, help="new: thư mục tài liệu THẬT")
     ap.add_argument("--name", default=None, help="new: tên project")
     ap.add_argument("--dest", default=None, help=f"new: nơi đặt project (mặc định {DEFAULT_DEST})")
@@ -556,6 +585,11 @@ def main():
     ap.add_argument("--ms", type=int, default=0)
     ap.add_argument("--sentinel", default=None, help="record: rel[:needle] — artifact chứng bước THẬT")
     ap.add_argument("--fresh", action="store_true", help="probe: copy sang thư mục mới rồi soi")
+    ap.add_argument("--text", default=None, help="drive: text gửi vào terminal (1 lượt)")
+    ap.add_argument("--label", default=None, help="drive: nhãn ghi vào trace cho lượt này")
+    ap.add_argument("--terminal", default=None, help="drive: handle terminal (term_...); bỏ trống → tự tìm qua --title")
+    ap.add_argument("--title", default="POC", help="drive: title hint để tự tìm terminal khi không truyền --terminal")
+    ap.add_argument("--timeout-ms", type=int, default=600000, help="drive: chờ tui-idle tối đa (ms)")
     ap.add_argument("--out", default=None)
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--json", action="store_true")
@@ -600,6 +634,22 @@ def main():
                            sentinel=sent, ok=ok, note=args.note,
                            logs=[{"cmd": args.cmd, "rc": args.rc, "out": (out.strip()[-1800:] or "(no output)")}]))
         print(f"✓ record bước {len(tr)+1}: {args.cmd} (rc={args.rc}, sentinel {'✓' if ok else '✗'} {sent})")
+        return
+
+    if args.mode == "drive":
+        if not (args.project and args.text and args.label):
+            print("drive cần --project, --text, --label", file=sys.stderr); sys.exit(2)
+        proj = Path(args.project).resolve()
+        handle = args.terminal or term_handle(proj, args.title)
+        if not handle:
+            print(f"drive: không tìm thấy terminal (title chứa '{args.title}') trong {proj} — "
+                  f"tạo trước bằng `orca terminal create --worktree path:{proj} --title '{args.title}' --command claude --focus`, "
+                  f"hoặc truyền --terminal <handle>", file=sys.stderr)
+            sys.exit(2)
+        tail = drive_step(proj, handle, args.text, args.label, timeout_ms=args.timeout_ms,
+                          must=args.must, llm=args.llm, sentinel=args.sentinel)
+        print(f"✓ drive '{args.label}' → terminal {handle} (chờ tối đa {args.timeout_ms}ms)")
+        print(tail[-1200:])
         return
 
     if args.mode == "probe":

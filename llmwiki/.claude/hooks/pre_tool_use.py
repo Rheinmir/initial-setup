@@ -32,6 +32,26 @@ def record_bite(root: str, rule: str, tool: str, target: str, err: str) -> None:
         pass
 
 
+def run_egress_guard(root: str, event: dict, tool: str, target: str) -> None:
+    """Chặn network-egress ngoài allow-list qua harness/scripts/egress-guard.py (bnal quarantine,
+    xem harness/egress-guard.config.yaml). Trước bản vá này script chỉ chạy --self-test trong
+    medic/fdk-gate — KHÔNG chặn Bash thật lúc runtime. Mặc định mode:warn nên vẫn fail-open cho
+    tới khi allow_domains được calib + lật mode:block. Fail-open nếu không tìm thấy script."""
+    guard = resolve_tool(root, "harness/scripts/egress-guard.py")
+    if not guard:
+        return
+    try:
+        r = subprocess.run([sys.executable, guard], input=json.dumps(event),
+                           capture_output=True, text=True, timeout=15)
+    except Exception:
+        return  # fail-open tuyệt đối
+    if r.returncode == 2:
+        err = r.stderr.strip()
+        record_bite(root, "egress-guard", tool, target, err)
+        print(err, file=sys.stderr)
+        sys.exit(2)
+
+
 def run_local(root: str, event: dict, tool: str, target: str) -> None:
     """Chạy rule RIÊNG của dự án (harness-local/run.py) SONG SONG framework. Block (exit 2) nếu vi phạm.
     Fail-open: dự án không có harness-local/ hoặc lỗi → no-op (không đụng framework)."""
@@ -79,6 +99,8 @@ def main() -> None:
             record_bite(root, name[:-3] if name.endswith(".py") else name, tool, target, err)
             print(err, file=sys.stderr)
             sys.exit(2)
+    if tool == "Bash":
+        run_egress_guard(root, event, tool, target)
     run_local(root, event, tool, target)  # rule RIÊNG của dự án (harness-local) — sau framework
     sys.exit(0)
 

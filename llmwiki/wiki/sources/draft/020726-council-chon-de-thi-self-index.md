@@ -1,7 +1,7 @@
 ---
 type: draft
 title: "020726-council-chọn-đề-thi — dựng app mẫu ngoài mẫu + harass test 8 loại vector, để council tự chọn đề thi (chống ludic fallacy)"
-status: proposed
+status: superseded  # T-260702-02 superseded — phần còn lại là GH#81
 tags: [council, self-index, wiki-core, relations, eval, harass, dogfood, output-report]
 timestamp: 2026-07-02
 relations:
@@ -16,7 +16,7 @@ relations:
 # 020726-council-chọn-đề-thi — app mẫu ngoài mẫu + harass 8 loại vector
 
 **Type:** draft
-**Status:** proposed
+**Status:** superseded (→ GH#81)
 **Tags:** council, self-index, wiki-core, relations, eval, harass, output-report
 **Proposed:** 2026-07-02
 **Task:** T-260702-02

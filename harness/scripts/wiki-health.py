@@ -16,7 +16,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-SKIP_BASENAMES = {"README.md", "_template.md"}
+SKIP_BASENAMES = {"README.md", "_template.md",
+                  # ledger append-only (code-logger / issue ledger): chứa văn bản LỊCH SỬ
+                  # được trích nguyên văn — [[...]] trong đó không phải liên kết sống.
+                  "log.md", "ISSUES.md"}
 CONTENT_DIRS = ("concepts", "entities", "sources", "draft", "architecture", "tours")
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]")
 MDLINK_RE = re.compile(r"\]\(([^)#\s]+\.md)\)")
@@ -54,17 +57,25 @@ def local_only_stem(stem: str, wiki: Path) -> bool:
     return _LO_CACHE[stem]
 
 
+def _archived(p: Path) -> bool:
+    # archive/ = lịch sử đông cứng (docs-curate dời vào, không bảo trì nữa) —
+    # link gãy trong đó không phải nợ sống, quét chỉ tạo nhiễu vĩnh viễn.
+    return "archive" in p.parts
+
+
 def content_files(wiki: Path) -> list[Path]:
     out = []
     for d in CONTENT_DIRS:
         base = wiki / d
         if base.is_dir():
-            out += [f for f in base.rglob("*.md") if f.name not in SKIP_BASENAMES]
+            out += [f for f in base.rglob("*.md")
+                    if f.name not in SKIP_BASENAMES and not _archived(f.relative_to(wiki))]
     return sorted(out)
 
 
 def all_pages(wiki: Path) -> list[Path]:
-    return sorted(f for f in wiki.rglob("*.md") if f.name not in SKIP_BASENAMES)
+    return sorted(f for f in wiki.rglob("*.md")
+                  if f.name not in SKIP_BASENAMES and not _archived(f.relative_to(wiki)))
 
 
 def git_last_commit_ts(repo_cwd: Path, file: Path):
@@ -111,7 +122,7 @@ def main() -> None:
             if target is None:
                 if not local_only_stem(name, wiki):   # wikilink→draft local-only ≠ broken
                     broken.append({"from": src.relative_to(wiki).as_posix(), "wikilink": name})
-            elif target != src and target in inbound:
+            elif target != src and target in inbound:  # inbound chỉ đo trên content pages
                 inbound[target] += 1
         for link in MDLINK_RE.findall(text):
             cand = (src.parent / link).resolve()

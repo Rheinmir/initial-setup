@@ -21,8 +21,8 @@ from pathlib import Path
 STEPS = [
     ("R3 index-sync", ["python3", "harness/validators/index_sync.py", "--wiki-dir", "llmwiki/wiki"],
      "index.md khớp file wiki (git-aware)"),
-    ("L4 wiki-health", ["python3", "harness/scripts/wiki-health.py", "--wiki-dir", "llmwiki/wiki", "--fail-on", "broken"],
-     "không broken wikilink"),
+    ("L4 wiki-health", ["python3", "harness/scripts/wiki-health.py", "--wiki-dir", "llmwiki/wiki", "--fail-on", "broken,summary"],
+     "không broken wikilink · Summary trong index.md không được là ngày tháng trơ"),
     ("arch-scan", ["python3", "harness/scripts/arch-scan.py", "--root", "."],
      "văn bản skill/doc khớp luật R1-R7"),
     ("harness-lint", ["python3", "harness/scripts/harness-lint.py", "--check"],
@@ -77,15 +77,22 @@ STEPS = [
         "python3 harness/scripts/web-clone.py --self-test >/dev/null && "
         "python3 harness/scripts/sweep-gate.py --self-test >/dev/null && "
         "python3 harness/scripts/archetype.py --self-test >/dev/null && "
+        "python3 harness/scripts/capability-stamp.py --self-test >/dev/null && "
+        "python3 harness/scripts/design-variety.py --self-test >/dev/null && "
+        "python3 harness/scripts/ledger-snapshot.py --self-test >/dev/null && "
         "python3 harness/scripts/mem-proxy.py --self-test >/dev/null && "
+        "python3 harness/scripts/qc-regression.py --self-test >/dev/null && "
         "python3 harness/scripts/retrieval-eval.py --self-test >/dev/null && "
         "python3 harness/scripts/skill-resolve-eval.py --self-test >/dev/null && "
-        "python3 harness/scripts/qc-regression.py --self-test >/dev/null && "
-        "python3 fdk/tools/fdk-poc.py --self-test >/dev/null && "
-        "python3 harness/scripts/capability-stamp.py --self-test >/dev/null && "
-        "python3 harness/scripts/unknown-ledger.py --self-test >/dev/null"],
-     "26 chức năng BNAL — self-test phải còn PASS (giữ verified trung thực; +3 wired 15/07/26: "
-     "mem-proxy/retrieval-eval/skill-resolve-eval; +qc-regression, +fdk-poc)"),
+        "python3 harness/scripts/unknown-ledger.py --self-test >/dev/null && "
+        "python3 harness/scripts/decision-anchoring-crosscheck.py --self-test >/dev/null && "
+        "python3 harness/scripts/decision-guard.py --self-test >/dev/null && "
+        "python3 harness/scripts/decision-liveness.py --self-test >/dev/null && "
+        "python3 harness/scripts/dep-health.py --self-test >/dev/null && "
+        "python3 harness/scripts/orca-dispatch.py --self-test >/dev/null && "
+        "python3 harness/scripts/orca-reconcile.py --self-test >/dev/null && "
+        "python3 fdk/tools/fdk-poc.py --self-test >/dev/null"],
+     "34 chức năng BNAL — self-test phải còn PASS (giữ verified trung thực; +fdk-poc.py từ nhánh /br)"),
 ]
 
 

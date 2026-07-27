@@ -1,721 +1,763 @@
 {
-  "schema": "skill-provenance/v1",
-  "skills": {
-    "agent-reach": {
-      "files": {
-        "SKILL.md": "7f7da09f52b8f88d1c438725e94c7335a04a6af45bdf33cae637456f2b1a321a"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "br": {
-      "files": {
-        "SKILL.md": "d7b2b6be4e2d4134646f843a596d56a5a94ce5aed745d73202334c7aec9f9469",
-        "assets/defaults.yaml": "8753bb2b49dbe53c8d1ec5df9ed22eccb643a07238dbfdd06737be665cfa353e",
-        "assets/design-template.md": "830734ed57b5f2b504204bec3c7d0958e8f5dcc91faee74708a80959c4eaad89",
-        "assets/frame-template.md": "253427bbec120ea572ff2f0dbe3ff442b928f18854f86916cac5dbf45443f00d",
-        "assets/queue.example.yaml": "5567b7015f7fb694aa0295acedce4f4850efa52e97083a65a23e9e6afa2eed57",
-        "assets/revise-prompt.md": "f088c244213d969ae0282f9ce737f605f4468732406251f6e1b1219d12b9f6c1",
-        "assets/spec-template.md": "c1a0f3bbf30d8d98c81b5cbdd5ea4c1be30f5a910150f1b9446d1e624c8a10b4"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "brandkit": {
-      "files": {
-        "SKILL.md": "35b9e557a8b6a301032be3aea2fea39f2901acb3210a93a675d192c671c0c27f"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "build-now-adapt-later": {
-      "files": {
-        "SKILL.md": "a1b047ed729cb12cd8059b3487b930bd45138811780814eb3999226323fb6b2c"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "cavecrew": {
-      "files": {
-        "SKILL.md": "47b23a366ba68c7277dfb1952b408d280ef591ab40c174559e1a001e2dc69a67"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "caveman": {
-      "files": {
-        "SKILL.md": "02522ac596157e429c493ff97a0d438369c825c77cae918094bec59254470b54"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "caveman-commit": {
-      "files": {
-        "SKILL.md": "23fceebe1ffe278b79f425995c225818aefbb82384c937c1bf338e0a0e59f2f1"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "caveman-compress": {
-      "files": {
-        "SKILL.md": "b5b2e46ccad05a1cef891bd05aeeac419ba3e0a559a93281206df733084b1068"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "caveman-help": {
-      "files": {
-        "SKILL.md": "d3e9ab19099eb10b387588b5f04fce2cd057594e3e7bd6a471aed30fc8443713"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "caveman-review": {
-      "files": {
-        "SKILL.md": "3e4e1359fb7d0bda9c174809ea852bf473dd34cf64e28f3c2d3cd8169573e49c"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "caveman-stats": {
-      "files": {
-        "SKILL.md": "13c335e90d6377ada50e02314b25c1cf1cec5e19a8bce704afa0d45925646f19"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "check-approve": {
-      "files": {
-        "SKILL.md": "3e53650776799e51502e9fcbd24cdbd27700ee79713160db02393ec669a1be83"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "checkpoint-trace": {
-      "files": {
-        "SKILL.md": "7d3789946a4fb41dd12ce4d7e6bcb4f547ac9e8e7f2204b728c6dd420dd839b3"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "council": {
-      "files": {
-        "SKILL.md": "f7be8acca5aaa8eacd6c5c06cff7b6d4fd6ac38baf2af6f333db889e87375a9b"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "cursor-animated-sites": {
-      "files": {
-        "SKILL.md": "71c0664c53e5f518a6987bed814d7e87d7fcdce4e20f36e82538a62ea559b02a"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "design-taste-frontend": {
-      "files": {
-        "SKILL.md": "afd5bd2a0c2b97168ec11f98c04f37a549a4fd8ac70c0f491d6fa90efc1dbf27"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "design-taste-frontend-v1": {
-      "files": {
-        "SKILL.md": "c975d963844f0bf4179afcbe36d00f40e0a022dd0d0c657e33a52368d2330e53"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "design-twice": {
-      "files": {
-        "SKILL.md": "a259aec8f50822c8e3f34623f02462002afbd898e30b1613b0d747edfcbaf17a"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "docs-curate": {
-      "files": {
-        "SKILL.md": "4cdbb29c9744d7d8e62ed7781d743ab26551b9dcbdbf209d72bc8945f670e9fb"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "docs-site-macos": {
-      "files": {
-        "SKILL.md": "0c3283ca7875faacb941b84e7d4f686cc154ce2013f2e11a30ae9ca4eae3d643"
-      },
-      "recorded": "2026-07-06",
-      "source": "local-authored"
-    },
-    "extract-site": {
-      "files": {
-        "SKILL.md": "8750e59cfca77d0e818270e806988a8d9e218576c1263ebc7c0531171d1843f1",
-        "assets/component-spec-template.md": "842e43cbbd90fd9aea1a6b3d722c87d1ca42016ff0bd5de170a630c8db4b2dec",
-        "assets/enumerate-assets.js": "6030e3113e88775661a260f7945ce7219358ceaca111404649b7f8f5906e3427",
-        "assets/extract-component-styles.js": "38d3497304b8a721f169cbf7da4851eb74270b1e0e47fadaa9b7a043d19162b0",
-        "assets/inspection-checklist.md": "e8d338a962a8d8ad6f3fdf1f80e190b697e903b96f9d8a93077dd9ea2ab7d439"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "failure-flywheel": {
-      "files": {
-        "SKILL.md": "c29797b3765b1313b0c130f865c3e005c150a0cbaf2d847969f1ff7f87192059"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "fdk": {
-      "files": {
-        "SKILL.md": "ba04abf02f58f41980eaf8617720ff240da994389ace017830d7a9d61809470b"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "fdk-poc": {
-      "files": {
-        "SKILL.md": "b0482089220f8bd3f86d1aca6d4d79b015629427361a23e8d324b261599ae521"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "fdk-uat": {
-      "files": {
-        "SKILL.md": "f199bfab0151d4409f26b5187db62af612e40259f1376acd03588dcaeab5a203"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "find-skills": {
-      "files": {
-        "SKILL.md": "3944913e5b8b98db3cca800204be86d156476ece5d2aef0bb90dc054390c6535"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "frontier-scan": {
-      "files": {
-        "SKILL.md": "81e983eda236f09d34bc35d2cc1b159c96a055fb7783bcd44f5a16cf321294c4"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "full-output-enforcement": {
-      "files": {
-        "SKILL.md": "80adcd02a4a94a6a6fe45a0cc6f851acc8e03b28972862bbe071bcfdbb2a0f55"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "gpt-taste": {
-      "files": {
-        "SKILL.md": "bc0da6b8c5d19a26c7135086b000864550058e3464c42c5b95c0102361858a20"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "hallmark": {
-      "files": {
-        "SKILL.md": "5437b73a1a829210681ca21fa09b7276a5978875f960d3998846e0dc333e9343",
-        "references/anti-patterns.md": "a36eb346ad59cafaa26119ed1e7c0bbb8aca6637209ee110eb630dd1a9307070",
-        "references/assets.md": "60929b3dc2258b69caf3012d99d174e1ad73da9645263db81a9b271cd6fd7d61",
-        "references/color.md": "31c470d16ceb17ccce290cbdd00b9e9a88f2094df8eaaefb67c86ec1e1cdb876",
-        "references/component-cookbook.md": "4d9ff4eeb675b9d668516ce5d098031d3552453b3671e50da30fb38cb9ab58bb",
-        "references/components/c1-outlined-chip.md": "bfc3bcef6e23062710845dd8986dbf98574c6c46ffade1db255dbe13a3203262",
-        "references/components/c2-inline-form-as-cta.md": "1a6e3d564f49a1d3345117bf2f8af5aea46938c6974bf7eb86cf890e5068bc95",
-        "references/components/c3-typographic-link.md": "59362c6d9f683ec15c3e09862f2ea6cd8e2a84574738ece98e479c58607d0d69",
-        "references/components/c4-sticky-bottom-bar.md": "67234a8d8722bf0685d00a64ac737748c82af7e0c25271d0c50f418739bd03c6",
-        "references/components/f1-bento-grid.md": "d696a5ab7d6258cff0d2d9527fe07651bfbda6a725a4dfd8de00f678e1fb2bbc",
-        "references/components/f2-sticky-scroll-stack.md": "0079ce8c01e8d008882411ed807aa367276cc67af9b956c4f06da1714007ae83",
-        "references/components/f3-tabular-spec-sheet.md": "16331628cf441c7b570055c8edd60693d0aa793d1bc5eb2bfd145da700d9f072",
-        "references/components/f4-step-sequence.md": "d3ca2aa99f7e639b8ccda20f5e263f3a33b03830f8c93d666f469b8e629975e2",
-        "references/components/f5-annotated-screenshot.md": "58f9f4811ea60f923b2f44e0f3e9bac95c40929f8b1af4fdeedd1eae424051ec",
-        "references/components/f6-product-card-grid.md": "22ebc07b00d71c950be8d1a0fdad2cc0e7340cfbbf2cd62c43804bfcfaaf106a",
-        "references/components/ft1-mast-headed.md": "7f5671b583e9991f9a4671c223d6c15efdee5c1161dc616cbe2b398eb8d1b6db",
-        "references/components/ft2-inline-rule-single-line.md": "de13bf7d9bfaddb42a84fc8584646e914f2273abdb34aa98ea9bd2f5d7ff0493",
-        "references/components/ft3-index-style-category-list.md": "9f70608d62872be05af910a6168017c872ee1c17b2dbb8329128569231aa3cce",
-        "references/components/ft4-dense-typographic.md": "b8d087773614698036e63474a8546024d874bb6da2b575e64fcaacc2fba0ad60",
-        "references/components/ft5-statement.md": "71be63a51def6a3b59badcd481e49d4d5c5d9f3d63a3b4a5b9c05482110f4000",
-        "references/components/ft6-letter-close.md": "8119d22fbbfb3efa83d0bdc41acbfc5037f2c80cb7c39659623d5216eb16c03e",
-        "references/components/ft7-newsletter-first.md": "2cd766761a8e18bff7bc473b3303392b806a15e461187ac325138f77a308dd48",
-        "references/components/ft8-marquee-scroll.md": "32b8d38df984b0db385e9ce2251bbf6bb8df279e3933c441b97a0b703961e9f0",
-        "references/components/h1-marquee.md": "8258b25e27232994126701a4f72bf05267fc9c5dfdc14bcf186efaf96a7dbb10",
-        "references/components/h2-split-diptych.md": "f6077864f5c58414d7a10648aa8a3162767f2e356d0701d01953181a83cf3364",
-        "references/components/h3-quote-led.md": "4b1427750c5041ab9201cd18fcdd3dd7a93622644eff518d9ad300339f9a46b7",
-        "references/components/h4-stat-led.md": "9ada00461ea12be83dec2fba58e19fffd2c559925e68eb72ec18e0ec434f6cec",
-        "references/components/h5-letter-hero.md": "afcd7bb6b4c888d7e8460e7af5e86dc50149ca253419757bed2834bf66083321",
-        "references/components/h6-photographic-fold.md": "59e046afd5648bfe2737966f1203c0212e7311fbf0e1edee448e3f68f45aa0d0",
-        "references/components/h7-demo-video-clipped-by-viewport-edge.md": "12b6f32a47a0b2e73547a0ac8b641cc19b1caa05dda4ffde424defb53afaa0de",
-        "references/components/h8-mockup-split-browser-framed.md": "954b0a3aebfe6de8a3be70fedda669099125dd2ebc9c07948fbdb457fd8dc166",
-        "references/components/h9-custom-illustration-centerpiece.md": "1d3d32859e6e451a67bfc38a403bd80115a42b6898a4d8788e4cfadb8c83e8d6",
-        "references/components/n1-wordmark-2-links.md": "8504774127e33f24a09844eb4c678e91b09ed513690fce51f7863d7cf3fdeab1",
-        "references/components/n10-floating-on-scroll-morph.md": "056c2107492ab0eb9dafc7ab4c7ff5454222c1ee127fa45615ccc7b8955da36a",
-        "references/components/n11-mega-menu.md": "b715421012d0997d25d5739c209be6129132fc91add677d75a8ad82d8672e1d4",
-        "references/components/n12-banner-retract.md": "2d52ecb8725b1991d4f6b78301cd6f112464f7b17315bdf0febbff67bca50a56",
-        "references/components/n13-inline-cmdk-pill.md": "6375fa0a1bbc92cba9a435159aa46cb084fc030c63e1abf8f073688959d7be75",
-        "references/components/n1b-saas-three-section.md": "c2631c7807e33eea9b02faa9121a0f9e64861467b57b8635ee97f5fa52bb60ae",
-        "references/components/n2-floating-chip.md": "70ea848537c5fe29be30f5e4b7478ecc39f86d0089f207549dc98a873b6c8fc1",
-        "references/components/n3-side-rail.md": "20ed8a06a599d73190502a4801a3be2933b8e06874371167196b7d32dae66111",
-        "references/components/n4-hidden-behind-k.md": "bccddb3a25a6afd457163b71e09de07ac23bf5d922fdeb9561e25d825bb97dcf",
-        "references/components/n5-floating-pill.md": "6dc8ffb9628fd7ee3669208091e11497864cecea69becc6b513ebdc1f3a737a3",
-        "references/components/n6-newspaper-masthead.md": "243a28d1165328c3479a1b75a3ae05dbfe2a6b8c9f867df8e35873b391f8edd5",
-        "references/components/n7-brutal-slab.md": "6c58d29129f7fd89b9fc755143648397749cdd06043ae0c0b51e6f07e7e6dcb5",
-        "references/components/n8-terminal-command.md": "c88d787bd2e5cf8bf6fb2c4121602dc0289760b41235d437468322821ee4334b",
-        "references/components/n9-edge-aligned-minimal.md": "cc20c76a5abe7099ed2bde3480c81f75f02a760a4c0d2ac79de1503dca9f9ee3",
-        "references/components/s1-left-margin-numbered.md": "074ed68eafb03ca775b0593d0599fe20c7891356f473f04996f42425e6586585",
-        "references/components/s2-hanging.md": "7b6d04cb896051006fe41b041a67ed77d25010edb579c60b03d88f68ae471462",
-        "references/components/s3-sticky-pinned.md": "4101cd7a28fe21a9b8094848ac6cc13c89f9e6f9bf801f04ac69b986c76727b4",
-        "references/components/s4-inline-no-break.md": "4b6d36da05383df1b29afe17b96645b816de07373016deb667efca340bb61ac6",
-        "references/components/s5-bottom-anchored.md": "55c159e2d8299501f14ac97468404dc8cad35695c2b7eaad2e972d314620eca0",
-        "references/components/t1-pull-quote-with-marginalia.md": "c7139796972c5f47d723742cbff02916a1ee0f2496456b86ac05d8839542be38",
-        "references/components/t2-logo-wall-hairline.md": "942121342a61bb4650722f7ba1b605347c6178d69ebeb740139b0bfb5c810e7f",
-        "references/components/t3-single-huge-quote.md": "7bca56e2cd630da3669f7cf8befd1bd654a5b249cf38b6d9af5a7c62e33b9239",
-        "references/components/t4-numbered-stat-strip.md": "a5fb5615902f9c4026f4ae7b0c96b536bb3cbb2fb4259031342d1cd190dab729",
-        "references/contract.md": "2923a056b95da63d04100ac56bc8cdff6bc0a717ac3e5da5cef69eb5feb4619c",
-        "references/copy.md": "703cdbf81fbef6f71d90596a32041d2a33a46fb71ba07ccf5ede6b4b1471d347",
-        "references/custom-craft.md": "417ff74cd83e1fea50c41948c53e18365269b880806ef4f31d9e0ebda0f99246",
-        "references/custom-theme.md": "a5026a0b00f69180ba9c24acec6e717bae0fb6e01daf998e8e900c57958a9eea",
-        "references/design-md.md": "a9368b64dd9b6e53e8c707830ce28fd8601d3195a81647ea46b6995aa3556b3c",
-        "references/export-formats.md": "de0a73d9bec7a31abbd0cbbf1ecd51c2e440f1f3fdc08f476a343959ca6c22f3",
-        "references/floating-nav.md": "c8c80f6560700bf6ee6baf28b81ec1539e9ff920d885624707de5fe8803c25d1",
-        "references/genres/atmospheric.md": "58d36e9a59c7d9e0ca99edeaaadab885f2635386fa69d52ea9eda3c29977e190",
-        "references/genres/editorial.md": "1e88cd0c94435c6a9edd1c0b93b67db4321fb3481ff0d66ee24869e655847319",
-        "references/genres/modern-minimal.md": "6125db00e38f2baca9369ed4d4aa917d977b85dd5eac6f19dac89707c3c3534b",
-        "references/genres/playful.md": "e52c6ff3fe21b5024c83ac1f03285e1d627e3469ff140d6bea728642026c4f95",
-        "references/hero-enrichment.md": "63c14cc2c256dd78a69a1c36f4bcb764940aa7f1ba2e6dd40ca36013f8884a83",
-        "references/imagery-kit.md": "39d71df8dd6186b27f174fd8ab8ffd379553be3917cff50810c72365f6d6cb53",
-        "references/interaction-and-states.md": "e816eb2d067ba9f6f288a3831549da95624a05f432ed2a50f54136f27dd2d67f",
-        "references/layout-and-space.md": "987f3a45f5dbe81547117a77987bcedf5376608a6412067e04337047e0c7c839",
-        "references/macrostructures.md": "a9024133c43e9ef388c331b5bc2f60de3d4a8c22b07b2d277bbafde941b24ea2",
-        "references/macrostructures/01-bento-grid.md": "aa268415862188414f8db94715e20ae7d29df3dc7c494083683378705f3f8493",
-        "references/macrostructures/02-long-document.md": "8ca81106396f2bd00eb9ef5d5d1f00c3aab0500394e706d6a2b3221a6c0d910f",
-        "references/macrostructures/03-marquee-hero.md": "2b7c35860086da6232cb3725c059bead9a31a91872d464266ce6e07a5a75f755",
-        "references/macrostructures/04-stat-led.md": "a6930b4ba6377c8ef5fcb7af6bf4393cd924292cf03871a37636dd4b77de22b7",
-        "references/macrostructures/05-workbench.md": "0cbe92772c7b2ffd9b24b9e446b1e1cd9ed22930b39030ef5a6e9cba5512d31f",
-        "references/macrostructures/06-conversational-faq.md": "373473bed23d055164edc04b16344fcd3861c1ab39ff73f3c75dc1719663d488",
-        "references/macrostructures/07-manifesto.md": "dc1327bad300179c1b233d02d20137776dc98c9affcfd3942b9f3f796ca67b93",
-        "references/macrostructures/08-photographic.md": "e5c77bb6ca6d82616c9c63bb6e68ee17c6af7bbca935f9ff29481294d7d1f74c",
-        "references/macrostructures/09-quote-led.md": "39069a564d9ebd76daf26f46ec7776828dc45fc6a72ae712b3bf7a4fd012f650",
-        "references/macrostructures/10-specimen.md": "7f23cead7f91c2ee2335eb2c87fb0aa1e7826f4573748d549756523085ed6ad4",
-        "references/macrostructures/11-catalogue.md": "99ff614600f18cfc80dfa3b9a2158dbea3b3674f76f40b70e721b9255796c265",
-        "references/macrostructures/12-letter.md": "6f3ad86e87223bd9b6b1267e27532811efbb60f50606e7f72c8525d2cc01d709",
-        "references/macrostructures/13-index-first.md": "25c832844a1b5e6ce17a335ac98e81d98d9e3372f514d83dc26ac299cc077865",
-        "references/macrostructures/14-narrative-workflow.md": "e604a1106131fe3a65721066a304922e757a78c997c197227840931079c780fd",
-        "references/macrostructures/15-split-studio.md": "400effa4de50d5f2fabd88be37447aa845deb3b67810ed4f2b995df458c852e4",
-        "references/macrostructures/16-feature-stack.md": "a389fae7fe39550352bdf1ce68cdaa3965a434fa1154f67d3c276e550d1d165a",
-        "references/macrostructures/17-type-specimen.md": "a1487fde891f73bf34a2ca38a631a2cb5c71d3a7b2ccd940114354e291ea8034",
-        "references/macrostructures/18-portfolio-grid.md": "af5d0f34a7ef7b81d6f4c8c845497ae553d44f418526d7e503346c9243b034e3",
-        "references/macrostructures/19-map-diagram.md": "5a576f25f4c8d58c14f574e3413560118343df9a9669db80c6c452daf509c3c3",
-        "references/macrostructures/20-ecosystem-index.md": "fe206580a39ffc4b3534f3a7414155aa626fe16b82b608a0b8b415c1510f17ad",
-        "references/macrostructures/21-component-playground.md": "ad3cbdbe9181e9472cb7b7fffbbe35021dc9b5b99ea86adc026f34d6b2c2f01f",
-        "references/microinteractions.md": "613ca56c2c16e40aeb594af21fabd651732d9de63c848aee51113602525f6e64",
-        "references/motion.md": "330d056810315f65819579f8207afe402703a9192bc76a2009558a59b7c84ccf",
-        "references/preview-examples.md": "df61c24c9a67457ef7369ec5f20575095326df72ffe6534c8fa9730581ebf7d9",
-        "references/responsive.md": "2bf18d72af704ca5dd3c220359a4c77c718efa19c40f62d9bff61ac4a90209b0",
-        "references/slop-test.md": "6eb49fc64ca54929d2c1600e2a6014268f1a7593787c0ed3f6ecb4ac8390ad86",
-        "references/structure.md": "ca5c0296ae428f8c4c5214407d431bbda5c453f98f2e7abdec03d644271af32b",
-        "references/study.md": "021fe4d001b38ee87414c1bb69321d2e44b67df8ede76ecec225c41a634aab20",
-        "references/themes/carnival.md": "119a9c803eac74958e5df6151da8a2575a1cc2d061a619bdb7f32cf972308ee2",
-        "references/themes/cobalt.md": "13be92af729e6b82d1b1e51aa078f7c007e2900c8f0798b2c0fd2c0eeac7019e",
-        "references/themes/hum.md": "bbdd1e89a32d6b15e99493ba9497816a0915bd4e9bf150b95868db597c20e1d5",
-        "references/themes/lumen.md": "d5459478d3aa1ea6330c221dfe011b717a70dbb036f597403b3a6b3cf82dd53b",
-        "references/typography.md": "94d7b2d2b138bd8687e09dc3dd618eaafff500b0497a6d69cb4c29b764e94b9c",
-        "references/verbs/audit.md": "0a5b484453f1697a8675a7020df9159d0b4ce22f059b873501bfd82c26d6a31a",
-        "references/verbs/redesign.md": "c2830f3b7d68e9622f55d376048a5a454c5ef59d309a211e716d1142e86acbdf"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "harness-tour": {
-      "files": {
-        "SKILL.md": "f8644009e79dc953129653f82f0ce87397212d6c6ba1b51f70a4b0d66f655ba7"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "harness-update": {
-      "files": {
-        "SKILL.md": "5ca75c9038407dceac1ed758d821774031d8be1cefc433ec92e3a47f005f536d"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "health-check": {
-      "files": {
-        "SKILL.md": "0f9b64b7f38b7707807d41134d95f86a82867fa14a2e43f7a4950f8c6292f064"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "high-end-visual-design": {
-      "files": {
-        "SKILL.md": "b8bf4039dfe6cf70212d925db750ade92aea5f631960bb8a6da1572e10618c5a"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "image-to-code": {
-      "files": {
-        "SKILL.md": "4eff3048ddf6987538ab204cd23eb9eddb22e29c47f8493f91c6f2210279758a"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "imagegen-frontend-mobile": {
-      "files": {
-        "SKILL.md": "72daf8861cc45b288c62006dbe870d0896565a90c3dd8ad2182b9d472a3df4dc"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "imagegen-frontend-web": {
-      "files": {
-        "SKILL.md": "5e2645b1dd7b36ed01637f0b11dd92c6ed0d443552bf338781ff47aceeba09e1"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "impact-check": {
-      "files": {
-        "SKILL.md": "653a585055019facac38ebbf0f726ebcfb3fe6565a3fcc4bb2af01dca1d64797"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "industrial-brutalist-ui": {
-      "files": {
-        "SKILL.md": "661f96c976193203465db987785cd0ee753ecb3293d0464bd7976a70747a76c2"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "ingest": {
-      "files": {
-        "SKILL.md": "fca92465d5894dc32e01319f74023b8b99b0183320cda681b772e00958fbce6f"
-      },
-      "recorded": "2026-07-06",
-      "source": "local-authored"
-    },
-    "jenkins-agent-l3-deploy": {
-      "files": {
-        "SKILL.md": "b6b299d50d96a2ca2b6691c9f37797508461f8561b6c265d57e9f33ba252fca0"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "join-project": {
-      "files": {
-        "SKILL.md": "05c654f01ee6e83ad29595124007438179df9b5081fc066da60d20a641770996"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "last30days": {
-      "files": {
-        "SKILL.md": "bee461995acc5faf1a9608d2f8c6ea82017995dc7b2bcf525f845331392cd5cf"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "lint": {
-      "files": {
-        "SKILL.md": "41a10f1de0fe66ed7d2aecb077eba0c606278eb863df795dec459907c49eb02e"
-      },
-      "recorded": "2026-07-06",
-      "source": "local-authored"
-    },
-    "loop-runner": {
-      "files": {
-        "SKILL.md": "5a002bb52694f1e9b3da3c1cd386e1419ba928d326732a0732cd5c2529b8095a"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "md-to-html": {
-      "files": {
-        "SKILL.md": "80a534a2249c86c5ea76ef9cb28899c3369a9bab4f222233457bc31d4726809f"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "medic": {
-      "files": {
-        "SKILL.md": "8ddaa08efea5038bf0d12cfe313994b7b1ac95185649aca27487f6f838e86fd6"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "minimalist-ui": {
-      "files": {
-        "SKILL.md": "215ee4c4c0cd91d30aba032271f09bbbf0b0fdddee70d64fcce0f9ffb991c5c8"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "new-project-setup": {
-      "files": {
-        "SKILL.md": "445be0cb1ed4eeb92f5337ccb65824320320e72a9e1b16f8b86ec39f13728dbd"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "new-skill": {
-      "files": {
-        "SKILL.md": "c23e676c05e117cb81ec68caad4041477b60144c76b7ffbc93b458bd5dc1e46d"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "onboard-codebase": {
-      "files": {
-        "SKILL.md": "b1605b889aa26ef9af35fc1f182fd28d73bf20197d02da71e3c28f5d26eda626"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "orca-dispatch-reference": {
-      "files": {
-        "SKILL.md": "f3b1653a1b2f6d8b2548aa1ee146dd2bfb0f19feb693132269e351ab8dcdda83"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "orca-eval": {
-      "files": {
-        "SKILL.md": "77d0280cf5c98860097096fa1cc7df0aff37abd7438f4a2fde808ea109b93c6d",
-        "assets/orca-eval-scan.sh": "8bf1fce55e52376a86eec146a81e2915364418d6394bc376d811d44bc5cc4153"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "orca-issue": {
-      "files": {
-        "SKILL.md": "420980c05bdee7370b5ec7fb1951d516ec6ebfc48ae505484bf82661e9c4946d"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "orca-onboard": {
-      "files": {
-        "SKILL.md": "728e5514460132f6b763b9a2bf159c3525ad7e521b4f42091feac19b86d5fb0f",
-        "assets/docs-site-skeleton.html": "7a031c6a9d4940775b684a1a2d6dcb09c9a339ac796ea6d315ba930b94ba6113"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "orca-sec-scans": {
-      "files": {
-        "SKILL.md": "4e43d35d003a57737dd0730a09828432df4cb18425d3ef29d24066982ed68835"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "orca-workflow": {
-      "files": {
-        "SKILL.md": "26af7988263644ea0374cc15aaf71ba8538beff4f541f382f8e00a290bfc8686"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "ovs-notes": {
-      "files": {
-        "SKILL.md": "698e95532cd7092891060aa78967c314c4c295f623282af1f5f416f1b756cd07"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "plan": {
-      "files": {
-        "SKILL.md": "80f62174eced01c8af8655644ea58f8dca8370ccb114c92b8b1c88874e2f2a30"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "propose": {
-      "files": {
-        "SKILL.md": "00920c2d2308be1b57eb31323be29e0de68fde03291ad4bc700627db9f4b9597"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "qc-code": {
-      "files": {
-        "SKILL.md": "cc1627e6c6dc989ed1e996af320a1ebfa8fa490713e02a29e27f06f77ae74170"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "qc-uiux": {
-      "files": {
-        "SKILL.md": "d18224e0ef1c4dff0123793583b295408a3361dc5c68392cd794348706fed47c"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "query": {
-      "files": {
-        "SKILL.md": "11b4960276688475fc8abe3de5fd114b09853641e77a468d714e0797db52d5eb"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "raise-issue": {
-      "files": {
-        "SKILL.md": "3b987ae25e569347b9847f78f770256571a9f568dd8828bcd55474342ca3f468"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "record-episode": {
-      "files": {
-        "SKILL.md": "bc29ffc800e3d36e81b6d803a4e6d4be0a090b469cc848f3283a0abb7cd7b5e1"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "redesign-existing-projects": {
-      "files": {
-        "SKILL.md": "7a2cdccaadf1a6f3de93d05815e067c7e99a707307b147735092886b5267e373"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "safe-change": {
-      "files": {
-        "SKILL.md": "60888526031f8c92a9b3105e9bfd6da6f1bb3cd0436858f69ecc59840f4423de"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "ship": {
-      "files": {
-        "SKILL.md": "d24a7e12e92d883c7092d0921353691337af72e8e71258949654c4c71f8761a9"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "skill-provenance": {
-      "files": {
-        "SKILL.md": "061c887a6adfa19d0acefd3028f16751359d788af4f27e43150eb82616417f07"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "snapshot-push": {
-      "files": {
-        "SKILL.md": "4167de90cee9367a2058418c856f4584705b84a70161a9fc4163887f00ecccd2"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "stitch-design-taste": {
-      "files": {
-        "SKILL.md": "7d03299958df0a3c57d9716c18121a6cd55e355532ebdab57cbc0a02c377f3e3"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "sync-template": {
-      "files": {
-        "SKILL.md": "69bac94015845e71771f436d0c71cf5f27eb0d8570e3f66d348f0af277975cd1"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "teach-me": {
-      "files": {
-        "SKILL.md": "2d171e1713c72aaa08d79eb2a9ade355382686929cfba4a03214027bd8ee2d81"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "tour-guide": {
-      "files": {
-        "SKILL.md": "a130e5d60e021888430ccb159811550b4fb599f84ee9fe3363431a6527866ca2"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "tour-guide-supademo": {
-      "files": {
-        "SKILL.md": "388deba7806200c995a18c59717a58bf3903512b026e7a13678eff0d1e515639"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "trace-grader": {
-      "files": {
-        "SKILL.md": "cf1b4f17810b9d6d8838f6d05826e40268580a11540a5553189860e925740be8"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "uat-nonit-testcase": {
-      "files": {
-        "SKILL.md": "89ff05025cb84f55a36335f01014b2283bc7d821fc60115ccf241860318b8cd0"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "unknown": {
-      "files": {
-        "SKILL.md": "0e362bc40ad452433513e339f997b91170709172cde09835476c5ecba6b0c6bc"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "verify-before-commit": {
-      "files": {
-        "SKILL.md": "01240b52bbad7353a4e42e180921d95747907ec3ffb82aa8d5844114a744ddb4"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "visual-qa": {
-      "files": {
-        "SKILL.md": "92459946b3f31a8f0c868a684695a6548da7e70e1bd2bd11ef66ef10e1ad6ade",
-        "assets/.gitignore": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
-        "assets/package-lock.json": "38e8a936bd4a4cfae70a013b1b2455a8a63cf84a28f3fb01f7008e2798a70b31",
-        "assets/package.json": "7647d7f2d4459d1ffa26a19d5c5295f9104364a2a21a2c59a453e5209b56d37b",
-        "assets/route-shots.mjs": "68378c3abf00cb51bda69a6dca83efb9aaa679de7ad09d470d62e55a2bb34f92"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "wayfinder": {
-      "files": {
-        "SKILL.md": "e3632055e130c26a1e284af195a8df289aa29102e1639247bf8b080acd6f4e7e"
-      },
-      "recorded": "2026-07-17",
-      "source": "local-authored"
-    },
-    "web-clone": {
-      "files": {
-        "SKILL.md": "9b2072bbab4c864d5e9789861ccb8906ba3a03afd30d2348898580373d5c4136"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "web-crawl": {
-      "files": {
-        "SKILL.md": "1397c5e7d212be9ec002177a8c52c7420f6e49a3c95ff89361dbc40e076f6c44"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "wiki-room": {
-      "files": {
-        "SKILL.md": "7550aaa5e819bad1e83daeec9b568e0ec8b8558606e88289bc23cbceb6b201f9"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
-    "wikieval": {
-      "files": {
-        "SKILL.md": "524b19b541cf682f8c27f044b04e15f176865d1c2bd21c6e8cf820fba581f3d1"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    }
+ "schema": "skill-provenance/v1",
+ "skills": {
+  "agent-reach": {
+   "adapt_mode": "external-pull",
+   "commit": "e825f6740d24c6c315c3b0dc41907e6c87ff39a5",
+   "files": {
+    "SKILL.md": "7f7da09f52b8f88d1c438725e94c7335a04a6af45bdf33cae637456f2b1a321a"
+   },
+   "recorded": "2026-07-07",
+   "source": "https://github.com/Panniantong/agent-reach",
+   "version": "1.5.0"
+  },
+  "br": {
+   "files": {
+    "SKILL.md": "d7b2b6be4e2d4134646f843a596d56a5a94ce5aed745d73202334c7aec9f9469",
+    "assets/defaults.yaml": "8753bb2b49dbe53c8d1ec5df9ed22eccb643a07238dbfdd06737be665cfa353e",
+    "assets/design-template.md": "830734ed57b5f2b504204bec3c7d0958e8f5dcc91faee74708a80959c4eaad89",
+    "assets/frame-template.md": "253427bbec120ea572ff2f0dbe3ff442b928f18854f86916cac5dbf45443f00d",
+    "assets/queue.example.yaml": "5567b7015f7fb694aa0295acedce4f4850efa52e97083a65a23e9e6afa2eed57",
+    "assets/revise-prompt.md": "f088c244213d969ae0282f9ce737f605f4468732406251f6e1b1219d12b9f6c1",
+    "assets/spec-template.md": "c1a0f3bbf30d8d98c81b5cbdd5ea4c1be30f5a910150f1b9446d1e624c8a10b4"
+   },
+   "recorded": "2026-07-17",
+   "source": "local-authored"
+  },
+  "brandkit": {
+   "files": {
+    "SKILL.md": "e54b2f5b06b3c7166c2ee90cccb172968337e505e21a99e608fd43b4f2e13e40"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "build-now-adapt-later": {
+   "files": {
+    "SKILL.md": "a1b047ed729cb12cd8059b3487b930bd45138811780814eb3999226323fb6b2c"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "cavecrew": {
+   "files": {
+    "SKILL.md": "47b23a366ba68c7277dfb1952b408d280ef591ab40c174559e1a001e2dc69a67"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "caveman": {
+   "files": {
+    "SKILL.md": "02522ac596157e429c493ff97a0d438369c825c77cae918094bec59254470b54"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "caveman-commit": {
+   "files": {
+    "SKILL.md": "23fceebe1ffe278b79f425995c225818aefbb82384c937c1bf338e0a0e59f2f1"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "caveman-compress": {
+   "files": {
+    "SKILL.md": "b5b2e46ccad05a1cef891bd05aeeac419ba3e0a559a93281206df733084b1068"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "caveman-help": {
+   "files": {
+    "SKILL.md": "f1f774142fbe07d91611e897e39b7e53c0a50f6015897749f75d367b1a85c6e0"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "caveman-review": {
+   "files": {
+    "SKILL.md": "3e4e1359fb7d0bda9c174809ea852bf473dd34cf64e28f3c2d3cd8169573e49c"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "caveman-stats": {
+   "files": {
+    "SKILL.md": "3ebad12bda3a1264bb5b97a7256f30dcf3fb3ed29c1a0674a4c94110d47f06a0"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "check-approve": {
+   "files": {
+    "SKILL.md": "a153c03035ad39704862e23aa7b8fa8b3108173100ebe366249a8fb43e8311d0"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "checkpoint-trace": {
+   "files": {
+    "SKILL.md": "7d3789946a4fb41dd12ce4d7e6bcb4f547ac9e8e7f2204b728c6dd420dd839b3"
+   },
+   "recorded": "2026-07-17",
+   "source": "local-authored"
+  },
+  "computer-use": {
+   "files": {
+    "SKILL.md": "7f5a7bbe8b2fb51a9637e8df71cd1dca1a84b213ffe5bf56dcdd3417d7fb1601"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "council": {
+   "files": {
+    "SKILL.md": "415a4e71cfb20f84b991fd3fa7476a8ca9eb2ae42c518bd2b2a95d143ce72e95"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "cursor-animated-sites": {
+   "files": {
+    "SKILL.md": "71c0664c53e5f518a6987bed814d7e87d7fcdce4e20f36e82538a62ea559b02a"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "design-taste-frontend": {
+   "files": {
+    "SKILL.md": "dd482730c278eafc3543a09f9995e165f79ecd8cf4140bb3317b4075128b2811"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "design-taste-frontend-v1": {
+   "files": {
+    "SKILL.md": "53dd48d8ee8057d51f43fa625c537942794983341a919f1b6305da1161894966"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "design-twice": {
+   "files": {
+    "SKILL.md": "a259aec8f50822c8e3f34623f02462002afbd898e30b1613b0d747edfcbaf17a"
+   },
+   "recorded": "2026-07-17",
+   "source": "local-authored"
+  },
+  "docs-curate": {
+   "files": {
+    "SKILL.md": "0aa107a85ce5cfddab929f3945a5f1807174fde792e72b1a40d460e56b85bf80"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "docs-site-macos": {
+   "files": {
+    "SKILL.md": "2290cb2913300f58516e0bdb1a13d7757d8db8572e6b76830d66d81fa858674a"
+   },
+   "recorded": "2026-07-07",
+   "source": "local-authored"
+  },
+  "extract-site": {
+   "files": {
+    "SKILL.md": "8750e59cfca77d0e818270e806988a8d9e218576c1263ebc7c0531171d1843f1",
+    "assets/component-spec-template.md": "842e43cbbd90fd9aea1a6b3d722c87d1ca42016ff0bd5de170a630c8db4b2dec",
+    "assets/enumerate-assets.js": "6030e3113e88775661a260f7945ce7219358ceaca111404649b7f8f5906e3427",
+    "assets/extract-component-styles.js": "38d3497304b8a721f169cbf7da4851eb74270b1e0e47fadaa9b7a043d19162b0",
+    "assets/inspection-checklist.md": "e8d338a962a8d8ad6f3fdf1f80e190b697e903b96f9d8a93077dd9ea2ab7d439"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "failure-flywheel": {
+   "files": {
+    "SKILL.md": "c29797b3765b1313b0c130f865c3e005c150a0cbaf2d847969f1ff7f87192059"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "fdk": {
+   "files": {
+    "SKILL.md": "c5497f54efcc580b6b4d426687e1e94b8862fc48795adffebf43c8da553770db"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "fdk-poc": {
+   "files": {
+    "SKILL.md": "b0482089220f8bd3f86d1aca6d4d79b015629427361a23e8d324b261599ae521"
+   },
+   "recorded": "2026-07-17",
+   "source": "local-authored"
+  },
+  "fdk-uat": {
+   "files": {
+    "SKILL.md": "f199bfab0151d4409f26b5187db62af612e40259f1376acd03588dcaeab5a203"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "find-skills": {
+   "files": {
+    "SKILL.md": "3944913e5b8b98db3cca800204be86d156476ece5d2aef0bb90dc054390c6535"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "frontier-scan": {
+   "files": {
+    "SKILL.md": "fa2570152b699578facdb6161547e80e710df7b5b70ab26a154c7888d1e01fc1"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "full-output-enforcement": {
+   "files": {
+    "SKILL.md": "80adcd02a4a94a6a6fe45a0cc6f851acc8e03b28972862bbe071bcfdbb2a0f55"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "gpt-taste": {
+   "files": {
+    "SKILL.md": "b4e774d50c619b7f111032e3bba9aa2940ec8e748962b5949f50d3825edd88a5"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "hallmark": {
+   "files": {
+    "SKILL.md": "8927287d9d0422402a2d1d893014eeae260ce0c88bbd2379869302206278f05a",
+    "references/anti-patterns.md": "a36eb346ad59cafaa26119ed1e7c0bbb8aca6637209ee110eb630dd1a9307070",
+    "references/assets.md": "60929b3dc2258b69caf3012d99d174e1ad73da9645263db81a9b271cd6fd7d61",
+    "references/color.md": "31c470d16ceb17ccce290cbdd00b9e9a88f2094df8eaaefb67c86ec1e1cdb876",
+    "references/component-cookbook.md": "4d9ff4eeb675b9d668516ce5d098031d3552453b3671e50da30fb38cb9ab58bb",
+    "references/components/c1-outlined-chip.md": "bfc3bcef6e23062710845dd8986dbf98574c6c46ffade1db255dbe13a3203262",
+    "references/components/c2-inline-form-as-cta.md": "1a6e3d564f49a1d3345117bf2f8af5aea46938c6974bf7eb86cf890e5068bc95",
+    "references/components/c3-typographic-link.md": "59362c6d9f683ec15c3e09862f2ea6cd8e2a84574738ece98e479c58607d0d69",
+    "references/components/c4-sticky-bottom-bar.md": "67234a8d8722bf0685d00a64ac737748c82af7e0c25271d0c50f418739bd03c6",
+    "references/components/f1-bento-grid.md": "d696a5ab7d6258cff0d2d9527fe07651bfbda6a725a4dfd8de00f678e1fb2bbc",
+    "references/components/f2-sticky-scroll-stack.md": "0079ce8c01e8d008882411ed807aa367276cc67af9b956c4f06da1714007ae83",
+    "references/components/f3-tabular-spec-sheet.md": "16331628cf441c7b570055c8edd60693d0aa793d1bc5eb2bfd145da700d9f072",
+    "references/components/f4-step-sequence.md": "d3ca2aa99f7e639b8ccda20f5e263f3a33b03830f8c93d666f469b8e629975e2",
+    "references/components/f5-annotated-screenshot.md": "58f9f4811ea60f923b2f44e0f3e9bac95c40929f8b1af4fdeedd1eae424051ec",
+    "references/components/f6-product-card-grid.md": "22ebc07b00d71c950be8d1a0fdad2cc0e7340cfbbf2cd62c43804bfcfaaf106a",
+    "references/components/ft1-mast-headed.md": "7f5671b583e9991f9a4671c223d6c15efdee5c1161dc616cbe2b398eb8d1b6db",
+    "references/components/ft2-inline-rule-single-line.md": "de13bf7d9bfaddb42a84fc8584646e914f2273abdb34aa98ea9bd2f5d7ff0493",
+    "references/components/ft3-index-style-category-list.md": "9f70608d62872be05af910a6168017c872ee1c17b2dbb8329128569231aa3cce",
+    "references/components/ft4-dense-typographic.md": "b8d087773614698036e63474a8546024d874bb6da2b575e64fcaacc2fba0ad60",
+    "references/components/ft5-statement.md": "71be63a51def6a3b59badcd481e49d4d5c5d9f3d63a3b4a5b9c05482110f4000",
+    "references/components/ft6-letter-close.md": "8119d22fbbfb3efa83d0bdc41acbfc5037f2c80cb7c39659623d5216eb16c03e",
+    "references/components/ft7-newsletter-first.md": "2cd766761a8e18bff7bc473b3303392b806a15e461187ac325138f77a308dd48",
+    "references/components/ft8-marquee-scroll.md": "32b8d38df984b0db385e9ce2251bbf6bb8df279e3933c441b97a0b703961e9f0",
+    "references/components/h1-marquee.md": "8258b25e27232994126701a4f72bf05267fc9c5dfdc14bcf186efaf96a7dbb10",
+    "references/components/h2-split-diptych.md": "f6077864f5c58414d7a10648aa8a3162767f2e356d0701d01953181a83cf3364",
+    "references/components/h3-quote-led.md": "4b1427750c5041ab9201cd18fcdd3dd7a93622644eff518d9ad300339f9a46b7",
+    "references/components/h4-stat-led.md": "9ada00461ea12be83dec2fba58e19fffd2c559925e68eb72ec18e0ec434f6cec",
+    "references/components/h5-letter-hero.md": "afcd7bb6b4c888d7e8460e7af5e86dc50149ca253419757bed2834bf66083321",
+    "references/components/h6-photographic-fold.md": "59e046afd5648bfe2737966f1203c0212e7311fbf0e1edee448e3f68f45aa0d0",
+    "references/components/h7-demo-video-clipped-by-viewport-edge.md": "12b6f32a47a0b2e73547a0ac8b641cc19b1caa05dda4ffde424defb53afaa0de",
+    "references/components/h8-mockup-split-browser-framed.md": "954b0a3aebfe6de8a3be70fedda669099125dd2ebc9c07948fbdb457fd8dc166",
+    "references/components/h9-custom-illustration-centerpiece.md": "1d3d32859e6e451a67bfc38a403bd80115a42b6898a4d8788e4cfadb8c83e8d6",
+    "references/components/n1-wordmark-2-links.md": "8504774127e33f24a09844eb4c678e91b09ed513690fce51f7863d7cf3fdeab1",
+    "references/components/n10-floating-on-scroll-morph.md": "056c2107492ab0eb9dafc7ab4c7ff5454222c1ee127fa45615ccc7b8955da36a",
+    "references/components/n11-mega-menu.md": "b715421012d0997d25d5739c209be6129132fc91add677d75a8ad82d8672e1d4",
+    "references/components/n12-banner-retract.md": "2d52ecb8725b1991d4f6b78301cd6f112464f7b17315bdf0febbff67bca50a56",
+    "references/components/n13-inline-cmdk-pill.md": "6375fa0a1bbc92cba9a435159aa46cb084fc030c63e1abf8f073688959d7be75",
+    "references/components/n1b-saas-three-section.md": "c2631c7807e33eea9b02faa9121a0f9e64861467b57b8635ee97f5fa52bb60ae",
+    "references/components/n2-floating-chip.md": "70ea848537c5fe29be30f5e4b7478ecc39f86d0089f207549dc98a873b6c8fc1",
+    "references/components/n3-side-rail.md": "20ed8a06a599d73190502a4801a3be2933b8e06874371167196b7d32dae66111",
+    "references/components/n4-hidden-behind-k.md": "bccddb3a25a6afd457163b71e09de07ac23bf5d922fdeb9561e25d825bb97dcf",
+    "references/components/n5-floating-pill.md": "6dc8ffb9628fd7ee3669208091e11497864cecea69becc6b513ebdc1f3a737a3",
+    "references/components/n6-newspaper-masthead.md": "243a28d1165328c3479a1b75a3ae05dbfe2a6b8c9f867df8e35873b391f8edd5",
+    "references/components/n7-brutal-slab.md": "6c58d29129f7fd89b9fc755143648397749cdd06043ae0c0b51e6f07e7e6dcb5",
+    "references/components/n8-terminal-command.md": "c88d787bd2e5cf8bf6fb2c4121602dc0289760b41235d437468322821ee4334b",
+    "references/components/n9-edge-aligned-minimal.md": "cc20c76a5abe7099ed2bde3480c81f75f02a760a4c0d2ac79de1503dca9f9ee3",
+    "references/components/s1-left-margin-numbered.md": "074ed68eafb03ca775b0593d0599fe20c7891356f473f04996f42425e6586585",
+    "references/components/s2-hanging.md": "7b6d04cb896051006fe41b041a67ed77d25010edb579c60b03d88f68ae471462",
+    "references/components/s3-sticky-pinned.md": "4101cd7a28fe21a9b8094848ac6cc13c89f9e6f9bf801f04ac69b986c76727b4",
+    "references/components/s4-inline-no-break.md": "4b6d36da05383df1b29afe17b96645b816de07373016deb667efca340bb61ac6",
+    "references/components/s5-bottom-anchored.md": "55c159e2d8299501f14ac97468404dc8cad35695c2b7eaad2e972d314620eca0",
+    "references/components/t1-pull-quote-with-marginalia.md": "c7139796972c5f47d723742cbff02916a1ee0f2496456b86ac05d8839542be38",
+    "references/components/t2-logo-wall-hairline.md": "942121342a61bb4650722f7ba1b605347c6178d69ebeb740139b0bfb5c810e7f",
+    "references/components/t3-single-huge-quote.md": "7bca56e2cd630da3669f7cf8befd1bd654a5b249cf38b6d9af5a7c62e33b9239",
+    "references/components/t4-numbered-stat-strip.md": "a5fb5615902f9c4026f4ae7b0c96b536bb3cbb2fb4259031342d1cd190dab729",
+    "references/contract.md": "2923a056b95da63d04100ac56bc8cdff6bc0a717ac3e5da5cef69eb5feb4619c",
+    "references/copy.md": "703cdbf81fbef6f71d90596a32041d2a33a46fb71ba07ccf5ede6b4b1471d347",
+    "references/custom-craft.md": "417ff74cd83e1fea50c41948c53e18365269b880806ef4f31d9e0ebda0f99246",
+    "references/custom-theme.md": "a5026a0b00f69180ba9c24acec6e717bae0fb6e01daf998e8e900c57958a9eea",
+    "references/design-md.md": "a9368b64dd9b6e53e8c707830ce28fd8601d3195a81647ea46b6995aa3556b3c",
+    "references/export-formats.md": "de0a73d9bec7a31abbd0cbbf1ecd51c2e440f1f3fdc08f476a343959ca6c22f3",
+    "references/floating-nav.md": "c8c80f6560700bf6ee6baf28b81ec1539e9ff920d885624707de5fe8803c25d1",
+    "references/frontend-design-delta.md": "23682d648dad8db82a5fb6d9c75c2d6e22d3fa673b3bda2a63e414f8b4ea93ea",
+    "references/genres/atmospheric.md": "58d36e9a59c7d9e0ca99edeaaadab885f2635386fa69d52ea9eda3c29977e190",
+    "references/genres/editorial.md": "1e88cd0c94435c6a9edd1c0b93b67db4321fb3481ff0d66ee24869e655847319",
+    "references/genres/modern-minimal.md": "6125db00e38f2baca9369ed4d4aa917d977b85dd5eac6f19dac89707c3c3534b",
+    "references/genres/playful.md": "e52c6ff3fe21b5024c83ac1f03285e1d627e3469ff140d6bea728642026c4f95",
+    "references/hero-enrichment.md": "63c14cc2c256dd78a69a1c36f4bcb764940aa7f1ba2e6dd40ca36013f8884a83",
+    "references/imagery-kit.md": "39d71df8dd6186b27f174fd8ab8ffd379553be3917cff50810c72365f6d6cb53",
+    "references/interaction-and-states.md": "e816eb2d067ba9f6f288a3831549da95624a05f432ed2a50f54136f27dd2d67f",
+    "references/layout-and-space.md": "987f3a45f5dbe81547117a77987bcedf5376608a6412067e04337047e0c7c839",
+    "references/macrostructures.md": "a9024133c43e9ef388c331b5bc2f60de3d4a8c22b07b2d277bbafde941b24ea2",
+    "references/macrostructures/01-bento-grid.md": "aa268415862188414f8db94715e20ae7d29df3dc7c494083683378705f3f8493",
+    "references/macrostructures/02-long-document.md": "8ca81106396f2bd00eb9ef5d5d1f00c3aab0500394e706d6a2b3221a6c0d910f",
+    "references/macrostructures/03-marquee-hero.md": "2b7c35860086da6232cb3725c059bead9a31a91872d464266ce6e07a5a75f755",
+    "references/macrostructures/04-stat-led.md": "a6930b4ba6377c8ef5fcb7af6bf4393cd924292cf03871a37636dd4b77de22b7",
+    "references/macrostructures/05-workbench.md": "0cbe92772c7b2ffd9b24b9e446b1e1cd9ed22930b39030ef5a6e9cba5512d31f",
+    "references/macrostructures/06-conversational-faq.md": "373473bed23d055164edc04b16344fcd3861c1ab39ff73f3c75dc1719663d488",
+    "references/macrostructures/07-manifesto.md": "dc1327bad300179c1b233d02d20137776dc98c9affcfd3942b9f3f796ca67b93",
+    "references/macrostructures/08-photographic.md": "e5c77bb6ca6d82616c9c63bb6e68ee17c6af7bbca935f9ff29481294d7d1f74c",
+    "references/macrostructures/09-quote-led.md": "39069a564d9ebd76daf26f46ec7776828dc45fc6a72ae712b3bf7a4fd012f650",
+    "references/macrostructures/10-specimen.md": "7f23cead7f91c2ee2335eb2c87fb0aa1e7826f4573748d549756523085ed6ad4",
+    "references/macrostructures/11-catalogue.md": "99ff614600f18cfc80dfa3b9a2158dbea3b3674f76f40b70e721b9255796c265",
+    "references/macrostructures/12-letter.md": "6f3ad86e87223bd9b6b1267e27532811efbb60f50606e7f72c8525d2cc01d709",
+    "references/macrostructures/13-index-first.md": "25c832844a1b5e6ce17a335ac98e81d98d9e3372f514d83dc26ac299cc077865",
+    "references/macrostructures/14-narrative-workflow.md": "e604a1106131fe3a65721066a304922e757a78c997c197227840931079c780fd",
+    "references/macrostructures/15-split-studio.md": "400effa4de50d5f2fabd88be37447aa845deb3b67810ed4f2b995df458c852e4",
+    "references/macrostructures/16-feature-stack.md": "a389fae7fe39550352bdf1ce68cdaa3965a434fa1154f67d3c276e550d1d165a",
+    "references/macrostructures/17-type-specimen.md": "a1487fde891f73bf34a2ca38a631a2cb5c71d3a7b2ccd940114354e291ea8034",
+    "references/macrostructures/18-portfolio-grid.md": "af5d0f34a7ef7b81d6f4c8c845497ae553d44f418526d7e503346c9243b034e3",
+    "references/macrostructures/19-map-diagram.md": "5a576f25f4c8d58c14f574e3413560118343df9a9669db80c6c452daf509c3c3",
+    "references/macrostructures/20-ecosystem-index.md": "fe206580a39ffc4b3534f3a7414155aa626fe16b82b608a0b8b415c1510f17ad",
+    "references/macrostructures/21-component-playground.md": "ad3cbdbe9181e9472cb7b7fffbbe35021dc9b5b99ea86adc026f34d6b2c2f01f",
+    "references/microinteractions.md": "613ca56c2c16e40aeb594af21fabd651732d9de63c848aee51113602525f6e64",
+    "references/motion.md": "330d056810315f65819579f8207afe402703a9192bc76a2009558a59b7c84ccf",
+    "references/preview-examples.md": "df61c24c9a67457ef7369ec5f20575095326df72ffe6534c8fa9730581ebf7d9",
+    "references/responsive.md": "2bf18d72af704ca5dd3c220359a4c77c718efa19c40f62d9bff61ac4a90209b0",
+    "references/slop-test.md": "6eb49fc64ca54929d2c1600e2a6014268f1a7593787c0ed3f6ecb4ac8390ad86",
+    "references/structure.md": "ca5c0296ae428f8c4c5214407d431bbda5c453f98f2e7abdec03d644271af32b",
+    "references/study.md": "021fe4d001b38ee87414c1bb69321d2e44b67df8ede76ecec225c41a634aab20",
+    "references/themes/carnival.md": "119a9c803eac74958e5df6151da8a2575a1cc2d061a619bdb7f32cf972308ee2",
+    "references/themes/cobalt.md": "13be92af729e6b82d1b1e51aa078f7c007e2900c8f0798b2c0fd2c0eeac7019e",
+    "references/themes/hum.md": "bbdd1e89a32d6b15e99493ba9497816a0915bd4e9bf150b95868db597c20e1d5",
+    "references/themes/lumen.md": "d5459478d3aa1ea6330c221dfe011b717a70dbb036f597403b3a6b3cf82dd53b",
+    "references/typography.md": "94d7b2d2b138bd8687e09dc3dd618eaafff500b0497a6d69cb4c29b764e94b9c",
+    "references/verbs/audit.md": "0a5b484453f1697a8675a7020df9159d0b4ce22f059b873501bfd82c26d6a31a",
+    "references/verbs/redesign.md": "c2830f3b7d68e9622f55d376048a5a454c5ef59d309a211e716d1142e86acbdf"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "harness-tour": {
+   "files": {
+    "SKILL.md": "d4d53e0712ccd9aada45b2904a165a682a1a2321d352f4de8a08782413701f0f"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "harness-update": {
+   "files": {
+    "SKILL.md": "62240946681d21bc085feb67fac2ee88daa5c2cc70c15142a4766c0b035ab04d"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "health-check": {
+   "files": {
+    "SKILL.md": "833a943b89bc9b3e61a24c3c77879bfe78bc0cbf20edc0ac3284e0778314daf4"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "high-end-visual-design": {
+   "files": {
+    "SKILL.md": "b95441f97b71b5a616e16ab358fc4b00aee8f4d884b459cd57b9017361c7ab00"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "i-have-adhd": {
+   "files": {
+    "SKILL.md": "944ddb6a03cdbeff392d81f26f4486f3f20e23285c37bed2e50f1eb9c9b089ca"
+   },
+   "recorded": "2026-07-20",
+   "source": "https://github.com/ayghri/i-have-adhd.git"
+  },
+  "image-to-code": {
+   "files": {
+    "SKILL.md": "faf7b2dfc7219e6280270b3c85099e293445435ee70abbf07833528f0a4d5fd1"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "imagegen-frontend-mobile": {
+   "files": {
+    "SKILL.md": "b4c48f2774582b1a7ceb0738dabcd9a0f32dee36745493029a547063d8284af3"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "imagegen-frontend-web": {
+   "files": {
+    "SKILL.md": "b11eec9b6ba4f6830788b81ec21c0092f8dd0084d9fad34c6ae9596126c58e64"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "impact-check": {
+   "files": {
+    "SKILL.md": "653a585055019facac38ebbf0f726ebcfb3fe6565a3fcc4bb2af01dca1d64797"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "industrial-brutalist-ui": {
+   "files": {
+    "SKILL.md": "92705bb29dab3e255376ed6a7e20051f3af9f1bf16f8e896c323cea5bf62df56"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "ingest": {
+   "files": {
+    "SKILL.md": "fca92465d5894dc32e01319f74023b8b99b0183320cda681b772e00958fbce6f"
+   },
+   "recorded": "2026-07-06",
+   "source": "local-authored"
+  },
+  "jenkins-agent-l3-deploy": {
+   "files": {
+    "SKILL.md": "1590c1cd50a596dac20e448445ebd0dd746180921ac814902e6f14b8db4fd698"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "join-project": {
+   "files": {
+    "SKILL.md": "05c654f01ee6e83ad29595124007438179df9b5081fc066da60d20a641770996"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "last30days": {
+   "adapt_mode": "external-pull",
+   "commit": "4bbfee40553d0eb4a25583834335449607c6bea3",
+   "files": {
+    "SKILL.md": "bee461995acc5faf1a9608d2f8c6ea82017995dc7b2bcf525f845331392cd5cf"
+   },
+   "recorded": "2026-07-07",
+   "source": "https://github.com/mvanhorn/last30days-skill",
+   "version": "3.11.0"
+  },
+  "lint": {
+   "files": {
+    "SKILL.md": "039b7b10dd8057cdcd6cdcaf4bf234f3dacdb604efb6ea9442484be1284518cc"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "loop-runner": {
+   "files": {
+    "SKILL.md": "f2c2ea6a033f04a84027b6eb12c1808134c2d29828348fa6c2971b9f3491dd82"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "md-to-html": {
+   "files": {
+    "SKILL.md": "80a534a2249c86c5ea76ef9cb28899c3369a9bab4f222233457bc31d4726809f"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "medic": {
+   "files": {
+    "SKILL.md": "8ddaa08efea5038bf0d12cfe313994b7b1ac95185649aca27487f6f838e86fd6"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "minimalist-ui": {
+   "files": {
+    "SKILL.md": "9c6cd449665b00b308b45fc0820e536dc9662d965c602b9c0daac876b5e8a829"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "new-project-setup": {
+   "files": {
+    "SKILL.md": "d9048f8b2a75e99f91d51d359da721c71754576fb66e0beaa58917a32cb5ef21"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "new-skill": {
+   "files": {
+    "SKILL.md": "cf76aa8ba0e30e31225debc630c515577d5f6984068d27f512aace8d7453dc11"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "onboard-codebase": {
+   "files": {
+    "SKILL.md": "b1605b889aa26ef9af35fc1f182fd28d73bf20197d02da71e3c28f5d26eda626"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "orca-cli": {
+   "files": {
+    "SKILL.md": "74c9559cc2826358a57eb4c4d117325ff413be05c7bcb181f017f474ebc07ecb"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "orca-dispatch-reference": {
+   "files": {
+    "SKILL.md": "e9686c010280619826dd6aea52df2039155593dd5e8c465c77ce18811705e75a"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "orca-eval": {
+   "files": {
+    "SKILL.md": "12ce9e3eaae7701a7a0a102c1ea2b6c03eaa28457daf4f8f13364753bff03f0c",
+    "assets/orca-eval-scan.sh": "8bf1fce55e52376a86eec146a81e2915364418d6394bc376d811d44bc5cc4153"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "orca-handover": {
+   "files": {
+    "SKILL.md": "9a47fc00f8cf82e6e15a3ad6d1abe7954397b53ad54eb82c7217c3817092bda8"
+   },
+   "recorded": "2026-07-20",
+   "source": "local-authored"
+  },
+  "orca-issue": {
+   "files": {
+    "SKILL.md": "5270a9f3700850d84ea53461bb08aff4fe43311874d89f9f9eab6c72e82374d6"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "orca-onboard": {
+   "files": {
+    "SKILL.md": "a864a970a6a10b2079e0b9666c03b891f739db13310aea0bfdc7b96d46d792cf",
+    "assets/docs-site-skeleton.html": "7a031c6a9d4940775b684a1a2d6dcb09c9a339ac796ea6d315ba930b94ba6113"
+   },
+   "recorded": "2026-07-13",
+   "source": "local-authored"
+  },
+  "orca-sec-scans": {
+   "files": {
+    "SKILL.md": "276c80f86cdb8523fd9e33ff7e52b07d957ee0af0c0f6f8c852abb03e14844fc"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "orca-workflow": {
+   "files": {
+    "SKILL.md": "bc361e75942ccc9d0ead7b6a1b2a5eeaca97d8d4a79196e778eefab1e6fef635"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "orchestration": {
+   "files": {
+    "SKILL.md": "d33b879e6682a61357401c3d3c1a688460278380fe09c24783fcb770e59b513c"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "ovs-notes": {
+   "files": {
+    "SKILL.md": "f68631f14ed1e0f02a2be60a18559fc75a9432a221a3c0b27e267787a5bd7a64"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "plan": {
+   "files": {
+    "SKILL.md": "80f62174eced01c8af8655644ea58f8dca8370ccb114c92b8b1c88874e2f2a30"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "propose": {
+   "files": {
+    "SKILL.md": "ae957f4db22281aff985b18da4a7d883e9c4e64a9657d9f794de7c35e7a271f2"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "qc-code": {
+   "files": {
+    "SKILL.md": "311576c29b18aa833299c18c67739f5accbc836f709724cde0f60867a915200c"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "qc-uiux": {
+   "files": {
+    "SKILL.md": "d18224e0ef1c4dff0123793583b295408a3361dc5c68392cd794348706fed47c"
+   },
+   "recorded": "2026-07-17",
+   "source": "local-authored"
+  },
+  "query": {
+   "files": {
+    "SKILL.md": "11b4960276688475fc8abe3de5fd114b09853641e77a468d714e0797db52d5eb"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "raise-issue": {
+   "files": {
+    "SKILL.md": "93a6edd8242668715a1df21fcbc772e2623683c8e2c174617bf6694f8069194b"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "record-episode": {
+   "files": {
+    "SKILL.md": "bc29ffc800e3d36e81b6d803a4e6d4be0a090b469cc848f3283a0abb7cd7b5e1"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "redesign-existing-projects": {
+   "files": {
+    "SKILL.md": "fb7b735f0d3179717bdaa3e4071dcbda3e1663b4b321a87172724873cde7e05d"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "safe-change": {
+   "files": {
+    "SKILL.md": "60888526031f8c92a9b3105e9bfd6da6f1bb3cd0436858f69ecc59840f4423de"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "ship": {
+   "files": {
+    "SKILL.md": "87f3def234c3c94ab30004d5080dcf2b2fb43d7fdff1e3879ae36e21abaf6037"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "skill-provenance": {
+   "files": {
+    "SKILL.md": "f96968e01955278d1b723064ba862874cb7436e05d60471a7167bdcb3788c412"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "snapshot-push": {
+   "files": {
+    "SKILL.md": "2839b4d5eeae33e571aa94fad32bf391b84224610151ab6886b9da775c13fc80"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "stitch-design-taste": {
+   "files": {
+    "SKILL.md": "88ffc7584a24eb72ae5f9f077379a600c7308697548ab0702c495853f01183aa"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "sync-template": {
+   "files": {
+    "SKILL.md": "589fa3e50e1a20da98b59c34d9e438a180212304f11086184a7f9f7ca3033299"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "teach-me": {
+   "files": {
+    "SKILL.md": "2d171e1713c72aaa08d79eb2a9ade355382686929cfba4a03214027bd8ee2d81"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "tour-guide": {
+   "files": {
+    "SKILL.md": "a130e5d60e021888430ccb159811550b4fb599f84ee9fe3363431a6527866ca2"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "tour-guide-supademo": {
+   "files": {
+    "SKILL.md": "388deba7806200c995a18c59717a58bf3903512b026e7a13678eff0d1e515639"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "trace-grader": {
+   "files": {
+    "SKILL.md": "b880d1bb8f65e2196d9194f3402a1ebdbac332bb7ffe92ac0cc8f8f0a40736c8"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "uat-nonit-testcase": {
+   "files": {
+    "SKILL.md": "1766031c5b96c21447ceefc1da428a371db89ab7db2812238728e504e0da3224"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "unknown": {
+   "files": {
+    "SKILL.md": "0e362bc40ad452433513e339f997b91170709172cde09835476c5ecba6b0c6bc"
+   },
+   "recorded": "2026-07-17",
+   "source": "local-authored"
+  },
+  "verify-before-commit": {
+   "files": {
+    "SKILL.md": "1601adc746132ad5730d509d2568251405c641cb9bbe8ceea803941d2fca22a1"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "visual-qa": {
+   "files": {
+    "SKILL.md": "92459946b3f31a8f0c868a684695a6548da7e70e1bd2bd11ef66ef10e1ad6ade",
+    "assets/.gitignore": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+    "assets/package-lock.json": "38e8a936bd4a4cfae70a013b1b2455a8a63cf84a28f3fb01f7008e2798a70b31",
+    "assets/package.json": "7647d7f2d4459d1ffa26a19d5c5295f9104364a2a21a2c59a453e5209b56d37b",
+    "assets/route-shots.mjs": "68378c3abf00cb51bda69a6dca83efb9aaa679de7ad09d470d62e55a2bb34f92"
+   },
+   "recorded": "2026-07-17",
+   "source": "local-authored"
+  },
+  "wayfinder": {
+   "files": {
+    "SKILL.md": "e3632055e130c26a1e284af195a8df289aa29102e1639247bf8b080acd6f4e7e"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "web-clone": {
+   "files": {
+    "SKILL.md": "4aaf9b3b566cb817b03b17f335036fd1c2708126553c687dc5777efe2dc55e47"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "web-crawl": {
+   "files": {
+    "SKILL.md": "8e2b8ec1b17357f6ce843233d9ccfa628894e26a2a2327dc662fb26854d44892"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
+  },
+  "wiki-room": {
+   "files": {
+    "SKILL.md": "7550aaa5e819bad1e83daeec9b568e0ec8b8558606e88289bc23cbceb6b201f9"
+   },
+   "recorded": "2026-07-04",
+   "source": "local-authored"
+  },
+  "wikieval": {
+   "files": {
+    "SKILL.md": "9d75fe37ccfc9a98d10f70f9c5aaa4c9bf44f54c237f9675982879eb8329b873"
+   },
+   "recorded": "2026-07-18",
+   "source": "local-authored"
   }
+ }
 }

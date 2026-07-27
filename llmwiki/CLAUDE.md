@@ -10,6 +10,16 @@ Giảm lỗi LLM-coding phổ biến. Thiên về cẩn trọng hơn tốc độ
 
 (Nguồn: 4 nguyên tắc của Karpathy CLAUDE.md, bản distill của Forrest Chang — `multica-ai/andrej-karpathy-skills`. Bối cảnh framework: rule + skill cụ thể nằm ngay dưới.)
 
+## 5-Why — chạy TRƯỚC mọi việc, không phải tuỳ chọn
+
+Trước khi sửa hay xây bất cứ thứ gì, hỏi **"vì sao"** cho tới khi chạm **cấu trúc** sinh ra nó — thường là năm tầng. Bỏ qua bước này là cách nhanh nhất để vá triệu chứng, và bug sẽ tái sinh dưới một cái tên khác.
+
+- **Viết chuỗi ra, đừng nghĩ thầm.** Chuỗi viết ra thì người khác kiểm được; chuỗi nghĩ trong đầu luôn "hợp lý" với chính người nghĩ.
+- **Dừng đúng chỗ.** Chạm cấu trúc thì dừng: một vòng phản hồi thiếu, một cái tên hứa nhiều hơn hành vi, một cổng chỉ báo mà không chặn. Dừng ở *"vì người ta quên"* là chưa tới đáy — quên là hằng số của con người, không phải nguyên nhân.
+- **Tìm HỘI TỤ trước khi sửa.** Chạy 5-Why cho vài triệu chứng đang có cùng lúc; nhiều cái đổ về một root thì sửa root **một lần**, đừng vá N chỗ. Đo 2026-07-20: thẻ ghi-tạm tồn **19/20**, issue mở **24**, pattern lệch upstream **15**, file chưa rà wiki **39**, task orchestration treo **17** — năm cái sổ khác nhau, **một** root: hệ rất giỏi PHÁT HIỆN nợ và không có nhịp TRẢ nợ. Lúc đó phản xạ sai là thêm bộ phát hiện thứ sáu.
+- **Nghi ngờ chẩn đoán đầu tiên của chính mình.** Nó thường là suy luận từ triệu chứng chứ chưa đọc code. Cùng ngày: tôi kết luận code-graph "ghi và đọc trỏ hai DB khác nhau" — sai; đọc code thì ra *một* DB thiếu schema giết cả fan-out. Chẩn đoán chỉ được tin sau khi **tái hiện** được.
+- **Ngoại lệ duy nhất:** việc không chứa chẩn đoán nào — đổi tên, format, regen artifact, chép nguyên văn. Việc nào có chữ "sửa", "hỏng", "vì sao", "sao lại thế" thì luôn chạy.
+
 ## Cái thang chống over-engineering — chạy khi VIẾT/SỬA code
 Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponytail, MIT — nguồn `060726-ponytail-distill`.)
 
@@ -35,6 +45,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 - EVERY wiki file must have an `## Origin` section — source is always traceable
 - NEVER write to `raw/`
 - ALWAYS update `wiki/index.md` when adding or removing a wiki file
+- Cột Summary trong `index.md` PHẢI là một câu mô tả nội dung thật (cái gì, để làm gì) — KHÔNG được chỉ là ngày tháng hay lặp lại tên file; ngày đã có sẵn trong tên file rồi, một dòng summary trơ ngày là vô dụng với người đọc. `wiki-health.py --fail-on summary` bắt lỗi này.
 - ALWAYS append to `wiki/log.md` after every operation
 - Use `[[wikilinks]]` to cross-reference entries in `wiki/`
 - Wiki files live in `concepts/`, `entities/`, `sources/`, `draft/`, `architecture/`, or `tours/` — never in `wiki/` root (enforced by R5 validator)
@@ -61,6 +72,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `ovs-notes` | Xem release notes/changelog — liệt kê các bản (tag/GH release) newest-first để chọn & đọc, read-only (khác /ship = cắt release) | `skills/utils/ovs-notes.md` | utils |
 | `orca-workflow` | Daily propose → gate → dispatch with Orca | `skills/orchestrate/orca-workflow.md` | orchestrate |
 | `orca-onboard` | Parallel codebase onboarding with Orca | `skills/orchestrate/orca-onboard.md` | orchestrate |
+| `orca-handover` | Sinh MỘT file .md bàn giao đủ dày để phiên KHÁC (không có context nào) mở ra là làm được ngay — việc dở + thứ tự có lý do + số đo làm bằng chứng + cạm bẫy đã trả giá + hướng đã thử và BỎ. KHÁC record-episode (ghi cho MÁY) và plan (task ĐÃ duyệt, đã rõ) | `skills/orchestrate/orca-handover.md` | orchestrate |
 | `orca-issue` | Sự cố/bug/regression — vòng repro-first → fix red→green → distill kép | `skills/orchestrate/orca-issue.md` | orchestrate |
 | `wayfinder` | Việc QUÁ LỚN một phiên & còn mù mờ — bản đồ ticket QUYẾT ĐỊNH (fog of war/frontier/out-of-scope), giải từng cái tới khi đường rõ. TRƯỚC /propose. Chỉ-gọi-tay | `skills/orchestrate/wayfinder.md` | orchestrate |
 | `onboard-codebase` | Deep analysis of legacy code to populate Wiki | `skills/dev-loop/onboard-codebase.md` | dev-loop |
@@ -68,7 +80,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `md-to-html` | User wants to render a professional HTML report | `skills/utils/md-to-html.md` | utils |
 | `docs-site-macos` | User wants macOS-style documentation site | `skills/utils/docs-site-macos.md` | utils |
 | `web-crawl` | Crawl/scrape a URL or site into LLM-ready markdown | `skills/utils/web-crawl.md` | utils |
-| `web-clone` | Clone a page's exact UI as one self-contained offline HTML | `skills/utils/web-clone.md` | utils |
+| `web-clone` | Clone a website — snapshot (1-file offline copy) or reconstruct (rebuild as editable Next.js code, canonical home for the full-clone pipeline) | `skills/utils/web-clone.md` | utils |
 | `fdk` | Đang phát triển CHÍNH framework (skill/rule/validator/hook/wiki) | `skills/utils/fdk.md` | utils |
 | `fdk-poc` | POC luồng /br chạy THẬT: tạo project mới, chạy vòng đời bằng lệnh thật + đo giờ + sentinel + LOG từng bước → HTML visualize (lệnh nào·nhanh không·nhớ mấy hub). KHÁC fdk-uat (test nhanh xanh/đỏ) | `skills/utils/fdk-poc.md` | utils |
 | `fdk-uat` | UAT thật một bản sắp phát hành — dựng dự án TRỐNG, cài bằng curl từ remote (đường người-mới), kiểm năng lực MỚI có tới tay không; không pass thì GỠ commit khỏi remote | `skills/utils/fdk-uat.md` | utils |
@@ -91,6 +103,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `hallmark` | **NỀN design mặc định** (Together AI) — 6 discipline + 57 cổng slop-test, từ chối trông AI-generated. Mọi UI đứng trên nó; skill taste khác là flavour. 4 verb: build/audit/redesign/study. Xem [[design-foundation]] | `skills/utils/hallmark.md` | utils |
 | `build-now-adapt-later` | When a task is blocked by missing or unverified information (an… | `skills/dev-loop/build-now-adapt-later.md` | dev-loop |
 | `cavecrew` | Decision guide for delegating to caveman-style subagents. | `skills/utils/cavecrew.md` | utils |
+| `i-have-adhd` | Định hình OUTPUT cho người đọc ADHD — hành động trước, đánh số bước, nêu lại state mỗi lượt, chặn lạc đề, ước lượng thời gian cụ thể, không mở bài/kết bài xã giao. Áp cho phần CHAT; tài liệu người đọc vẫn theo luật văn xuôi đầy đủ | `skills/utils/i-have-adhd.md` | utils |
 | `caveman` | Ultra-compressed communication mode. | `skills/utils/caveman.md` | utils |
 | `caveman-commit` | Ultra-compressed commit message generator. | `skills/utils/caveman-commit.md` | utils |
 | `caveman-compress` | Compress natural language memory files (CLAUDE.md, todos, preferences)… | `skills/utils/caveman-compress.md` | utils |
@@ -101,7 +114,8 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `cursor-animated-sites` | Build an interactive "cursor-animated walkthrough" page on top of the… | `skills/utils/cursor-animated-sites.md` | utils |
 | `design-taste-frontend` | Anti-slop frontend skill for landing pages, portfolios, and redesigns. | `skills/utils/design-taste-frontend.md` | utils |
 | `design-taste-frontend-v1` | The original v1 taste-skill, preserved for projects depending on its exact… | `skills/utils/design-taste-frontend-v1.md` | utils |
-| `extract-site` | Extract and convert a website or docs site into clean markdown | `skills/utils/extract-site.md` | utils |
+| `extract-site` | Extract and convert a website or docs site into clean markdown (full-code clone → see `web-clone`) | `skills/utils/extract-site.md` | utils |
+| `fable5` | Reasoning protocol distilled from Claude Fable 5 — Floor check, multi-hypothesis diagnosis, adversarial self-review, Constraint Loop. Persists for the session like `/caveman` once invoked | `skills/utils/fable5.md` | utils |
 | `find-skills` | Helps users discover and install agent skills when they ask questions like… | `skills/utils/find-skills.md` | utils |
 | `full-output-enforcement` | Overrides default LLM truncation behavior. | `skills/utils/full-output-enforcement.md` | utils |
 | `gpt-taste` | Elite UX/UI & Advanced GSAP Motion Engineer. | `skills/utils/gpt-taste.md` | utils |

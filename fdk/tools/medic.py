@@ -16,6 +16,7 @@ Triết lý: Meadows (vòng phản hồi trên tầng enforcement) + hub-1-tên/
 Tự-mở-coverage: đọc policy.yaml/validator/generator LIVE → thêm chức năng mà quên hàng rào → medic tự báo.
 Self-contained: chỉ stdlib. Fail-open từng probe: probe lỗi → SKIP, không giết cả cổng.
 """
+import json
 import re
 import subprocess
 import sys
@@ -70,9 +71,20 @@ def p_coverage():
 
 
 def p_backstop():
-    """Backstop L2 git còn sống không (pre-commit)."""
-    if (ROOT / ".git/hooks/pre-commit").exists():
-        return "ok", "pre-commit đã cài (.git/hooks)", ""
+    """Backstop L2 git còn SỐNG không — không phải "có tồn tại file hook không".
+
+    Bản cũ hỏi `.git/hooks/pre-commit.exists()` rồi kết luận "đã cài". Nhưng shim git là
+    một file shell gọi binary `pre-commit`; binary vắng mặt thì shim vẫn tồn tại còn hook
+    thì GÃY lúc commit — cổng sức khoẻ cuối tuyên bố một phòng tuyến đang sống từ một inode.
+    Cùng lớp lỗi với code-graph (xem p_deps)."""
+    import shutil as _sh
+    hook = (ROOT / ".git/hooks/pre-commit").exists()
+    binary = _sh.which("pre-commit") is not None
+    if hook and binary:
+        return "ok", "pre-commit sống (shim + binary trên PATH)", ""
+    if hook and not binary:
+        return "warn", ("shim git CÓ nhưng binary `pre-commit` KHÔNG trên PATH — "
+                        "hook gãy lúc commit, L2 coi như TẮT"), "pip install pre-commit"
     return "warn", "pre-commit CHƯA cài — backstop L2 tắt", "pre-commit install"
 
 
@@ -111,18 +123,52 @@ def p_frontend():
     return "ok", "HTML sinh sạch anti-pattern frontend", ""
 
 
+#   Root-cause gap (senior-lens 2026-07-18): 4 probe mới (capproof, provenance) + 4 mechanism
+#   mới ship trong 2 ngày mà KHÔNG vào mechanisms.yaml — narrative probe vẫn PASS vì nó chỉ so
+#   manifest ĐÃ KHAI với trang, không biết PROBES thực tế đã lớn hơn manifest. Vá lần này chỉ là
+#   TRIỆU CHỨNG (thêm tay 4 dòng); vá TẬN GỐC là dòng dưới — bắt PROBES tự đối chiếu chính nó với
+#   manifest, để probe mới KHÔNG THỂ ship im lặng lần sau (probe mới không có dòng ở đây → medic đỏ
+#   ngay, không cần ai nhớ hỏi "đã document chưa").
+#   Giá trị None = quyết định TƯỜNG MINH "đây là probe nội bộ/meta, không narrate" (không phải
+#   quên) — thêm probe mới mà không thêm dòng vào đây là lỗi cấu trúc (KeyError-shaped), không
+#   phải lỗi ngữ nghĩa (string không khớp).
+PROBE_MECH_MAP = {
+    "rules": None, "coverage": None, "backstop": None, "docs": None, "frontend": None,
+    "narrative": None, "foundation": None, "code": None, "eval": None, "freshinstall": None,
+    "selfstate": "code-state", "capsurface": "capsurface",
+    "capproof": "capproof", "provenance": "provenance-scope",
+    "orchestration": None, "deps": None,
+}
+
+
 def p_narrative():
     """Narrative overstack có TRUNG THỰC không (council-025) — KHÁC docs-probe (chỉ so
     html==generator-output = tính TRUNG THÀNH bản sao). Probe này gác tính TRUNG THỰC bản gốc:
       (b) mọi live_probe trong mechanisms.yaml phải TỒN TẠI (manifest không nói dối);
       (a) mọi cơ-chế LIVE phải XUẤT HIỆN trong overstack.html (không narrative drift);
-      (c) canary: skill mô tả tuyến-phòng-thủ mà chưa vào manifest → warn.
+      (c) canary: skill mô tả tuyến-phòng-thủ mà chưa vào manifest → warn;
+      (d) ROOT-CAUSE (2026-07-18): mọi probe trong PROBES đối chiếu PROBE_MECH_MAP — probe MỚI
+          không có dòng map (dù None hay id thật) → FAIL ngay, không chờ ai audit tay lần nữa.
     Parse manifest bằng regex → medic vẫn stdlib-only; fail-open nếu không parse được."""
     man = ROOT / "harness/mechanisms.yaml"
     page = ROOT / "llmwiki/html/overstack.html"
     if not (man.exists() and page.exists()):
         return "skip", "thiếu mechanisms.yaml/overstack.html", ""
     text = man.read_text(encoding="utf-8")
+    ids = re.findall(r'^\s*-\s*id:\s*(\S+)', text, re.M)
+    unmapped = [n for n, _, _ in PROBES if n not in PROBE_MECH_MAP]
+    if unmapped:
+        return ("fail", f"probe MỚI chưa khai trong PROBE_MECH_MAP: {','.join(unmapped)}",
+                "fdk/tools/medic.py — thêm dòng '<probe>: \"<mechanism-id>\"' hoặc '<probe>: None' (nếu meta)")
+    dangling = [(n, mid) for n, mid in PROBE_MECH_MAP.items() if mid and mid not in ids]
+    if dangling:
+        d = dangling[0]
+        return ("fail", f"probe '{d[0]}' map sang mechanism '{d[1]}' nhưng id đó KHÔNG có trong mechanisms.yaml",
+                f"thêm entry id: {d[1]} vào harness/mechanisms.yaml, hoặc sửa PROBE_MECH_MAP")
+    # LƯU Ý TÊN: trường trong manifest gọi là `live_probe` nhưng probe này chỉ kiểm ĐƯỜNG DẪN
+    # CÓ TỒN TẠI — nó chứng minh "manifest không nói dối về vị trí", KHÔNG chứng minh cơ-chế
+    # đang chạy. Cơ-chế bị vô hiệu (hook gỡ khỏi settings, validator không resolve) vẫn lọt.
+    # Cùng lớp lỗi đã sửa ở p_deps; giữ probe vì nó vẫn bắt được manifest trỏ vào hư không.
     names = re.findall(r'^\s*name:\s*"?(.+?)"?\s*$', text, re.M)
     probes = re.findall(r'^\s*live_probe:\s*(.+?)\s*$', text, re.M)
     if not names or len(names) != len(probes):
@@ -288,6 +334,127 @@ def p_capsurface():
     return "ok", "bề mặt năng lực khớp version (downstream sẽ thấy đúng khi có bản mới)", ""
 
 
+def p_provenance():
+    """Skill NGOÀI (adapt_mode=external-pull — pin + audit, engine ở ngoài) chạy full-permission
+    sau khi cài; supply-chain drift (upstream sửa lén sau lúc pin) chỉ lộ ra nếu ai đó CHỦ ĐỘNG
+    chạy check. Gap #4 (senior-lens review 2026-07-18): trust chỉ gác lúc cài, không có nhịp
+    re-verify. Scope HẸP CÓ CHỦ Ý: chỉ hard-fail MODIFIED trên skill external-pull (rủi ro thật —
+    checksum đổi sau khi pin = có thể bị sửa lén). Skill local-authored đổi MỖI NGÀY là dev churn
+    bình thường (chính phiên này vừa sửa qc-code/hallmark/lint) — hard-fail trên chúng là đúng
+    kiểu 'gate cries wolf' đã né ở capproof; chỉ đếm, không chặn."""
+    sp = ROOT / "fdk/tools/skill-provenance.py"
+    if not sp.exists():
+        return "skip", "skill-provenance.py chưa có", ""
+    rc, out = sh([PY, str(sp), "check", "--json"], timeout=30)
+    try:
+        rows = json.loads(out)["rows"]
+    except Exception:
+        return "skip", "skill-provenance --json không parse được", ""
+    ext_bad = [r for r in rows if r.get("adapt_mode") == "external-pull" and r["status"] == "MODIFIED"]
+    local_mod = sum(1 for r in rows if r.get("adapt_mode") != "external-pull" and r["status"] == "MODIFIED")
+    untracked = sum(1 for r in rows if r["status"] == "UNTRACKED")
+    if ext_bad:
+        names = ", ".join(r["name"] for r in ext_bad)
+        return ("fail", f"skill NGOÀI bị sửa lén sau khi pin: {names}",
+                f"soi diff skills/<name>/SKILL.md với commit đã pin; đúng ý thì "
+                f"`python3 fdk/tools/skill-provenance.py record <name> --source <src>` để re-pin")
+    return ("ok", f"external-pull sạch (0 tamper) · {local_mod} local đổi (dev churn, không chặn) "
+                  f"· {untracked} untracked (chưa record, advisory)", "")
+
+
+def p_capproof():
+    """Năng lực MỚI vào phải kèm bằng chứng sống; năng lực đã-proven không được tụt.
+    Ratchet: nợ tồn trong baseline chỉ đếm, không đỏ (gate cries wolf thì bị tắt)."""
+    bc = ROOT / "fdk/tools/build-capabilities.py"
+    bl = ROOT / "harness/metrics/capproof-baseline.json"
+    if not bc.exists():
+        return "skip", "không có build-capabilities.py", ""
+    rc, out = sh([PY, str(bc), "--capproof-json"])
+    try:
+        cp = json.loads(out)
+    except Exception:
+        return "skip", "capproof-json không parse được", ""
+    if cp.get("downstream"):
+        return "skip", "downstream: không đo được (không có harness/tests) — by design", ""
+    if not bl.exists():
+        return ("warn", f"{cp['counts']['unproven']} UNPROVEN, chưa có baseline — chốt nợ tồn đi",
+                "python3 fdk/tools/build-capabilities.py --write-capproof-baseline")
+    base = json.loads(bl.read_text(encoding="utf-8"))
+    known = set(base.get("proven", [])) | set(base.get("unproven", []))
+    new_debt = [k for k in cp["unproven"] if k not in known]
+    demoted = [k for k in cp["unproven"] if k in set(base.get("proven", []))]
+    if new_debt or demoted:
+        parts = ([f"{len(new_debt)} năng lực MỚI không proof: {','.join(new_debt[:3])}"] if new_debt else []) \
+              + ([f"{len(demoted)} năng lực TỤT (mất proof): {','.join(demoted[:3])}"] if demoted else [])
+        return ("fail", " · ".join(parts),
+                "thêm test/frontmatter proof: cho từng cái, hoặc chốt có chủ ý: build-capabilities.py --write-capproof-baseline")
+    return "ok", (f"{cp['counts']['proven']}/{cp['counts']['total']} có NEO khai báo (tĩnh, chưa thực thi) "
+                  f"· chưa neo {cp['counts']['unproven']}"
+                  + (f" · {len(cp.get('dups', []))} trùng-ứng-viên" if cp.get("dups") else "")), ""
+
+
+
+def p_orchestration():
+    """Việc giao cho agent có bị bỏ quên không. Đo 2026-07-20: 78% task orchestration
+    có `dispatch: null` — chưa BAO GIỜ được giao; 17 task treo, cũ nhất 59 ngày.
+    Gốc là coordinator không biết lúc nào worker xong (orca terminal wait --for tui-idle
+    timeout 90s trên việc xong sau 9s) nên bỏ cuộc, tự làm inline.
+
+    WARN chứ không FAIL: nợ điều phối không phải hỏng hệ, và một cổng đỏ vì nợ tồn
+    đọng sẽ bị học cách phớt lờ — lúc đó mất luôn tín hiệu thật. Không có Orca → skip."""
+    tool = ROOT / "harness/scripts/orca-reconcile.py"
+    if not tool.exists():
+        return "skip", "orca-reconcile.py chưa có", ""
+    rc, out = sh([PY, str(tool), "--json"], timeout=180)
+    if rc != 0:
+        return "skip", "orca-reconcile không chạy được", ""
+    try:
+        rep = json.loads(out)
+    except Exception:
+        return "skip", "orca-reconcile --json không parse được", ""
+    if not rep.get("available"):
+        return "skip", f"không có Orca ({rep.get('reason', 'runtime tắt')})", ""
+    if not rep.get("open_total"):
+        return "ok", f"0 task treo / {rep.get('total_tasks', 0)} task", ""
+    g = rep.get("groups", {})
+    never = g.get("chua-tung-dispatch", 0)
+    return "warn", (f"{rep['open_total']} task treo (cũ nhất {rep.get('max_age_days', 0)}d)"
+                    + (f" · {never} CHƯA TỪNG giao" if never else "")), \
+           "python3 harness/scripts/orca-reconcile.py"
+
+
+
+def p_deps():
+    """Dependency NGOÀI còn dùng được không — không chỉ còn tồn tại.
+
+    Bài học 2026-07-20: orientation quảng cáo code-graph dựa trên `.is_file()` của
+    index.db. DB 0 byte / thiếu schema / server chết đều lọt, nên framework lùa mọi
+    phiên vào một tool hỏng suốt nhiều tuần (đo: 37 tool-call vs 14 của grep).
+    Nguyên tắc: quảng cáo một năng lực = phải THĂM DÒ nó.
+
+    WARN chứ không FAIL: dependency ngoài chết là chuyện môi trường của người dùng,
+    không phải repo hỏng. Absent (không cài) thì im — người không dùng không bị phiền."""
+    tool = ROOT / "harness/scripts/dep-health.py"
+    if not tool.exists():
+        return "skip", "dep-health.py chưa có", ""
+    rc, out = sh([PY, str(tool), "--json"], timeout=60)
+    if rc != 0:
+        return "skip", "dep-health không chạy được", ""
+    try:
+        deps = json.loads(out).get("deps", [])
+    except Exception:
+        return "skip", "dep-health --json không parse được", ""
+    bad = [d for d in deps if d.get("status") == "degraded"]
+    if bad:
+        first = bad[0]
+        return "warn", (f"{len(bad)}/{len(deps)} dependency HỎNG: "
+                        + ", ".join(d["name"] for d in bad)
+                        + f" — {first.get('reason', '')}"), first.get("fix", "")
+    ok = [d for d in deps if d.get("status") == "ok"]
+    return "ok", (f"{len(ok)}/{len(deps)} dependency ngoài dùng được"
+                  + (f" ({', '.join(d['name'] for d in ok)})" if ok else "")), ""
+
+
 PROBES = [
     ("rules",    ["rules", "luật", "bite"],      p_rules),
     ("coverage", ["rules", "coverage", "luật"],  p_coverage),
@@ -302,6 +469,10 @@ PROBES = [
     ("eval",     ["eval", "baseline"],           p_eval),
     ("freshinstall", ["freshinstall", "install", "orchestration", "e2e", "push"], p_freshinstall),
     ("capsurface", ["capsurface", "version", "capabilities", "bump", "downstream"], p_capsurface),
+    ("capproof", ["capproof", "proof", "unproven", "ratchet", "dup"], p_capproof),
+    ("provenance", ["provenance", "supply-chain", "external-pull", "tamper"], p_provenance),
+    ("orchestration", ["orchestration", "orca", "dispatch", "task", "treo"], p_orchestration),
+    ("deps", ["deps", "dependency", "code-graph", "orca", "mcp", "ngoài"], p_deps),
 ]
 # bỏ 'drift' probe trùng — drift đã báo trong rules:
 PROBES = [p for p in PROBES if p[0] != "drift"]

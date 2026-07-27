@@ -25,6 +25,7 @@ import json
 import pathlib
 import subprocess
 import sys
+import time
 
 try:
     import fcntl  # POSIX only — cùng quy ước wiki_ledger
@@ -180,7 +181,31 @@ def clear_code_drift(wiki_dir: pathlib.Path) -> int:
                 fcntl.flock(lk.fileno(), fcntl.LOCK_UN)
 
 
+def log_sync_cost(root: pathlib.Path, status: str, ms: int, suspects: int) -> None:
+    """Ghi chi phí một lượt --check vào harness/metrics/sync-log.jsonl (fail-open).
+
+    Vì sao: kiến trúc này cố ý KHÔNG embedding — cổng no-op trả lời "có cần rà không" mà
+    không gọi model (0 token). Nhưng một lợi thế không đo được thì không phải lợi thế, chỉ
+    là niềm tin: không có số thì vừa không chứng minh được, vừa không phát hiện được lúc nó
+    thoái hoá. `sync_tokens` giữ chỗ cho đủ trường — ở cổng no-op nó luôn 0 theo thiết kế.
+
+    Guardrail thật nằm ở `sync_ms`: cổng chậm thì dev tắt hook, mà cổng bị tắt là cổng chết.
+    KHÔNG tự tạo thư mục — downstream không có harness/ trong repo (ADR-017) thì im lặng bỏ qua.
+    """
+    try:
+        d = root / "harness" / "metrics"
+        if not d.is_dir():
+            return
+        rec = {"ts": datetime.datetime.now().isoformat(timespec="seconds"),
+               "status": status, "sync_ms": ms, "sync_tokens": 0, "suspects": suspects}
+        with open(d / "sync-log.jsonl", "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    except Exception:  # noqa: BLE001 — đo lường không bao giờ được làm gãy cổng
+        pass
+
+
 def cmd_check(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
+    t0 = time.perf_counter()
     head = run_git(root, "rev-parse", "HEAD").strip()
     anchor = read_anchor(wiki_dir)
     if anchor is None:
@@ -189,6 +214,7 @@ def cmd_check(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
         print(json.dumps(msg, ensure_ascii=False) if as_json else
               f"⚠ wiki-sync: chưa có neo {ANCHOR_NAME} — sau lần rà wiki kế tiếp chạy "
               f"`wiki-sync.py --mark-synced` để bật cổng no-op.")
+        log_sync_cost(root, "no-anchor", int((time.perf_counter() - t0) * 1000), 0)
         return 2
     changed = changed_since(root, wiki_dir, anchor["gitHead"])
     if changed is None:
@@ -197,6 +223,7 @@ def cmd_check(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
         print(json.dumps(msg, ensure_ascii=False) if as_json else
               f"⚠ wiki-sync: neo {anchor['gitHead'][:10]} không còn trong lịch sử "
               f"(rebase/squash?) — rà wiki một lượt rồi `--mark-synced` để neo lại.")
+        log_sync_cost(root, "anchor-invalid", int((time.perf_counter() - t0) * 1000), 0)
         return 2
     if not changed:
         msg = {"status": "current", "head": head, "anchor": anchor["gitHead"],
@@ -204,6 +231,7 @@ def cmd_check(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
         print(json.dumps(msg, ensure_ascii=False) if as_json else
               f"✓ wiki current — code không đổi kể từ neo {anchor['gitHead'][:10]} "
               f"({anchor.get('updatedAt', '?')}). No-op, 0 token.")
+        log_sync_cost(root, "current", int((time.perf_counter() - t0) * 1000), 0)
         return 0
     suspects = map_suspects(wiki_dir, changed)
     if suspects:
@@ -230,7 +258,50 @@ def cmd_check(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
             print("  → không trang wiki nào nhắc trực tiếp tới file đổi — vẫn nên /lint "
                   "nếu thay đổi mang tính kiến trúc.")
         print("  Rà xong chạy: wiki-sync.py --mark-synced")
+    log_sync_cost(root, "drift", int((time.perf_counter() - t0) * 1000), len(suspects))
     return 3
+
+
+def cmd_flags_for(wiki_dir: pathlib.Path, pages: str, as_json: bool) -> int:
+    """Trang nào TRONG SỐ pages đang mang cờ code-drift — dùng trên ĐƯỜNG ĐỌC (/query).
+
+    Vì sao tồn tại: `--check` ghi cờ vào stale.json nhưng tới 2026-07-19 chỉ `/lint` đọc
+    cờ đó, mà lint chạy theo chu kỳ → giữa hai lần lint, /query trả trang đã lệch code mà
+    KHÔNG cảnh báo (đúng ca "graph là source-of-truth nhưng nội dung lệch" → model lập
+    luận trên tri thức cũ). Đây là đầu tiêu thụ cờ cho đường đọc.
+
+    FAIL-OPEN TUYỆT ĐỐI — khác mọi subcommand khác của file này (CLI/CI, lỗi phải nổi).
+    Lý do: nó nằm trên đường ĐỌC. stale.json thiếu/hỏng/khoá không bao giờ được phép làm
+    gãy một câu trả lời; mất cảnh báo là suy giảm chấp nhận được, mất đường đọc thì không.
+    """
+    try:
+        wanted = [s.strip() for s in pages.split(",") if s.strip()]
+        if not wanted:
+            return 0
+        try:
+            stale = json.loads((wiki_dir / "stale.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            stale = {}
+        hits = {}
+        for rel, meta in (stale.items() if isinstance(stale, dict) else []):
+            if not isinstance(meta, dict) or meta.get("action") != "code-drift":
+                continue
+            stem = rel.rsplit("/", 1)[-1].removesuffix(".md")
+            for w in wanted:
+                wstem = w.rsplit("/", 1)[-1].removesuffix(".md")
+                if w == rel or wstem == stem:
+                    hits[rel] = meta
+                    break
+        if as_json:
+            print(json.dumps({"flagged": hits}, ensure_ascii=False, indent=1))
+        elif hits:
+            for rel, meta in sorted(hits.items()):
+                print(f"⚑ CẢNH BÁO DRIFT: `{rel}` có thể đã lỗi thời — code đổi kể từ lần "
+                      f"rà cuối (⇐ {meta.get('by', '?')}, cờ {meta.get('ts', '?')}). "
+                      f"Kiểm lại trước khi tin; chạy /lint để rà.")
+    except Exception:  # noqa: BLE001 — fail-open có chủ đích, xem docstring
+        pass
+    return 0
 
 
 def cmd_mark(root: pathlib.Path, wiki_dir: pathlib.Path, as_json: bool) -> int:
@@ -263,8 +334,20 @@ def main() -> None:
     ap.add_argument("--wiki-dir", default=None, help="thư mục wiki (mặc định: llmwiki/wiki hoặc wiki/)")
     ap.add_argument("--check", action="store_true", help="kiểm drift (mặc định)")
     ap.add_argument("--mark-synced", action="store_true", help="chốt neo sau khi rà wiki")
+    ap.add_argument("--flags-for", default=None, metavar="PAGES",
+                    help="đường ĐỌC: trang nào trong danh sách (slug/relpath, phân tách bằng dấu "
+                         "phẩy) đang mang cờ code-drift — luôn exit 0, fail-open")
     ap.add_argument("--json", action="store_true", help="output máy đọc")
     a = ap.parse_args()
+    if a.flags_for is not None:
+        # Fail-open ngay từ khâu định vị: không có git/wiki cũng không được gãy đường đọc.
+        try:
+            root = pathlib.Path(run_git(pathlib.Path(a.root).resolve(), "rev-parse",
+                                        "--show-toplevel").strip() or a.root).resolve()
+            wiki_dir = detect_wiki_dir(root, a.wiki_dir)
+        except Exception:  # noqa: BLE001
+            sys.exit(0)
+        sys.exit(cmd_flags_for(wiki_dir, a.flags_for, a.json))
     root = pathlib.Path(run_git(pathlib.Path(a.root).resolve(), "rev-parse", "--show-toplevel").strip()
                         or a.root).resolve()
     wiki_dir = detect_wiki_dir(root, a.wiki_dir)

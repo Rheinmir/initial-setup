@@ -18,9 +18,9 @@ Tách vòng đời đề xuất thành hai văn bản có hai người đọc kh
 ## Context
 Đã query wiki trước khi soạn (force-query, R7-f):
 
-- `ADR-003 (skill-as-single-source-of-truth)` — mọi yêu cầu về hành vi propose sống trong `skills/propose/SKILL.md`; `orca-workflow` chỉ *gọi* skill, không mô tả lại. Thay đổi này vì thế phải rơi vào skill, không rơi vào workflow.
-- `ADR-004` — context nội-bộ-framework là opt-in; skill mới không được auto-fire đầu phiên.
-- `ADR-015` (persona theo archetype) và bảng chi phí CLI trong `skills/orchestrate/orca-workflow.md` — dispatch hiện giao task cho CLI rẻ chạy headless (`opencode run` / `agy -p` / `kiro run`).
+- ``ADR-003-skill-as-single-source-of-truth`` — mọi yêu cầu về hành vi propose sống trong `skills/propose/SKILL.md`; `orca-workflow` chỉ *gọi* skill, không mô tả lại. Thay đổi này vì thế phải rơi vào skill, không rơi vào workflow.
+- ``ADR-004`` — context nội-bộ-framework là opt-in; skill mới không được auto-fire đầu phiên.
+- ``ADR-015`` (persona theo archetype) và bảng chi phí CLI trong `skills/orchestrate/orca-workflow.md` — dispatch hiện giao task cho CLI rẻ chạy headless (`opencode run` / `agy -p` / `kiro run`).
 - Bài học **250626** ghi ngay trong `orca-workflow.md`: CLI agent headless **thực đo giao hàng ~1/5 task**. Đây là dữ kiện nền của toàn bộ đề xuất này.
 - `harness/validators/proposal_complete.py` — R7 hiện có 6 check (a)–(f): bảng Agent Task Assignment, link sequence diagram, số `diagram-box` ≥ số task, cấm `.msg{opacity:0}`, prose `class="desc"` mỗi diagram, và `## Context` phải có nội dung.
 - Nguồn đối chiếu ngoài: `fdk/docs/superpowers/` (10 cặp spec+plan thật) + repo `obra/superpowers` đã clone về `scratchpad/superpowers/` — đọc `skills/brainstorming/SKILL.md`, `skills/writing-plans/SKILL.md`, `skills/subagent-driven-development/{SKILL.md,implementer-prompt.md,task-reviewer-prompt.md}`.
@@ -103,7 +103,7 @@ Ba cách đạt mục tiêu, đã cân nhắc:
 
 ## Notes
 - Nguồn ngoài: `scratchpad/superpowers/` (clone `obra/superpowers`), `fdk/docs/superpowers/` (10 cặp spec+plan thật, tỷ lệ spec:plan ≈ 1:8).
-- ADR-003 (skill-as-single-source-of-truth) · ADR-004 · ADR-015
+- `ADR-003-skill-as-single-source-of-truth` · `ADR-004` · `ADR-015`
 
 ## Origin
 - **Draft:** `wiki/sources/draft/140726-propose-plan-split-superpowers.md`

@@ -16,8 +16,8 @@ id: 020726-orca-issue-ledger-travel
 
 Query wiki trước khi draft (R7-f):
 
-- **ADR-004** (`fdk/wiki/sources/adr/ADR-004-framework-dev-context-opt-in.md`): context nội-bộ-framework là opt-in qua /fdk, KHÔNG auto-bơm và KHÔNG distribute — đây chính là lý do p-04 tồn tại: quy tắc problem-tree đang nằm trong fdk nên không travel theo dự án. Lời giải phải cưỡi trên trụ ĐƯỢC distribute (skill loop trong `llmwiki/skills/`, hook harness) chứ không được nhét thêm context framework vào mọi phiên.
-- **ADR-005** (logger-and-capabilities-travel-downstream): tiền lệ đúng cho "thứ gì cần travel thì đi cùng harness/hooks khi bootstrap" — R17 flush trong `session_end.py` đã tự travel theo cơ chế này.
+- **`ADR-004`** (`fdk/wiki/sources/adr/ADR-004-framework-dev-context-opt-in.md`): context nội-bộ-framework là opt-in qua /fdk, KHÔNG auto-bơm và KHÔNG distribute — đây chính là lý do p-04 tồn tại: quy tắc problem-tree đang nằm trong fdk nên không travel theo dự án. Lời giải phải cưỡi trên trụ ĐƯỢC distribute (skill loop trong `llmwiki/skills/`, hook harness) chứ không được nhét thêm context framework vào mọi phiên.
+- **`ADR-005`** (logger-and-capabilities-travel-downstream): tiền lệ đúng cho "thứ gì cần travel thì đi cùng harness/hooks khi bootstrap" — R17 flush trong `session_end.py` đã tự travel theo cơ chế này.
 - **Skill hiện có** (LOOP_MAP trong `llmwiki/CLAUDE.md`): `failure-flywheel` (gom lỗi lặp → rule), `loop-runner` (vòng fix có guard), `trace-grader` (chấm đường đi), `safe-change`/`verify-before-commit` (đường ray sửa code) — orca-issue KHÔNG làm lại các mảnh này, chỉ điều phối chúng theo thứ tự issue-specific. `orca-workflow` là entry point chính user gọi hằng ngày.
 - **Ledger problem-tree** (`llmwiki/html/fdk-problem-tree.html`, rule R16/R17 vừa thêm, skill fdk § Problem-tree): p-02 và p-04 là hai node đỏ 0/3 đang chờ chính proposal này.
 - **Eval 020726** (`sources/draft/020726-eval-report.md`): khuyến cáo KHÔNG gắn nghĩa vụ ledger vào verify-before-commit (no-op tốn token ở mọi commit dự án thường) — gắn vào nhánh framework của orca-workflow + hook tất định.

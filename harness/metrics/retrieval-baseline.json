@@ -1,165 +1,165 @@
 {
   "schema": "retrieval-baseline/v1",
   "generated_by": "harness/scripts/retrieval-eval.py",
-  "generated_at": "2026-07-03",
+  "generated_at": "2026-07-20",
   "k": 5,
   "evals_dir": "llmwiki/wiki/sources/evals/retrieval",
   "summary": {
     "goldens": 30,
     "decided": 30,
     "hits": 30,
-    "total_tokens": 1010479
+    "total_tokens": 975814
   },
   "goldens": {
     "architecture": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 53709
+      "tokens": 54629
     },
     "blocking-layer": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 22598
+      "tokens": 22976
     },
     "bnal-adapter": {
       "hit": 1,
       "recall": 0.5,
-      "tokens": 15625
+      "tokens": 16025
     },
     "boris-roles": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 16206
+      "tokens": 16804
     },
     "boris-template": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 18462
+      "tokens": 18761
     },
     "decision-adr-gate": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 26981
+      "tokens": 27679
     },
     "docs-macos": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 36907
+      "tokens": 37907
     },
     "enforcement-floor": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 20455
+      "tokens": 20893
     },
     "explain-clone-site": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 49123
-    },
-    "extract-site": {
-      "hit": 1,
-      "recall": 1.0,
-      "tokens": 36970
+      "tokens": 49263
     },
     "fdk-optin": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 15182
+      "tokens": 11987
     },
     "fdk-what": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 31471
+      "tokens": 31991
     },
     "feature-catalog": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 12143
+      "tokens": 13173
     },
     "harness-local": {
       "hit": 1,
       "recall": 0.5,
-      "tokens": 42501
+      "tokens": 43320
     },
     "logger-downstream": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 34975
+      "tokens": 35409
+    },
+    "newcomer-adr": {
+      "hit": 1,
+      "recall": 1.0,
+      "tokens": 21591
     },
     "onboarding-tour": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 21686
+      "tokens": 22586
     },
     "orient-forcequery": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 30708
+      "tokens": 32527
     },
     "outer-eval": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 44988
+      "tokens": 45191
     },
     "policy-sot": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 13420
+      "tokens": 14116
     },
     "project-local-rule": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 22737
+      "tokens": 22897
     },
     "protected-lib": {
       "hit": 1,
       "recall": 0.5,
-      "tokens": 35445
+      "tokens": 35725
     },
     "pull-gate": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 77850
+      "tokens": 78130
     },
     "query-eval": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 52336
+      "tokens": 21767
     },
     "r10": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 24777
+      "tokens": 25337
     },
     "rule-registry": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 35361
+      "tokens": 35481
     },
     "scanner-gitignore": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 54414
+      "tokens": 55593
     },
     "skill-sot": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 79448
+      "tokens": 77216
     },
     "trend-bnal-1": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 16902
+      "tokens": 17642
     },
     "trend-bnal-2": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 35675
+      "tokens": 36354
     },
     "wiki-in-kit": {
       "hit": 1,
       "recall": 1.0,
-      "tokens": 31424
+      "tokens": 32844
     }
   }
 }

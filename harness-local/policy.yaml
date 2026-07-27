@@ -1,19 +1,28 @@
 # harness-local/policy.yaml — registry rule RIÊNG của dự án này.
 #
 # Id dùng namespace P<n> (P = project), KHÔNG dùng R<n> (đụng framework R1–R13 → bị guard chặn).
-# Mỗi rule: id · name · validator (path tương đối từ gốc repo) · statement.
-# `harness-local/run.py --check` kiểm: id hợp lệ (P<n>, không trùng), validator tồn tại + chạy được.
+# Mỗi rule: id · name · validator (path tương đối từ gốc repo) · statement · fixtures.
+# `harness-local/run.py --check`     kiểm: id hợp lệ (P<n>, không trùng), validator tồn tại + compile.
+# `harness-local/run.py firedrill`   CHỨNG rule còn cắn: drive fixtures.bad→phải CHẶN, .good→phải QUA.
+#   Rule CÓ validator mà THIẾU fixtures = blind-spot → firedrill FAIL (không im lặng). Fixture là
+#   {path, content}; hook write-event dựng từ nó. CI downstream chạy firedrill mỗi PR.
 
 rules: []
 
-# Ví dụ (bỏ comment + sửa, rồi tạo validator tương ứng):
+# Ví dụ (bỏ comment + sửa, rồi tạo validator tương ứng — NHỚ khai fixtures để chứng được):
 #
 # rules:
 #   - id: P1
 #     name: no-console-log
 #     validator: harness-local/validators/no_console_log.py
 #     statement: "Không để console.log trong src/ khi commit."
+#     fixtures:
+#       bad:  { path: "src/x.js", content: "console.log(1)" }   # PHẢI bị chặn
+#       good: { path: "src/x.js", content: "const x = 1" }      # PHẢI qua
 #   - id: P2
 #     name: api-needs-test
 #     validator: harness-local/validators/api_needs_test.py
 #     statement: "Mỗi endpoint mới trong api/ phải có test tương ứng."
+#     fixtures:
+#       bad:  { path: "api/new.js", content: "export const route = 1" }
+#       good: { path: "api/new.js", content: "// has test in new.test.js" }

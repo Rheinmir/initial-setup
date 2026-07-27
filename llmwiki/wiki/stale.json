@@ -1,1 +1,350 @@
-{}
+{
+ "concepts/adapt-modes.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "concepts/wiki-core-relations.md": {
+  "by": "fdk/wiki/log.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "concepts/skill-craft.md": {
+  "by": "fdk/CAPABILITIES.md (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/150726-session-provenance.md": {
+  "by": "harness/metrics/scratch-log.jsonl",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/170726-session-provenance.md": {
+  "by": "fdk/wiki/log.md (+1)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/180726-session-provenance.md": {
+  "by": "fdk/wiki/log.md (+1)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/190726-session-provenance.md": {
+  "by": "fdk/wiki/log.md (+1)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/030726-session-provenance.md": {
+  "by": "fdk/tools/medic.py (+1)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/160726-session-provenance.md": {
+  "by": "harness/metrics/scratch-log.jsonl",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/020726-orca-issue-ledger-travel.md": {
+  "by": "fdk/CAPABILITIES.md (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/130726-session-provenance.md": {
+  "by": "harness/metrics/scratch-log.jsonl",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/200726-session-provenance.md": {
+  "by": "fdk/wiki/log.md (+1)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/140726-session-provenance.md": {
+  "by": "harness/metrics/scratch-log.jsonl",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/140726-propose-plan-split-superpowers.md": {
+  "by": "fdk/CAPABILITIES.md (+7)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/030726-narrative-as-data.md": {
+  "by": "fdk/tools/medic.py (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/030726-medic-cong-suc-khoe-tong.md": {
+  "by": "fdk/tools/build-capabilities.py (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/110726-eval-blinding-grader-context.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/140726-spec-kit-traceability.md": {
+  "by": "fdk/CAPABILITIES.md (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/200726-orchestration-triage.md": {
+  "by": "harness/council.personas.yaml (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/200726-code-graph-index-broken.md": {
+  "by": "harness/metrics/code-graph-ab.json (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/030726-secondary-memory.md": {
+  "by": "fdk/wiki/log.md (+1)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/030726-milestone-v106-harden.md": {
+  "by": "fdk/tools/medic.py (+1)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/110726-shipped-vs-documented-parity.md": {
+  "by": "fdk/CAPABILITIES.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/200726-orchestration-loop-closure.md": {
+  "by": "fdk/wiki/log.md (+8)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/190726-graph-lessons-grapuco.md": {
+  "by": "fdk/wiki/log.md (+9)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/190726-travel-gap-forcing-functions.md": {
+  "by": "fdk/CAPABILITIES.md (+5)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/030726-skill-usage-dashboard.md": {
+  "by": "harness/metrics/scratch-log.jsonl",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/020726-docs-site-fdk-strategy.md": {
+  "by": "fdk/wiki/log.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/060726-wiki-sync-openwiki-distill.md": {
+  "by": "harness/scripts/wiki-sync.py (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/030726-memory-episodic-vector.md": {
+  "by": "fdk/wiki/log.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/020726-ingest-fdk-strategy.md": {
+  "by": "fdk/wiki/log.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/030726-foundation-section.md": {
+  "by": "fdk/tools/medic.py",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/020726-audit-fdk-strategy.md": {
+  "by": "harness/version.json (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/050726-ship-selfindex-engine-downstream.md": {
+  "by": "llmwiki/skills/wiki-loop/query.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/070726-ponytail-distill.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/020726-eval-report.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/030726-retrieval-eval-baseline-rot.md": {
+  "by": "harness/metrics/retrieval-baseline.json",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/040726-episodic-vector-plan.md": {
+  "by": "fdk/wiki/log.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/analysis/040726-precommit-slow-fragile-on-commit.md": {
+  "by": "harness/scripts/harness-doctor.py (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/160726-teach-me-skill.md": {
+  "by": "fdk/CAPABILITIES.md (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/170726-absorb-six-sources.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/150726-unknown-ledger.md": {
+  "by": "fdk/CAPABILITIES.md (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/180726-capability-proof-map.md": {
+  "by": "fdk/CAPABILITIES.md (+5)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/030726-foundation-section-PLAN.md": {
+  "by": "fdk/CAPABILITIES.md (+5)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/150726-hallmark-design-foundation.md": {
+  "by": "fdk/CAPABILITIES.md (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/150726-mattpocock-absorb.md": {
+  "by": "fdk/CAPABILITIES.md (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/170726-absorb-six-sources-PLAN.md": {
+  "by": "fdk/tools/medic.py (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/180726-archetype-tester.md": {
+  "by": "llmwiki/personas/builder.md (+4)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/060726-design-standard-ai-elite-PLAN.md": {
+  "by": "fdk/CAPABILITIES.md",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/060726-ponytail-distill-PLAN.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/180726-capability-proof-map-PLAN.md": {
+  "by": "fdk/CAPABILITIES.md (+6)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "sources/draft/archive/proposals/150726-qc-code-skill.md": {
+  "by": "fdk/CAPABILITIES.md (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "draft/uiux/020726-overstack-docs-redesign.md": {
+  "by": "fdk/skills.search.json",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "draft/uiux/300626-audit-fix-docs-site-macos.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "draft/orca/010726-query-retrieval-eval.md": {
+  "by": "fdk/wiki/log.md (+5)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "draft/orca/010726-trupillar4-council-persona.md": {
+  "by": "harness/council.personas.yaml (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "draft/orca/030726-eval-report.md": {
+  "by": "skills/orca-onboard/SKILL.md (+2)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ },
+ "draft/orca/010726-onboard-html-tabs-redesign.md": {
+  "by": "fdk/wiki/log.md (+3)",
+  "action": "code-drift",
+  "ts": "2026-07-20T14:24:54",
+  "session": null
+ }
+}

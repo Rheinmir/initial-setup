@@ -30,7 +30,7 @@ Overstack có đủ mảnh (`council`, `wikieval`, `trace-grader`, `claim-receip
 
 ## Không thuộc phạm vi
 - Không xây lại từng component (blinding schema, claim class là 2 issue con riêng).
-- Không tự-chạy MỌI thứ vô tội vạ — phải chọn trigger đúng + có ngắt (chi phí token, đệ quy hook như R13 đã từng nổ — xem precommit-r13-recursion-bug).
+- Không tự-chạy MỌI thứ vô tội vạ — phải chọn trigger đúng + có ngắt (chi phí token, đệ quy hook như R13 đã từng nổ — xem `precommit-r13-recursion-bug`).
 
 ## Hướng gợi ý (không bắt buộc)
 - Định nghĩa 1-2 **trigger tự động** cụ thể thay vì "tự động hoá mọi thứ":

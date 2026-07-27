@@ -70,10 +70,32 @@ def _medic_verdict():
 
 
 def _graph_symbols():
-    """code-graph index nếu có (nhị phân: có index → đếm, không → UNKNOWN, không suy diễn)."""
+    """code-graph index có DÙNG ĐƯỢC không — không phải "file có tồn tại không".
+
+    Docstring cũ tự nhận "không suy diễn" trong khi đang suy diễn: `db.is_file()` rồi in
+    `index có (NKB)`. DB 0 byte cho ra đúng chữ "index có (0KB)" — và dòng đó lên thẳng
+    bảng FACT của overstack.html cho người đọc. Cùng lớp lỗi đã sửa ở dep-health.py, nên
+    hỏi luôn câu đúng: mở được và có bảng thật không."""
+    import sqlite3
     for db in (ROOT / ".graph-agent" / "index.db",):
-        if db.is_file():
-            return f"index có ({db.stat().st_size // 1024}KB)"
+        if not db.is_file():
+            continue
+        kb = db.stat().st_size // 1024
+        try:
+            # KHÔNG mode=ro: WAL thiếu -shm → ro báo hỏng trên DB lành.
+            conn = sqlite3.connect(str(db))
+            try:
+                names = {r[0] for r in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'")}
+                n = conn.execute("SELECT COUNT(*) FROM symbols").fetchone()[0] \
+                    if "symbols" in names else 0
+            finally:
+                conn.close()
+        except sqlite3.Error:
+            return f"index HỎNG ({kb}KB, không mở được) — dùng grep"
+        if {"symbols", "files"} <= names:
+            return f"index dùng được ({n} symbol, {kb}KB)"
+        return f"index HỎNG ({kb}KB, thiếu bảng) — dùng grep"
     return "UNKNOWN (không có .graph-agent/index.db — dùng grep)"
 
 

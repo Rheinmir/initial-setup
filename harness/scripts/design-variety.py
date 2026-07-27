@@ -63,6 +63,19 @@ def report(rows):
     return stamped, unstamped, repeats
 
 
+def self_test() -> int:
+    """Tất định: 2 trang cùng macrostructure phải bị BÁO lặp, trang khác không."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        hd = Path(d)
+        for name, macro in (("a.html", "hero-grid"), ("b.html", "hero-grid"), ("c.html", "broadsheet")):
+            (hd / name).write_text(f"<!-- design: macrostructure={macro} theme=t1 -->", encoding="utf-8")
+        stamped, unstamped, repeats = report(read_stamps(hd))
+        ok = len(stamped) == 3 and not unstamped and repeats == {"hero-grid": 2}
+    print("design-variety self-test:", "PASS" if ok else "FAIL")
+    return 0 if ok else 1
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--log", action="store_true")
@@ -72,7 +85,11 @@ def main():
     ap.add_argument("--theme", default="")
     ap.add_argument("--brief", default="")
     ap.add_argument("--date", default="", help="YYYY-MM-DD (không có Date.now trong CI)")
+    ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
+
+    if a.self_test:
+        sys.exit(self_test())
 
     if a.stamp:
         rec = {"date": a.date, "file": a.stamp, "macrostructure": a.macro,

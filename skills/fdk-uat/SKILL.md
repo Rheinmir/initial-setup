@@ -1,6 +1,5 @@
 ---
 name: fdk-uat
-disable-model-invocation: true
 description: >-
   UAT THẬT cho một bản framework sắp phát hành - dựng một dự án TRỐNG hoàn toàn mới, cài overstack
   đúng đường NGƯỜI MỚI (curl bootstrap từ GitHub raw, không phải file:// working-tree), rồi kiểm chứng
@@ -82,13 +81,25 @@ Tối thiểu, theo `fdk/docs/fresh-install-gate.md`:
 2. **Harness cắn thật:** `bash harness/poc-vendor-neutral/test-broad.sh` → PASS (validator GOOD-pass / BAD-block).
 3. **Năng lực MỚI tới tay** — phần riêng của bản này (checklist bước 1). Đây là mục hay bị bỏ nhất, và cũng là mục duy nhất chứng minh bản MỚI có giá trị.
 4. **Orchestration-ready:** skill `orchestration` / `orca-cli` / `orca-dispatch-reference` reachable.
-5. *(tuỳ chọn — thấy được bằng mắt)* dựng workspace Orca thật:
+5. **BẮT BUỘC (không phải tuỳ chọn — feedback 2026-07-24, lần thứ 2 bị nhắc vì skip bước này): dựng workspace Orca thật + TỰ VERIFY nó hiện trong app, đừng chỉ chạy filesystem-level.** Chỉ curl-cài vào một thư mục tạm rồi test bằng CLI KHÔNG tính là UAT hoàn chỉnh — user không thấy được gì, "không visual = không dùng được". Đây là cổng CỨNG: UAT KHÔNG được coi là PASS nếu bỏ qua bước này.
 ```bash
-orca repo add --path "$D" --json                          # CHÚ Ý: --path, KHÔNG positional
-orca worktree create --repo id:<repoId> --name uat --agent claude \
-                     --setup skip --no-parent --activate --json
+WT_NAME="uat-$(date +%y%m%d-%H%M)"                          # tên xác định, dùng để verify ở bước sau
+REPO_ID=$(orca repo add --path "$D" --json | python3 -c "import json,sys; print(json.load(sys.stdin)['result']['repo']['id'])")
+orca worktree create --repo "id:$REPO_ID" --name "$WT_NAME" --setup skip --no-parent --activate --json
 ```
 > Cạm bẫy đã dính: `orca repo add <path>` positional → `Unknown command`. Repo chưa có commit → Orca không nhận. `repo add` **không** làm workspace hiện trong app — phải `worktree create`.
+
+**Cổng verify — chạy NGAY sau lệnh trên, đây không phải bước phụ:**
+```bash
+orca worktree list --repo "id:$REPO_ID" --json | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+names = [w['displayName'] for w in d['result']['worktrees']]
+assert '$WT_NAME' in names, f'KHÔNG THẤY worktree tên {\"$WT_NAME\"} — UAT KHÔNG ĐƯỢC TÍNH LÀ PASS. Có: {names}'
+print(f'✓ worktree \"$WT_NAME\" hiện thật trong Orca — {names}')
+"
+```
+Assertion FAIL ở đây → **DỪNG, không được tiếp tục báo PASS cho user** — quay lại sửa lệnh `worktree create` (thường do `--repo` sai định dạng selector hoặc `repo add` chưa commit) rồi verify lại. Đây chính là gate cấu trúc thay cho việc "phải nhớ tự giác dựng workspace mỗi lần" — nhớ tay đã fail 2 lần liền (2026-07-21, 2026-07-24), giờ ép bằng assert.
 
 ### 4. PHA 2 — main-URL smoke, NGAY SAU merge (canary KHÔNG thay được bước này)
 Pha 1 chạy với **ref khác** và **ba biến override** → nó **mù** với chính các giá trị **mặc định**. Mà mặc định là chỗ chứa chuỗi nhánh hardcode (`bootstrap.sh` `BASE=`, `install.sh` `REPO_RAW=`, `SKILLS_REF=`). Chỉ pha này kiểm được **đúng cái lệnh người mới thật sự gõ**.
@@ -152,6 +163,7 @@ Gỡ xong: ghi lại **vì sao fail** vào `llmwiki/html/fdk-problem-tree.html` 
 - **Rule mới phải CẮN, không chỉ có mặt.** File `policy.yaml` có dòng luật ≠ luật chặn được. Luôn test bằng một file BAD thật.
 - **Trần (ceiling) cố ý:** UAT headless không spin được model LLM, nên "`/orchestration` chạy được" chỉ kiểm ở mức tất định (cài đủ + reachable + ping runtime). Live-run bằng model thật vẫn là acceptance làm tay.
 - Fail thì **gỡ**, không "để đó sửa sau". Remote là thứ người khác kéo về.
+- **Workspace Orca hiện thật là BẮT BUỘC, có assert kiểm tên, không phải "tuỳ chọn thấy được bằng mắt".** Bị nhắc lặp lại 2 lần (2026-07-21, 2026-07-24) vì trước đây ghi là tuỳ chọn nên bị bỏ qua khi chạy vội — filesystem-only test KHÔNG tính là UAT hoàn chỉnh dù mọi lệnh CLI khác xanh hết.
 
 ## Origin
 - Luồng distill từ `fdk/docs/fresh-install-gate.md` (§ "Luồng chuẩn: dựng workspace Orca mới rồi test fresh-install") + yêu cầu của user 2026-07-14: cho phép push trước để test thật, không pass thì gỡ commit khỏi remote.

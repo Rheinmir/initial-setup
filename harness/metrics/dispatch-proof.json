@@ -1,0 +1,50 @@
+{
+ "measured": "2026-07-20",
+ "task": "T-260720-01",
+ "tool": "harness/scripts/orca-dispatch.py (sentinel __ORCA_DONE__<id>:$?)",
+ "why": "Orca không có agent_status ở bất kỳ đâu; terminal wait --for tui-idle TIMEOUT 90s trên việc xong sau vài giây (status vẫn 'running' vì đó là shell). Sentinel đảo phụ thuộc: cơ chế nằm ở SHELL nên mọi vendor CLI đều đi qua, không cần agent hợp tác.",
+ "baseline_broken": {
+  "cmd": "orca terminal wait --for tui-idle --timeout-ms 90000",
+  "result": "ok:false code:timeout",
+  "note": "việc thật xong trong ~9s"
+ },
+ "runs": [
+  {
+   "vendor": "opencode",
+   "model": "deepseek-v4-flash-free",
+   "cmd": "opencode run \"Tra loi dung mot tu: thu do Viet Nam?\"",
+   "answer": "Hà Nội",
+   "exit_code": 0,
+   "waited_ms": 9385,
+   "detected": true
+  },
+  {
+   "vendor": "agy",
+   "cmd": "agy -p \"Tra loi dung mot tu: thu do Nhat Ban?\"",
+   "answer": "Tokyo",
+   "exit_code": 0,
+   "waited_ms": 9088,
+   "detected": true
+  },
+  {
+   "vendor": "shell",
+   "purpose": "nhánh LỖI cố ý — chứng xong-lỗi ≠ xong-đúng",
+   "cmd": "lenh-khong-ton-tai-xyz",
+   "exit_code": 127,
+   "waited_ms": 2337,
+   "detected": true
+  }
+ ],
+ "not_run": [
+  {
+   "vendor": "kiro",
+   "reason": "chưa cài trên máy này"
+  },
+  {
+   "vendor": "codex",
+   "reason": "chưa cài trên máy này"
+  }
+ ],
+ "verdict": "3/3 lượt phát hiện kết thúc đúng, gồm 2 vendor khác nhau + 1 nhánh lỗi. Trung bình ~9s so với baseline TIMEOUT 90s. Claim 'Orca không giao việc được' bị BÁC — Orca giao được; thứ thiếu là quan sát kết thúc, nay đã có.",
+ "limit": "Đo LỆNH kết thúc, không đo AGENT nghĩ xong. Đúng với chế độ một-phát (opencode run, agy -p); agent TUI tương tác thì KHÔNG đúng."
+}

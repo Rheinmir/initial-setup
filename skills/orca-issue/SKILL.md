@@ -26,3 +26,9 @@ Khác vòng làm-tính-năng ở hai chốt cứng: **không tái hiện đượ
 - **Surgical** — chỉ chạm vùng đã khoanh ở bước 3; thấy code lân cận "muốn dọn" thì ghi chú, không dọn trong vòng sự cố.
 - **Distill là bắt buộc, không phải lịch sự** — vòng chưa xong khi chưa ghi wiki + flywheel; đây là cách lỗi hôm nay thành rào chắn ngày mai.
 - Sự cố nặng cần nhiều người/agent → escalate sang `orca-workflow` để dispatch, nhưng các chốt 2 và 4 vẫn giữ nguyên.
+- **Đọc thông báo lỗi NGUYÊN VĂN trước khi đoán** (superpowers systematic-debugging) — error message + stack trace là dữ kiện rẻ nhất; triage mà chưa trích nguyên văn lỗi là đang đoán.
+- **Một hypothesis một lần** — mỗi vòng chỉ đổi MỘT thứ rồi chạy lại repro; đổi nhiều thứ cùng lúc (shotgun-fix) thì xanh cũng không biết vì sao xanh.
+- **3 fix liên tiếp thất bại → dừng, nghi ngờ TẦM kiến trúc** — không thử fix thứ 4 cùng cỡ; quay lại bước 3 với giả thuyết to hơn (sai tầng, sai component, sai giả định nền).
+
+## Origin
+- **Absorb 2026-07-17 (adapt_mode: dissolve, T-260717-02):** 3 chốt cuối (đọc lỗi nguyên văn · một hypothesis một lần · 3-fail-nghi-kiến-trúc) distill từ `obra/superpowers` (`systematic-debugging` — Iron Law + Four Phases). Các chốt trùng vòng sẵn có (repro-first, root-cause, red→green) KHÔNG absorb lại. Clone sẵn trong scratchpad/superpowers.

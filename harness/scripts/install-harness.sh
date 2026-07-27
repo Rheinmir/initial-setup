@@ -25,12 +25,14 @@ set -euo pipefail
 SELF_HEAL=0
 NO_CLONE=0
 ALL_SUBREPOS=0
+PRINT_REF=0
 ARGS=()
 for a in "$@"; do
   case "$a" in
     --self-heal)    SELF_HEAL=1 ;;
     --no-clone)     NO_CLONE=1 ;;
     --all-subrepos) ALL_SUBREPOS=1 ;;
+    --print-ref)    PRINT_REF=1 ;;   # in ref nguồn rồi thoát — để test được mà không clone thật
     *) ARGS+=("$a") ;;
   esac
 done
@@ -48,6 +50,24 @@ cleanup() { [ -n "${TMP_CLONE:-}" ] && rm -rf "${TMP_CLONE:-}" || true; [ -n "${
 trap cleanup EXIT
 
 # ---------- 0. Xác định nguồn ----------
+# REF nguồn để clone. Mặc định nhánh chính; nhưng UAT canary cài từ raw của MỘT NHÁNH KHÁC,
+# và trước đây 4 chỗ clone đều hardcode -b orca → hook/engine LUÔN lấy từ nhánh chính, tức
+# canary MÙ với mọi thay đổi trong llmwiki/.claude/hooks, harness/scripts, harness/validators,
+# fdk/tools. Cổng nghiệm thu chấm nhầm bản cũ mà vẫn xanh. Suy REF từ REPO_RAW (canary đã trỏ
+# sẵn) nên không đẻ thêm biến người dùng phải nhớ; HARNESS_REF để ép tay khi cần.
+HARNESS_REF="${HARNESS_REF:-}"
+if [ -z "$HARNESS_REF" ] && [ -n "${REPO_RAW:-}" ]; then
+  case "$REPO_RAW" in
+    https://raw.githubusercontent.com/*/*/*)
+      _r="${REPO_RAW#https://raw.githubusercontent.com/}"   # <owner>/<repo>/<ref...>
+      _r="${_r#*/}"; _r="${_r#*/}"                          # <ref...> (giữ được ref có dấu /)
+      [ -n "$_r" ] && HARNESS_REF="$_r"
+      ;;
+  esac
+fi
+HARNESS_REF="${HARNESS_REF:-orca}"
+[ "$PRINT_REF" = "1" ] && { echo "$HARNESS_REF"; exit 0; }
+
 src_ok() { [ -d "$1/harness/validators" ] && [ -d "$1/llmwiki/.claude/hooks" ]; }
 SRC="$BUNDLE"
 if ! src_ok "$SRC"; then
@@ -55,10 +75,10 @@ if ! src_ok "$SRC"; then
     warn "Bundle nguồn thiếu và --no-clone bật → fast-fail (không treo mạng). Cung cấp bundle rồi chạy lại."
     exit 1
   fi
-  log "Bundle cạnh script thiếu file nguồn → clone template rheinmir/setup@orca"
+  log "Bundle cạnh script thiếu file nguồn → clone template rheinmir/setup@$HARNESS_REF"
   TMP_CLONE="$(mktemp -d /tmp/llmwiki-harness-src.XXXXXX)"
-  git clone --depth 1 -b orca git@github.com:rheinmir/setup.git "$TMP_CLONE" >/dev/null 2>&1 \
-    || git clone --depth 1 -b orca https://github.com/rheinmir/setup.git "$TMP_CLONE" >/dev/null 2>&1
+  git clone --depth 1 -b "$HARNESS_REF" git@github.com:rheinmir/setup.git "$TMP_CLONE" >/dev/null 2>&1 \
+    || git clone --depth 1 -b "$HARNESS_REF" https://github.com/rheinmir/setup.git "$TMP_CLONE" >/dev/null 2>&1
   SRC="$TMP_CLONE"
   src_ok "$SRC" || { warn "Template repo chưa có harness/ — sync template trước"; exit 1; }
 fi
@@ -112,11 +132,16 @@ if [ "${1:-}" = "--global" ]; then
   # repo (fdk/tools, harness/scripts, harness/validators) để hooklib.resolve_tool + find_validators
   # tìm được engine ở ~/.claude/harness/<rel>. Mọi project được gác dùng CHUNG — cài 1 lần, update 1 chỗ,
   # KHÔNG copy vào từng repo. code_imports.py đi cùng build-wiki-graph.py (copy nguyên thư mục).
-  mkdir -p "$GH/fdk/tools" "$GH/harness/scripts" "$GH/harness/validators"
+  mkdir -p "$GH/fdk/tools" "$GH/harness/scripts" "$GH/harness/validators" "$GH/llmwiki/personas"
   cp "$SRC/fdk/tools/"*.py         "$GH/fdk/tools/"        2>/dev/null || true
   cp "$SRC/harness/scripts/"*.py   "$GH/harness/scripts/"  2>/dev/null || true
+  # personas travel theo engine (archetype.py --get đọc posture; UAT canary 260718 bắt preamble rỗng)
+  cp "$SRC/llmwiki/personas/"*.md  "$GH/llmwiki/personas/" 2>/dev/null || true
   cp "$SRC/harness/validators/"*.py "$GH/harness/validators/" 2>/dev/null || true
   cp "$SRC/harness/"*.yaml         "$GH/harness/"          2>/dev/null || true
+  # config đi CÙNG script đọc nó (mem-rank.py ⇄ mem-rank.config.yaml) — glob *.py bên trên bỏ sót,
+  # script global đọc config repo-local là đường dẫn tới "chạy được ở máy này, chết ở máy khác".
+  cp "$SRC/harness/scripts/"*.yaml  "$GH/harness/scripts/"  2>/dev/null || true
   cp "$SRC/harness/version.json"   "$GH/version.json"      2>/dev/null || true
   # Phase 1 v4 (council-038): poc-vendor-neutral (RÀO CHẮN R1-R17: bin/llmwiki-validate.py, policy.yaml,
   # gen-converters) → global. CI downstream (Phase 3) sẽ curl bootstrap → cài poc global → validate từ global;
@@ -126,6 +151,39 @@ if [ "${1:-}" = "--global" ]; then
     cp -R "$SRC/harness/poc-vendor-neutral/." "$GH/harness/poc-vendor-neutral/" 2>/dev/null || true
     log "GLOBAL-SHARED rào chắn: poc-vendor-neutral (validate + policy + converters) → $GH/harness/poc-vendor-neutral/"
   fi
+  # TẦNG 3 (travel-policy.yaml framework_only) KHÔNG được ở lại global: các glob *.py bên trên copy
+  # tất tay, nên gỡ lại đúng danh sách đã khai. Installer TIÊU THỤ policy — policy hết là văn bản mô tả
+  # (đo 2026-07-20: 18/18 mục tầng 3 vẫn đi xuống global, tầng 3 khi đó là hư cấu).
+  # Gác hai chiều bằng harness/validators/travel_policy_sync.py.
+  # Danh sách nằm NGAY ĐÂY, không đọc travel-policy.yaml lúc chạy: script này được copy đi khắp nơi
+  # (bundle, clone remote, bản đã cài trong repo target) nên mọi đường dẫn tới policy đều có thể trỏ
+  # vào bản CŨ. Đo 2026-07-20: đọc policy runtime làm fresh-install-smoke đỏ vì script working-tree
+  # gặp policy remote còn xếp medic.py ở tầng 3 → xoá medic khỏi global; mà smoke là cổng chặn push
+  # ⇒ deadlock chỉ-xanh-sau-khi-push. Hằng số đi cùng script thì không bao giờ lệch pha với script.
+  # Đồng bộ với travel-policy.yaml framework_only do harness/validators/travel_policy_sync.py gác.
+  STRIP_TIER3="
+fdk/tools/build-overstack-docs.py
+fdk/tools/build-cheatsheet.py
+fdk/tools/build-docs-index.py
+fdk/tools/build-health-dashboard.py
+fdk/tools/whiteboard-skill-map.py
+fdk/tools/new-skill.py
+harness/scripts/harness-lint.py
+harness/scripts/harness-doctor.py
+harness/scripts/fdk-gate.py
+harness/scripts/sync-skills.py
+harness/scripts/skill-registry.py
+harness/scripts/bnal-selftest.py
+harness/scripts/adapt-registry.py
+harness/scripts/arch-scan.py
+harness/scripts/audit.py
+harness/scripts/dispatch-verify.py
+"
+  n=0
+  for rel in $STRIP_TIER3; do
+    if [ -f "$GH/$rel" ]; then rm -f "$GH/$rel"; n=$((n+1)); fi
+  done
+  log "GLOBAL: gỡ $n tool framework_only khỏi $GH — tầng 3 chỉ chạy ở repo framework"
   log "GLOBAL-SHARED engine: fdk/tools + harness/scripts + validators + *.yaml + version.json → $GH/ (mọi project dùng chung)"
 
   SETTINGS="$HOME/.claude/settings.json"
@@ -230,8 +288,8 @@ else
   # SAME_BUNDLE=1 — pull all harness files from remote (overwrite local)
   if [ "$NO_CLONE" != "1" ]; then
     TMP_SYNC="$(mktemp -d /tmp/llmwiki-harness-sync.XXXXXX)"
-    if git clone --depth 1 -b orca git@github.com:rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 \
-        || git clone --depth 1 -b orca https://github.com/rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1; then
+    if git clone --depth 1 -b "$HARNESS_REF" git@github.com:rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 \
+        || git clone --depth 1 -b "$HARNESS_REF" https://github.com/rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1; then
       mkdir -p "$ROOT/harness/validators" "$ROOT/harness/scripts" "$ROOT/harness/evals" "$ROOT/harness/tests"
       cp -R "$TMP_SYNC/harness/validators/"*    "$ROOT/harness/validators/" 2>/dev/null || true
       cp    "$TMP_SYNC/harness/policy.yaml"      "$ROOT/harness/policy.yaml" 2>/dev/null || true
@@ -258,8 +316,8 @@ else
   # SAME_BUNDLE: hooks already pulled in TMP_SYNC from step 3; clone if step 3 skipped
   if [ "$NO_CLONE" != "1" ] && [ ! -d "${TMP_SYNC:-}" ]; then
     TMP_SYNC="$(mktemp -d /tmp/llmwiki-harness-sync.XXXXXX)"
-    git clone --depth 1 -b orca git@github.com:rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 \
-      || git clone --depth 1 -b orca https://github.com/rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 || true
+    git clone --depth 1 -b "$HARNESS_REF" git@github.com:rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 \
+      || git clone --depth 1 -b "$HARNESS_REF" https://github.com/rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 || true
   fi
   if [ -d "${TMP_SYNC:-}" ]; then
     cp "$TMP_SYNC/llmwiki/.claude/hooks/"*.py "$ROOT/llmwiki/.claude/hooks/" 2>/dev/null || true

@@ -346,6 +346,22 @@ def render_html(rep) -> str:
 """
 
 
+def self_test() -> int:
+    """Tất định: fixture 1 dòng transcript Skill-call → collect/aggregate phải đếm đúng."""
+    import json as _json
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        td = Path(d)
+        line = {"type": "assistant", "timestamp": "2026-07-14T10:00:00.000Z",
+                "sessionId": "st-1", "message": {"content": [
+                    {"type": "tool_use", "name": "Skill", "input": {"skill": "qc-code"}}]}}
+        (td / "s1.jsonl").write_text(_json.dumps(line) + "\n", encoding="utf-8")
+        events = collect([td])
+        ok = len(events) == 1 and events[0]["skill"] == "qc-code" and iso_week(parse_ts(line["timestamp"])) == "2026-W29"
+    print("skill-usage self-test:", "PASS" if ok else "FAIL")
+    return 0 if ok else 1
+
+
 def main():
     ap = argparse.ArgumentParser(description="Đo tần suất skill từ transcript (GH#8)")
     ap.add_argument("--weekly", action="store_true", help="chốt tuần + sinh HTML")
@@ -357,7 +373,10 @@ def main():
                          "mặc định: TỰ suy mọi worktree của repo qua git")
     ap.add_argument("--json", action="store_true", help="in JSON thô")
     ap.add_argument("--no-html", action="store_true", help="không ghi file HTML")
+    ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
+    if args.self_test:
+        sys.exit(self_test())
 
     dirs = args.transcripts or discover_transcript_dirs(ROOT)
     dirs = [d for d in dirs if d.is_dir()]

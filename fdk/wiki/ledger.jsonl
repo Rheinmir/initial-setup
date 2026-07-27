@@ -3,3 +3,5 @@
 {"ts": "2026-07-05T22:12:53", "session": "62b41f4c", "action": "add", "target": "concepts/framework-dev-antipatterns.md", "tool": "Write"}
 {"ts": "2026-07-06T09:37:32", "session": "62b41f4c", "action": "add", "target": "sources/adr/ADR-017-global-shared-engine-repo-data-travel.md", "tool": "Write"}
 {"ts": "2026-07-08T17:04:55", "session": "ab0659cb", "action": "modify", "target": "concepts/framework-dev-antipatterns.md", "tool": "Edit"}
+{"ts": "2026-07-18T09:50:07", "session": "246fa7ac", "action": "add", "target": "sources/evals/adapt-modes-pick.md", "tool": "Write"}
+{"ts": "2026-07-18T09:50:17", "session": "246fa7ac", "action": "add", "target": "sources/evals/capproof-liveness.md", "tool": "Write"}

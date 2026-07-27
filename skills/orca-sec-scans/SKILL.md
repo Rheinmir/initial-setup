@@ -114,10 +114,20 @@ Chạy lại Bước 2 trên target đã fix, xác nhận `remaining = NONE`.
 8. **"`SELECT *` cho tiện."**
    → Trả mọi cột gồm PII (CCCD/MST/BHXH/lương) + `search` toàn-cột làm oracle dò giá trị. Verify: whitelist cột trả về; search không quét cột nhạy cảm.
 
-### Khi nào chạy quét động (BẮT BUỘC)
-- **Trước khi đưa app ra public domain** — lỗ no-auth biến thành internet-exposed ngay lúc đó.
-- Sau mỗi lần đổi reverse proxy / thêm route API / sửa lớp auth.
-- Khi user nói "có lỗ hổng không", "an toàn chưa", "kiểm tra bảo mật".
+### Trigger-conditions — hành vi code nào BẮT BUỘC scan
+
+Không chờ ai nhớ gọi skill — diff rơi vào bảng là nghĩa vụ scan kích hoạt (distill từ `WorldFlowAI/everything-claude-code` security-review):
+
+| Thay đổi vừa làm | Bắt buộc | Vì sao |
+|---|---|---|
+| Thêm/sửa auth, session, phân quyền | Trivy + quét động | Token để localStorage dính XSS, thiếu check role trước thao tác nhạy cảm — lớp lỗi authorization là thứ Trivy không thấy. |
+| Nhận input người dùng (form, param, upload) | Trivy + quét động | Input không validate bằng schema + file upload không giới hạn size/type/extension là cửa vào SQLi/XSS/RCE. |
+| Đụng secret / credential / API key | Trivy (secret scan) | Key hardcode trong source hoặc lọt git history — phải ở env var và platform secret, `.env` phải gitignore. |
+| Mở API endpoint mới | Trivy + quét động | Endpoint mới mặc định THIẾU rate-limit + CSRF + check quyền; error message dễ lộ chi tiết nội bộ/stack trace. |
+| Thanh toán / dữ liệu nhạy cảm | Trivy + quét động + review tay | PII/tiền không được vào log, error phải generic; một lỗ là compromise cả nền tảng — err on the side of caution. |
+| Đưa app ra public domain / đổi reverse proxy | Quét động | Lỗ no-auth "nội bộ" biến thành internet-exposed đúng lúc đó (checklist giả định dev ở trên). |
+
+Không rơi vào bảng → scan theo nhịp release là đủ. Câu tự kiểm: **"diff này có làm một trong 6 việc trên không?"** — trả lời được dưới một phút. User nói "có lỗ hổng không", "an toàn chưa" → luôn là trigger.
 
 ## Rules
 
@@ -128,3 +138,6 @@ Chạy lại Bước 2 trên target đã fix, xác nhận `remaining = NONE`.
 - Không commit `security/*.json|html` lên server deploy — chỉ là artifact review.
 - Khi deploy bonbon-ai: **chỉ push `be` và `fe`** (2 submodule) lên server; tooling (trivy.yaml, security/, skill) không lên server.
 - Mọi thay đổi fix phải qua build/verify trước khi commit (`go build ./...`, `pnpm i`, …).
+
+## Origin
+- **Absorb 2026-07-17 (adapt_mode: dissolve, T-260717-02):** bảng trigger-conditions distill từ `WorldFlowAI/everything-claude-code` (`skills/security-review/SKILL.md` — When to Activate + 10 nhóm checklist). Clone depth-1 trong scratchpad/, không vendor bytes.

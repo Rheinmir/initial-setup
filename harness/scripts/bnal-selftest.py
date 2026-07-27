@@ -22,8 +22,11 @@ EXEMPT = {"fdk-gate", "flywheel", "bnal-selftest"}
 
 
 def _has_selftest(p: Path) -> bool:
+    # Chỉ match dạng QUOTED ('--self-test' / 'selftest' trong so-sánh argv) = handler thật.
+    # Match trần từng vồ nhầm docstring nhắc tới --self-test bằng văn xuôi
+    # (bnal_config/bnal_guard/bnal_metrics: "không có CLI riêng để --self-test") → drift giả.
     try:
-        return bool(re.search(r"--self-test|selftest", p.read_text(encoding="utf-8")))
+        return bool(re.search(r'["\'](?:--self-test|selftest)["\']', p.read_text(encoding="utf-8")))
     except Exception:
         return False
 

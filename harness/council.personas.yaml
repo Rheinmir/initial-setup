@@ -27,6 +27,18 @@ personas:
   taleb:       { name: "Nassim Taleb",     lens: "Phản mong manh & rủi ro đuôi",    sig: "Thiết kế cho cái ĐUÔI, không phải trung bình." }
   rams:        { name: "Dieter Rams",      lens: "Thiết kế lấy người dùng",         sig: "Ít hơn, nhưng tốt hơn — người dùng quyết." }
 
+  # 6 ARCHETYPE vòng đời (Boris Cherny — ADR-015). Trước 2026-07-19 chúng sống ở một thư viện
+  # TÁCH RỜI (llmwiki/personas/*.md) nên không ghế nào gọi được chúng vào room: ranh giới nghề
+  # ("đó là Builder") là ngõ cụt, ý tưởng chạm ranh giới thì bốc hơi. Đăng ký ở đây để dùng CHUNG
+  # một danh bạ với 18 lens trên. Khoá `posture` trỏ file posture đầy đủ; engine chỉ đọc
+  # name/lens/sig nên khoá thừa là vô hại (council.py:975).
+  prototyper:  { name: "Prototyper",       lens: "0→1, nháp rồi vứt",               sig: "Bắn nhiều ý, phần lớn KHÔNG ship — đó là điểm.",           posture: "llmwiki/personas/prototyper.md" }
+  builder:     { name: "Builder",          lens: "1→N, dựng cho production",        sig: "Làm cho nó đúng, đủ rào, giao được.",                      posture: "llmwiki/personas/builder.md" }
+  sweeper:     { name: "Sweeper",          lens: "Dọn & gỡ",                        sig: "Bớt đi cái gì? Xoá là bậc thang rẻ nhất.",                 posture: "llmwiki/personas/sweeper.md" }
+  grower:      { name: "Grower",           lens: "Lặp theo dữ liệu dùng thật",      sig: "Đo trước khi tin — metric mục tiêu KÈM guardrail.",        posture: "llmwiki/personas/grower.md" }
+  maintainer:  { name: "Maintainer",       lens: "Scale, an toàn, tin cậy",         sig: "Rủi ro đã đóng chưa? Bằng chứng đâu?",                     posture: "llmwiki/personas/maintainer.md" }
+  tester:      { name: "Tester",           lens: "Verify design-first",             sig: "Cái gì chứng minh nó SAI? Viết bài thi trước.",            posture: "llmwiki/personas/tester.md" }
+
 # 13 cặp đối-trọng (counterweight) — bốc roster phải có ≥1 cặp để KHÔNG thành phòng vọng âm.
 polarity_pairs:
   - [rams, ada]            # tối-giản ↔ hệ-hình-thức
@@ -42,6 +54,9 @@ polarity_pairs:
   - [musashi, aurelius]    # đòn-dứt-khoát ↔ chấp-nhận
   - [meadows, linus]       # sửa-hệ-thống ↔ sửa-local
   - [aristotle, watts]     # phân-loại ↔ hoà-tan
+  - [prototyper, maintainer] # đẻ-cái-mới ↔ giữ-cái-đang-chạy
+  - [grower, sweeper]      # thêm-để-thắng ↔ bớt-để-gọn
+  - [builder, tester]      # dựng ↔ chứng-minh-nó-sai
 
 # case → roster. base = 3 (lẻ, mean-rank không hoà); extra = +2 khi --size 5. base đã cài 1 cặp đối-trọng.
 cases:
@@ -53,8 +68,10 @@ cases:
   decision:  { base: [munger, kahneman, taleb],   extra: [aurelius, socrates] }
   simplify:  { base: [laozi, linus, rams],        extra: [feynman, watts] }
   ml-ai:     { base: [karpathy, ilya, feynman],   extra: [taleb, ada] }
+  lifecycle: { base: [prototyper, builder, maintainer], extra: [grower, tester] }
 
 profiles:
   classic:     [aristotle, socrates, suntzu, ada, aurelius, machiavelli, laozi, feynman, linus, musashi, watts, karpathy, ilya, kahneman, meadows, munger, taleb, rams]
   exploration: [socrates, watts, taleb, laozi, munger, kahneman, meadows, aristotle, ada, feynman, ilya, machiavelli]
   lean:        [feynman, linus, kahneman, taleb, rams]
+  archetype:   [prototyper, builder, sweeper, grower, maintainer, tester]

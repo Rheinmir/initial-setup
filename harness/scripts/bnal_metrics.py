@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """bnal_metrics — shared by-code JSONL capture (gitignore + fail-open). ONE place replacing the
 _ensure_gitignored / _metrics_file / _read / write_all that were copy-pasted into the
-capture features (flywheel, mem-rank, token-budget). Capture must never break the session."""
+capture features (flywheel, mem-rank, token-budget). Capture must never break the session.
+
+proof: harness/scripts/flywheel.py
+(thư viện dùng chung, không có CLI riêng — exercised transitively bởi flywheel.py --self-test,
+import trực tiếp bnal_metrics)"""
 import json
 from pathlib import Path
 

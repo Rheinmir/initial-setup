@@ -57,6 +57,39 @@ def find_code_dirs(root: Path):
     return out
 
 
+
+def _db_usable(db_path) -> bool:
+    """DB sqlite này query được không — mở được VÀ có bảng thật.
+
+    Mượn nguyên định nghĩa của harness/scripts/dep-health.py (một nguồn duy nhất). Import
+    được thì import; không thì tự kiểm tại chỗ theo đúng cùng tiêu chí — hook KHÔNG bao giờ
+    được phép chết vì thiếu harness.
+    """
+    try:
+        import importlib.util
+        for cand in (Path(os.environ.get("CLAUDE_PROJECT_DIR", ".")) / "harness/scripts/dep-health.py",
+                     Path.home() / ".claude/harness/harness/scripts/dep-health.py"):
+            if cand.is_file():
+                spec = importlib.util.spec_from_file_location("_dephealth", cand)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                return bool(mod.db_has_schema(Path(db_path)))
+    except Exception:
+        pass
+    try:
+        import sqlite3
+        # KHÔNG mode=ro: WAL thiếu -shm thì ro báo hỏng trên DB lành (xem dep-health).
+        conn = sqlite3.connect(str(db_path))
+        try:
+            names = {r[0] for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")}
+        finally:
+            conn.close()
+        return {"symbols", "files"} <= names
+    except Exception:
+        return False
+
+
 def main() -> None:
     payload = read_payload()
     root = Path(project_dir(payload)).resolve()
@@ -71,7 +104,14 @@ def main() -> None:
     if REG.exists():
         reg_entries = {l.strip() for l in REG.read_text(encoding="utf-8").splitlines() if l.strip()}
 
-    db_dirs = [d for d in code_dirs if (d / ".graph-agent" / "index.db").is_file()]
+    # "Có file index.db" KHÔNG suy ra "code-graph dùng được" — DB 0 byte hoặc thiếu bảng
+    # `symbols` vẫn là một file. Cùng anti-pattern đã khai tử ở session_start, và ở ĐÂY nó
+    # nặng hơn: kết luận này (a) GHI path vào registry global ~/.graph-agent/repos.txt,
+    # (b) DẬP TẮT cảnh báo "chưa index". Dùng chung đúng một định nghĩa với dep-health.py
+    # để hai nơi không bao giờ trôi khỏi nhau.
+    db_dirs = [d for d in code_dirs
+               if (d / ".graph-agent" / "index.db").is_file()
+               and _db_usable(d / ".graph-agent" / "index.db")]
     if not db_dirs:
         sys.exit(0)  # project KHÔNG dùng code-graph → im hoàn toàn, không nag
 

@@ -43,11 +43,17 @@ def _check_lifecycle(tasks: dict) -> list:
             errs.append(f"{tid}: history rỗng (mọi task phải có ít nhất 'proposed')")
             continue
         states = [h.get("state") for h in hist]
-        unknown = [s for s in states if s not in IDX]
-        if unknown:
-            errs.append(f"{tid}: state lạ {unknown} (chỉ cho {ORDER})")
+        # 'superseded' = terminal hợp lệ từ BẤT KỲ điểm nào của chuỗi (task bị thay thế
+        # bởi task/issue khác — ngữ nghĩa docs-curate JOIN); phần trước nó vẫn phải liền mạch.
+        chain = states[:-1] if states and states[-1] == "superseded" else states
+        if not chain:
+            errs.append(f"{tid}: 'superseded' phải đứng sau ít nhất 'proposed'")
             continue
-        idxs = [IDX[s] for s in states]
+        unknown = [s for s in chain if s not in IDX]
+        if unknown:
+            errs.append(f"{tid}: state lạ {unknown} (chỉ cho {ORDER} + terminal 'superseded')")
+            continue
+        idxs = [IDX[s] for s in chain]
         # phải là 0,1,2,…,k liền mạch tiến (bắt: lùi, nhảy cóc/né gate, trùng)
         if idxs != list(range(len(idxs))):
             errs.append(

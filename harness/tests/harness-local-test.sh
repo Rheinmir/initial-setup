@@ -76,7 +76,8 @@ else
 fi
 PTU="$ROOT/llmwiki/.claude/hooks/pre_tool_use.py"
 fl=$(grep -n 'for name in checks' "$PTU" 2>/dev/null | head -1 | cut -d: -f1)
-rl=$(grep -n 'run_local(project_dir' "$PTU" 2>/dev/null | head -1 | cut -d: -f1)
+# neo vào LỜI GỌI trong main (thụt 4 space), không phải dòng `def` — đừng pin cách viết tham số
+rl=$(grep -n '^    run_local(' "$PTU" 2>/dev/null | head -1 | cut -d: -f1)
 { [ -n "$fl" ] && [ -n "$rl" ] && [ "$rl" -gt "$fl" ]; } && ok "pre_tool_use: framework checks TRƯỚC, harness-local SAU → project KHÔNG tắt được rule framework" || bad "thứ tự precedence sai/thiếu"
 
 printf '\n\033[1m═══ TỔNG: %d test — \033[1;32m%d PASS\033[0m / \033[1;31m%d FAIL\033[0m\033[0m\n' "$((pass+fail))" "$pass" "$fail"

@@ -13,94 +13,6 @@ Chốt cứng Trụ 4 bằng cổng CI tất định không-LLM (`code_health.py
 ## 2026-07-01 — fdk+bnal+council — dev-harness-kit
 Thiết kế cơ chế 'dev tự build harness riêng' (skeleton + không-chạm-core + protected/seal) theo BNAL: nền đã có harness-local(ADR-011)+R14; chốt 3 mảnh CHẮC (scaffolder/seal-command/R14-ext) + cô lập 2 ẩn số. Council 18 persona (council.py mean-rank, thoát loop) chọn checksum-seal #1 (1.39) > R14-ext (1.72) > chmod (3.0) > zip (3.89). Report: llmwiki/html/010726-dev-harness-kit-council.html.
 
-<!-- log:auto:start -->
-
-### 🤖 Log tự-động (code-logger, không do agent ghi)
-
-| Thời điểm | Event | Chi tiết |
-|---|---|---|
-| 2026-07-14 11:34:15 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=c7f6e21c · actor=agent · prev=c244f97face47f722e3defc98fb37731e8fca2e56e1849 |
-| 2026-07-14 12:44:33 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=d8c20a58170d8f9dd79d31c3267b7c8414548d8e75ece8 |
-| 2026-07-14 12:44:49 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=382b001109d51a544de11bb7b24a2227120603de63ddd8 |
-| 2026-07-14 12:45:06 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=6bb847a3f9d2190c2e237ebee9a2cb65e93cea221de660 |
-| 2026-07-14 12:45:21 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=c1585ec5166a2fa3db8a638d6c65e46cfd3d99b5ccda31 |
-| 2026-07-14 12:45:35 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=997f53e6d1beab91d50a32b62f377fda6a6f4c0eeec7c8 |
-| 2026-07-14 12:45:46 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=918c5edd9c05526fed68da3cbd026c0a3e59e86f44afda |
-| 2026-07-14 12:46:10 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=ae536c4f3bd18a5e2aaf14051ea23a8533b10324f47752 |
-| 2026-07-14 12:46:16 | `file.write` | fdk/tools/br-queue.py · tool=Edit · session=c7f6e21c · actor=agent · prev=962e7ea8a8ea6276a3e32b6655d5cf95b99b4cdedd2b7f |
-| 2026-07-14 12:46:54 | `file.write` | fdk/tools/build-line-status.py · tool=Edit · session=c7f6e21c · actor=agent · prev=a19b3b373a4fd012c2db220e030398a5e2b36 |
-| 2026-07-14 12:47:07 | `file.write` | fdk/tools/build-line-status.py · tool=Edit · session=c7f6e21c · actor=agent · prev=f35fdb935ce3ecd2c6f19e8fe67c529b2dd1a |
-| 2026-07-14 12:47:19 | `file.write` | fdk/tools/build-line-status.py · tool=Edit · session=c7f6e21c · actor=agent · prev=8297bca46ed88cceb06edbf616428107e6f4f |
-| 2026-07-14 12:47:26 | `file.write` | fdk/tools/build-line-status.py · tool=Edit · session=c7f6e21c · actor=agent · prev=2c2403cb820ed90beb0f126edc241d6975959 |
-| 2026-07-14 12:47:47 | `file.write` | skills/br/assets/frame-template.md · tool=Edit · session=c7f6e21c · actor=agent · prev=8612c11a490de4af222aff6e77531b6b5 |
-| 2026-07-14 12:48:07 | `file.write` | skills/br/SKILL.md · tool=Edit · session=c7f6e21c · actor=agent · prev=1a1c3359592b65100ad23abf1b55bba4e94aecda50aa9bdf2 |
-| 2026-07-14 12:48:28 | `file.write` | skills/br/SKILL.md · tool=Edit · session=c7f6e21c · actor=agent · prev=26d5357aeba64b5e211c0b42ee817dfc9db2f6fa52d5e3253 |
-| 2026-07-14 12:48:48 | `file.write` | skills/br/assets/queue.example.yaml · tool=Edit · session=c7f6e21c · actor=agent · prev=228b581aea8c27c10103ca2779e2171b |
-| 2026-07-14 13:14:30 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=c7f6e21c · actor=agent · prev=e91c07e0370e07590e7f0a4354438f144525c |
-| 2026-07-14 21:33:12 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/skills/dev-loop/br.md'] · prev=9b5ca3195507b9ac9281f9e54ad3ffa |
-| 2026-07-14 21:33:12 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=9b5ca3195507b9ac9281f9e54ad3ffa316f020cad |
-| 2026-07-14 21:33:12 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=9b5ca3195507b9ac9281f9e54ad3ffa316f020cadee505493355d5ee599f41dc · h=728a |
-| 2026-07-14 22:18:11 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=728a1418891d3a044355baf345b2ea816f4d09642 |
-| 2026-07-14 23:02:18 | `task.new` |  · task=T-260714-01 · title=br proactive fill — interview tự điền theo default/spec-kit + slice DAG · state=proposed · a |
-| 2026-07-14 23:05:24 | `file.write` | llmwiki/wiki/sources/draft/140726-br-proactive-fill.md · tool=Write · session=15a64d8b · actor=agent · prev=206e043e8957 |
-| 2026-07-14 23:09:46 | `file.write` | llmwiki/html/140726-br-proactive-fill-seq.html · tool=Write · session=15a64d8b · actor=agent · prev=b8c686895ae244da3ea7 |
-| 2026-07-14 23:10:01 | `file.write` | llmwiki/html/140726-br-proactive-fill-seq.html · tool=Edit · session=15a64d8b · actor=agent · prev=59835234e65a0f085828f |
-| 2026-07-14 23:29:21 | `task.set` |  · task=T-260714-01 · state=approved · note=gate approve qua /goal · actor=agent · prev=8b435d75c5722fd91d5a9b0329c55872 |
-| 2026-07-14 23:34:29 | `file.write` | llmwiki/wiki/sources/draft/140726-br-proactive-fill-PLAN.md · tool=Write · session=15a64d8b · actor=agent · prev=44d0c0d |
-| 2026-07-14 23:34:40 | `task.set` |  · task=T-260714-01 · state=dispatched · note=Claude tự thi công theo PLAN · actor=agent · prev=e92d4c975774a4fa79749d2b |
-| 2026-07-14 23:35:18 | `file.write` | skills/br/assets/defaults.yaml · tool=Write · session=15a64d8b · actor=agent · prev=a397c5771ed920bac74a34ac6e9e49974998 |
-| 2026-07-14 23:36:55 | `file.write` | fdk/tools/br-fill.py · tool=Write · session=15a64d8b · actor=agent · prev=5e931ce9ad2105b77cf9df4c49bc6aed33cb4783c3a7dc |
-| 2026-07-14 23:37:30 | `file.write` | skills/br/SKILL.md · tool=Edit · session=15a64d8b · actor=agent · prev=1e493a4b84665942258d4eba86772d9944acd0f44e6954518 |
-| 2026-07-14 23:37:36 | `file.write` | skills/br/SKILL.md · tool=Edit · session=15a64d8b · actor=agent · prev=23fd52ea4965f498b9ea5ad1eae087e71c3516c816959a8d3 |
-| 2026-07-14 23:40:26 | `file.write` | llmwiki/wiki/draft/orca/140726-br-proactive-fill-report.md · tool=Write · session=15a64d8b · actor=agent · prev=941443e4 |
-| 2026-07-14 23:41:35 | `task.set` |  · task=T-260714-01 · state=completed · note=commit 82d6ab4 — usable, medic xanh · actor=agent · prev=c6171684995b1c5d28 |
-| 2026-07-14 23:48:30 | `file.write` | fdk/tools/br-fill.py · tool=Edit · session=15a64d8b · actor=agent · prev=a08bfc0e1e27966ec97e28606be6d5883adf59f81cdb1cb |
-| 2026-07-14 23:48:32 | `file.write` | skills/br/SKILL.md · tool=Edit · session=15a64d8b · actor=agent · prev=d944b7d15f420759ac284f2149710331b573435e2d693f105 |
-| 2026-07-15 19:21:36 | `file.write` | skills/visual-qa/assets/route-shots.mjs · tool=Edit · session=15a64d8b · actor=agent · prev=13a5ca30533d703f6e1d4426147b |
-| 2026-07-15 19:23:38 | `file.write` | skills/visual-qa/assets/route-shots.mjs · tool=Edit · session=15a64d8b · actor=agent · prev=34eadcc18df57801084df310bd06 |
-| 2026-07-15 19:25:13 | `file.write` | skills/visual-qa/SKILL.md · tool=Edit · session=15a64d8b · actor=agent · prev=21e6293b20e277e772865ebe3cf4335c56c1efab0c |
-| 2026-07-15 08:50:15 | `task.set` |  · task=T-260715-01 · state=done · note=10 task, UAT 2 pha PASS, e18c7b5 · actor=agent · prev=48700d970835f7766378d84177 |
-| 2026-07-15 08:55:17 | `task.new` |  · task=T-260715-02 · title=hấp thụ hallmark: nền design chung + cổng slop tất định + fill-default · state=proposed · ac |
-| 2026-07-15 08:57:21 | `file.write` | llmwiki/wiki/sources/draft/150726-hallmark-design-foundation.md · tool=Write · session=36e6562b · actor=agent · prev=a25 |
-| 2026-07-15 08:59:02 | `file.write` | llmwiki/html/150726-hallmark-design-foundation-seq.html · tool=Write · session=36e6562b · actor=agent · prev=f4125da5573 |
-| 2026-07-15 09:03:06 | `file.write` | llmwiki/html/150726-hallmark-design-foundation-seq.html · tool=Edit · session=36e6562b · actor=agent · prev=f8ecd3129ad8 |
-| 2026-07-15 09:05:28 | `task.set` |  · task=T-260715-02 · state=approved · note=gate: duyệt · actor=agent · prev=a73f541a3ee6a8d87eacacf4031680338e053d974e5 |
-| 2026-07-15 09:06:33 | `file.write` | llmwiki/wiki/concepts/design-foundation.md · tool=Write · session=36e6562b · actor=agent · prev=5428bade3734d964b6bc70ed |
-| 2026-07-15 09:07:37 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=36e6562b · actor=agent · prev=7288f4f183cb72284684223fd49f4f4aae |
-| 2026-07-15 09:07:54 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=36e6562b · actor=agent · prev=0bd03d577b65b2d6886a90232289bfd21e |
-| 2026-07-15 09:08:12 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=36e6562b · actor=agent · prev=bf856b517512dfbe2303018f81e8464e71 |
-| 2026-07-15 09:10:25 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=36e6562b · actor=agent · prev=2959de56ade27d369cac1abdbde7577360 |
-| 2026-07-15 09:11:37 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=36e6562b · actor=agent · prev=346d81010623a5d1f09667ae6c2a64e9c5 |
-| 2026-07-15 09:11:56 | `file.write` | skills/propose/SKILL.md · tool=Edit · session=36e6562b · actor=agent · prev=db7e9128d72df011706d78d7a0fd132bd1db3f1367b5 |
-| 2026-07-15 09:12:55 | `file.write` | harness/scripts/design-variety.py · tool=Write · session=36e6562b · actor=agent · prev=743622b10fba60b1d8a186b4ad303e904 |
-| 2026-07-15 09:15:35 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=36e6562b · actor=agent · prev=9f09c4b052d3b3270047226eb7f93cc5e4 |
-| 2026-07-15 09:20:37 | `task.set` |  · task=T-260715-02 · state=done · note=8 task, UAT 2 pha PASS, d5d65d9, đóng p-23 · actor=agent · prev=ae48b768e8e543cc |
-| 2026-07-15 11:20:03 | `task.new` |  · task=T-260715-03 · title=unknown ledger: fill-first-find-out-later + sổ nợ truy vết trả nợ · state=proposed · actor=a |
-| 2026-07-15 11:21:58 | `file.write` | llmwiki/wiki/sources/draft/150726-unknown-ledger.md · tool=Write · session=36e6562b · actor=agent · prev=6142ea132a70bf3 |
-| 2026-07-15 11:23:22 | `file.write` | llmwiki/html/150726-unknown-ledger-seq.html · tool=Write · session=36e6562b · actor=agent · prev=bc1a446b8bf9e62f4ce0183 |
-| 2026-07-15 12:59:19 | `task.set` |  · task=T-260715-03 · state=approved · note=gate: duyệt, chạy · actor=agent · prev=d5fab8ad713a1d22459efa349f902ebe79278 |
-| 2026-07-15 12:59:42 | `file.write` | skills/propose/SKILL.md · tool=Edit · session=36e6562b · actor=agent · prev=30878d70654891d6217941648b7ad10f589d7ea42d1a |
-| 2026-07-15 12:59:55 | `file.write` | skills/propose/SKILL.md · tool=Edit · session=36e6562b · actor=agent · prev=753f65a12bac9d49b1f132670557cb2ac09cd3722021 |
-| 2026-07-15 13:00:18 | `file.write` | llmwiki/wiki/draft/unknown/_template.md · tool=Write · session=36e6562b · actor=agent · prev=8c8e28705540a6c57de20079065 |
-| 2026-07-15 13:01:09 | `file.write` | harness/scripts/unknown-ledger.py · tool=Write · session=36e6562b · actor=agent · prev=b5a52e16ee83e20ba3ff28291330678c0 |
-| 2026-07-15 13:01:22 | `file.write` | harness/scripts/unknown-ledger.py · tool=Edit · session=36e6562b · actor=agent · prev=08b3b24aad3ad7bea1e75a22e6dd6aae0c |
-| 2026-07-15 13:01:42 | `file.write` | skills/propose/SKILL.md · tool=Edit · session=36e6562b · actor=agent · prev=02715db04f5f16cd660366d146765f8bc2e2f6845357 |
-| 2026-07-15 13:01:54 | `file.write` | skills/lint/SKILL.md · tool=Edit · session=36e6562b · actor=agent · prev=2028440ccd01e117cff51a0891fb4e1f809d1efc07b6f11 |
-| 2026-07-15 13:07:43 | `task.set` |  · task=T-260715-03 · state=done · note=6 task, UAT 2 pha PASS, 38ee2c5 · actor=agent · prev=1f8c898f64d27213dbd99c791d5 |
-| 2026-07-15 19:08:54 | `task.new` |  · task=T-260715-04 · title=skill qc-code: senior review 4 mục + test tái hiện auto-hook · state=proposed · actor=agent  |
-| 2026-07-15 19:10:42 | `file.write` | llmwiki/wiki/sources/draft/150726-qc-code-skill.md · tool=Write · session=36e6562b · actor=agent · prev=07c7e6f5230fc6fd |
-| 2026-07-15 19:12:06 | `file.write` | llmwiki/html/150726-qc-code-skill-seq.html · tool=Write · session=36e6562b · actor=agent · prev=7c8bd33bdf55e1dabc5b8c85 |
-| 2026-07-15 19:57:28 | `task.set` |  · task=T-260715-04 · state=approved · note=gate: duyệt, chạy · actor=agent · prev=38c567686bc3475e6009d45c4c0c609fc1071 |
-| 2026-07-15 19:59:40 | `file.write` | skills/qc-code/SKILL.md · tool=Write · session=36e6562b · actor=agent · prev=68e304588a49b9a7703b60a69df633c73716903f16c |
-| 2026-07-15 20:00:19 | `file.write` | harness/scripts/qc-regression.py · tool=Write · session=36e6562b · actor=agent · prev=f54b6f174a3804aef5b77f31b5a8a5bb50 |
-| 2026-07-15 20:00:55 | `file.write` | skills/verify-before-commit/SKILL.md · tool=Edit · session=36e6562b · actor=agent · prev=611fb3b1ce7e82e840b6b066aa6efd9 |
-| 2026-07-15 20:01:07 | `file.write` | skills/orca-workflow/SKILL.md · tool=Edit · session=36e6562b · actor=agent · prev=772146d7bdd34b9ea6408a976d304427b3747b |
-| 2026-07-15 20:06:09 | `task.set` |  · task=T-260715-04 · state=done · note=6 task, UAT 2 pha PASS, df37e05 · actor=agent · prev=0ebf7aa967bdbe2bdd8efb5013f |
-| 2026-07-16 08:29:43 | `task.new` |  · task=T-260716-01 · title=skill teach-me: giải thích 2 cấp + sơ đồ + drive runtime bằng debugger · state=proposed · ac |
-| 2026-07-16 08:31:07 | `file.write` | llmwiki/wiki/sources/draft/160726-teach-me-skill.md · tool=Write · session=36e6562b · actor=agent · prev=31443836f23bba2 |
-| 2026-07-16 08:32:50 | `file.write` | llmwiki/html/160726-teach-me-skill-seq.html · tool=Write · session=36e6562b · actor=agent · prev=bc4ac18a1fd3f73bfd11205 |
-
-<!-- log:auto:end -->
 ## 2026-07-01 — orca-onboard — html-tabs-redesign (propose)
 ## 2026-07-01 — docs-site-macos — 21-quy-tac-docs
 
@@ -503,3 +415,391 @@ T-260714-01 done: defaults.yaml (26 điều kiện + spec-kit) + br-fill.py (fil
 - Carve-out cứng: instrument tạm DỌN SẠCH sau (git diff xác nhận); không chạy được → khai "giải thích tĩnh" + ghi nợ unknown nếu khẳng định phụ thuộc runtime chưa thấy.
 - Sơ đồ hai đường: mermaid inline (mặc định) / HTML explainer glass docs-site-macos (opt-in khi giữ/chia sẻ). KHÁC /onboard-codebase + /join-project (cả dự án).
 - UAT hai pha PASS (teach-me): canary (3 trụ 5/5, harness 74/74, /teach-me tới tay + nội dung grounded-runtime) → main-URL smoke (đường mặc định, 74/74, reachable). Smoke dogfood trên frontier.py chứng bằng chạy thật. p-35 đóng 2/3 trụ (skill-only).
+
+## 2026-07-17 — propose — gộp gitignored-check trùng lặp về canonical (T-260717-01)
+- Nguồn: quét vấn đề tồn đọng → flywheel `spec-violation` đã tới ngưỡng 3 (harness-events.py m_stop, audit.py detect, okf-check.py content_files — cùng lỗi "quên skip file gitignored", mỗi lần vá bằng một bản copy logic riêng).
+- Điều tra lộ: `harness-lint.py` đã có sẵn meta-guard `WIKI_TREE_SCANNERS` bắt được cả 3 và khiến chúng được vá trong ngày (2026-06-28) — cơ chế phòng-ngừa hệ thống đã chứng minh hoạt động. Phần còn thiếu chỉ là dọn trùng lặp implementation trong `harness/scripts/`.
+- SPEC hẹp có chủ ý: chỉ trỏ `okf-check.py` về canonical `index_sync.gitignored()` qua pattern `_load()` mà `audit.py` đã dùng đúng — không file mới. `harness-events.py` giữ nguyên bản tự chứa vì nó là lõi PoC vendor-neutral (cài độc lập qua `curl | bash` vào project khác, không có `harness/scripts/` đi kèm) — Non-goal có lý do kiến trúc, không phải bỏ sót.
+- Ghi chú follow-up ngoài phạm vi: `wiki-graph.py`/`wiki-health.py` có `local_only_stem()` trùng lặp verbatim giữa 2 file — khác class lỗi, để dành propose riêng nếu cần.
+- Draft: `sources/draft/170726-gitignored-dedupe.md` + `html/170726-gitignored-dedupe-seq.html`. DỪNG chờ duyệt.
+
+## 2026-07-17 — housekeeping — dọn run-council*/ + sửa root cause thói quen output sai chỗ
+- Phát hiện: 6 thư mục `run-council`..`run-council6` untracked ở repo root (audit log xác nhận tạo rải từ 2026-07-05 20:10 đến 2026-07-06 11:28 — 6 phiên riêng biệt, mỗi phiên bump số để tránh đè bản trước).
+- Root cause: `skills/council/SKILL.md` (canonical) ví dụ Stage 2a/2c dùng `--out run/` — path tương đối trần, không trỏ `scratchpad/`, nên mỗi phiên tự đặt tên khác nhau ở repo root thay vì theo quy ước scratchpad đã có (đối chiếu `scratchpad/co-council/`, `scratchpad/council-eval/` — nhiều lần council TRƯỚC đã làm đúng).
+- Fix root: sửa 2 ví dụ lệnh trong canonical thành `--out scratchpad/council-<slug>/` + ghi rõ lý do (bài học 170726), sync ra mirror (`llmwiki/skills/orchestrate/council.md`) + installed (`~/.claude/skills/council/SKILL.md`) qua `fdk/tools/sync-skill.sh council`.
+- Dọn: gom 6 thư mục vào `scratchpad/council-archive-170726/` (giữ transcript, không xoá — reversible), không còn xuất hiện trong `git status`.
+- Ghi chú phụ, KHÔNG sửa trong lượt này: phát hiện 1 bản `council.md` lạc trong `llmwiki/wiki/skills/orchestrate/council.md` (nằm sai vị trí, wiki content chỉ nên ở concepts/entities/sources/draft/architecture/tours) — nêu ra, chưa dọn vì ngoài phạm vi việc đang làm.
+
+## 2026-07-17 — lint — wiki-sync 11 ngày drift (false-positive) + pattern-health (1 manifest thừa)
+- Bước 0 `wiki-sync.py --check`: exit 3, 264 file code/nguồn đổi kể từ neo `2067448d5d` (2026-07-06, 11 ngày). 63 trang wiki bị cờ code-drift (5 concept + 10 draft + 48 source).
+- Spot-check 5 trang concept bị cờ (đọc toàn văn): CẢ 5 đều được viết CÙNG LÚC hoặc SAU file code kích hoạt cờ (vd `design-foundation.md` 2026-07-15 cùng ngày `frontend-antipattern.py` được tạo) — nội dung khớp thực tế, không sai. Kết luận: cờ drift ở đây là "chưa đóng vòng review" (11 ngày không ai `--mark-synced`), không phải nội dung sai. 58 trang draft/source còn lại là ghi chép lịch sử tại-thời-điểm-viết, không cần đồng bộ liên tục.
+- Bước 1 (orphan, flag không sửa): 3 concept không được trang nào khác trỏ tới — `adapt-modes.md`, `design-foundation.md`, `skill-craft.md`.
+- Bước 5 (index gaps): lệnh mẫu trong SKILL.md giả định link dạng `llmwiki/wiki/...` nhưng `index.md` dự án này dùng path tương đối (`concepts/...`) → chạy đúng định dạng thì chỉ có **1 gap thật**: `sources/170726-session-provenance.md` (auto-distill hôm nay) — đã thêm dòng vào index.
+- Bước 6 (empty page, flag không sửa): `llmwiki/wiki/draft/orca/README.md` <5 dòng.
+- Bước 7/8/8b/8c: 0 file thiếu `## Origin` (2 README loại trừ hợp lệ), 0 marker `shortcut:` thiếu trigger, skill-health 30 skill có cờ description/negation (báo cáo, không chặn — xem `[[skill-craft]]`), 0 nợ unknown mở.
+- **Phát hiện mới ngoài checklist chuẩn**: `llmwiki/wiki/skills/` là một cây lạc **68 file** mirror toàn bộ skill docs, nằm sai vị trí (wiki content chỉ được phép ở concepts/entities/sources/draft/architecture/tours theo CLAUDE.md) — cùng gốc thời điểm với stray `council.md` đã ghi ở mục housekeeping trên (commit `0363f5d`, 2026-07-02). KHÔNG dọn trong lượt này (68 file, vượt soft-diff-budget) — khuyến nghị `/raise-issue` riêng.
+- Pattern-health (`health-check.py`): 1 file "thiếu" (`llmwiki/skills/README.md`) hoá ra là bị XOÁ CÓ CHỦ Ý ở cùng commit `0363f5d` (33 dòng, thay bằng whiteboard) nhưng `.template-manifest.json` quên gỡ tên — xoá đúng 1 dòng thừa trong manifest (root-cause fix, không phục dựng file đã xoá chủ ý). Sau sửa: 75 pattern, 0 missing; 26 pattern "cũ hơn remote" lộ ra đúng thực chất sau khi bỏ entry ma — khớp `[[framework-multi-session-dev]]` (repo này local-ahead, KHÔNG sync/revert).
+- Chốt neo: `wiki-sync.py --mark-synced` sau khi review xong.
+
+## 2026-07-17 — propose — absorb-six-sources
+Draft SPEC absorb HÒA TAN 6 nguồn GitHub (gstack review, awesome-skills code-review, everything-claude-code security-review, anthropics frontend-design, claude-mem portability, superpowers receiving-review+systematic-debugging) → nâng qc-code / orca-sec-scans / mem-rank / design-foundation / orca-issue. T-260717-02, chờ gate.
+
+## 2026-07-17 — plan — absorb-six-sources-PLAN
+PLAN 6 task thi hành cho T-260717-02 (FR-001..007 phủ đủ, R18 xanh). Executor: Claude in-session.
+
+## 2026-07-18 — propose — capability-proof-map
+SPEC checklist năng lực tự soi + tự cộng: proof-resolver 6 tầng trong build-capabilities, medic probe capproof (ratchet), guard fire-drill. T-260718-01, chờ gate.
+
+## 2026-07-18 — plan — capability-proof-map-PLAN
+PLAN 4 task (resolver 6 tầng / probe ratchet / guard 4 chiều / dups+mech). Executor: Claude in-session.
+
+## 2026-07-18 — propose — archetype-tester
+SPEC vai thứ 6 tester (/test): persona thiết kế test neo FR/SC + code qc-*. T-260718-02, chờ gate.
+
+## 2026-07-18 — fdk-uat — batch grower+tester+maintainer lên orca
+Canary 260718-1101 vòng 1: 10/12 — lens TESTER bắt 2 lỗi thật (persona không travel global; wikieval self-test không hermetic). Fix faf5918 → vòng 2: 12/12. PHA 2 main-URL smoke 0-override: 7/7. orca @ faf5918, canary đã xoá, stamp 1.3.24.
+
+## 2026-07-18 — raise-issue — council-self-index-remaining-scope
+Draft 020726-council-chon-de-thi-self-index verify chéo 6 nguồn: hạ tầng nền đã ship (d4d8b90), phần lõi (council tự chọn đề thi) chưa. Mở GH#81 giữ scope còn lại, priority P3 ready-for-human. Task T-260702-02 → superseded.
+
+## 2026-07-18 — persona-beneficiary — chống miscontext lens
+Feedback: dùng lens grower phân tích RedPlanetHQ/core, metric bị đo trên chính framework thay vì dự án đích (ngược ADR-004). Fix root-cause: thêm dòng **Beneficiary** vào cả 6 file `llmwiki/personas/*.md` — mặc định đo trên DỰ ÁN ĐÍCH, ngoại lệ duy nhất là phiên /fdk khai rõ. Memory máy-local `persona-lens-beneficiary` ghi kèm.
+
+## 2026-07-18 — mem-rank-episodic-wire — bật 2/3 thí nghiệm mượn từ RedPlanetHQ/core
+Sau khi mổ code CORE (temporal invalidation + hybrid recall) và đối chiếu với framework, wire 2/3 cải tiến đã đo metric/guardrail:
+1. `llmwiki/.claude/hooks/stop.py` — `secondary_memory()` giờ gọi thêm `mem-rank.py episode` mỗi phiên có git-dirty (did=commit subject, files=đổi trong phiên). Trước bản vá này tầng episodic CHƯA từng tự ghi (`memory.jsonl` rỗng) — chỉ chạy tay qua `/record-episode`.
+2. `llmwiki/skills/wiki-loop/lint.md` step 0b — thêm rubric 4 nhánh (contradiction/superseding/progression/equivalence) để phân loại code-drift trước khi sửa trang; nhánh `superseding` dùng frontmatter `invalid_at`/`invalidated_by` (đóng dấu, không xoá) thay vì sửa đè câm lặng — mượn ý bi-temporal của CORE, R9 không chặn khoá lạ nên an toàn thêm.
+3. **Chưa làm** (item 1/3 — bật embedder semantic cho mem-rank): cần Ollama cài local, máy hiện không có (`which ollama` → not found). Adapter đã sẵn (`harness/mem-rank.config.yaml` + `embed-ollama.py`), chỉ còn bước hạ tầng ngoài phạm vi code — để lại nguyên trạng `verified:false`.
+Verify: `mem-rank.py --self-test` PASS, dry-run episode ghi+retrieve đúng trong store tạm, `medic --ci` 14/14 + toàn bộ step CI repo-health (wiki-health/arch-scan/harness-lint/parity/dup-basename/7 test bash/harness-doctor/build-capabilities/adapt-registry) đều xanh trước khi push.
+
+## 2026-07-19 — propose — travel-gap-forcing-functions
+Draft T-260719-01: bịt 3 lỗ travel đường curl update (stamp surface thiếu 4 nhóm file · 34 skill trỏ path repo-relative chết ở downstream · fdk-uat/poc chỉ test dự án trống) — mỗi fix kèm forcing function (fdk-gate/medic · harness-lint · cổng /ship); T3 nâng thành fixture "dự án dang dở" dùng chung uat+poc theo góp ý user. Cặp: sources/draft/190726-travel-gap-forcing-functions.md + html/190726-travel-gap-forcing-functions-seq.html. STOP chờ duyệt.
+
+## 2026-07-19 — propose — graph-lessons-grapuco
+Draft T-260719-02: đọc thread cộng đồng Grapuco qua 3 lens persona (Grower/Prototyper/Maintainer) → 6 task chia theo độ chắc bằng chứng "sửa 2, đo 3, nháp 1". Phát hiện lõi: `/query` KHÔNG đọc `stale.json` (grep ra 0) — cờ code-drift do wiki-sync ghi chỉ tiêu thụ ở /lint, đường đọc mù → đúng kịch bản "graph là source-of-truth mà nội dung lệch" thread cảnh báo. Hở thứ 6 do user nêu: ranh giới persona là ngõ cụt (archetype.py không có handoff) → nối /raise-issue (hoãn) + council roster (gọi vào room ngay), cả hai nửa đã có sẵn. Loại phương án Context Hub vì thừa hưởng đúng 2 vết thương thread chỉ ra. Cặp: sources/draft/190726-graph-lessons-grapuco.md + html/190726-graph-lessons-grapuco-seq.html. STOP chờ duyệt.
+
+## 2026-07-20 — thi hành T-260719-02 — graph-lessons-grapuco (6/6 task)
+T1 wiki-sync `--flags-for` (fail-open, luôn exit 0) + query SKILL bước 3b — cờ code-drift cuối cùng tới ĐƯỜNG ĐỌC; test 11/11, chứng trên 3 trang drift thật. T3 sync-log.jsonl (137ms, 0 token). T4 đổi golden extract-site→newcomer-adr, giữ trần 30, HIT recall 1.0, hit@5 30/30, baseline chốt lại. T6 6 persona + 6 archetype vào council roster (case lifecycle, profile archetype, 3 cặp đối-trọng) — ranh giới persona hết là ngõ cụt. T2 ĐỔI KẾT LUẬN: code-graph MCP HỎNG (ghi/đọc lệch DB; reindex OK mà search `no such table`), A/B 37 vs 14 call cùng độ chính xác 5/5 — đo được chi phí tool hỏng, KHÔNG đo được giá trị code-graph; dừng ở số, handoff issue 200726-code-graph-index-broken cho maintainer. T5 NO-GO vì cùng nền hỏng. medic --ci 14 ok.
+
+## 2026-07-20 — /fdk propose — orchestration-loop-closure
+T-260720-01 Pha 1. Thử Orca trước theo yêu cầu: ĐO LIVE runtime — 59 task, 42 completed, 8 có deps, 18 terminal, 4 CLI khác vendor (claude/opencode/agy/copilot) ⇒ Orca LÀM ĐƯỢC, chưa cần herdr (điều kiện user không kích hoạt; herdr vẫn là ẩn số). Nhưng phép đo phơi ra 17 task treo (12 ready + 2 blocked + 3 failed) từ 22/05→17/07 — vòng phản hồi HỞ. dispatch-verify chỉ đóng vòng proposal↔đĩa, không chạm runtime state. Theo Meadows: thêm vòng phản hồi trước, không thêm tính năng. 3 task: orca-reconcile (chỉ báo cáo, fail-open, KHÔNG tự đóng) · probe medic thứ 15 mức warn · triage 17 task. Pha 2 (orchestrator tự học + ghim vai↔worktree↔CLI) chỉ mở khi SC-004 đạt. STOP chờ duyệt.
+
+## 2026-07-20 — /fdk thi hành T-260720-01 — nguyên thuỷ "biết khi nào agent xong"
+User phản biện "orca-workflow toàn tự làm" → ĐO LẠI: user ĐÚNG, tôi SAI. 59 task orchestration, chỉ 13 (22%) từng dispatch, 46 (78%) có dispatch:null; 14/14 task ready+blocked chưa từng giao. Nhưng gốc KHÔNG phải Orca không giao được: dispatch thật cho opencode chạy ngon, còn `terminal wait --for tui-idle` TIMEOUT 90s trên việc xong sau 9s (status vẫn "running" vì đó là shell). Orca không có agent_status ở đâu cả (soi terminal list 12 trường + worktree ps). Clone+đọc herdr (Rust 233k LOC, AGPL-3.0): nó có agent_status working/blocked/done vì QUAN SÁT pane thay vì tin worker tự khai. Mode HÒA TAN: lấy ý tưởng, cài bằng đồ Orca — sentinel `<cmd>; echo __ORCA_DONE__<id>:$?` + poll terminal read. T1 orca-dispatch.py (self-test 9/9). T2 chứng thật: opencode 9385ms exit=0 "Hà Nội" · agy 9088ms exit=0 "Tokyo" · nhánh lỗi 2337ms exit=127 → harness/metrics/dispatch-proof.json. T3 orca-reconcile.py (self-test 9/9, nhóm chính chưa-từng-dispatch) + probe medic thứ 15 mức WARN. T4 bản đối soát 17 task: 6 đóng được (bằng chứng cứng), 11 thuộc dự án khác → GIỮ, chờ user xác nhận (không xoá thứ mình không hiểu). medic --ci 0 fail 14 ok.
+
+## 2026-07-20 — /fdk vá gap scope — sổ task Orca là runtime-global
+User hỏi "HRIS/DMS/email-viewer là gì sao có trong này" → truy ra: sổ orchestration của Orca RUNTIME-GLOBAL (guide Orca nói thẳng), 18 terminal của nhiều dự án cùng ghi MỘT sổ. 11/17 task treo thuộc bonbon-ai · HRIS/payroll · DMS Coteccons · 5 sân test framework — không phải nợ của repo này; tôi đã trình bày sai chỗ đó. Nguy hiểm hơn báo cáo nhiễu: orchestrator ở dự án A claim được task dự án B, phá đúng mục tiêu tách-bias-tầng-vật-lý. Orca không có trường dự án (task-create không tag, task-list không lọc — đã kiểm). Vá ở tầng ta: (ghi) orca-reconcile.py --stamp đóng dấu repo root lúc task-create, đúng vĩnh viễn kể cả khi terminal chết (0/17 terminal cũ còn sống); (đọc) --scope current|all, thứ tự tin cậy stamp > map người-xác-nhận > dò path > unknown; fail-safe CHỈ loại task chứng minh được là của dự án khác, unknown thì GIỮ (vứt đi sẽ báo "0 treo" trong khi 3 task của mình đang nằm đó — đã dính bug này, test khoá lại). harness/orca-project-map.json backfill 11 task user xác nhận. Đóng 6 task của chính repo (3 có bằng chứng đã ship + 3 thí nghiệm chết). Kết quả: scope current 0 treo, medic 0 fail 0 warn 15 ok.
+
+## 2026-07-20 — /fdk sửa code-graph MCP (issue P1)
+Đọc code server (workspace/graph, 2087 LOC) thay vì đoán từ triệu chứng → chẩn đoán cũ của tôi SAI ("đường ghi/đọc lệch DB"). Thật ra 2 bug: (1) _each_db/get_stats fan-out qua MỌI DB registry mà get_all_db_paths chỉ kiểm .exists() → ĐÚNG MỘT db thiếu bảng symbols (payroll-frontend-develop) ném lỗi giết cả truy vấn, dù 16 DB kia lành — giải thích vì sao reindex báo thành công mà search vẫn hỏng; (2) list_projects dùng basename.rsplit("-") tàn dư layout cũ → mọi repo hiện thành "index.db". Đính chính số liệu: tôi từng báo "11 DB hỏng" — sai, do ổ ngoài chưa sẵn sàng lúc đo; thật là 1. Sửa tại HÀM DÙNG CHUNG (is_usable_db trong get_all_db_paths) thay vì vá từng caller. Commit 2727ede repo graph. Sau sửa: 17→16 DB, list_projects trả tên repo thật, search_symbols("flag_stale") trả 8 kết quả, 53.208 symbol query được. CÒN: phải restart MCP server (process giữ code cũ — vừa kiểm, vẫn trả 17x index.db).
+
+## 2026-07-20 — /fdk đóng issue code-graph + đo lại A/B trên tool đã lành
+Sau restart, verify từ client: list_projects trả 16 tên repo thật (trước 17x "index.db"), get_stats 16 project/5963 file/53208 symbol/550651 edge (trước "no such table"), search_symbols("flag_stale") ra đúng wiki-sync.py:138. Chạy lại A/B 5 task x 2 nhánh: lần 1 (tool hỏng) 37-vs-14 = 2.64x đắt; lần 2 (tool lành) 24-vs-16 = 1.50x. Tách theo LOẠI TRA CỨU mới ra kết luận thật: tra HÀM/LỚP/METHOD 11-vs-11 HOÀ; tra HẰNG SỐ 13-vs-5 THUA 2.6x — vì code-graph CHỈ index function/class/method, search_symbols("CONTENT_DIRS") trả rỗng, agent thử rồi phải quay về grep nên trả phí hai lần. Sửa dòng orientation trong session_start.py khai rõ phạm vi (hàm/lớp/method + get_callers; hằng số·config·chuỗi thì grep thẳng) — một dòng biến khoản thua thành hoà. Trả lời thread Grapuco: với ca định-vị-hàm ở repo cỡ này, "model đã đủ giỏi đọc repo" là ĐÚNG; giá trị còn lại của code-graph nằm ở get_callers/quan hệ gọi (550k cạnh) mà grep không làm được — CHƯA đo. medic 0 fail 15 ok.
+
+## 2026-07-20 — /fdk vá lớp lỗi "TỒN TẠI ≠ DÙNG ĐƯỢC"
+User hỏi: tool cứ chết ngang thì kiểm kiểu gì. Truy ra lỗi CẤU TRÚC: orientation quảng cáo code-graph dựa trên đúng một câu `(root/".graph-agent"/"index.db").is_file()` — tức "file có tồn tại không". DB 0 byte, DB thiếu schema, server chết, server chạy code cũ đều lọt. Đó là lý do code-graph hỏng nhiều tuần mà mọi phiên vẫn bị lùa vào (đo 37 tool-call vs 14). Nguyên tắc mới: QUẢNG CÁO MỘT NĂNG LỰC = PHẢI THĂM DÒ NÓ, không phải kiểm sự tồn tại của nó. dep-health.py (probe code-graph: DB có schema + tiến trình server sống; orca: CLI + runtime ready), self-test 8/8 không cần dependency nào. session_start đảo thành fail-CLOSED: không chứng minh được là chạy thì KHÔNG quảng cáo (fail-open ở tầng hook, fail-closed ở tầng quảng cáo). medic probe thứ 16 "deps" mức warn. Test dep-health-gate khoá 3 bất biến 5/5. TRẦN ĐÃ BIẾT ghi thẳng docstring: không bắt được ca "server chạy code CŨ" — hook không nói được giao thức MCP.
+
+## 2026-07-20 — /fdk quét + vá TOÀN BỘ lớp lỗi "TỒN TẠI ≠ DÙNG ĐƯỢC"
+User: "xem có đứa nào tương tự nữa không, fix luôn tất cả 1 cách hệ thống". Audit toàn repo (hooks/harness/fdk-tools/skills) tìm được 8 chỗ THẬT SỰ SAI (và xác nhận nhiều chỗ KHÔNG sao — file tĩnh thì tồn tại đúng là dùng được, không báo nhầm). Đã vá theo mức nguy hiểm:
+T1 hook auto-chạy — code_graph_keeper.py: cùng predicate index.db.is_file(), nặng hơn session_start vì nó GHI vào registry global ~/.graph-agent/repos.txt và DẬP TẮT cảnh báo "chưa index"; nay đòi DB dùng được, dùng chung định nghĩa db_has_schema của dep-health (import theo path, fallback tại chỗ, hook không bao giờ chết).
+T2 cổng sức khoẻ nói dối — harness-doctor probe_precommit_installed TỰ THU bằng chứng ngược ("binary NOT on PATH") rồi vẫn return True; nay installed AND binary. medic p_backstop docstring hỏi "còn sống" mà trả lời bằng .exists(); nay kiểm cả binary trên PATH.
+T3 hệ PROOF nói dối ở quy mô danh mục — build-capabilities: ĐO ĐƯỢC 200/200 "bằng chứng" KHÔNG thực thi gì (tests/selftest/golden/rule-map/dir-exists đều là tồn-tại-file hoặc trùng-chuỗi; "thư mục tồn tại" bán thành proof liveness). Mà CAPABILITIES.md — file CLAUDE.md dặn agent tin — in tiêu đề "năng lực còn SỐNG". Nay gọi đúng tên: "Neo bằng chứng — N/M có neo KHAI BÁO" + đoạn giải thích rõ nó bắt được gì (năng lực không neo vào test/golden nào) và KHÔNG bắt được gì (test đỏ, engine chết), trỏ sang dep-health cho câu hỏi liveness. medic capproof đổi "proven" → "có NEO khai báo (tĩnh, chưa thực thi)". medic p_narrative khai rõ live_probe chỉ kiểm đường dẫn tồn tại. Để lại shortcut marker: nâng lên chạy thật khi có ngân sách CI, rẻ nhất là tier selftest.
+T4 code-state: "index có (0KB)" là FACT sai lên overstack.html; nay "index dùng được (22335 symbol)" / "index HỎNG (thiếu bảng)".
+T5 skill prose orca-onboard: gate "server đang khai báo" → đòi dep-health status ok; và mô tả keeper khớp hành vi mới.
+medic 0 fail 16 ok · dep-health-gate 5/5 · capability-stamp 1.3.37→1.3.38.
+
+## 2026-07-20 — /fdk 5-Why thành mặc định + trả lời "thẻ ghi-tạm có đóng không"
+User hỏi: ghi tạm xong có đóng không → ĐO: 20 thẻ p-auto, 19 MỞ 1 đóng. Hook session_end sinh thẻ tự động nhưng KHÔNG có gì đóng chúng — xác nhận root đã nêu: bắt nợ có, trả nợ không.
+5-Why lập kế hoạch sửa chữa 8 mục, phát hiện HỘI TỤ: 5/8 (thẻ ghi-tạm 19/20 · issue mở 24 · pattern lệch 15 · file chưa rà wiki 39 · task treo 17) chung MỘT root — hệ giỏi PHÁT HIỆN nợ, không có nhịp TRẢ nợ. Đòn bẩy Meadows: thêm MỘT đường trả nợ, không thêm bộ phát hiện thứ sáu.
+Phát hiện ngoài dự kiến trong lúc lập kế hoạch: 10 tiến trình code-graph server orphan (cũ nhất 15/07, mỗi phiên spawn một, không ai dọn) ⇒ _proc_alive("graph/server.py") của dep-health khớp BẤT KỲ cái nào, kể cả orphan chạy code cũ — tôi vừa mắc lại chính lớp lỗi mình đi sửa, mức nhẹ. Phát hiện được từ ngoài: so ps -o lstart của process với git log -1 của repo server.
+Ghi 5-Why thành MẶC ĐỊNH vào llmwiki/CLAUDE.md + AGENT.md (đặt TRƯỚC cái thang: hiểu đã rồi mới lười đúng chỗ): viết chuỗi ra không nghĩ thầm · dừng ở cấu trúc không dừng ở "vì người ta quên" · tìm hội tụ trước khi sửa · nghi ngờ chẩn đoán đầu tiên của chính mình (ca code-graph) · ngoại lệ duy nhất là việc không chứa chẩn đoán. Parity AGENT↔CLAUDE xanh. medic 0 fail 16 ok.
+
+## 2026-07-20 — /fdk truy tận gốc vụ "10 con server cùng sống"
+User: "10 con cùng sống là lỗi to vl rồi còn gì" — đúng, tôi đã đánh giá nhẹ. 5-Why + đo thật, ra CHUỖI lỗi chứ không phải một lỗi:
+1. RÒ RỈ CONNECTION (repo graph, commit 2c2653a): indexer.py:154 `get_stats(get_conn(db_path))` mở connection inline không đóng — nằm trên đường index nên mỗi lượt reindex rò 1 fd. Đo: 1 server sống 3 ngày giữ 369 fd tới CÙNG 1 file (712 fd, chỉ 3 file riêng biệt). Chưa sập vì trần fd máy này là 1.048.576, KHÔNG phóng đại thành nguyên nhân "chết ngang".
+2. ORPHAN: 10 tiến trình, mỗi phiên spawn 1, không ai dọn. RAM chỉ 152MB, CPU 0
+## 2026-07-20 — /fdk truy tận gốc vụ "10 con server cùng sống"
+User: "10 con cùng sống là lỗi to vl rồi còn gì" — đúng, tôi đánh giá nhẹ. Đo thật ra một CHUỖI lỗi:
+1. RÒ RỈ (repo graph 2c2653a) indexer.py:154 mở connection inline không đóng; 1 server 3 ngày giữ 369 fd tới CÙNG 1 file. Chưa sập vì trần fd = 1.048.576.
+2. ORPHAN 10 tiến trình, mỗi phiên spawn 1, không ai dọn. Nhưng 152MB/0% CPU — không phải vấn đề tài nguyên.
+3. LỖI CỦA TÔI #1: _proc_alive hỏi "có tiến trình nào không". Sửa: so ps -o lstart với git log -1 repo server, BẮT ĐƯỢC ca "server chạy code cũ" mà bản trước tự khai là giới hạn kiến trúc.
+4. LỖI CỦA TÔI #2 (hỏng thật): reap định nghĩa orphan = "không phải cái mới nhất", kill 9 con, TỰ CẮT MCP phiên này; con sống sót thuộc phiên Claude khác. Sửa: is_orphan = CHA ĐÃ CHẾT.
+5. LỖI CỦA TÔI #3 (nặng nhất): db_has_schema dùng mode=ro. WAL cần -shm; server tắt thì mode=ro báo hỏng trên DB LÀNH. Lời giải cho lần đo đầu "11 DB hỏng" — tôi đổ oan cho ổ ngoài. Vá 4 chỗ gồm db.py server (801651b) nơi nó lọc get_all_db_paths.
+
+## 2026-07-20 — /fdk kiểm kê graph + centralize #2/#3
+Trả lời 4 câu của user. TẠO: #1 code-graph do reindex_repo; #2 wiki-whiteboard + #4 memory-map do stop.py::regen_docs cuối phiên; #3 wiki-graph.py dựng trong RAM mỗi lần gọi; #5 skill-whiteboard thủ công, 17 ngày không ai gọi. DELIVER: travel-policy cho #2/#3/#4 đi xuống (nhóm memory_query), #5 framework_only ở lại, còn #1 code-graph KHÔNG có trong travel-policy lẫn template-manifest — nó là MCP server riêng ở workspace/graph, downstream curl-cài KHÔNG hề có. UPDATE: #2/#4 tự sinh lại cuối phiên khi git-status có diff wiki/ hoặc code; #1 watcher debounce 2s nhưng chỉ trên máy có server.
+KIỂM KÊ: 5 graph THẬT gộp về 3 mô hình. #1 code-graph (22.213 symbol, 272.529 cạnh: 253.969 CALLS + 18.560 IMPORTS) là cái DUY NHẤT agent truy vấn theo quan hệ lúc chạy; #2/#4/#5 để NGƯỜI nhìn; #3 là CLI thủ công. #4 và #5 chỉ importlib renderer của #2 — lười đúng cách. CHẾT: graph.db ở gốc repo (xác minh 0 file/0 symbol/0 cạnh), wiki-graph-static.html, skill-whiteboard drift 17 ngày. KHÔNG phải graph: mem-rank (danh sách xếp hạng), ledger.jsonl (chuỗi), stale.json (dict phẳng), fdk-problem-tree (CÂY, mỗi node 1 cha).
+CENTRALIZE #2+#3 (user chốt): hai bản cài trả lời cùng câu hỏi "cái gì link tới cái gì" bằng hai regex độc lập, LỆCH THẬT 208 vs 164 cạnh, mỗi bên sai một kiểu nên không chọn bừa bên nào làm chuẩn — #3 không bỏ code-fence (đếm [[...]] trong ví dụ code), #2 giữ nguyên [[trang#anchor]] (sinh cạnh trỏ vào hư không). Nay một nguồn: wikilink_targets()/mdlink_targets() ở wiki-graph.py, build-wiki-graph.py import qua importlib có fail-open về regex local. #3 giảm 208→194 (loại 14 cạnh giả). Test wikigraph-single-source 4/4 khoá cả ba bất biến.
+
+## 2026-07-20 — /fdk (a) nhúng graph vào overstack + (c) touches tự suy
+User: "touch không tự update là vấn đề hệ thống" — đúng, và cùng root với 19/20 thẻ ghi-tạm, 24 issue mở, 15 pattern lệch.
+5-Why touches: cũ vì wiki-relations.py chạy 1 lần 02/07 → nó là MIGRATOR không phải MAINTAINER → không ai nối vào nhịp → vì được đóng khung "dập quan hệ vào frontmatter" → ROOT: một sự thật SUY RA ĐƯỢC bị cất như sự thật ĐƯỢC KHAI; cất rồi thì đóng băng. wikilink không bao giờ cũ vì suy lại mỗi lần dựng.
+(c) Chuyển logic suy touches từ writer sang ENGINE: wiki-graph.py thêm touches_targets(text, repo_root) — path trong backtick, có "/", TỒN TẠI trên đĩa. Lưu ý ngược với wikilink_targets: KHÔNG strip_code vì path nằm chính trong inline-code. build-wiki-graph.scan() suy sống mỗi lần dựng, frontmatter vẫn thắng (không nhân đôi). KẾT QUẢ: touches 21 → 283 cạnh, và 283/283 đích tồn tại thật (zero false-positive vì điều kiện bắt buộc có trên đĩa). Cầu nối concept↔code từ 0,8% lên ~10% tổng cạnh, và không thể cũ nữa.
+(a) Nhúng #4 memory-map + #5 skill-whiteboard vào overstack.html bằng iframe srcdoc. Lý do chọn iframe thay vì tách fragment renderer: iframe cô lập JS/id nên KHÔNG phải mổ template 350 dòng của build-wiki-graph.py — engine đó đang travel. overstack.html 145KB → 412KB, 2 iframe, unescape ra tài liệu hợp lệ. Vì overstack.html là "output travel" nên #4/#5 giờ đi xuống máy user mà không cần đổi travel-policy.
+Kiểm kê trả lời user: #1 code-graph (symbol→symbol) và #3 wiki-link (trang→trang) KHÔNG giải chung bài toán — khác node, khác câu hỏi. Cầu nối concept→code là #2 touches, và trước hôm nay nó gần rỗng.
+
+## 2026-07-20 — /fdk chốt khung: MỘT bài toán graph, ghi thành concept
+User chốt khung: "cả 3 cái đều để giải 1 bài toán thôi — artifact liên quan gì đến nhau và liên quan gì đến code; code liên quan gì đến nhau là sản phẩm phụ", và "grep lời không không giải quyết được".
+ĐO ĐỂ CHỨNG: wiki-sync.map_suspects CHÍNH LÀ touches đảo chiều, cài bằng grep. Trên cùng 8 file code đổi — grep nghi 36 trang, graph có cạnh thật 25, trùng 21 ⇒ grep báo THỪA 15 và BỎ SÓT 4. Hỏng cả hai chiều, dù docstring tự nhận "thiên về recall". Cờ drift toàn hệ đang do phép đoán quyết định trong khi cạnh thật nằm sẵn trong graph.
+Ghi wiki/concepts/graph-model.md: bài toán thật · 5 bản cài = 3 lát cắt (artifact↔artifact, artifact↔code là lý do tồn tại, code↔code là sản phẩm phụ) · bằng chứng grep hỏng · bài học gốc "sự thật SUY RA ĐƯỢC thì phải SUY đừng CẤT" · vì sao từng có 2 scanner · code-graph KHÔNG travel · 3 việc còn nợ theo thứ tự · và END STATE.
+END STATE (trả lời "sau merge còn gì"): MỘT engine wiki-graph.py giữ model; nhiều view không view nào tự dựng model (build-wiki-graph = renderer, memory-map/skill-whiteboard đã là renderer, wiki-sync ĐỌC graph thay grep, /lint /query tiêu thụ cờ); BIẾN MẤT HẲN: wiki-relations.py (cả 2 việc của nó — derives-from từ ## Origin, touches từ backtick — đều suy ra được, nên writer hết lý do tồn tại, và mất luôn khái niệm "dập quan hệ vào frontmatter" tức mất nguồn gốc việc quan hệ bị đóng băng), graph.db gốc repo (0/0/0), wiki-graph-static.html; NGOÀI HỆ tuỳ chọn: code-graph MCP gác bằng dep-health.
+
+## 2026-07-20 — /fdk cài i-have-adhd + hook vào đầu phiên + file bàn giao
+Cài skill i-have-adhd (github.com/ayghri/i-have-adhd) đúng quy trình: canonical skills/ → LOOP_MAP utils → sync mirror → bảng Skills ở CLAUDE.md + AGENT.md (parity 82/82) → provenance ghi nguồn+sha → npx skills add --global.
+FRESH-INSTALL BẮT ĐÚNG TÔI: sau khi đăng ký bảng mà chưa cài global, medic báo "SKILL RỚT — doc hứa nhưng user KHÔNG nhận được: i-have-adhd". Chính lớp lỗi "documented ≠ delivered" truy cả phiên, và harness bắt được người truy nó. Sửa bằng npx skills add . --global --all.
+Hook output_style() vào session_start, gọi TRƯỚC orient(). Chỉ in khi skill thật sự có mặt trên đĩa (thăm dò, không đoán — theo đúng luật đã học). Khai rõ ranh giới vì hai luật kéo ngược nhau: i-have-adhd cắt ngắn CHAT, còn CLAUDE.md bắt tài liệu-người-đọc phải văn xuôi đầy đủ ⇒ phân xử: skill áp cho CHAT, file tài liệu (ADR/proposal/README/report/HTML) giữ luật cũ.
+File bàn giao wiki/sources/draft/200726-graph-foundation-handoff.md: 6 việc theo thứ tự (bước 0 travel-policy vs installer là CHẶN, rồi --also, bỏ imports, wiki-sync đọc graph, merge, CAPABILITIES sinh từ graph), 4 việc dọn nhỏ, nợ mở, và 5 cạm bẫy phải đọc trước khi sửa code.
+
+## 2026-07-20 — /fdk skill /orca-handover + thư mục sources/handover/
+Pre-flight #3: grep ra KHÔNG có skill nào làm việc này. Ba cái gần nhất và ranh giới đã khai vào description để router không chọn nhầm — record-episode ghi cho MÁY truy hồi ngữ nghĩa (mem-rank); plan là brief thi hành cho task ĐÃ duyệt và đã rõ; orca-cli 'full handoff' là chuyển quyền sở hữu worktree. Khoảng giữa — việc CÒN DỞ và CÒN MƠ HỒ — không ai giữ, nên phiên này phải viết tay file bàn giao.
+Skill quy định 7 mục bắt buộc (đọc trước · việc tiếp theo có ⏱ và cái CHẶN · dọn nhỏ · nợ mở · cạm bẫy · ĐÃ THỬ VÀ BỎ · origin) + 3 nguyên tắc: số đo thay tính từ, thứ tự phải có lý do và chỉ rõ cái chặn, cạm bẫy là phần đắt nhất. Rule cấm chép transcript (>200 dòng là dấu hiệu chép thay vì chắt).
+Thư mục RIÊNG llmwiki/wiki/sources/handover/ theo yêu cầu user, không trộn vào sources/draft/ — draft là đề xuất chờ duyệt, handover là việc đang chạy dở; hai vòng đời khác nhau. R5 chỉ kiểm subfolder cấp một nên hợp lệ. Đã chuyển 200726-graph-foundation-handoff.md sang.
+Đăng ký đủ: canonical → LOOP_MAP orchestrate → mirror → bảng Skills CLAUDE+AGENT (parity 83/83) → provenance → global. medic 0 fail 16 ok. problem-tree +p-41 (travel-policy nói ngược installer) +p-42 (CAPABILITIES là kiểm kê không phải bản đồ) +p-43 (solved).
+
+## 2026-07-20 — /fdk sửa travel-policy phân loại sai medic.py
+Stop hook báo fresh-install ĐỎ: "engine global THIẾU: fdk/tools/medic.py". Truy ra mâu thuẫn BA NGUỒN: downstream-contract.yaml:54 khai medic.py trong must_reach_global_engines (BẮT BUỘC tới global) · travel-policy.yaml xếp nó framework_only · install-harness.sh:154-175 đọc travel-policy để XOÁ nhóm đó khỏi global. Installer xoá đúng thứ hợp đồng nghiệm thu đòi ⇒ cổng đỏ tất định. Chú thích của chính travel-policy tự khai "stop.py gọi có guard fail-open ở downstream" — tác giả biết downstream cần mà vẫn xếp nhầm tầng. Sửa: medic.py → global_shared/engine_core. Sau sửa: install giữ lại medic (29 file .py ở global), fresh-install PASS, medic --ci 0 fail 16 ok.
+BÀI HỌC CÔNG CỤ (đã dính 2 lần trong ngày): output `ls` bị RTK nén làm tôi chẩn đoán nhầm hai lần — lần đầu đếm fdk/tools ra "19 vs 27, không thiếu gì" (thật ra thiếu 8), lần sau tưởng medic.py có sẵn. Phải kiểm sự tồn tại file bằng python pathlib hoặc `test -e`, KHÔNG dựa vào `ls | grep` khi đang chẩn đoán.
+Kèm p-44 vào problem-tree (con của p-41 — cùng lớp "hai nguồn chân lý nói ngược nhau").
+
+## 2026-07-20 — /propose vệ sinh nền + trần ngân sách context (T-260720-02)
+Đo trước, đề xuất sau. Số nền: code-graph 16 project / 5.970 file / 546.133 cạnh; get_callers("save") ~65 kết quả ~2.000 token, hỏng 4 cách (không tách project · index cả node_modules và .next · trùng lặp thô · khớp tên chứ không khớp symbol). Kho skill: 83 mô tả = 10.686 token nạp mỗi phiên, nhưng chỉ 26/83 skill từng được gọi trên 46 phiên. BA HƯỚNG THỬ RỒI BỎ, đều bác bằng số: BM25 chấm prompt để auto-inject (điểm trôi theo độ dài — log Jenkins 3.159 điểm vs trung vị 11.61; margin nổ ở đuôi thưa nên "tiếp tục"/"ok" đạt margin vô cực); head+tail scoring (74% prompt dài đổi kết luận); min-cut/Ncut (sai hình dạng bài — bài đúng là PCST, chưa tới ngưỡng). Bằng chứng phản diện mạnh nhất từ repo code-review-graph 22k sao: eval của chính họ cho 195.653 token cho một commit sửa docstring, thất bại ở BUDGET chứ không ở thuật toán. Kết luận hội tụ: chặn nằm ở vệ sinh dữ liệu và cưỡng chế ngân sách, không ở thuật toán chọn. Chọn phương án lọc nguồn + trần cưỡng chế; PCST giữ lại kèm điều kiện kích hoạt đo được (FR-007).
+BÀI HỌC PHƯƠNG PHÁP: tập "prompt thật" ban đầu lẫn 22.863 tool-result + 4.412 message subagent — kết luận đầu tiên rút ra từ dữ liệu bẩn và đã phải rút lại. Lọc bằng cờ transcript (isSidechain/toolUseResult/isMeta), không lọc bằng khớp chuỗi.
+
+## 2026-07-20 — /failure-flywheel distill session này
+Ghi 3 failure vào missing-verification (fnmatch glob vượt "/", travel-policy đọc runtime, kết luận BM25 từ transcript bẩn). Report: missing-verification 5x + spec-violation 3x, cả hai chạm threshold=3. Draft --date 260720 (DDMMYY quen dùng cho tên file wiki) ra file SAI NGÀY 290626 — flywheel.py:_ddmmyy() nuốt exception khi --date không đúng ISO YYYY-MM-DD, rơi về DEFAULT_DATE 2026-06-29 không cảnh báo. Bug này chính nó là instance thứ 6 của missing-verification, xảy ra NGAY TRONG LÚC distill loại lỗi đó — đã ghi thêm vào sổ. Xoá file sai, draft lại đúng ISO date → 200726-failure-missing-verification.md, 5 failure, STOP cho người duyệt (skill từ chối tự viết rule vào TODO — đúng thiết kế "never auto-promote").
+
+## 2026-07-21 — /propose code-graph → KÉO NGOÀI (T-260721-01)
+Sau khi T1-T4 (context-hygiene) thi hành xong, lộ ra code-graph không nằm trong travel-policy — chỉ có code_graph_keeper.py giữ registry bền, không ai cài server. User hỏi: curl không tự cài nếu quan trọng thì phải từ bỏ, viết lại, hay giữ 1 bản ổn định để kéo về? Ánh xạ đúng 3 lựa chọn vào [[adapt-modes]]: "từ bỏ+distill riêng"=HÒA TAN, "1 bản lưu đơn để kéo về"=nghe giống NHÚNG nhưng đúng là KÉO NGOÀI. Quyết định bằng dữ kiện: git log repo graph thật cho 2 tác giả (rheinmir + Trần Bùi Hoàng Gia), remote Rheinmir/graph-kit — CÙNG org sở hữu rheinmir/setup (framework này). Không phải bên thứ ba như last30days/agent-reach mà là repo khác của cùng tác giả. Loại HÒA TAN (viết lại thứ đã có+chạy tốt), loại NHÚNG (vendor sẽ trôi khỏi bản gốc ngay từ commit sau). Chọn KÉO NGOÀI theo đúng khuôn research_reach đã có tiền lệ. Draft: FR-001..006, pin theo sha (chưa có tag), bootstrap trong install-harness.sh --global, verify bằng thăm dò thật (nguyên tắc dep-health.py) chứ không chỉ kiểm tồn tại file. R7 xanh, CHƯA được duyệt — khác draft context-hygiene đã "thi hành đi thôi", draft này đụng install-harness.sh (mã dùng chung mọi máy) nên dừng đúng ở bước hỏi duyệt.
+
+## 2026-07-21 — /fdk giải cây vấn đề
+Triage 36 node open/partial, KHÔNG giải hết (Meadows: đừng bắn một phát) — chỉ đóng sổ node có bằng chứng thật hoặc làm được ngay với chi phí thấp. Kết quả: 36 → 14 còn mở.
+
+**Đóng sổ có verify lại (không phải suy từ trí nhớ):**
+- p-39 (code-graph 2 DB lệch) — chẩn đoán gốc SAI, đã tự sửa trong CLAUDE.md 5-Why; verify lại: list_projects 0/16 trùng tên, 16/16 DB lành 0 lỗi no-such-table.
+- p-41 (travel-policy nói ngược install-harness.sh) — travel_policy_sync.py exit 0, khớp commit 882ec92 đã có sẵn từ trước phiên này.
+
+**Giải mới trong phiên — debounce Stop hook (p-45):** đo lại build-wiki-graph.py 49.0s + medic.py --ci 26.1s, hai bước ăn ~75-90s MỖI LƯỢT vì cổng kích hoạt quá lỏng. Thêm debounce theo thời gian (window 180s, harness/metrics/.stop-debounce.json). Nhánh trang trí (wiki-graph) debounce vô điều kiện; nhánh GATE (medic --ci) debounce CÓ ĐIỀU KIỆN — chỉ bỏ qua nếu lần trước ĐÃ healthy, một FAIL luôn chạy lại ngay, test 5 assert xác nhận không bao giờ bị giấu. KHÔNG rewrite build-wiki-graph.py (generator dùng chung, để dành /propose riêng nếu cần incremental thật).
+
+**Triage 15 thẻ p-auto-*** (flush card tồn 19 ngày, 02/07→21/07, chưa ai chưng lọc): đọc lại toàn bộ, không thẻ nào có nội dung vấn đề riêng biệt ngoài "bề mặt bị chạm" (toàn artifact tự sinh). Đóng sổ, gộp làm bằng chứng cho p-10 (nhịp ship/triage chậm) thay vì để trôi vô thời hạn.
+
+**Nợ mở, không giải trong phiên này (đúng chủ đích — đừng chồng fix chưa kịp phát tác):** p-07/08/09/10 (harness governance cũ), p-12/13/15/17 (partial, cần đo thêm), p-32 (fdk-uat sentinel), p-36/37/38 (orchestration), p-42 (CAPABILITIES.md kiểm kê vs bản đồ — liên quan trực tiếp draft 200726-context-hygiene-budget nhưng chưa thi hành T5-T7 nên chưa đủ đóng).
+
+**Phát hiện phụ, chưa sửa:** hai node cùng id "p-07" (một từ 02/07, một từ 08/07) — bug id-trùng có sẵn trong cây từ trước, ngoài phạm vi lượt này.
+
+## 2026-07-21 — docs-site-macos capability-map
+Dựng llmwiki/html/210726-capability-map.html — đối chiếu 3 nguồn thật (travel-policy.yaml, LOOP_GROUPS, fdk-problem-tree.html #tree-data) trả lời "các năng lực có cô lập không". Số đo: 61% (25/41) vấn đề có scope chạm ≥2 trụ, 12/41 chạm cả 3; stop.py orchestrate 10 tool tuần tự (điểm hội tụ vật lý); 7/83 skill rơi ngoài LOOP_GROUPS vì CLAUDE.md khai "wiki-loop" mà code không biết. Verdict: chưa đủ cô lập — ranh giới có trên giấy nhưng rò ở chỗ quan trọng nhất.
+
+## 2026-07-21 — /propose migration code-là-source-of-truth (T-260721-02)
+User đọc bài RDD (goonnguyen.substack) và yêu cầu chuyển kiến trúc: code là sự thật, quan hệ suy ra được, merge so sánh A-B tự động. Đối chiếu trung thực: bài viết là Revenue-DD, KHÔNG chứa luận điểm merge A-B — phần đó là của user và là phần mạnh nhất. Phần áp dụng được của bài (SDD chết vì 135 plan + 40 ADR = distractor interference) khớp bệnh đã đo của ta: p-41 (đọc travel-policy 3 lần tin nhầm cả 3 — distractor interference xảy ra thật trong phiên 20/07), p-10 (15 draft tồn), p-42 (CAPABILITIES từ os.listdir), 7/83 skill rơi khỏi mind map vì LOOP_GROUPS viết tay. Nền đã đi nửa đường: touches tự suy 21→283 (bc39047), log.md render từ events.jsonl, STRIP_TIER3+travel_policy_sync (bước 0), khuôn --check. SPEC: 3 lớp artifact AUTHORED/DERIVED/STATE + ledger một chỗ (FR-001), mọi DERIVED có --check nối medic (FR-002), quan hệ CHỈ suy từ nguồn — khai tử wiki-relations.py (FR-003), LOOP_GROUPS → frontmatter SKILL.md, wiki-loop thành giá trị hợp lệ (FR-004), CAPABILITIES từ graph trả p-42 (FR-005), merge protocol regen + diff A-B thử trên merge thật (FR-006), draft-age vào lint trả p-10 (FR-007), hạ vai wiki thành "nguồn chân lý của WHY" (FR-008). Điểm nghẽn chốt ở cổng: travel-policy Tầng 2 đang khai wiki là "nguồn chân lý" — mâu thuẫn trực diện, giải bằng tách WHY (wiki giữ) / WHAT-quan-hệ (code sinh). 7 task, phân công theo cost table (3 OpenCode, 3 Claude, 1 kép). CHỜ DUYỆT.
+
+## 2026-07-21 — hoàn nguyên move-lạc harness-local (medic narrative fail)
+Stop hook báo "manifest NÓI DỐI: live_probe harness-local không tồn tại". Truy: harness-local/ (gốc, tracked HEAD, hợp đồng cứng ADR-011) bị xoá khỏi working tree, xuất hiện bản lạc llmwiki/harness-local/ (mtime 17/07, byte giống hệt HEAD, 0 consumer). Grep chứng minh harness-local PHẢI ở gốc: wired vào pre-commit:65, gen-converters CI:170 ($PWD/harness-local/run.py), install-harness:319 (scaffold $ROOT/harness-local), harness-local-test.sh + downstream-firedrill-test.sh, mechanisms.yaml, scoped-hooks. harness-local-test.sh:73 còn assert PHẢI ngoài manifest + ở gốc. Kết luận: move sang llmwiki/ là NHẦM, không phải relocation chủ đích. Hoàn nguyên: git checkout -- harness-local/ + rm bản lạc. Medic 0 fail 16 ok. KHÔNG phải việc phiên này tạo ra — có thể phiên song song; ghi lại để không tưởng mất việc.
+
+## 2026-07-21 — /propose decision-anchoring (T-260721-03)
+Sau chuỗi hỏi "từ code tìm WHY thế nào / code đổi doc biết ra sao / neo theo symbol là gì / adapt đứa ngoài hạ tầng thế nào", viết SPEC. Phát hiện quan trọng lúc grounding: harness/mechanisms.yaml (ADR-001, council-025) ĐÃ LÀ tiền lệ chạy sống của đúng ý tưởng này — id+desc(WHY)+live_probe(anchor path) + medic probe "narrative" tự bắt khi live_probe biến mất. Bằng chứng sống ngay trong phiên: probe đó vừa bắt được harness-local/ bị git-mv, chặn medic tới khi hoàn nguyên. Giới hạn của tiền lệ: neo mức FILE, không phải SYMBOL — sửa nội bộ hàm không kích hoạt xác nhận lại; chỉ phủ 1 loại quyết định (mechanism), không phủ ADR/feedback khác. SPEC = tổng quát hoá pattern đã chứng minh, không phát minh mới: thêm anchor_symbol+confirmed cạnh live_probe cũ, dùng code-graph (vừa vệ sinh xong phiên trước) resolve, 3 trạng thái LIVE/STALE/ORPHAN, lệnh why <symbol>, /lint báo cáo không chặn. Kiểm chéo vercel-labs/zerolang (agent-first, graph NẰM TRONG compiler) — đọc thẳng README: graph chứa symbols/types/effects/ownership/calls, 0 trường rationale. Ngay lab đi xa nhất cũng không giải WHY — củng cố đây là lỗ thật của cả ngành, không phải fantasy riêng. FR-007 chốt ranh giới trung thực: liveness chỉ cấu trúc (tồn tại/đổi tên/xoá), KHÔNG semantic — phán đoán ý nghĩa ở lại người. T8 (promote concepts/decision-anchoring.md) đặt CUỐI cùng, sau khi T1-T7 xanh — đúng luật "wiki entries chỉ tạo sau khi code commit". CHỜ DUYỆT.
+
+## 2026-07-21 — vá 2 lỗ hổng decision-anchoring (feedback trực tiếp)
+User hỏi liên tiếp 2 câu, cả hai đều bắt trúng chỗ SPEC thiếu:
+
+1. "case delete và edit thì sao đủ CRUD chứ" — lộ ra tôi chỉ nghĩ CRUD trên 1 trục (code), bỏ sót trục thứ 2 (chính mục quyết định/neo). Xoá VẬT LÝ một mục mechanisms.yaml có anchor_symbol thì liveness KHÔNG CÒN GÌ ĐỂ KIỂM — không ORPHAN, không STALE, WHY biến mất không dấu vết. Đúng chính bệnh "docs rot" mà cả cơ chế sinh ra để chống, xảy ra ngay trong chính cơ chế. Vá: FR-009 (CRUD phía decision — update tự do, delete CẤM vật lý, bắt buộc status: retired theo đúng kỷ luật append-only đã chạy sống ở fdk-problem-tree.html) + SC-006 + task mới T8 (validator so git-diff bắt xoá-lén). Số task 8→9, promote-concept đổi từ T8→T9.
+
+2. "phụ thuộc vào cái gì hay input, dependency là gì" — lộ ra dependency chain của liveness chưa viết ra, và có đúng 1 case UNAVAILABLE (code-graph MCP không tới được) mà FR-002 (3 trạng thái) không xử lý — sẽ rơi nhầm xuống ORPHAN, gây bão báo-động-giả. KHÔNG PHẢI rủi ro lý thuyết: code-graph MCP của chính phiên này đang disconnect thật (kill để restart nạp code T1-T4 hygiene trước đó, không tự respawn) — dùng ngay sự kiện đang xảy ra làm bằng chứng. Vá: FR-002 mở rộng 4 trạng thái (thêm UNAVAILABLE) + SC-007 + Global constraints ghi rõ dependency chain (git → code-graph THĂM DÒ được, nguyên tắc dep-health.py → project reindex → mới tin kết quả) + T1 Plan/verify mở rộng.
+
+Cả 2 vá xong, R7 xanh (exit 0), 9/9 diagram-box khớp 9 task. Bài học chung: câu hỏi "còn thiếu gì" hiệu quả hơn nhiều so với tự rà — cả hai lỗ hổng đều tồn tại từ bản đầu tiên và R7/self-review không bắt được vì chúng không phải placeholder hay thiếu nhất-quán-tên, mà là thiếu HẲN một góc nhìn.
+
+## 2026-07-21 — persona-lens grower/tester soi decision-anchoring
+User gọi 2 lens (llmwiki/personas/grower.md + tester.md), khai beneficiary = chính framework (ngoại lệ /fdk theo ADR-004). 
+
+Tester: bắt 3 lỗ — (1) race trên T8 (so nguyên file thay vì theo id, đúng câu hỏi đã ghi nợ U-03 — nay nâng thành FR-010 bắt buộc, đóng U-03), (2) chưa test hồi phục UNAVAILABLE→LIVE khi code-graph sống lại, (3) T9 promote-concept không có gate xác minh trích dẫn khớp output thật (LLM trust boundary, 1/13 nhóm lỗi qc-code). Cả 3 vá NGAY vào SPEC (FR-010, SC-008), mở rộng trong task có sẵn T1/T8/T9 — không phình thêm task, giữ 9/9 diagram-box khớp R7.
+
+Grower: bắt 1 lỗ — 8 SC toàn correctness, không SC nào đo adoption, không kill-switch nếu không ai dùng anchor_symbol/why — trong khi chính SPEC tự trích bài học touches (chết vì không ai tiêu thụ) mà không tự áp cho mình. KHÔNG vá ngay — đúng ranh giới persona (grower đòi "đã dựng xong" mà T1-T9 còn pending) — raise-issue đúng quy trình ghi trong chính grower.md ("chạm ranh giới → /raise-issue assignee: <persona>"): GH#83, ledger 210721-decision-anchoring-adoption-metric.md, ISSUES.md đã đăng ký.
+
+Bài học phương pháp: cả 3 phiên liên tiếp (CRUD, dependency, persona-lens) đều tìm ra lỗ hổng THẬT bằng cách đổi góc nhìn thay vì tự rà lại cùng một góc — không cái nào là placeholder hay lỗi chính tả mà R7/self-review bắt được.
+
+## 2026-07-21 — plan — decision-anchoring-PLAN
+
+`/plan` mở rộng SPEC `210721-decision-anchoring.md` (đã duyệt ngầm: user "rồi làm đi" + "trong chiều này xong cả 3 v0.1-0.3") thành `210721-decision-anchoring-PLAN.md` — 9 task (T1-T9, phát hiện lại T9 nằm TRONG v0.3, không tách rời như tóm tắt phiên trước ghi nhầm). Quyết định kiến trúc quan trọng: engine liveness đọc TRỰC TIẾP `.graph-agent/index.db` (sqlite) thay vì gọi MCP `search_symbols`/`get_symbol_context` — vì script CLI chạy ngoài context Claude không gọi được MCP tool (chỉ Claude-agent gọi được); đây là biến thể thi hành của "thăm dò code-graph" (Global constraints), verify bằng checksum sha256[:16] khớp cột `checksum` của bảng `files` (proxy cho "project đã reindex"). Khảo sát thật trước khi viết PLAN: DB hiện có 108 file/984 symbol nhưng KHÔNG index `llmwiki/.claude/hooks/stop.py` (chỉ 4/10 file trong `hooks/`) — bằng chứng sống cho nhánh UNAVAILABLE, không phải giả định. R7 (`proposal_complete.py`) chặn 2 lần trước khi xanh: thiếu `### Task N` (dùng nhầm `##`), và tự nhắc "TBD"/"TODO"/"điền sau" trong Self-review khi nói KHÔNG còn — cùng bẫy đã gặp ở SPEC gốc.
+
+## 2026-07-21 — decision-anchoring — T1-T9 thi hành xong (v0.1+v0.2+v0.3)
+
+Thi hành đầy đủ PLAN `210721-decision-anchoring-PLAN.md`, không dừng ở SPEC: `harness/scripts/decision-liveness.py` (T1: schema `anchor_symbol`/`confirmed` + engine 4 trạng thái, đọc trực tiếp `.graph-agent/index.db` thay vì MCP vì script CLI không gọi được MCP tool), 2 mục pilot trong `mechanisms.yaml` (T2 `stop-debounce` neo `_debounced`/stop.py, T6 `code-graph-probe-boundary` neo `probe_code_graph`/dep-health.py — 25 mục tổng, 2 anchored), lệnh `why <symbol>` (T3), self-test bao đủ 3 nhánh code-side sửa-thân/đổi-tên/xoá trên sandbox git (T4, SC-003) + mô phỏng drift kiểu harness-local (T5, SC-002), `/lint` bước 8e báo ORPHAN/STALE (T7), `harness/scripts/decision-guard.py` khoá xoá-vật-lý theo từng id (T8, SC-006 + race FR-010 đóng U-03), và `llmwiki/wiki/concepts/decision-anchoring.md` promote kèm `decision-anchoring-crosscheck.py` đối chiếu 4 FACT với output thật (T9, FR-010 trust boundary — script tự FAIL nếu concept trích sai số, không dựa lời tự khai).
+
+Bằng chứng thật quan trọng nhất: pilot `_debounced` resolve ra UNAVAILABLE (không phải LIVE) vì `.graph-agent/index.db` thật KHÔNG index `stop.py` — xác nhận nhánh UNAVAILABLE hoạt động đúng trên dữ liệu thật, không phải giả lập; `why` vẫn trả đủ nội dung WHY (SC-001 không đòi trạng thái phải LIVE, chỉ đòi đọc được lý do). Regen `overstack.html` từ manifest để giữ probe `narrative` của `medic` xanh (25 cơ chế khớp). R7 (`proposal_complete.py`) chặn PLAN 2 lần trước khi xanh — thiếu `### Task N` (dùng nhầm `##`) và tự nhắc "TBD"/"TODO"/"điền sau" trong Self-review khi nói KHÔNG còn (bẫy lặp lại từ SPEC gốc). Một bug thật phát hiện qua self-test: `confirmed: YYYY-MM-DD` chỉ có độ phân giải NGÀY — nếu commit xác nhận và commit sửa cùng ngày, `git log --until=<ngày>` trả về HEAD thay vì baseline; self-test phải backdate commit init để mô phỏng đúng use-case thật (không phải bug của thuật toán diff, mà là hạn chế granularity đã biết trước ở FR-004).
+
+## 2026-07-21 — fdk — bỏ disable-model-invocation của fdk-uat
+
+User yêu cầu tường minh (xác nhận 2 lần: "tôi cho phép" rồi gọi `/fdk sửa đi cho tôi`) gỡ cờ `disable-model-invocation: true` khỏi `skills/fdk-uat/SKILL.md`, để agent tự gọi được `/fdk-uat` qua Skill tool thay vì bắt buộc user tự gõ. Lý do đồng ý sửa: đây là skill trong chính repo/framework của user (không phải guard nền tảng bên ngoài), user có toàn quyền trên chính cấu hình của mình, và đã xác nhận rõ ràng qua đúng kênh dành cho thay đổi framework (`/fdk`). Đồng bộ qua `fdk/tools/sync-skill.sh fdk-uat` (canonical → mirror llmwiki → bản cài `~/.claude`), cả 3 bản đã gỡ cờ.
+
+## 2026-07-21 — decision-anchoring — fdk-uat bắt lỗi thật T7, đã vá
+
+`/fdk-uat` (main-URL smoke, curl thật từ nhánh `orca`) phát hiện T7 sai vị trí sửa: bước 8e đã chèn vào `llmwiki/skills/wiki-loop/lint.md` (mirror) thay vì `skills/lint/SKILL.md` (canonical, nguồn thật cho gói npx phân phối) — nên bước 8e chưa từng tới tay người dùng thật qua đường cài remote, dù mọi test nội bộ trong repo đều xanh (vì test chạy trên bản mirror, không phải bản thật được ship). Đây đúng lớp lỗi eval 020726 mà `fdk/tools/sync-skill.sh` sinh ra để chặn ("ĐỪNG cp tay từng bản — nguồn drift"). Vá bằng cách chèn 8e vào `skills/lint/SKILL.md` rồi chạy `sync-skill.sh lint` để đồng bộ đúng chiều canonical→mirror→installed (parity xác nhận bằng `diff`, cả 3 bản khớp).
+
+Kết quả UAT còn lại: 3 trụ có mặt sau curl bootstrap thật (không override biến); `harness/scripts/decision-liveness.py`/`decision-guard.py` tới tay qua tầng `global_shared` (`~/.claude/harness/harness/scripts/`), self-test ALL PASS chạy từ bản vừa cài, không phải bản dev; `why _debounced` trên dự án UAT trống trả đúng WHY + UNAVAILABLE trung thực (dự án mới chưa có `.graph-agent/index.db`); `test-broad.sh` 74/74 PASS.
+
+## 2026-07-21 — decision-anchoring — UAT dựng workspace Orca thật (thấy được bằng mắt)
+
+Lần UAT trước chỉ chạy filesystem-level (`/tmp`, xoá sau khi verify) — user chỉ ra không thấy gì trong app Orca. Dựng lại: curl bootstrap thật vào `~/orca/workspaces/uat-decision-anchoring-260721-1707`, `orca repo add` + `orca worktree create --name uat-verify --activate` — hiện đủ 2 worktree (`main` + `uat-verify`) trong `orca worktree list`, giữ lại (không xoá) để mở được trong app. Verify lại decision-anchoring trong chính worktree đó: `why _debounced` đúng WHY + UNAVAILABLE trung thực, self-test ALL PASS, skill `lint` global đã có bước 8e.
+
+`/fdk-poc` bị hoãn: tool `fdk/tools/fdk-poc.py` chỉ tồn tại trên nhánh `Rheinmir/issue-15-br-k` (chưa merge `orca`, lệch ~127-281 commit mỗi chiều) — không có trên `orca` nên không chạy thật được, đúng luật "không bịa bước" của chính skill đó. User chọn bỏ qua.
+
+## 2026-07-21 — decision-anchoring — 2 agent thật test độc lập trong workspace Orca
+
+Spawn 2 phiên Claude Code THẬT (không phải tôi tự gõ lệnh) trong worktree `uat-verify`, mỗi phiên nhận một nhiệm vụ mơ hồ có chủ ý (không mách lệnh) để xem agent có tự khám phá cơ chế decision-anchoring không.
+
+**Agent 1 (tra WHY):** tự grep `~/.claude`, tìm đúng bộ 3 script, tự chạy `decision-liveness.py why _debounced`, trả đúng WHY. Thành công không cần gợi ý thêm.
+
+**Agent 2 (test ORPHAN):** tự bắt lỗi trong chính đề bài (tôi ra đề đổi tên `_debounce_mark`, nhưng symbol neo thật là `_debounced`) và tự sửa lại test cho đúng. Kết quả baseline thật trên `~/.claude/harness`: `path_state=ORPHAN` (không có `llmwiki/.claude/hooks/stop.py`, harness home chỉ mirror `llmwiki/personas/`), `symbol_state=UNAVAILABLE` (`.graph-agent/index.db` không tồn tại). Agent giải thích đúng: đây không phải bug logic (self-test sandbox đã pass) mà vì 2 tầng hạ tầng cần (file thật + index tươi) đang gãy sẵn trong bản cài — đúng thiết kế FR-002 "không bao giờ báo ORPHAN/STALE giả khi hạ tầng đứt".
+
+**Phát hiện phụ, NGOÀI phạm vi (chưa xử lý):** MCP code-graph có một project "setup" khác trỏ `~/harness/setup` báo sai `_debounced` tồn tại dòng 49-60 trong khi file thật ở đó chỉ 46 dòng — index cũ lệch từ trước, không liên quan decision-liveness.py (script không lọc theo field "project", chỉ đọc DB riêng theo ROOT của chính nó). Agent 2 đúng đắn không đụng vào — cần `/raise-issue` riêng nếu muốn xử lý sau.
+
+Không file nào bị agent ghi/sửa trong cả 2 phiên — sạch.
+
+## 2026-07-21 — decision-anchoring — happy path LIVE xác nhận qua code-graph MCP thật
+
+Agent 2 (tiếp tục phiên trước) dùng code-graph MCP THẬT: `reindex_repo("/Users/giatran/orca/setup/setup")` → 107 file scan, 1 reindex (stop.py dirty), 0 lỗi; `search_symbols`/`get_symbol_context` xác nhận `_debounce_mark` (38-46), `_debounce_state` (30-35), `_debounced` (49-60, callers: regen_docs, framework_medic_mirror) khớp 100% file thật. Chạy `decision-liveness.py check/why` từ đúng bản trong repo dev (không phải mirror `~/.claude/harness` — DB_PATH tự resolve theo `Path(__file__).parents[2]`, không cần sửa biến môi trường):
+
+```
+[stop-debounce]              → LIVE (resolve stop.py:49-60, không đổi kể từ 2026-07-21)
+[code-graph-probe-boundary]  → LIVE (resolve dep-health.py:151-195, không đổi kể từ 2026-07-21)
+```
+
+Đây là lần đầu tiên cơ chế thật ra khỏi UNAVAILABLE — đóng nốt case còn thiếu trong toàn bộ chuỗi verify (trước đó chỉ có UNAVAILABLE thật + STALE/ORPHAN/LIVE trên sandbox). Xác nhận: mọi lần UNAVAILABLE trước đó là ĐÚNG hành vi (hạ tầng thật sự gãy — thiếu file hoặc index cũ), không phải lỗi logic của `resolve_symbol`/`compute_state`. Agent không sửa file mã nguồn nào, chỉ ghi `.graph-agent/index.db` (index cache, không phải nguồn code).
+
+## 2026-07-21 — decision-anchoring — 5-Why "trỏ nhầm root" + vá thông điệp UNAVAILABLE
+
+User yêu cầu 5-Why cho hiện tượng "trỏ nhầm root" mà 2 agent test gặp phải (UNAVAILABLE ở mirror `~/.claude/harness`, ORPHAN-giả ở index cũ `~/harness/setup`, chỉ LIVE khi chạy đúng repo dev thật). Chuỗi:
+
+1. Script tự suy `ROOT = Path(__file__).parents[2]` — có 3+ bản cùng tên script nằm ở 3 root khác nhau, không lệnh nào tự báo đang ở world nào.
+2. Nhiều bản phân tán là CỐ Ý — travel-policy tầng `global_shared` chủ động nhân bản script dùng-chung ra global harness home.
+3. Nhân bản (cố ý) gây trỏ nhầm vì bản nhân ra KHÔNG đồng bộ toàn vẹn — có `mechanisms.yaml`/`decision-liveness.py` nhưng thiếu `llmwiki/.claude/hooks/stop.py` (chính file nó trỏ tới) và thiếu `.graph-agent/index.db`.
+4. Không có kiểm tra toàn vẹn này vì travel-policy phân loại THEO TỪNG FILE độc lập, không mô hình hoá quan hệ tham chiếu CHÉO TẦNG (một mục ở `harness/` trỏ symbol ở `llmwiki/`).
+5. Góc mù này chưa lộ trước đó vì mọi `live_probe` cũ đều trỏ file NẰM TRONG CHÍNH `harness/`/`fdk/` (cùng tầng) — decision-anchoring là cơ chế ĐẦU TIÊN neo chéo tầng.
+
+**Root cause:** `global_shared` "hứa" là *"dùng chung mọi phiên"* nhưng chỉ đồng bộ đúng cái được khai `global_shared`, không đồng bộ theo-nhu-cầu những gì nó tham chiếu chéo sang tầng khác.
+
+**Fix đòn-bẩy-thấp đã áp** (không sửa cả travel-policy — để dành nếu tái diễn nhiều hơn): `resolve_symbol()` trong `decision-liveness.py` giờ tự phân biệt UNAVAILABLE "chưa reindex" (tạm) khỏi "file/DB không tồn tại ở ROOT này — có thể đang chạy nhầm bản global_shared, thử repo dev thật hoặc reindex_repo qua code-graph MCP" (cấu trúc). Verify thật trên đúng 2 root gây nhầm trước đó: mirror `~/.claude/harness` giờ in gợi ý rõ ràng, repo dev thật vẫn LIVE đúng như trước. Self-test vẫn ALL PASS.
+
+## 2026-07-21 — decision-anchoring — 5-Why xuôi cho "vì sao agent phải tự reindex" + giảm ma sát
+
+User hỏi tiếp: nếu wiring agent-tự-reindex thì giải được bài toán gì (5-Why xuôi, chứng minh giá trị). Chuỗi: (1) xoá vòng lặp "hỏi→UNAVAILABLE→mò→reindex→hỏi lại" trong 1 lượt; (2) đo được thật hôm nay — agent 2 tốn thêm 1 lượt mới ra LIVE; (3) đúng lời hứa gốc "từ code tìm WHY, không cần nhớ tay"; (4) UNAVAILABLE-lượt-đầu dễ hiểu nhầm "cơ chế hỏng" — đúng nguyên nhân giết `touches` ("không ai tiêu thụ thì không ai nuôi"); (5) chi phí đo được NGAY (khác GH#83 phải chờ dữ liệu dài hạn) nên đáng sửa ngay, đòn bẩy rẻ (đổi luồng thông tin, không đổi kiến trúc MCP).
+
+Vá: thêm đoạn hướng dẫn tường minh vào docstring đầu `decision-liveness.py` ("AGENT ĐANG ĐỌC FILE NÀY... trước tiên hãy tự gọi reindex_repo qua code-graph MCP") + thêm mục "Trỏ nhầm root, và vì sao reindex vẫn phải do agent chủ động" vào concept — giải thích rõ 2 ràng buộc cứng khiến máy không tự reindex được (MCP chỉ agent gọi; cố ý không để máy tự sửa lặng lẽ, theo tiền sử code-graph server hỏng-mà-không-ai-biết của `dep-health.py`). Verify: self-test ALL PASS, crosscheck 4 FACT khớp, `medic --ci` 0 fail.
+
+## 2026-07-21 — decision-anchoring — UAT thật kiểm CRUD phía code + đa luồng, vá 2 lỗ
+
+User hỏi trực tiếp: "CRUD phía code có thực sự handle hết chưa, có xử lý đa luồng không". Trả lời bằng test thật, không đoán:
+
+**CRUD phía code:** đủ 4 sự kiện vòng đời (read=`why`, update-body→STALE, update-rename→ORPHAN, delete-file/symbol→ORPHAN) đều đã verify thật. Phát hiện thật khi đọc lại code: DB thật CÓ 10 cặp (file, tên symbol) trùng nhau — nguyên nhân là code-graph indexer APPEND dòng mới mỗi lần reindex thay vì thay thế (tự gây ra bởi 3 lần reindex liên tiếp `decision-liveness.py` trong phiên hôm nay). Query `symbols` cũ không có `ORDER BY` — `.fetchone()` lấy dòng nào cũng được, không xác định.
+
+**Đa luồng:** thử tái hiện crash bằng writer giữ WAL lock + reader đọc cùng lúc — **KHÔNG crash** (tự phản chứng giả thuyết ban đầu, WAL mode cho phép đọc-ghi đồng thời an toàn). Thử ép DB corrupt sau khi qua `db_status()` check — bị bắt sớm ở chính `db_status()`, không lọt xuống dưới. Nhưng phát hiện thật khác: khối `conn.execute()` thứ 2 (query bảng `symbols`) KHÔNG có `except` bọc quanh, chỉ có `finally: conn.close()` — lỗi sqlite thoáng qua (thiếu cột do reindex nửa chừng, disk I/O) sẽ **crash cả script** thay vì trả UNAVAILABLE. Tái hiện thật bằng DB có đủ tên bảng (qua được schema check) nhưng thiếu cột `line_start`/`line_end` → xác nhận crash trước khi vá.
+
+**Vá cả 2:** (1) `ORDER BY id DESC LIMIT 1` khi query symbols — ưu tiên dòng mới nhất, không đọc phải dòng ma từ lần index cũ; (2) bọc `except sqlite3.Error` quanh cả 2 khối query trong `resolve_symbol()`, đúng ethos fail-open đã dùng ở `dep-health.py`. Verify lại: self-test ALL PASS, ca thiếu-cột giờ trả UNAVAILABLE gracefully thay vì crash, crosscheck 4 FACT khớp, `medic --ci` 0 fail.
+
+## 2026-07-22 — propose — artifact-provenance-eventlog
+
+`/propose` cho event log theo pattern Kafka git-native (`T-260722-01`), nối tiếp trực tiếp mạch decision-anchoring hôm qua. Tự đánh giá ban đầu ("Kafka thừa, git+events.jsonl đủ") sai ở 2 điểm user chỉ ra và tôi tự kiểm chứng lại: `events.jsonl` bị gitignore (không merge qua nhánh/máy), chỉ actor {agent,system} qua hook Claude Code (không multi-vendor). CAP/AP framing của user (mỗi lãnh địa local độc lập, hợp nhất chỉ ở merge) trở thành luận điểm chính của Approach A: file JSONL git-tracked, hash-chain THEO TỪNG writer (không phải 1 chuỗi toàn cục), merge bằng driver `merge=union` có sẵn trong git (không tự viết consensus). Thêm FR-007 (adapter 3 hàm duy nhất) theo yêu cầu bổ sung giữa lượt: chừa slot migrate sang broker thật sau này mà không sửa mọi call site. R7 chặn 1 lần (thiếu `class="desc"` — dùng nhầm `class="prose"`), đã sửa. SPEC+HTML (`docs-site-macos`, draggable diagram + mind map + theme toggle) đã xanh, dừng chờ duyệt.
+
+## 2026-07-22 — propose — artifact-provenance-eventlog: vòng phản biện /fable5, chốt FR-005
+
+User bật `/fable5` thách 2 luận điểm về SPEC `220722-artifact-provenance-eventlog.md`: ẩn dụ cờ vua ("tăng trưởng vô hạn nhưng thực tế bounded") và câu hỏi "outlines có giúp được không" (kèm ảnh một hội thoại khác về constrained-decoding). Kết quả chạy đủ Floor+5 Move: ẩn dụ cờ vua SAI CƠ CHẾ khi soi kỹ (cờ vua pruning bằng cách vĩnh viễn không thăm phần cây luỹ thừa; log của mình append-only, tăng TUYẾN TÍNH — không cùng loại tăng trưởng) nhưng kết luận thực dụng của user vẫn đúng bằng lý do khác đơn giản hơn (log tuyến tính cùng bậc tăng trưởng với chính git history, chỉ thêm hằng số nhân — không cần ẩn dụ). Điểm "log hỗn loạn thứ tự vẫn dùng làm clue truy origin được" của user ĐÚNG và hạ mức nghiêm trọng của rủi ro merge=union-timeline-skew đã nêu trước đó xuống thấp hơn (chỉ hại use-case cần replay đúng thứ tự, không hại use-case lookup mà `/lint` bước 0b đã chạy sống). "outlines" không áp trực tiếp cho Claude API (không lộ logits) nhưng đúng ý tưởng của nó áp được qua tool-use/structured-output built-in của Claude cho nhánh "cần agent phán đoán" của `correlate()`.
+
+Vá vào SPEC: FR-005 thêm yêu cầu cứng — nhánh fallback PHẢI trả lời qua tool-use schema `{is_related, confidence, reasoning}`, không phải free-text. Đồng bộ vào Task T4 (Plan), `## Origin` (ghi lại toàn bộ vòng phản biện), và HTML companion (thêm đoạn desc T4). R7 vẫn xanh sau mọi sửa.
+
+## 2026-07-22 — concept mới — log-model + đơn giản hoá SPEC provenance-log
+
+User chỉ đúng chỗ over-engineering: SPEC `220722-artifact-provenance-eventlog.md` đang cố cho `correlate()` (FR-005) tự suy quan hệ NỘI DUNG "wiki nói về code nào" — trong khi `touches_targets` (`wiki-graph.py:88`, content-based, tất định, chạy sống 21→283 cạnh) đã giải xong câu hỏi đó, mạnh hơn nhiều. Bài học rộng hơn: repo có 5 cơ chế "ghi lại chuyện đã xảy ra" (`events.jsonl`/`scratch-log.jsonl`/`memory.jsonl`/`touches`/`provenance-log` đề xuất) — cố ép chúng phối hợp/hợp nhất làm hệ MỎNG MANH hơn, không bền hơn; mỗi cái giữ đúng phạm vi hẹp thì độc lập, dễ tin.
+
+Tạo `llmwiki/wiki/concepts/log-model.md` — bản đồ 1 file cho agent bất kỳ đọc một lần là định vị (bảng tra nhanh theo câu hỏi, sơ đồ ASCII độc lập, không mũi tên nối ngang). Thêm note 2 dòng vào docstring 4 file liên quan (`code-logger.py`, `scratch-log.py`, `mem-rank.py`, `wiki-graph.py::touches_targets`) trỏ về trang này. Sửa SPEC: FR-005 thu hẹp phạm vi `correlate()` chỉ còn "cùng phiên/mạch công việc theo thời gian" (không suy nội dung), thêm dòng Non-goals nói rõ ranh giới với `touches`. R7 vẫn xanh, `py_compile` sạch cả 4 file đã note.
+
+## 2026-07-23 — skill-maintenance — gộp trùng lặp web-clone vs extract-site
+
+Phát hiện `skills/extract-site/SKILL.md` Mode 3 và `skills/web-clone/SKILL.md` Mode B mô tả
+CÙNG một pipeline reconstruct (distill từ `ai-website-cloner-template`) ở 2 nơi độc lập — rủi ro
+drift khi sửa 1 bên quên bên kia. Gộp: `web-clone` là nhà canonical duy nhất cho pipeline này,
+`extract-site` Mode 3 rút còn 1 đoạn trỏ sang. Sync mirror + bản cài máy qua `sync-skill.sh`,
+cập nhật bảng skill `AGENT.md`/`CLAUDE.md` (2 dòng), regen `fdk/CAPABILITIES.md`. Giữ nguyên phần
+không trùng: extract-site vẫn là nhà cho design-token extraction (DESIGN.md/tokens.json/css),
+web-clone vẫn là nhà cho Mode A (snapshot offline byte-exact).
+
+## 2026-07-23 — propose — provenance-log: chốt lý do KHÔNG gộp vào scratch-log.jsonl
+
+User hỏi tiếp "5 log này có bỏ được cái nào không, hay mỗi cái giải bài toán riêng" — trả lời bằng bảng ánh xạ 5 log → 5 bài toán cụ thể (đều có ví dụ thật đã xảy ra trong phiên), rồi tự Attack chính đề xuất `provenance-log` mới: có thể gộp vào `scratch-log.jsonl` (đã git-tracked sẵn) thay vì đẻ file mới không? Kết luận: KHÔNG gộp, nhưng lý do đúng không phải "khác chủ đề" (yếu) mà là hai HỢP ĐỒNG TIN CẬY khác nhau — `scratch-log` optional/curated ("why OPTIONAL — không ép agent", tự khai trong chính docstring), `provenance-log` cần mandatory/automatic (FR-006 hứa lịch sử ĐẦY ĐỦ, thiếu 1 dòng phải là bug chứ không phải lựa chọn). Gộp chung sẽ tái tạo đúng loại nhầm lẫn đã tốn công sửa trong phiên (UNAVAILABLE 2 nguyên nhân bị lẫn ở decision-liveness.py, mirror-drift ở /lint 8e). Đã sửa vào Non-goals của SPEC, R7 vẫn xanh.
+
+## 2026-07-23 — plan — artifact-provenance-eventlog-PLAN
+
+`/plan` mở rộng SPEC `220722-artifact-provenance-eventlog.md` (duyệt qua "chạy /plan đi") thành PLAN thi hành T1-T5. T6 (rotate, v0.3/COULD) loại khỏi PLAN có chủ ý — ngưỡng rotate chưa trả nợ (U-05), viết task cho nó sẽ là placeholder giả trang, đúng điều khoản "cổng ngược" của /plan. Trước khi viết PLAN, verify thật claim kỹ thuật cốt lõi của SPEC (FR-004, merge=union) trên sandbox git — 3 dòng từ 2 branch độc lập đều còn sau merge, KHÔNG cần config thêm gì ngoài dòng `.gitattributes` — xác nhận Approach A khả thi, không cần quay lại /propose. R7 chặn 1 lần (Self-review tự nhắc TBD/TODO literal khi nói KHÔNG còn — bẫy đã gặp nhiều lần trong phiên), đã sửa.
+
+## 2026-07-24 — decision-anchoring/provenance-log — T1-T5 thi hành xong, đánh dấu implemented
+
+Thi hành đầy đủ PLAN `220722-artifact-provenance-eventlog-PLAN.md` (T1-T5, T6 hoãn chờ trả nợ U-05): `harness/scripts/provenance-log.py` (adapter `append_event`/`read_events`/`correlate`/`classify_topic`, hash-chain theo writer_id, `.gitattributes merge=union` verify thật trên sandbox 2 branch — 2 sự kiện đều còn sau merge, không mất dòng); `decision-liveness.py confirm <id>` (T3, bump `confirmed:` + phát event `decision.confirm`, verify thật trên `stop-debounce`); `correlate()` phạm vi hẹp temporal-only (T4, FR-005 đã thu hẹp sau phản biện trước đó); wiring `stop.py::regen_docs()` gọi `record-changed` phân loại theo path-prefix (T5, verify thật — file `.py` → `code.change`).
+
+Một bug thật bắt được qua self-test: `classify_topic()` ban đầu kỳ vọng `SKILL.md`/`README.md` → `code.change`, nhưng `_CODE_RE` (mượn từ `stop.py`) cố ý KHÔNG chứa `.md` — sửa bằng cách thêm nhánh `p.endswith(".md")` riêng cho `.md` ngoài `llmwiki/wiki/`. Đồng bộ mirror global (`~/.claude/harness`), bump `capability-stamp` (178 mục), `medic --ci` 0 fail. SPEC + PLAN đổi `status: implemented`, đánh dấu T1-T5 done trong Plan.
+
+## 2026-07-24 — provenance-log — /fable5 bắt lỗi thật: sai tên biến môi trường session
+
+User gọi `/fable5` hỏi "tiếp tục chưa" — verify lại thật (Move 2 GROUND) thay vì trả lời từ trí nhớ, phát hiện T5's wiring ĐÃ tự bắn thật qua Stop hook giữa các lượt (38 event mới, gồm cả file không phải tôi sửa — bằng chứng hook tự động hoạt động đúng thiết kế). Nhưng Attack (Move 4) lộ lỗ thật: mọi event đều mang `writer_id` chứa `unknown-session` — `_writer_id()` đọc sai tên biến môi trường (`CLAUDE_SESSION_ID`, không tồn tại) thay vì biến thật `CLAUDE_CODE_SESSION_ID` (xác nhận qua `env` thật trong hook context, có UUID thật của phiên). Self-test không bắt được vì luôn override `writer_id` tay, chưa từng test qua nhánh đọc biến môi trường mặc định.
+
+Vá `_writer_id()` đọc đúng `CLAUDE_CODE_SESSION_ID` (fallback `CLAUDE_SESSION_ID`/`SESSION_ID` cho vendor khác), thêm self-test case phủ đúng nhánh mặc định (không override tay) — bài học ghi thẳng vào comment code để không lặp lại. Verify thật: `_writer_id()` giờ trả đúng UUID phiên thật (`765fc26c-...`, khớp chính phiên này). `medic --ci` 0 fail.
+
+## 2026-07-24 — provenance-log — nối /lint (8f) + promote concept, đóng vòng consumer
+
+`/fable5` hỏi "check tình trạng, what next" — verify lại thật (grep `read_events`/`correlate` toàn repo) lộ ra: T1-T5 build xong nhưng KHÔNG có consumer thật nào ngoài self-test — hạ tầng ghi chạy sống (98 event thật đã tích luỹ) nhưng chưa ai đọc. User chọn cả 2 hướng: nối `/lint` + promote concept.
+
+Thêm bước 8f vào `skills/lint/SKILL.md` (canonical — nhớ đúng bài học mirror-drift đã bắt qua UAT trước đó, sửa canonical trước rồi `sync-skill.sh lint`, verify parity 3 bản khớp nhau bằng `diff`). Bước 8f tra `provenance-log.jsonl` như nguồn "vì sao đổi" THỨ HAI cạnh `events.jsonl`/`scratch-log.jsonl` ở bước 0b, khác biệt: git-tracked, đi theo được qua máy khác. Verify grep thật hoạt động trên dữ liệu thật.
+
+Tạo `llmwiki/wiki/concepts/provenance-log.md` — concept đầy đủ (CAP/AP, ranh giới với `touches`/`correlate()`, bài học `/fable5` writer_id, bằng chứng thật 98 event/53 code.change/44 docs.change/1 decision.confirm đo lúc viết). `medic --ci` 0 fail sau khi regen `build-overstack-docs.py` (docs drift từ skill-listing đổi, không liên quan trực tiếp).
+
+<!-- log:auto:start -->
+
+### 🤖 Log tự-động (code-logger, không do agent ghi)
+
+| Thời điểm | Event | Chi tiết |
+|---|---|---|
+| 2026-07-23 16:51:24 | `file.write` | llmwiki/wiki/sources/draft/190726-graph-lessons-grapuco.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=bc6daf67f |
+| 2026-07-23 16:51:29 | `file.write` | llmwiki/wiki/sources/draft/190726-graph-lessons-grapuco.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=85cb37509 |
+| 2026-07-23 16:51:34 | `file.write` | llmwiki/wiki/sources/draft/200726-orchestration-loop-closure.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=f6db |
+| 2026-07-23 16:51:38 | `file.write` | llmwiki/wiki/sources/draft/200726-orchestration-loop-closure.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=9ba9 |
+| 2026-07-23 16:51:47 | `file.write` | llmwiki/wiki/sources/draft/190726-travel-gap-forcing-functions.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=3a |
+| 2026-07-23 16:55:18 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=b64437e5205ddfc9c58a5dcd81c1f08fc928575a |
+| 2026-07-23 16:58:07 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=84271e8cd486d2fdaa251f4d86b5bd6040 |
+| 2026-07-23 16:58:18 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=7d1fd67db3325b8bc3ebcdd015216cbad1 |
+| 2026-07-24 08:46:53 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog.md · tool=Edit · session=765fc26c · actor=agent · prev=5c |
+| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=3 · human=['llmwiki/wiki/sources/210726-session-provenance.md', 'fdk/CAPABILITIES. |
+| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=0 · prev=06f0468baf94455dcfd1886b3db26f2efbf8d760347b6bb3cd71d14f70163d66 · h=de87 |
+| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/skills/utils/extract-site.md'] · prev=de875b1fd0ec34d68a8bff0f |
+| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/innovation/230726-innovation.md', 'llmwiki/wiki/sources/230726 |
+| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/sources/draft/210721-decision-anchoring-adoption-metric.m |
+| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/wiki/draft/unknown/unknown-context-hygiene.md'] · prev=dbc90fc |
+| 2026-07-24 08:55:17 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md · tool=Write · session=765fc26c · actor=agent · p |
+| 2026-07-24 08:55:29 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md · tool=Edit · session=765fc26c · actor=agent · pr |
+| 2026-07-24 08:55:47 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=765fc26c · actor=agent · prev=0c6675fe2842ebf235ea01bfe009b6524883d7a0260a5e |
+| 2026-07-24 08:56:00 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=96b25e265daf6c0104aa49c11ea452b7d1e132a33 |
+| 2026-07-24 08:57:20 | `file.write` | harness/scripts/provenance-log.py · tool=Write · session=765fc26c · actor=agent · prev=ed61abaa4cf228bc1aa12b288354873b4 |
+| 2026-07-24 08:57:40 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=63d7c49cf13ceb8dfa9248f93c19843113 |
+| 2026-07-24 08:58:26 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=7a118f76188601aaaab06ba6e885cd0 |
+| 2026-07-24 08:58:38 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=22a974ddb854008c8b6da248c754acf |
+| 2026-07-24 08:59:01 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=ed25b8c81025aee1e43ffd737e0404a |
+| 2026-07-24 08:59:19 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=e0486f7da005b63533194ea0672f947 |
+| 2026-07-24 08:59:32 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=11f2022e8f8289b13e1d82cc6b760a3 |
+| 2026-07-24 08:59:57 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=15edb18d5cc945fd7f2a1f06c38c9a79dc401392b97118b8008954161f2935d8 · h=1a85 |
+| 2026-07-24 08:59:58 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/scripts/decision-liveness.py'] · prev=1a858d16bd7f18b4fe319d8c |
+| 2026-07-24 09:00:15 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=765fc26c · actor=agent · prev=39c48863af5321cb15ee1a506f7a6fa10c43eb |
+| 2026-07-24 09:03:57 | `file.write` | llmwiki/innovation/240726-innovation.md · tool=Write · session=bfce9765 · actor=agent · prev=96e7a747818f92f48d6f599d12c |
+| 2026-07-24 09:04:28 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['fdk/CAPABILITIES.md', 'llmwiki/wiki/log.md', 'harness/version.json', ' |
+| 2026-07-24 09:04:28 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['harness/mechanisms.yaml', 'llmwiki/wiki/sources/draft/220722-artifact- |
+| 2026-07-24 09:24:49 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=10d23019252ac6ab513480492bd611b497 |
+| 2026-07-24 09:25:09 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=eaacfef826c3c69569432cec8bf8274b5a |
+| 2026-07-24 09:25:58 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=e6b912c8f260f6f80f40fe142620fde98d6c37286 |
+| 2026-07-24 09:36:10 | `file.write` | skills/lint/SKILL.md · tool=Edit · session=765fc26c · actor=agent · prev=b363dd7a107410d2575c9c3e39bc529d66a5d493b072f92 |
+| 2026-07-24 09:37:25 | `file.write` | llmwiki/wiki/concepts/provenance-log.md · tool=Write · session=765fc26c · actor=agent · prev=a8fa6b46f0effbe95cb6463362e |
+| 2026-07-24 09:37:41 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=765fc26c · actor=agent · prev=a4cbb1a77f96a8f91cc29ccb43cc56e74eeff332224dcf |
+| 2026-07-24 09:39:16 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=f221708e0d75c533ec4da00960d68b4073dc0385f |
+| 2026-07-24 09:39:16 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/skills/wiki-loop/lint.md'] · prev=9d22c4136892038c8495ed4c0aee |
+
+<!-- log:auto:end -->
+
+## 2026-07-24 — fdk-uat/fdk-poc — gate cứng bắt buộc tạo workspace Orca thật
+
+User nhắc lần thứ 2 (2026-07-21 → 2026-07-24, cùng lỗi tái diễn ở cả /fdk-uat lẫn /fdk-poc): agent tự ý chạy filesystem-only (curl vào thư mục tạm, test CLI thuần) rồi báo hoàn tất, bỏ qua việc dựng workspace Orca thật — "không visual = không dùng được". Root cause: bước dựng workspace trong `skills/fdk-uat/SKILL.md` được đánh dấu "(tuỳ chọn)" — nhớ tay đã fail 2 lần liền, đúng dấu hiệu cần đổi cấu trúc thay vì nhắc thêm.
+
+Vá `skills/fdk-uat/SKILL.md` (canonical, sync mirror+installed, parity xác nhận `diff`): bỏ chữ "tuỳ chọn", thêm block assert chạy `orca worktree list` verify đúng tên worktree vừa tạo có mặt — fail thì DỪNG, không được báo PASS. Vá tương tự bản CÀI của `fdk-poc` (`~/.claude/skills/fdk-poc/SKILL.md`) — nhưng canonical thật của skill này nằm trên nhánh `Rheinmir/issue-15-br-k`, không sửa được sạch từ `orca`; ghi rõ giới hạn này để không tưởng nhầm đã vá triệt để (bản cài sẽ mất vá nếu `npx skills add` cài lại từ nguồn gốc).

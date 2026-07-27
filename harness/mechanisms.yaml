@@ -121,6 +121,7 @@ mechanisms:
     surface: [mechanism, maintain]
     desc: "scratch-log (RAW append-only, track git) + memory-map (view) + session-provenance (auto-distill) — bắt sửa/context VỤN, không mất gì, truy được ở phiên sau. AUTO cuối lượt qua Stop-hook (issue #5, council-030): auto-điền why từ git nếu chưa ghi tay → distill → regenerate memory-map.html, không cần agent nhớ gõ"
     live_probe: harness/scripts/scratch-log.py
+    proof: harness/tests/memory-map-user-reachability-test.sh
 
   - id: harness-update
     name: harness-update
@@ -135,6 +136,7 @@ mechanisms:
     surface: [mechanism]
     desc: "overstack tự tường thuật trạng thái code: FACT có [nguồn]+lệnh tái tạo, tách FACT/OPINION (council-advisory); medic probe selfstate gác reproducibility"
     live_probe: fdk/tools/code-state.py
+    proof: fdk/tools/medic.py
 
   - id: skill-usage
     name: "skill-usage (đo tần suất)"
@@ -142,3 +144,61 @@ mechanisms:
     surface: [mechanism]
     desc: "đọc transcript phiên → đếm lời gọi Skill-tool theo skill + tuần ISO; xếp hạng dùng nhiều + skill chết + so tuần trước → dashboard weekly-<ISOweek>.html self-contained; local-only, deterministic, không telemetry (GH#8)"
     live_probe: fdk/tools/skill-usage.py
+
+  - id: capsurface
+    name: "capsurface (bề mặt năng lực đóng dấu)"
+    kind: tool
+    surface: [mechanism, maintain]
+    desc: "capability-stamp ép bump version khi bề mặt năng lực (skill+rule+engine) đổi mà chưa khai — downstream so sha, lệch thì đỏ, không tự tưởng 'current' mà thật ra đã cũ (p-08)"
+    live_probe: harness/scripts/capability-stamp.py
+
+  # ── 4 cơ-chế mới phiên 2026-07-18 (senior-lens grower+maintainer audit: chính chúng
+  #    lọt lưới narrative — probe pass vì manifest chưa khai, không phải vì chúng không tồn tại) ──
+  - id: capproof
+    name: "capproof (bằng chứng còn sống)"
+    kind: tool
+    surface: [mechanism, maintain]
+    desc: "resolver 6 tầng map mỗi năng lực (skill/rule/tool/mech) sang bằng chứng chạy được; medic probe ratchet — nợ tồn chỉ đếm, năng lực MỚI thiếu proof hoặc TỤT mới đỏ; đảo chiều bêu ứng-viên-trùng"
+    live_probe: fdk/tools/build-capabilities.py
+
+  - id: ledger-snapshot
+    name: "ledger-snapshot (ký ức sống sót mất máy)"
+    kind: tool
+    surface: [mechanism, maintain]
+    desc: "SessionEnd tự gom 30 ledger (flywheel/memory/events/audit/tasks) thành tarball, prune giữ N bản; round-trip+dedupe, loại baseline (regen được); fail-open"
+    live_probe: harness/scripts/ledger-snapshot.py
+
+  - id: provenance-scope
+    name: "provenance re-verify (scope hẹp)"
+    kind: rule
+    surface: [mechanism, maintain]
+    desc: "medic probe hard-fail CHỈ khi skill NGOÀI (adapt_mode=external-pull) bị sửa lén sau khi pin; skill local-authored đổi hằng ngày không cries-wolf (gap#4 senior-lens)"
+    live_probe: fdk/tools/skill-provenance.py
+
+  - id: archetype-tester
+    name: "archetype tester (/test)"
+    kind: tool
+    surface: [mechanism]
+    desc: "vai thứ 6 (Cherny 5→6): senior tester thiết kế kịch bản test neo FR/SC + code test qc-* đỏ-trước, khớp lưới qc-regression tất định"
+    live_probe: harness/scripts/archetype.py
+
+  # ── decision-anchoring pilot (T-260721-03) — 2 mục đầu tiên có anchor_symbol (neo mức-symbol,
+  #    cạnh live_probe mức-file cũ). Liveness suy bởi harness/scripts/decision-liveness.py. ──
+  - id: stop-debounce
+    name: "stop-debounce (_debounced/require_ok)"
+    kind: hook
+    surface: [mechanism]
+    desc: "Stop hook debounce theo thời gian (mặc định 180s) cho 2 bước nặng nhất (build-wiki-graph 49s + medic --ci 26s) — p-45: cổng kích hoạt lỏng nên chúng fire gần mọi lượt dev framework, 75-90s thuế mỗi lần dừng. require_ok=True (dùng cho gate medic) chỉ bỏ qua nếu lần trước ĐÃ healthy — một FAIL luôn chạy lại ngay, debounce không bao giờ giấu regression thật."
+    live_probe: llmwiki/.claude/hooks/stop.py
+    anchor_symbol: "setup::llmwiki/.claude/hooks/stop.py::_debounced"
+    proof: harness/scripts/decision-liveness.py
+    confirmed: "2026-07-23"
+
+  - id: code-graph-probe-boundary
+    name: "code-graph probe boundary (thăm dò thay vì kiểm tồn tại)"
+    kind: tool
+    surface: [mechanism]
+    desc: "Quyết định 2026-07-20: quảng cáo một dependency ngoài (code-graph) phải THĂM DÒ nó (schema DB, tiến trình server, code server có mới không) — không chỉ kiểm file .is_file(). Neo vào adapter trong repo (dep-health.py), không trỏ thẳng ra graph-kit ngoài repo vì graph-kit không index được (KÉO NGOÀI không version hoá theo pin)."
+    live_probe: harness/scripts/dep-health.py
+    anchor_symbol: "setup::harness/scripts/dep-health.py::probe_code_graph"
+    confirmed: "2026-07-21"

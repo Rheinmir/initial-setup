@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """code-logger — ghi log framework BẰNG CODE, không phụ thuộc agent nhớ.
 
+Xem llmwiki/wiki/concepts/log-model.md để biết sổ này khác gì scratch-log/mem-rank/
+touches/provenance-log — mỗi sổ trả lời một câu hỏi hẹp, KHÔNG phối hợp với nhau.
+
 Vấn đề: AGENT.md/CLAUDE.md bảo "ALWAYS append to wiki/log.md after every operation" —
 nhưng đó là kỷ luật con-người/agent, agent QUÊN là chuyện thường → log.md drift, không
 phản ánh thực tế. Cùng họ với `hooklib.audit()` (đã ghi raw event BẰNG CODE) và
@@ -76,9 +79,16 @@ def record(root, event: str, **fields) -> None:
         rec = {"ts": datetime.now().isoformat(timespec="seconds"), "event": event}
         rec.update({k: v for k, v in fields.items() if v is not None})
         rec.setdefault("actor", "agent")              # event từ hook = agent; reconcile ghi đè "system"/"human"
-        rec["prev"] = _last_hash(path) or "genesis"   # neo vào mắt xích trước (append-only)
-        rec["h"] = _chain_hash(rec["prev"], rec)        # rec lúc này chưa có "h"
         with open(path, "a", encoding="utf-8") as f:
+            # flock TRƯỚC khi đọc đuôi: 2 session ghi đồng thời từng cùng đọc một tail
+            # → 2 mắt xích cùng `prev` → chuỗi đứt oan (race 2026-07-17, dòng 1307/1308).
+            try:
+                import fcntl
+                fcntl.flock(f, fcntl.LOCK_EX)
+            except Exception:
+                pass                                   # không flock được (fs lạ) → thà race còn hơn mất event
+            rec["prev"] = _last_hash(path) or "genesis"   # neo vào mắt xích trước (append-only)
+            rec["h"] = _chain_hash(rec["prev"], rec)        # rec lúc này chưa có "h"
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
     except Exception:
         pass
@@ -120,9 +130,13 @@ def render_md(root, keep: int = 40) -> bool:
         block = "\n".join(lines)
         text = log.read_text(encoding="utf-8")
         if AUTO_START in text and AUTO_END in text:
-            pre = text.split(AUTO_START)[0]
-            post = text.split(AUTO_END, 1)[1]
-            new = pre.rstrip() + "\n\n" + block + post
+            # marker cũ có thể đứng lệch giữa file (agent vẫn append thủ công phía dưới
+            # mỗi lần) — gộp pre+post (bỏ block cũ) rồi đặt lại block ở CUỐI file, để
+            # block "sự kiện mới nhất" luôn nằm đúng vị trí thời gian của nó.
+            pre = text.split(AUTO_START)[0].rstrip()
+            post = text.split(AUTO_END, 1)[1].strip()
+            body = pre + ("\n\n" + post if post else "")
+            new = body.rstrip() + "\n\n" + block + "\n"
         else:
             new = text.rstrip() + "\n\n" + block + "\n"
         log.write_text(new, encoding="utf-8")
@@ -288,6 +302,46 @@ def cost_summary(root) -> None:
     print("  theo model:")
     for m, c in sorted(by_model.items(), key=lambda x: -x[1]):
         print(f"    ${c:8.2f}  {m}")
+
+
+def audit_rechain(root) -> None:
+    """Sửa chuỗi ĐỨT bằng cách tính lại prev/h từ điểm đứt — KHÔNG đổi nội dung event nào.
+
+    Dùng cho ca đã chẩn đoán là race đa-phiên (2 mắt xích cùng `prev`), không phải tamper.
+    Việc sửa TỰ LỘ: sau khi rechain, append 1 event `audit.rechain` ghi số mắt xích tính lại
+    — ai đọc sổ đều thấy chuỗi từng được nối lại, không giấu được."""
+    root = Path(root)
+    path = _events_path(root)
+    try:
+        lines = [ln for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    except Exception:
+        print("rechain: chưa có events.jsonl")
+        return
+    objs = [json.loads(ln) for ln in lines]
+    first = next((i for i, o in enumerate(objs) if o.get("h")), None)
+    if first is None:
+        print("rechain: chuỗi chưa khởi tạo — không có gì để nối")
+        return
+    prev_h, fixed, from_line = "genesis", 0, None
+    out = lines[:first]
+    for i in range(first, len(objs)):
+        body = {k: v for k, v in objs[i].items() if k != "h"}
+        body["prev"] = prev_h
+        h = _chain_hash(prev_h, body)
+        if objs[i].get("prev") != prev_h or objs[i].get("h") != h:
+            fixed += 1
+            if from_line is None:
+                from_line = i + 1
+        body["h"] = h
+        out.append(json.dumps(body, ensure_ascii=False))
+        prev_h = h
+    if not fixed:
+        print("rechain: chuỗi đã nguyên vẹn — không sửa gì")
+        return
+    path.write_text("\n".join(out) + "\n", encoding="utf-8")
+    record(root, "audit.rechain", actor="system", fixed=fixed, from_line=from_line,
+           note="tính lại prev/h từ điểm đứt (race đa-phiên cùng prev) — nội dung event giữ nguyên")
+    print(f"rechain: tính lại {fixed} mắt xích từ dòng {from_line} — nội dung event không đổi")
 
 
 def audit_verify(root) -> bool:
@@ -484,6 +538,8 @@ def main() -> None:
     elif "--cost-summary" in args:
         cost_summary(root)
     elif "--audit" in args:
+        if "--rechain" in args:
+            audit_rechain(root)
         ok = audit_verify(root)
         if "--check" in args:          # chế độ gate: chuỗi đứt → exit 2 (interactive --audit vẫn exit 0)
             sys.exit(0 if ok else 2)

@@ -59,3 +59,10 @@ lume/
 llmwiki/raw/payroll requirement/
 qa-shots/
 fdk/docs/superpowers/
+
+# flywheel success-flywheel raw history (local)
+harness/metrics/successes.jsonl
+llmwiki/wiki/sources/draft/archive/
+
+# mem-rank local memory store
+harness/metrics/memory.jsonl

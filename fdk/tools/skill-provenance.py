@@ -145,6 +145,13 @@ def evaluate(data: dict):
 def cmd_check(a) -> int:
     data = load_store()
     rows, problem = evaluate(data)
+    if getattr(a, "json", False):
+        recorded = data["skills"]
+        out = [{"name": n, "status": s, "detail": d,
+                "source": recorded.get(n, {}).get("source"),
+                "adapt_mode": recorded.get(n, {}).get("adapt_mode")} for n, s, d in rows]
+        print(json.dumps({"schema": "skill-provenance-check/v1", "rows": out}, ensure_ascii=False))
+        return 0
     if a.name:
         rows = [r for r in rows if r[0] == a.name]
         if not rows:
@@ -211,6 +218,9 @@ def main() -> int:
     p_chk = sub.add_parser("check", help="verify checksum + phát hiện skill lạ")
     p_chk.add_argument("name", nargs="?", help="giới hạn 1 skill")
     p_chk.add_argument("--ci", action="store_true", help="exit 1 nếu MODIFIED/UNTRACKED")
+    p_chk.add_argument("--json", action="store_true",
+                       help="in rows kèm source/adapt_mode — để medic phân biệt "
+                            "external-pull (rủi ro thật) với local-authored (dev churn bình thường)")
 
     sub.add_parser("list", help="liệt kê provenance đã ghi")
 

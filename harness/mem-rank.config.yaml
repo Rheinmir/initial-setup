@@ -4,21 +4,29 @@
 # agent memory as production infra (Mem0/Zep/Letta) — ADD/UPDATE/DELETE/NOOP ops + ranked
 # retrieval that returns the few relevant memories instead of dumping full context.
 #
-# The store, the 4 ops, and the deterministic token-overlap ranker are built now (--self-test).
-# The BEST relevance signal (an embedding model) and the right eviction policy are the unknowns.
+# The store, the 4 ops, and BOTH rankers are built + self-tested now:
+#   - token-overlap (Jaccard, lexical): zero-dep DEFAULT, works offline everywhere.
+#   - embedding (cosine over `embedder_cmd`): REAL semantic path — code exists + tested; it needs
+#     an embedding backend, which a travel-able framework can't bundle, so the backend is pluggable.
+# Only the model WEIGHTS come from the environment — the wiring is no longer a null stub.
 
-verified: false                   # ASSUMPTION (not verified) — relevance.scorer defaults to deterministic token-overlap (no embedding model wired); eviction thresholds are ship-guesses, not tuned on real memory load.
+verified: false                   # token-overlap default is deterministic + tested; flip true once an embedder_cmd is wired + calibrated on real load.
 
 relevance:
-  scorer: token-overlap           # ASSUMPTION (not verified) — 'token-overlap' (Jaccard) now; 'embedding' is the absent adapter
-  embedding_model: null           # ASSUMPTION (absent) — no embedding model wired; null => fall back to token-overlap
+  scorer: token-overlap           # 'token-overlap' (Jaccard, offline default) | 'embedding' (semantic, needs embedder_cmd below)
+  # embedder_cmd: reads text on STDIN, prints a JSON float array on STDOUT. Any backend works:
+  #   Ollama : 'python3 harness/scripts/embed-ollama.py'   (nomic-embed-text, offline, no key)
+  #   Voyage : 'python3 harness/scripts/embed-voyage.py'   (needs VOYAGE_API_KEY, network)
+  # Set scorer: embedding AND embedder_cmd to turn on semantic recall; unreachable => auto-fallback.
+  embedder_cmd: null              # null => token-overlap (semantic path off)
+  min_score: 0.25                 # embedding only: cosine floor for NOOP (cosine>0 even for unrelated)
 
 eviction:
-  policy: score                   # ASSUMPTION (not verified) — score | lru | none; evict lowest-relevance when over cap
-  max_entries: 500                # ASSUMPTION (not verified) — 500 is a guess; tune to real memory volume
+  policy: score                   # score | lru | none; evict lowest-relevance when over cap
+  max_entries: 500                # tune to real memory volume
 
-# ADAPT-CHECKLIST (finalize when an embedding backend / real memory load exists):
-#   1. Name relevance.embedding_model + set scorer: embedding (richer than token-overlap).
-#   2. Calibrate eviction.policy + max_entries against real memory volume / recall needs.
+# ADAPT-CHECKLIST (turn on semantic recall):
+#   1. Point relevance.embedder_cmd at a backend (STDIN text -> STDOUT JSON float array) + set scorer: embedding.
+#   2. Calibrate relevance.min_score + eviction on real memory volume.
 #   3. Run: python3 harness/scripts/mem-rank.py --self-test  (must PASS).
 #   4. Flip verified:true. Only then trust ranked retrieval for production recall.

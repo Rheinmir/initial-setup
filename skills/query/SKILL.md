@@ -26,6 +26,12 @@ When user asks question requiring synthesis across multiple wiki pages or raw so
 1. **Tầng 1 — quét, KHÔNG mở full trang nào:** `ripgrep` câu hỏi trên `wiki/index.md` + nội dung wiki (`rg -c '<term>' wiki/` để đếm khớp), xếp hạng trang theo **độ phủ term** (trang chứa nhiều term của câu hỏi nhất). Câu hỏi về code → dùng code-graph MCP (`search_symbols`) thay `rg`. Kết quả tầng này = danh sách slug + dòng khớp; chưa `Read` full trang nào.
 2. **Tầng 2 — khoan:** chỉ `Read` FULL **top-N trang cao điểm nhất** (mặc định ~5). Bỏ phần đuôi bảng xếp hạng — không đọc cho "chắc".
 3. **Tầng 3 — bối cảnh:** nếu câu trả lời cần mạch liên quan, lần theo `[[wikilinks]]` của các trang vừa đọc (tương đương timeline/related của engram) — vẫn chỉ mở trang được trỏ tới, không mở tất cả.
+3b. **Cổng drift trên đường ĐỌC (0 token, fail-open)** — trước khi tổng hợp, hỏi xem trang mình vừa đọc có đang lệch code không:
+   `RUN: python3 harness/scripts/wiki-sync.py --flags-for "<slug1,slug2,…>"` (downstream không có `harness/` trong repo thì dùng bản global: `python3 ~/.claude/harness/harness/scripts/wiki-sync.py --flags-for "…" --root .`).
+   Truyền đúng các trang đã `Read` ở tầng 2–3. Lệnh **luôn exit 0**; im lặng = không trang nào bị cờ.
+   Có dòng `⚑ CẢNH BÁO DRIFT` → **chuyển nguyên văn cảnh báo đó vào câu trả lời** (một dòng mỗi trang, đặt ngay đầu phần trả lời) rồi mới trả lời bình thường; đừng nuốt cảnh báo, cũng đừng từ chối trả lời.
+   Vì sao có bước này: `wiki-sync --check` ghi cờ `code-drift` vào `stale.json`, nhưng trước 2026-07-19 chỉ `/lint` đọc cờ đó — mà lint chạy theo chu kỳ, nên giữa hai lần lint `/query` trả về trang đã lệch code **mà không cảnh báo gì**. Đó đúng là ca "wiki là nguồn sự thật nhưng nội dung đã lệch" khiến model lập luận tự tin trên tri thức cũ.
+
 4. If answer needs info not in wiki, check `raw/` for unprocessed sources.
 5. Synthesize and answer directly.
 6. Evaluate: does answer contain non-obvious insight, connection, or conclusion not already in wiki?

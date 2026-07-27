@@ -13,6 +13,7 @@ parse được, bắt buộc đúng 1 trường `type` không rỗng; bên đọ
 Dùng bởi: skill health-check (--check), sync-template & harness-update (--migrate).
 """
 import argparse
+import importlib.util
 import re
 import sys
 from pathlib import Path
@@ -21,6 +22,9 @@ try:
     import yaml
 except ImportError:
     yaml = None
+
+HERE = Path(__file__).resolve().parent          # harness/scripts
+VALIDATORS = HERE.parent / "validators"
 
 SKIP_BASENAMES = {"README.md", "_template.md", "index.md", "log.md", "decisions.md", "active-context.md"}
 CONTENT_DIRS = ("concepts", "entities", "sources", "draft", "architecture", "tours")
@@ -32,26 +36,26 @@ H1_RE = re.compile(r"^#\s+(.*?)\s*$")
 DIR_TYPE = {"concepts": "concept", "entities": "entity", "draft": "draft", "sources": "source"}
 
 
-def gitignored(path) -> bool:
-    """True nếu path bị .gitignore loại (archive/draft/html local-only). Fail-open: git lỗi → False.
-    Khớp index_sync.gitignored — file gitignored là local-only, không phải đối tượng OKF/migrate."""
-    try:
-        import subprocess
-        return subprocess.run(["git", "check-ignore", "-q", str(path)],
-                              capture_output=True, timeout=5).returncode == 0
-    except Exception:
-        return False
+def _load(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def content_files(wiki: Path):
     """File wiki để check/migrate OKF — ĐÃ loại file gitignored (local-only): an-toàn-mặc-định,
-    caller (audit, sync-template) khỏi tự lọc → không flag/migrate file archive/draft cố ý local."""
+    caller (audit, sync-template) khỏi tự lọc → không flag/migrate file archive/draft cố ý local.
+    gitignored() dùng CANONICAL index_sync.py (pattern _load() như audit.py) — trước đây tự cài
+    lại logic git check-ignore riêng, 3 scanner từng thiếu bước này cùng lúc (failure-flywheel
+    170726, 3 ca spec-violation); giờ 1 implementation duy nhất, sửa 1 chỗ là mọi caller ăn theo."""
+    index_mod = _load(VALIDATORS / "index_sync.py", "_indexsync")
     out = []
     for p in wiki.rglob("*.md"):
         if p.name in SKIP_BASENAMES:
             continue
         rel = p.relative_to(wiki).parts
-        if rel and rel[0] in CONTENT_DIRS and not gitignored(p):
+        if rel and rel[0] in CONTENT_DIRS and not index_mod.gitignored(p.relative_to(wiki).as_posix(), wiki):
             out.append(p)
     return sorted(out)
 

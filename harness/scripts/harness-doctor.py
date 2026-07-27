@@ -640,8 +640,16 @@ def probe_precommit_installed():
     if py is None:
         bits.append("`python` NOT on PATH (only python3) — pre-commit's generated git "
                     "shim historically calls `python`; install with a python3 on PATH")
-    if installed:
+    # Bản cũ trả True chỉ vì shim git tồn tại — TRONG KHI đã tự thu được bằng chứng ngược
+    # ("binary NOT on PATH", "`python` NOT on PATH") rồi nhét vào chuỗi mô tả. Shim có mà
+    # binary thiếu = hook GÃY lúc commit, còn doctor vẫn xanh. Verdict phải dùng chính bằng
+    # chứng nó đã thu, không được chỉ đọc inode.
+    if installed and binary:
         return True, "pre-commit in .git/hooks", "installed (" + "; ".join(bits) + ")"
+    if installed and not binary:
+        return False, "pre-commit in .git/hooks", ("shim git CÓ nhưng binary `pre-commit` "
+                                                   "KHÔNG trên PATH — hook sẽ gãy lúc commit, "
+                                                   "L2 coi như TẮT. " + "; ".join(bits))
     return False, "pre-commit in .git/hooks", ("NOT installed — run `pre-commit install` "
                                                "(L2 git backstop inactive). " + "; ".join(bits))
 

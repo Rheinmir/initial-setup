@@ -28,6 +28,8 @@ _FALLBACK = {"verified": False, "archetypes": {
                "tools": ["success-flywheel", "wikieval"], "posture": "llmwiki/personas/grower.md"},
     "maintainer": {"keyword": "/maintain", "phase": "scale / harden", "cli": "claude",
                    "tools": ["harness-update", "orca-sec-scans"], "posture": "llmwiki/personas/maintainer.md"},
+    "tester": {"keyword": "/test", "phase": "verify design-first", "cli": "claude",
+               "tools": ["qc-code", "wikieval"], "posture": "llmwiki/personas/tester.md"},
 }}
 
 
@@ -57,16 +59,25 @@ def dispatch_cmd(spec, project="<project>"):
     return "(Claude trực tiếp — phân tích/nuance; không dispatch CLI)"
 
 
+def _posture_path(root, rel: str):
+    """REPO-LOCAL → GLOBAL (~/.claude/harness) — downstream không có llmwiki/personas trong repo;
+    install --global copy personas lên harness home (bài học UAT canary 260718: preamble rỗng)."""
+    import os
+    for base in (Path(root),
+                 Path(os.environ.get("OVERSTACK_HARNESS_HOME") or (Path.home() / ".claude" / "harness"))):
+        p = base / rel
+        if p.is_file():
+            return p
+    return None
+
+
 def get(root, token):
     arcs = _archetypes(root)
     name, spec = resolve(arcs, token)
     if not name:
         return f"[archetype] không có '{token}'. Có: " + ", ".join(f"{n} ({s.get('keyword')})" for n, s in arcs.items())
-    posture = ""
-    try:
-        posture = (root / spec.get("posture", "")).read_text(encoding="utf-8")
-    except Exception:
-        posture = f"(thiếu file posture {spec.get('posture')})"
+    pp = _posture_path(root, spec.get("posture", ""))
+    posture = pp.read_text(encoding="utf-8") if pp else f"(thiếu file posture {spec.get('posture')} — cả repo lẫn global)"
     return (f"# Dispatch persona: {name.upper()}  ·  {spec.get('keyword')}  ·  phase {spec.get('phase')}\n"
             f"# CLI gợi ý: {spec.get('cli')}{(' / ' + spec['model']) if spec.get('model') else ''}\n"
             f"# Lệnh: {dispatch_cmd(spec)}\n"
@@ -89,9 +100,11 @@ def self_test() -> int:
     n1, s1 = resolve(arcs, "/sweep")
     n2, s2 = resolve(arcs, "maintainer")
     n3, _ = resolve(arcs, "/nope")
-    posture_ok = all((root / s.get("posture", "")).is_file() for s in arcs.values())
+    n4, s4 = resolve(arcs, "/test")
+    posture_ok = all(_posture_path(root, s.get("posture", "")) is not None for s in arcs.values())
     ok = (n1 == "sweeper" and "simplify" in s1.get("tools", []) and n2 == "maintainer"
-          and n3 is None and len(arcs) == 5 and posture_ok)
+          and n3 is None and n4 == "tester" and "qc-code" in s4.get("tools", [])
+          and len(arcs) == 6 and posture_ok)
     print("archetype self-test:", "PASS" if ok else "FAIL")
     return 0 if ok else 1
 

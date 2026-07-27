@@ -109,6 +109,38 @@ jobs:
         run: bash harness/tests/patterns-guard-test.sh .
       - name: U11 self-integrity — stamp repo ↔ global version-skew (GH#63 Phase 5)
         run: bash harness/tests/harness-integrity-test.sh .
+      - name: flywheel auto-capture — rule cắn tự vào ledger (capture không chờ ai nhớ gõ)
+        run: bash harness/tests/flywheel-autocapture-test.sh .
+      - name: install ref-override — canary không được chấm nhầm bản cũ (UAT mù engine)
+        run: bash harness/tests/install-ref-override-test.sh .
+      - name: downstream fire-drill — CI downstream tự chứng rule gốc còn cắn (đúng cách)
+        run: bash harness/tests/downstream-firedrill-test.sh .
+      - name: capproof — checklist năng lực tự soi còn cắn (nợ mới đỏ, nợ tồn đếm)
+        run: bash harness/tests/capproof-test.sh .
+      - name: ledger-snapshot — ký ức máy-local round-trip + backup tự chạy
+        run: bash harness/tests/ledger-snapshot-test.sh .
+      - name: skill-provenance-scope — tamper skill NGOÀI đỏ, dev churn local không cries-wolf
+        run: bash harness/tests/skill-provenance-scope-test.sh .
+      - name: engines-smoke — chạy THẬT từng engine từng thiếu proof (26 nợ capproof → 0)
+        run: bash harness/tests/engines-smoke-test.sh .
+      - name: hook-guard-invariant — self-test không được commit trần (GH#30, chặn đệ quy hook)
+        run: bash harness/tests/hook-guard-invariant-test.sh .
+      - name: wiki-sync — neo code→wiki (no-op gate 0-token)
+        run: bash harness/tests/wiki-sync-test.sh .
+      - name: docs-skill-okf — skill tạo wiki .md phải xuất chuẩn OKF v0.1 (R9)
+        run: bash harness/tests/docs-skill-okf-test.sh .
+      - name: harness-update — T1-T4 cài/refresh trong repo tạm cô lập
+        run: bash harness/tests/harness-update-test.sh .
+      - name: orca-guard fail-open — hook thiếu file không được brick tool (cozyroom)
+        run: bash harness/tests/orca-guard-failopen-test.sh .
+      - name: r12-v3-workspace — sweep subrepo behind (T5)
+        run: bash harness/tests/r12-v3-workspace-test.sh .
+      - name: tests-wired — MỌI harness/tests/*-test.sh phải có step trong workflow này
+        run: |
+          for t in harness/tests/*-test.sh; do
+            grep -q "$(basename "$t")" .github/workflows/harness.yml \
+              || { echo "chưa wire vào CI: $t"; exit 1; }
+          done
       - name: harness-doctor — fire-drill (mọi rail còn cắn?)
         run: python3 harness/scripts/harness-doctor.py --ci
       - name: capabilities current (fdk/CAPABILITIES.md khớp đĩa)

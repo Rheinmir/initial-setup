@@ -128,11 +128,12 @@ LOOP_GROUPS = {
          "new-project-setup": "build", "onboard-codebase": "build", "new-skill": "build",
          "skill-provenance": "build",
          "wikieval": "eval", "ship": "eval", "loop-runner": "eval", "failure-flywheel": "eval",
-         "br": "eval", "checkpoint-trace": "eval"}),
+         "br": "eval", "checkpoint-trace": "eval", "design-twice": "edit", "qc-uiux": "edit"}),
     "orchestrate": (
         [("dispatch", "🐳 điều phối"), ("eval", "📊 đánh giá"), ("ops", "🚀 vận hành & deploy")],
         {"orca-workflow": "dispatch", "orca-onboard": "dispatch", "orchestration": "dispatch",
          "orca-cli": "dispatch", "orca-dispatch-reference": "dispatch", "wayfinder": "dispatch",
+         "orca-handover": "dispatch",
          "council": "eval", "trace-grader": "eval", "orca-eval": "eval",
          "orca-sec-scans": "ops", "jenkins-agent-l3-deploy": "ops", "orca-issue": "ops"}),
     "utils": (
@@ -149,12 +150,14 @@ LOOP_GROUPS = {
          "imagegen-frontend-web": "imagegen",
          "cavecrew": "caveman", "caveman": "caveman", "caveman-commit": "caveman", "caveman-compress": "caveman",
          "caveman-help": "caveman", "caveman-review": "caveman", "caveman-stats": "caveman",
-         "fdk": "fdk", "fdk-uat": "fdk", "medic": "fdk", "harness-tour": "fdk", "harness-update": "fdk", "health-check": "fdk",
+         "fdk": "fdk", "fdk-uat": "fdk", "fdk-poc": "fdk", "medic": "fdk", "harness-tour": "fdk", "harness-update": "fdk", "health-check": "fdk",
          "snapshot-push": "fdk", "sync-template": "fdk", "docs-curate": "fdk",
+         "agent-reach": "utility",
          "check-approve": "utility", "computer-use": "utility", "find-skills": "utility",
          "full-output-enforcement": "utility", "join-project": "utility", "last30days": "utility",
          "raise-issue": "utility", "ovs-notes": "utility", "frontier-scan": "utility",
-         "uat-nonit-testcase": "utility", "visual-qa": "utility", "unknown": "utility"}),
+         "uat-nonit-testcase": "utility", "visual-qa": "utility", "unknown": "utility",
+         "fable5": "utility", "i-have-adhd": "utility"}),
 }
 
 
@@ -992,6 +995,46 @@ def sections(root: Path):
         "bảng <b>từng rule</b> ở tab <a href=\"@harness\">Nền 2 · Harness</a>; bảng <b>từng skill</b> ở tab "
         "<a href=\"@skills\">Skill</a>. Mind map trên là bản tra cứu nhanh; bảng đầy đủ nằm đúng tab chủ đề.</p>",
     ]))
+    # ── Graph nhúng: đường DUY NHẤT để memory-map (#4) và skill-whiteboard (#5) xuống
+    # được máy user. Hai artifact đó KHÔNG travel (generator là framework_only), nhưng
+    # overstack.html thì "output travel" — nên nhúng vào đây là chúng đi theo.
+    # Dùng iframe srcdoc thay vì tách fragment renderer: iframe cô lập JS/id, nên KHÔNG
+    # phải mổ template 350 dòng của build-wiki-graph.py — engine đó đang travel, mổ nó
+    # để lấy một khung nhìn là đổi rủi ro lấy tiện.
+    # TỰ SINH hai graph trước khi nhúng — KHÔNG dựa vào thứ tự hook.
+    # Bug đã dính ngay lần đầu: stop.py chạy build-overstack-docs ở block (A), còn
+    # wiki-graph ở block (B) và memory-map ở secondary_memory() — đều SAU. Nên overstack
+    # nhúng bản cũ và medic báo docs stale ở mọi phiên. Root không phải "sai thứ tự" mà là
+    # "overstack phụ thuộc artifact có trigger sinh KHÁC nó". Tự sinh thì hết cả lớp lỗi,
+    # không phải sắp lại thứ tự rồi mong nó đứng yên.
+    import subprocess as _sp
+    for _gen in ("memory-map.py", "whiteboard-skill-map.py"):
+        _g = root / "fdk" / "tools" / _gen
+        if _g.is_file():
+            try:
+                _sp.run([sys.executable, str(_g)], cwd=str(root), capture_output=True, timeout=60)
+            except Exception:
+                pass   # fail-open: thiếu/hỏng generator thì nhúng bản đang có
+
+    emb = []
+    for fname, title, why in (
+            ("memory-map.html", "Bản đồ trí nhớ",
+             "phiên nào chạm file nào — cạnh <code>elaborates</code>, sinh lại cuối mỗi phiên"),
+            ("skill-whiteboard.html", "Bản đồ skill",
+             "loop chứa skill nào — cạnh <code>contains</code> / <code>orchestrates</code>")):
+        f = root / "llmwiki" / "html" / fname
+        if not f.is_file():
+            continue
+        doc = f.read_text(encoding="utf-8").replace("&", "&amp;").replace('"', "&quot;")
+        emb.append(f'<h3>{title}</h3><p class="lead">{why}</p>'
+                   f'<iframe title="{title}" style="width:100%;height:640px;border:1px solid '
+                   f'var(--line,#d8e2f0);border-radius:12px;background:#fff" '
+                   f'sandbox="allow-scripts" srcdoc="{doc}"></iframe>')
+    if emb:
+        S.append(("graphs", "Bản đồ quan hệ", "· BẢN ĐỒ", "Bản đồ quan hệ (graph)", [
+            '<p class="lead">Các đồ thị này nhúng thẳng vào trang, nên chúng đi cùng '
+            '<code>overstack.html</code> xuống máy bạn — không cần cài thêm gì.</p>'] + emb))
+
     return S
 
 
@@ -1008,7 +1051,7 @@ def render(root: Path) -> str:
                ("3 nền tảng", ["wiki", "harness", "skills"]),
                ("Dùng hằng ngày", ["workflow", "orca", "bnal"]),
                ("Đo & kiểm khi chạy", ["advanced", "runtime", "awareness", "codestate"]),
-               ("Tra cứu", ["reference"]),
+               ("Tra cứu", ["reference", "graphs"]),
                ("Vận hành", ["maintain"]),
                ("👷 Cho người phát triển overstack", ["fdk", "newfeature"])]
     # Thứ tự thân bài = thứ tự phẳng của `grouped` (nav ↔ thân luôn khớp, chống lệch khi chèn/di tab)

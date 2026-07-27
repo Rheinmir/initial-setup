@@ -24,6 +24,12 @@ version: 4
 global_shared:
   engine_core:
     - "llmwiki/.claude/hooks/*.py — 8 hook (stop/pre-post_tool_use/session_*/user_prompt_submit)"
+    # medic.py PHẢI tới global: stop.py gọi nó ở CẢ downstream (gương-soi cuối lượt), và
+    # downstream-contract.yaml khai nó trong must_reach_global_engines. Trước 2026-07-20 nó
+    # bị xếp nhầm vào framework_only → install-harness.sh (đọc chính file này) XOÁ nó khỏi
+    # global → fresh-install-smoke đỏ với "engine global THIẾU: fdk/tools/medic.py".
+    # Hai hợp đồng nói ngược nhau và installer nghe theo cái sai. Cùng lớp lỗi p-41.
+    - "fdk/tools/medic.py — cổng sức khoẻ tổng (stop.py gọi ở downstream, guard fail-open)"
     - "harness/validators/*.py — 14 validator ép R1-R17"
     - "harness/scripts/bnal_config.py + bnal_guard.py + bnal_metrics.py — dep chung"
     - "harness/poc-vendor-neutral/** — rào chắn R1-R17 (llmwiki-validate + policy.yaml + gen-converters); CI downstream validate từ đây (Phase 1+3 v4)"
@@ -46,8 +52,17 @@ global_shared:
     - "harness/scripts/code-logger.py + archetype.py"
   util_maintain:
     - "harness/scripts/health-check.py + okf-check.py + sync-template.py — downstream tự-update"
+    - "fdk/tools/build-capabilities.py — bản đồ năng lực; deploy CẠNH hooks (ADR-005), downstream tự sinh CAPABILITIES.md"
     - "fdk/tools/build-skill-search.py + skill-usage.py + docs-curate.py + artifacts.py"
     - "harness/scripts/web-clone.py + web-crawl.py"
+  # research_reach: năng lực NGHIÊN CỨU/VỚI-TỚI internet — adapt_mode=external-pull (KÉO HẠ TẦNG NGOÀI,
+  # không hòa-tan vào kit). Engine ở ~/.agents/skills (global, dùng chung mọi project); repo chỉ giữ
+  # RECIPE đi theo git = mirror SKILL.md + pin trong fdk/skills.provenance.json (source+commit+sha).
+  # State máy-local (yt-dlp/ffmpeg/Node/mcporter + cookie login + API key) KHÔNG travel — tái lập bằng
+  # `agent-reach doctor`/`install --safe` mỗi máy. Xem concept [[adapt-modes]] để chọn đúng kiểu adapt.
+  research_reach:
+    - "last30days — mvanhorn/last30days-skill v3.11.0 (research 30 ngày: Reddit/X/YT/TikTok/HN/Polymarket/GitHub)"
+    - "agent-reach — Panniantong/agent-reach v1.5.0 (capability layer 15 nền, zero-API-fee, doctor self-heal)"
 
 # ── TẦNG 2 · TRAVEL-IN-REPO — dữ liệu riêng dự án, đi theo git, sống sót clone ──
 travel_in_repo:
@@ -60,13 +75,11 @@ travel_in_repo:
 # ── TẦNG 3 · FRAMEWORK-ONLY — chỉ chạy ở repo framework (dev/maintain kit) ──
 framework_only:
   fdk/tools/build-overstack-docs.py:   "sinh overstack.html của framework (output travel, generator ở lại)"
-  fdk/tools/build-capabilities.py:     "bản đồ năng lực framework"
   fdk/tools/build-cheatsheet.py:       "cheatsheet skill (dev)"
   fdk/tools/build-docs-index.py:       "dashboard llmwiki (dev)"
   fdk/tools/build-health-dashboard.py: "dashboard sức khỏe framework"
   fdk/tools/whiteboard-skill-map.py:   "bản đồ skill (dev)"
   fdk/tools/new-skill.py:              "scaffold skill vào publish tree (dev)"
-  fdk/tools/medic.py:                  "cổng sức khoẻ framework (stop.py gọi có guard fail-open ở downstream)"
   harness/scripts/harness-lint.py:     "harness tự gác chính nó"
   harness/scripts/harness-doctor.py:   "fire-drill rule (dev)"
   harness/scripts/fdk-gate.py:         "cổng push khi dev framework"

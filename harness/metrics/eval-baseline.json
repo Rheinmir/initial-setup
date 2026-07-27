@@ -1,14 +1,34 @@
 {
   "schema": "wikieval-baseline/v1",
   "generated_by": "harness/scripts/wikieval.py",
-  "generated_at": "2026-06-28",
+  "generated_at": "2026-07-18",
   "evals_dir": "fdk/wiki/sources/evals",
   "summary": {
-    "goldens": 2,
-    "decided": 2,
-    "passed": 2
+    "goldens": 4,
+    "decided": 4,
+    "passed": 4
   },
   "goldens": {
+    "adapt-modes-pick": {
+      "pass": true,
+      "score": 1.0,
+      "decided_by": "tier1-asserts",
+      "asserts": [
+        "contains:HÒA TAN",
+        "contains:KÉO NGOÀI",
+        "regex:(?i)(dissolve|hòa tan)"
+      ]
+    },
+    "capproof-liveness": {
+      "pass": true,
+      "score": 1.0,
+      "decided_by": "tier1-asserts",
+      "asserts": [
+        "icontains:unproven",
+        "regex:(?i)(capproof|bằng chứng)",
+        "regex:(?i)ratchet|nợ"
+      ]
+    },
     "r2-origin": {
       "pass": true,
       "score": 1.0,

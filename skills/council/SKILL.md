@@ -102,9 +102,14 @@ Collect the replies into `answers.json` — `[{"id","author","text"}, ...]`, whe
 
 ### Stage 2a — blind packet (council.py is deterministic)
 ```bash
-python3 harness/scripts/council.py prepare answers.json --config harness/council.config.yaml --out run/
+python3 harness/scripts/council.py prepare answers.json --config harness/council.config.yaml --out scratchpad/council-<slug>/
 ```
-Writes `run/council.packet.{json,md}`: the answers relabelled A/B/C with authors
+`<slug>` = short name for this run (e.g. `release-gate`). Always under `scratchpad/`
+(gitignored, per-repo convention) — never bare `run/` or a repo-root folder; those
+leak as untracked clutter that never gets cleaned up (lesson 170726, 6 stray
+`run-council*/` dirs found at repo root from past sessions copying this example
+literally). Writes `scratchpad/council-<slug>/council.packet.{json,md}`: the
+answers relabelled A/B/C with authors
 removed, plus each judge's **presentation order** from the anchor guard. Show
 each judge its answers in its row's order to cancel position bias.
 
@@ -118,9 +123,9 @@ Collect into `judges.json` — `[{"judge","ranking":["B","A","C"]}, ...]`.
 
 ### Stage 2c — aggregate (council.py is deterministic)
 ```bash
-python3 harness/scripts/council.py rank answers.json --judges judges.json --config harness/council.config.yaml --out run/
+python3 harness/scripts/council.py rank answers.json --judges judges.json --config harness/council.config.yaml --out scratchpad/council-<slug>/
 ```
-Writes `run/council.transcript.{json,md}`: mean-rank consensus, the winner, the
+Writes `scratchpad/council-<slug>/council.transcript.{json,md}`: mean-rank consensus, the winner, the
 dissent table (most-contested answer), and a `chairman_brief`.
 
 ### Stage 3 — Final Response (orchestration generates)

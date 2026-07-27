@@ -45,6 +45,34 @@ Soi: **tên có nói đúng việc nó làm** không (hàm `getUser` mà ghi DB,
 ### 4. Logic & bug — điểm/10 · lỗi nặng nhất · TEST tái hiện mỗi bug
 Soi: **edge case** (null · rỗng · số âm · overflow) · **off-by-one** (`<` vs `<=`, index cuối) · **race condition** (state chia sẻ, await xen kẽ, đọc-rồi-ghi không atomic). Mỗi bug tìm được → **viết một test-case ĐỎ tái hiện lỗi** (chứng minh bug có thật, không phải nghi ngờ). Test đỏ là dữ kiện; verdict là ý kiến.
 
+## Bản đồ 13 nhóm lỗi (gstack) + severity
+
+Mỗi finding gắn đúng MỘT nhóm + MỘT severity, format: `[<nhóm>][<severity>] <mô tả> — <cách sửa>`. 5 nhóm CRITICAL soi trước:
+
+| # | Nhóm (CRITICAL) | Soi cái gì |
+|---|---|---|
+| 1 | SQL & data safety | Nối chuỗi vào query (kể cả đã `.to_i`) thay vì parameterize; check-then-set không atomic (TOCTOU); ghi DB vòng qua validation của model; N+1 thiếu eager-load. |
+| 2 | Race condition & concurrency | Đọc-kiểm-ghi không có unique constraint; find-or-create thiếu index → gọi song song đẻ bản ghi trùng; chuyển status không dùng `WHERE old_status=?` atomic; render HTML thô trên dữ liệu người dùng (XSS). |
+| 3 | LLM output trust boundary | Giá trị LLM sinh (email/URL/tên) ghi DB không validate format; output có cấu trúc không kiểm type/shape; URL do LLM sinh được fetch không allowlist (SSRF); output LLM vào knowledge-base không sanitize (stored prompt-injection). |
+| 4 | Shell injection | `subprocess`/`os.system` với `shell=True` + nội suy chuỗi — dùng argument array; `eval`/`exec` trên code LLM sinh không sandbox. |
+| 5 | Enum & value completeness | Thêm một giá trị enum/status/tier mới → PHẢI đọc code NGOÀI diff: mọi consumer switch/filter/hiển thị giá trị anh em, mọi allowlist `%w[]`, mọi chuỗi `case/if-elif` — thiếu một consumer là bug âm thầm. |
+
+8 nhóm INFORMATIONAL (soi sau, thiên về auto-fix): **async/sync mixing** (gọi sync blocking trong `async def`, `time.sleep` thay `asyncio.sleep`) · **column/field-name safety** (tên cột trong ORM query lệch schema → rỗng âm thầm) · **LLM prompt** (list 0-indexed trong prompt, prompt khai tool không khớp code, limit khai nhiều chỗ dễ drift) · **type coercion** (giá trị qua biên Ruby→JSON→JS đổi kiểu; input hash/digest không normalize kiểu) · **view/frontend** (style inline re-parse mỗi render, O(n·m) lookup trong view, filter phía app thay vì `WHERE`) · **time-window safety** ("hôm nay" không phủ 24h, hai feature dùng hai kiểu bucket thời gian cho cùng dữ liệu) · **completeness gaps** (bản 80-90% khi 100% chỉ tốn thêm chút code, test thiếu nhánh negative dễ bổ sung) · **distribution & CI/CD** (version tool trong workflow lệch dự án, secret hardcode, tag `v1.2.3` vs `1.2.3` lệch nhau, publish không idempotent).
+
+**Severity** (distill từ awesome-skills/code-review-skill): `[blocking]` = phải sửa trước khi merge · `[important]` = nên sửa, không đồng ý thì bàn · `[nit]` = nhỏ, tuỳ tác giả · `[suggestion]` = hướng khác đáng cân nhắc, không bắt buộc. Nhóm CRITICAL thiên về `blocking/important`; nhóm INFORMATIONAL thiên về `nit/suggestion` — nhưng severity đi theo TÁC ĐỘNG thật của finding, không đi theo nhóm một cách máy móc.
+
+## Nhận review — verify trước khi sửa
+
+Chiều ngược của skill này: khi MÌNH là người nhận finding (từ người, từ LLM reviewer, kể cả từ chính /qc-code). Finding là CLAIM, chưa phải sự thật (distill từ `obra/superpowers` receiving-code-review):
+
+1. **Đọc hết feedback rồi mới phản ứng** — restate yêu cầu bằng lời của mình; chỗ nào chưa hiểu thì HỎI trước khi sửa bất kỳ mục nào (các mục có thể liên quan nhau — hiểu một nửa là sửa sai).
+2. **Verify claim với code thật** — chạy hoặc đọc đúng đoạn được trỏ: claim có đúng với codebase NÀY không, sửa theo có vỡ gì không, code hiện tại có lý do tồn tại không.
+3. **Chỉ sửa khi đã tự thấy lỗi** — finding sai thì phản hồi bằng lý lẽ kỹ thuật kèm bằng chứng, không lặng lẽ bỏ qua, cũng không lặng lẽ làm theo. Không verify được thì nói thẳng: "chưa kiểm được vì thiếu X".
+4. **Sửa từng mục một, test từng mục** — không gộp một lượt rồi hy vọng.
+5. **Cấm màn diễn đồng thuận** — "You're absolutely right!" / khen ngợi feedback thay cho hành động là tín hiệu đang blind-comply. Xác nhận kỹ thuật hoặc bắt tay làm, không diễn.
+
+Blind-comply với review sai tạo ra bug mới mang vẻ mặt "đã được review" — lớp bug khó nghi ngờ nhất.
+
 ## Kết luận (verdict)
 Một trong hai, kèm lý do:
 - **PASS** — không lỗi nặng ở mục nào, sang bước kế được.
@@ -71,4 +99,5 @@ Mỗi test ở mục logic:
 ## Origin
 - Distill từ yêu cầu user 2026-07-15 (qc-code 4 mục + sinh test + auto-hook). Quyết định "nối vào đâu" đã hỏi user → option 3 (LLM thủ công, test auto-hook tất định), phạm vi diff hiện tại.
 - Absorb qua `/propose` → `150726-qc-code-skill`, task `T-260715-04`.
+- **Absorb 2026-07-17 (adapt_mode: dissolve, T-260717-02):** bản đồ 13 nhóm lỗi distill từ `garrytan/gstack` (`review/checklist.md`); severity từ `awesome-skills/code-review-skill`; mục "Nhận review" từ `obra/superpowers` (`receiving-code-review`). Clone depth-1 trong scratchpad/, không vendor bytes.
 - **Commit:** _(verify-before-commit điền)_

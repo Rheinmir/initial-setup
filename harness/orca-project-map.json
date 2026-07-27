@@ -1,0 +1,18 @@
+{
+ "_why": "Backfill quy thuộc cho task orchestration CŨ. Sổ task của Orca là runtime-global và không có trường dự án, nên task tạo trước khi có cơ chế --stamp không tự khai được mình thuộc repo nào (thực đo 2026-07-20: 15/17 task treo quy thuộc 'unknown' vì spec viết path tương đối). File này ghi lại quy thuộc do NGƯỜI xác nhận, để orca-reconcile.py --scope current không báo nhầm việc của dự án khác thành nợ của repo này.",
+ "_rule": "Chỉ ghi mục mà người đã xác nhận. Task mới KHÔNG cần vào đây — dùng `orca-reconcile.py --stamp` lúc task-create là tự khai chính xác.",
+ "_confirmed_by": "user, 2026-07-20 — 'xác nhận nó không liên quan tới dự án của chúng ta'",
+ "tasks": {
+  "task_29467f85b9d0": "/Volumes/giatbhSSD(APFS)/workspace/bonbon-ai",
+  "task_ef85de290c68": "/Volumes/giatbhSSD(APFS)/workspace/bonbon-ai",
+  "task_22fd20341a37": "/Volumes/giatbhSSD(APFS)/workspace/bonbon-ai",
+  "task_dae8d64881a7": "external:HRIS-payroll",
+  "task_fad15be6c94c": "external:HRIS-payroll",
+  "task_9342bdf70008": "external:DMS-coteccons",
+  "task_69a4c9809b77": "/Users/giatran/orca/tester/1-webservice",
+  "task_b1ea535d5e4d": "/Users/giatran/orca/tester/2-datapipeline",
+  "task_4df5ddaefbc4": "/Users/giatran/orca/tester/3-cli-toolkit",
+  "task_428bb3355096": "/Users/giatran/orca/tester/4-polyglot",
+  "task_e3bb0e8c2118": "/Users/giatran/orca/tester/5-knowledgebase"
+ }
+}

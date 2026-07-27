@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 """scratch-log — BỘ NHỚ THỨ CẤP tầng THÔ + DISTILL (proposal 030726-secondary-memory).
 
+Xem llmwiki/wiki/concepts/log-model.md để biết sổ này khác gì events.jsonl/mem-rank/
+touches/provenance-log — mỗi sổ trả lời một câu hỏi hẹp, KHÔNG phối hợp với nhau.
+
 Bắt SỬA VỤN + CONTEXT VỤN (không chỉ proposal chính thức) để KHÔNG MẤT gì + truy được ở phiên sau.
 File-first, visualizable, KHÔNG RAG. Chỉ stdlib.
 

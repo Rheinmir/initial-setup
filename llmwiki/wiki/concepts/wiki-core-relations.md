@@ -219,7 +219,7 @@ Transcript đầy đủ (5 câu trả lời gốc, thứ tự trình bày chốn
 
 ## Notes
 - Đây là **proposal + đánh giá**, chưa code — theo rule dev-loop: dừng chờ duyệt trước khi hiện thực.
-- Liên quan: fdk-dev-strategy (#3/#4/#7 ăn lãi kép), harness-enforcement-floor, [[rule-registry]], [[010726-query-retrieval-eval]].
+- Liên quan: `fdk-dev-strategy` (#3/#4/#7 ăn lãi kép), `harness-enforcement-floor`, [[rule-registry]], `query-retrieval-eval`.
 
 ## Kiểm chứng NGOÀI-MẪU (2026-07-03 — benchmark self-index)
 Council seed42 chê bộ test cũ "tự chọn đề thi (ludic fallacy)". Đáp lại: để **council ra đề** → dựng app **ngoài-mẫu** (TS plugin-host, ground-truth niêm phong hash) → chạy **engine thật** `build-wiki-graph.py` → chấm mù bằng cơ chế benchmark chuẩn ngành (edge P/R/F1 + hallucination/omission-rate + negative-control; áp từ ContextBench/Unified-KG-Benchmark qua `/last30days`).

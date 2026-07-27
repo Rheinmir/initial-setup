@@ -28,7 +28,7 @@ Xử lý chính nằm ở `src/app.py`.
 - test fixture
 EOF
 echo "print('v1')" > src/app.py
-git add -A && git commit -qm init
+git add -A && git -c core.hooksPath=/dev/null commit --no-verify -qm init
 
 # 1. chưa có neo → exit 2 (nhắc --mark-synced)
 rc=0; python3 "$SYNC" --check >/dev/null || rc=$?
@@ -45,13 +45,13 @@ assert "không đổi → no-op exit 0" 0 "$rc"
 
 # 4. chỉ wiki đổi (không code) → vẫn no-op (parity openwiki)
 echo "- ghi chú thêm" >> llmwiki/wiki/concepts/app-core.md
-git add -A && git commit -qm "docs: wiki only"
+git add -A && git -c core.hooksPath=/dev/null commit --no-verify -qm "docs: wiki only"
 rc=0; python3 "$SYNC" --check >/dev/null || rc=$?
 assert "chỉ wiki đổi → vẫn no-op" 0 "$rc"
 
 # 5. code đổi → exit 3 + trang nhắc tới file bị cờ code-drift
 echo "print('v2')" > src/app.py
-git add -A && git commit -qm "feat: change app"
+git add -A && git -c core.hooksPath=/dev/null commit --no-verify -qm "feat: change app"
 rc=0; out=$(python3 "$SYNC" --check --json) || rc=$?
 assert "code đổi → drift exit 3" 3 "$rc"
 echo "$out" | python3 -c "

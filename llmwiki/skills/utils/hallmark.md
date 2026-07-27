@@ -1,6 +1,6 @@
 ---
 name: hallmark
-description: "Anti-AI-slop design skill for greenfield pages, audits, redesigns, and design extraction from URLs or screenshots. Use when the user asks to build a new app or landing page, wants to redesign something, invokes Hallmark by name, or uses audit/redesign/study."
+description: "SÀN design mặc định của overstack (anti-AI-slop) — mọi UI đứng trên nó: build trang mới, audit, redesign, extract design từ URL/screenshot, và KHÓA HỆ THIẾT KẾ XUYÊN MÀN HÌNH qua design.md (chạy `hallmark redesign` cả app một lần → sinh design.md ở project root → mọi màn hình sau bám cùng hệ token/type/motion, không mỗi màn một kiểu). Gọi khi user nói: 'thiết kế', 'giao diện', 'làm UI/landing page/app mới', 'redesign', 'audit design', 'design system', 'đồng bộ giao diện giữa các màn hình', 'khóa hệ thiết kế', 'sao trang này trông AI-generated', hoặc gọi đích danh hallmark / dùng verb build·audit·redesign·study. Việc chạm UI mà không chắc dùng gì → dùng skill này (nó là sàn, các skill taste khác là flavour bên trên)."
 version: 1.1.0
 ---
 
@@ -54,6 +54,10 @@ These six disciplines are **not** verb-specific. They apply to default Design, `
 5. **Mobile responsiveness — every emit verified at 320 / 375 / 414 / 768 px.** Hallmark's output must render flawlessly at all four widths. The non-negotiables: no horizontal scroll + root `overflow-x: clip` on both `html` and `body`, never `hidden` (gate 34); no two-line clickable text — buttons, primary nav links, footer links, breadcrumbs, CTAs (gate 49); image-bearing grid tracks use `minmax(0, 1fr)`, never bare `1fr` (gate 50); display headers wrap inside long words via `overflow-wrap: anywhere; min-width: 0` (gate 51); section heads collapse to one column on mobile across every theme variant (gate 52); radio-tab patterns don't scroll-jump (gate 53). See [`references/responsive.md` § Mobile — non-negotiable](references/responsive.md). This is a hard floor, not a wish list.
 
 6. **Typography purity — no italic headers.** Headings and display type are always roman (`font-style: normal`). An italicised emphasis word inside an otherwise-upright heading (`Built to <em>think</em>`) is one of the most reliable AI tells; so is an all-italic display face on headings. Carry emphasis with weight, accent colour, or a drawn underline. Italic survives only as *body-copy* emphasis inside running paragraphs. See [`references/anti-patterns.md` § Italic headers](references/anti-patterns.md) and slop-test gate **38a**.
+
+7. **Frontend-design checkpoints (delta trên sàn).** Bốn checkpoint distill từ skill `frontend-design` của Anthropic: KHÔNG tiêu trục-brief-bỏ-ngỏ vào một trong ba default-AI-look có tên (kem+serif+đất-nung · gần-đen+acid-accent · broadsheet hairline); hero là THESIS của chủ đề, không phải "số to + nhãn nhỏ + gradient"; mỗi trang một signature element duy nhất — tiêu boldness đúng một chỗ rồi soi gương bỏ bớt một phụ kiện; UX-writing theo hành động (nút nói đúng việc, tên hành động giữ nguyên xuyên flow, error chỉ đường, empty-state là lời mời). Load [`references/frontend-design-delta.md`](references/frontend-design-delta.md) khi build/redesign UI.
+
+8. **Variety memory — cưỡng chế xuyên phiên (tất định).** Mỗi trang emit ra mang stamp `<!-- design: macrostructure=<M> theme=<T> -->`; sau khi emit, nếu repo có harness thì chạy `python3 harness/scripts/design-variety.py` (hoặc `--stamp <file> --macro <M> --theme <T>` để ghi log) — nó BÁO khi trang mới LẶP cấu trúc trang trước (structural distance, không phải colour-swap), đưa trục Variety từ tự-giác thành kiểm được. Trên project có `design.md` luật đảo chiều (các màn hình phải CHUNG hệ) — bỏ qua cảnh báo lặp ở đó.
 
 ---
 

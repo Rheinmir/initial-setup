@@ -30,7 +30,7 @@ Một file HTML duy nhất (`llmwiki/html/problem-tree.html`; riêng repo framew
 
 ## Travel — vì sao dự án nào cũng có
 
-Convention nằm ở các trụ **được distribute**: skill `orca-workflow` (mọi dự án nạp), hook `session_end.py` + validator (đi cùng harness khi bootstrap — tiền lệ ADR-005), template sổ rỗng do `install.sh` seed (chỉ khi chưa tồn tại). Cố ý KHÔNG nằm trong `fdk` vì fdk không distribute (ADR-004).
+Convention nằm ở các trụ **được distribute**: skill `orca-workflow` (mọi dự án nạp), hook `session_end.py` + validator (đi cùng harness khi bootstrap — tiền lệ `ADR-005`), template sổ rỗng do `install.sh` seed (chỉ khi chưa tồn tại). Cố ý KHÔNG nằm trong `fdk` vì fdk không distribute (`ADR-004`).
 
 ## Origin
 

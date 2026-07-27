@@ -78,12 +78,27 @@ def summarize_today(root: pathlib.Path, session_id: str):
     return tools, sorted(files)
 
 
+def snapshot_ledgers(root: pathlib.Path) -> None:
+    """Maintainer #2 (2026-07-18): ký ức máy-local (flywheel/memory/events/audit/tasks) gom
+    tarball mỗi cuối phiên — backup không chờ ai nhớ. resolve_tool: repo-local → global
+    (downstream dùng engine ~/.claude/harness). Fail-open tuyệt đối."""
+    try:
+        from hooklib import resolve_tool
+        snap = resolve_tool(str(root), "harness/scripts/ledger-snapshot.py")
+        if snap:
+            subprocess.run([sys.executable, snap, "export", "--quiet", "--root", str(root)],
+                           capture_output=True, timeout=30)
+    except Exception:
+        pass
+
+
 def main() -> None:
     payload = read_payload()
     audit(payload, "SessionEnd")
 
     root = pathlib.Path(project_dir(payload))
     flush_problem_tree(root, payload.get("session_id", ""))
+    snapshot_ledgers(root)
     wiki = find_wiki_dir(str(root))
     if wiki is None:
         sys.exit(0)

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """L1/Stop: trước khi Claude kết thúc lượt — nếu phiên có sửa wiki thì index.md phải khớp (R3).
 Exit 2 = chặn dừng, Claude phải sửa index trước. Có guard chống lặp vô hạn."""
+import json
 import os
 import re
 import subprocess
 import sys
+import time
 
 from hooklib import audit, code_log, find_validators, find_wiki_dir, project_dir, read_payload, resolve_tool, run_validator
 
@@ -12,6 +14,50 @@ from hooklib import audit, code_log, find_validators, find_wiki_dir, project_dir
 # file code (đa ngôn ngữ) trong git-status → trigger regen phần code-graph của wiki-graph.
 # `$` + re.M vì mỗi dòng porcelain kết ở đường dẫn; khớp SUPPORTED_EXTS của code_imports.
 _CODE_RE = re.compile(r"\.(py|js|jsx|ts|tsx|mjs|cjs|go|rs|java|rb|php|c|h|cpp|cc|sh)$", re.M)
+
+# p-45 (fdk-problem-tree, đo 2026-07-21): build-wiki-graph.py 49.0s + medic.py --ci 26.1s —
+# hai bước nặng nhất trong Stop hook, chạy TUẦN TỰ. Cổng kích hoạt cả hai ("wiki/code có đổi
+# trong git status") rất lỏng nên với một phiên dev framework (chạm fdk/harness/skills/llmwiki
+# liên tục) chúng fire gần như MỌI lượt — 75-90s thuế mỗi lần dừng, không phải "thỉnh thoảng".
+# Đòn bẩy rẻ: debounce theo thời gian (đã có tiền lệ trong repo — watcher.py debounce 2s cho
+# code-graph). KHÔNG đổi thuật toán generator (build-wiki-graph.py là engine dùng chung, sửa
+# sai lan rộng — để dành cho /propose riêng nếu cần incremental thật). Window là default CHƯA
+# đo trên hành vi thật, chỉnh qua biến môi trường khi cần, không phải hằng số thiêng.
+_DEBOUNCE_STATE = "harness/metrics/.stop-debounce.json"
+_DEBOUNCE_WINDOW_S = int(os.environ.get("OVERSTACK_STOP_DEBOUNCE_S", "180"))
+
+
+def _debounce_state(root: str) -> dict:
+    path = os.path.join(root, _DEBOUNCE_STATE)
+    try:
+        return json.load(open(path, encoding="utf-8")) if os.path.isfile(path) else {}
+    except Exception:
+        return {}
+
+
+def _debounce_mark(root: str, key: str, ok: bool = True) -> None:
+    path = os.path.join(root, _DEBOUNCE_STATE)
+    state = _debounce_state(root)
+    state[key] = {"ts": time.time(), "ok": ok}
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        json.dump(state, open(path, "w", encoding="utf-8"))
+    except Exception:
+        pass  # ghi state lỗi → chỉ mất tác dụng debounce lần sau, không chặn gì
+
+
+def _debounced(root: str, key: str, require_ok: bool = False) -> bool:
+    """True = NÊN BỎ QUA lần chạy này (vừa chạy trong window giây gần đây).
+
+    `require_ok=True` — dùng cho GATE sức khoẻ (medic --ci), KHÔNG dùng cho việc trang trí:
+    chỉ bỏ qua nếu lần trước ĐÃ healthy. Một FAIL luôn được chạy lại ngay lượt sau — debounce
+    không bao giờ được phép giấu một regression thật, chỉ tiết kiệm khi hệ đang khoẻ.
+    Fail-open: state đọc lỗi/thiếu → coi như CHƯA chạy, không bao giờ chặn vì debounce hỏng."""
+    rec = _debounce_state(root).get(key)
+    if not isinstance(rec, dict):
+        return False
+    fresh = time.time() - rec.get("ts", 0) < _DEBOUNCE_WINDOW_S
+    return fresh and (not require_ok or rec.get("ok") is True)
 
 
 def _scope_config(root: str):
@@ -83,11 +129,20 @@ def regen_docs(root: str) -> None:
         # GH#49: scope KHAI TƯỜNG MINH qua .overstack.yaml (wiki_dir + code_root) — relocate/thu hẹp
         # vùng index, tách được mẹ/con; thiếu config → mặc định cũ (llmwiki/wiki + root). cwd=root vì
         # generator resolve output + code_root theo cwd. --also fdk/wiki chỉ khi tồn tại.
-        if wikigraph_on and (re.search(r"(wiki/|build-wiki-graph\.py)", st) or _CODE_RE.search(st)):
+        if (wikigraph_on and (re.search(r"(wiki/|build-wiki-graph\.py)", st) or _CODE_RE.search(st))
+                and not _debounced(root, "wiki-graph")):
             wiki_dir, code_root = _scope_config(root)
             also = ["--also", "fdk/wiki"] if os.path.isdir(os.path.join(root, "fdk", "wiki")) else []
             subprocess.run([sys.executable, wg, wiki_dir, *also, "--code-root", code_root],
                            cwd=root, capture_output=True, timeout=90)
+            _debounce_mark(root, "wiki-graph")
+        # T5 (provenance-log, T-260722-01): phân loại file đổi theo path-prefix, ghi sự kiện
+        # artifact-level. Gọi qua subprocess (CLI, không import chéo hooks/ <-> harness/scripts/)
+        # — cùng pattern subprocess.run([sys.executable, wg, ...]) đã dùng cho wiki-graph ở trên.
+        pl = resolve_tool(root, "harness/scripts/provenance-log.py")
+        if pl:
+            subprocess.run([sys.executable, pl, "record-changed", "--root", root],
+                           cwd=root, capture_output=True, timeout=30)
     except Exception:
         pass
 
@@ -98,7 +153,10 @@ def secondary_memory(root: str, session: str) -> None:
     Meadows #6 — cấu trúc luồng thông tin, không phải kỷ luật người). Mỗi lần dừng, khi phiên có
     SỬA thật (git dirty): (a) `scratch-log auto` tự điền why từ git nếu phiên chưa có why thủ công;
     (b) `scratch-log distill` gom → sources/DDMMYY-session-provenance.md; (c) `memory-map` regenerate
-    llmwiki/html/memory-map.html. ĐỐI XỨNG wiki-graph: engine resolve REPO-LOCAL → GLOBAL
+    llmwiki/html/memory-map.html; (d) `mem-rank episode` tự ghi episode có-cấu-trúc (did=commit subject,
+    files=đổi trong phiên) vào tầng episodic — trước bản vá này layer này CHƯA từng được gọi tự động
+    (memory.jsonl rỗng, phải gõ tay `/record-episode`); giờ mỗi phiên có sửa thật đều để lại 1 episode
+    retrieve được, không cần agent nhớ. ĐỐI XỨNG wiki-graph: engine resolve REPO-LOCAL → GLOBAL
     ~/.claude/harness/ (downstream KHÔNG copy engine vào repo), enablement bật MẶC ĐỊNH downstream qua
     llmwiki/.harness-stamp (cùng tín hiệu đã gate hook global) — không cần setting tay. cwd=root nên engine
     global vẫn đọc/ghi ĐÚNG project. Fail-open tuyệt đối: thiếu engine / lỗi / timeout → im lặng."""
@@ -128,6 +186,18 @@ def secondary_memory(root: str, session: str) -> None:
             subprocess.run([sys.executable, mm], cwd=root, capture_output=True, timeout=40)
     except Exception:
         pass
+    mr = resolve_tool(root, "harness/scripts/mem-rank.py")
+    if mr:
+        try:
+            subject = subprocess.run(["git", "log", "-1", "--format=%s"], cwd=root,
+                                      capture_output=True, text=True, timeout=8).stdout.strip()
+            changed = [ln[3:] for ln in dirty.splitlines() if len(ln) > 3][:8]
+            did = subject or "(phiên có sửa, chưa commit)"
+            subprocess.run([sys.executable, mr, "episode", did,
+                             "--files", ",".join(changed), "--session", session],
+                           cwd=root, capture_output=True, timeout=15)
+        except Exception:
+            pass
 
 
 _ANSI = re.compile(r"\033\[[0-9;]*m")
@@ -158,15 +228,21 @@ def framework_medic_mirror(root: str) -> int:
         return 0
     if not any(ln[3:].startswith(FW_SURFACES) for ln in st.splitlines() if len(ln) > 3):
         return 0  # phiên không chạm framework → im lặng (chống theater)
+    # p-45: medic --ci đo 26.1s, fire gần mọi lượt trong phiên dev framework. Debounce CHỈ khi
+    # lần trước healthy — một FAIL luôn chạy lại ngay, không bao giờ bị giấu (require_ok=True).
+    if _debounced(root, "medic", require_ok=True):
+        return 0
     try:
         p = subprocess.run([sys.executable, medic, "--ci"], cwd=root,
                            capture_output=True, text=True, timeout=120)
     except Exception:
         return 0  # medic lỗi/timeout không được chặn người dùng
     if p.returncode == 0:
+        _debounce_mark(root, "medic", ok=True)
         head = next((_strip(ln) for ln in p.stdout.splitlines() if "▉" in ln), "medic KHOẺ")
         print(f"🩺 [medic gương-soi] phiên đụng framework → đã tự soi: {head}", file=sys.stderr)
         return 0
+    _debounce_mark(root, "medic", ok=False)
     fails = [_strip(ln) for ln in p.stdout.splitlines() if "✗" in ln or "▉ FAIL" in ln]
     print("🩺 [medic gương-soi] phiên ĐỤNG framework mà medic --ci CÓ FAIL — sửa trước khi kết thúc:\n"
           + "\n".join(fails[:10])
@@ -197,8 +273,13 @@ def main() -> None:
     tp = payload.get("transcript_path")  # Trụ 1 Cost Attribution: 1 cost record / run, upsert theo session (cumulative, idempotent)
     if tp:
         code_log(root, "--run-cost", f"--transcript={tp}", f"--session={payload.get('session_id') or ''}")
-    regen_docs(root)               # overstack.html + CAPABILITIES tự cập nhật khi skill/rule đổi (repo framework)
+    # THỨ TỰ CÓ CHỦ ĐÍCH: thứ SINH nội dung chạy trước thứ RENDER nội dung.
+    # secondary_memory ghi session-provenance vào wiki và sinh lại memory-map; regen_docs
+    # dựng wiki-graph + overstack (overstack NHÚNG memory-map). Thứ tự cũ ngược lại nên
+    # overstack luôn ôm bản memory-map cũ và medic báo "docs CŨ so đĩa" ở MỌI phiên —
+    # một cảnh báo đúng nhưng vô phương sửa bằng cách chạy lại generator.
     secondary_memory(root, (payload.get("session_id") or ""))  # issue #5: bộ-nhớ-thứ-cấp tự lưu context vụn cuối lượt
+    regen_docs(root)               # overstack.html + CAPABILITIES tự cập nhật khi skill/rule đổi (repo framework)
     if framework_medic_mirror(root) == 2:  # T2: đụng framework → soi medic; FAIL thật thì chặn dừng
         sys.exit(2)
     if not wiki_changed(root):

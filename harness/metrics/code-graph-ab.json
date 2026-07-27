@@ -1,0 +1,63 @@
+{
+ "measured": "2026-07-20 (LẦN 2 — sau khi sửa code-graph, commit 2727ede)",
+ "task": "T-260719-02 / T-260720-01",
+ "supersedes": "lần 1 đo khi code-graph ĐANG HỎNG (A=37 B=14) — số đó là chi phí của lỗi, không phải giá trị của tool",
+ "runs": [
+  {
+   "task": "flag_stale",
+   "kind": "function",
+   "code_graph_calls": 4,
+   "baseline_calls": 3
+  },
+  {
+   "task": "hard_cap",
+   "kind": "constant",
+   "code_graph_calls": 5,
+   "baseline_calls": 2
+  },
+  {
+   "task": "detect_wiki_dir",
+   "kind": "function",
+   "code_graph_calls": 3,
+   "baseline_calls": 3
+  },
+  {
+   "task": "cmd_roster",
+   "kind": "function",
+   "code_graph_calls": 4,
+   "baseline_calls": 5
+  },
+  {
+   "task": "content_dirs",
+   "kind": "constant",
+   "code_graph_calls": 8,
+   "baseline_calls": 3
+  }
+ ],
+ "totals": {
+  "code_graph": 24,
+  "baseline": 16,
+  "ratio": 1.5
+ },
+ "by_kind": {
+  "function_class_method": {
+   "code_graph": 11,
+   "baseline": 11,
+   "verdict": "HOÀ — code-graph không thắng cũng không thua"
+  },
+  "module_level_constant": {
+   "code_graph": 13,
+   "baseline": 5,
+   "verdict": "code-graph THUA nặng — nó KHÔNG index hằng số module-level, search_symbols trả rỗng, agent phải quay về grep nên trả phí HAI lần"
+  }
+ },
+ "accuracy": {
+  "code_graph_found": 5,
+  "baseline_found": 5,
+  "of": 5,
+  "note": "hai nhánh cùng đáp án"
+ },
+ "root_finding": "code-graph chỉ index function/class/method (A5b xác nhận: search_symbols cho CONTENT_DIRS/WIKI_DIRS trả rỗng). Với hằng số và chuỗi, nó cấu trúc-tính không giúp được, mà orientation lại bảo thử nó TRƯỚC — nên mỗi lần tìm hằng số là một lần trả phí thừa.",
+ "actionable": "Orientation nên nói RÕ: code-graph cho HÀM/LỚP/METHOD; hằng số·config·chuỗi thì grep thẳng. Chỉ sửa một dòng hướng dẫn là biến 13-vs-5 (thua) thành hoà.",
+ "answers_grapuco_thread": "Ở repo cỡ này, code-graph KHÔNG còn lợi thế cho tra cứu hàm (hoà 11-11). Ba người trong thread nói 'model đã đủ giỏi đọc repo' — với ca định-vị-hàm thì họ ĐÚNG. Giá trị còn lại của code-graph nằm ở get_callers/edges (550.651 cạnh), thứ grep không làm được — chưa đo trong bộ này."
+}

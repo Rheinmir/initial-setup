@@ -35,6 +35,7 @@ LOOP_MAP = {
     "teach-me": "dev-loop",
     # orchestrate
     "orca-dispatch-reference": "orchestrate", "orca-onboard": "orchestrate", "orca-issue": "orchestrate",
+    "orca-handover": "orchestrate",
     "wayfinder": "orchestrate",
     "orca-sec-scans": "orchestrate", "orca-workflow": "orchestrate", "orca-eval": "orchestrate",
     "council": "orchestrate", "trace-grader": "orchestrate",
@@ -42,7 +43,9 @@ LOOP_MAP = {
     "ingest": "wiki-loop", "lint": "wiki-loop", "query": "wiki-loop", "wiki-room": "wiki-loop",
     "record-episode": "wiki-loop",
     # utils
-    "cavecrew": "utils", "caveman": "utils", "caveman-commit": "utils", "caveman-compress": "utils",
+    "agent-reach": "utils",
+    "cavecrew": "utils", "caveman": "utils",
+    "i-have-adhd": "utils", "caveman-commit": "utils", "caveman-compress": "utils",
     "caveman-help": "utils", "caveman-review": "utils", "caveman-stats": "utils",
     "extract-site": "utils", "harness-tour": "utils",
     "agent-reach": "utils", "harness-update": "utils", "health-check": "utils", "fdk": "utils", "fdk-uat": "utils", "fdk-poc": "utils", "medic": "utils", "md-to-html": "utils",

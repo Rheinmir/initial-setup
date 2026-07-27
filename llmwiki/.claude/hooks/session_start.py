@@ -80,22 +80,70 @@ def wiki_drift(root: Path) -> None:
         pass
 
 
+
+def output_style(root: Path) -> None:
+    """Nhắc kiểu OUTPUT đầu mỗi phiên — chỉ khi skill thật sự có mặt (thăm dò, không đoán).
+
+    ADR-004 không cấm: đây KHÔNG phải context nội-bộ-framework, nó là cách nói chuyện với
+    user, áp cho mọi dự án. Nhưng vẫn theo đúng luật đã học hôm nay — quảng cáo một năng
+    lực thì phải KIỂM nó có mặt, không được nhắc mù.
+
+    Ranh giới phải nói rõ, vì hai luật đang kéo ngược nhau: i-have-adhd bảo cắt ngắn, còn
+    CLAUDE.md bảo tài liệu-người-đọc phải là văn xuôi đầy đủ. Phân xử: skill này áp cho
+    phần CHAT; file tài liệu (ADR, proposal, README, report, trang HTML) giữ nguyên luật cũ.
+    """
+    try:
+        for cand in (Path.home() / ".claude/skills/i-have-adhd/SKILL.md",
+                     root / "skills/i-have-adhd/SKILL.md"):
+            if cand.is_file():
+                print("🧠 [output] Áp `/i-have-adhd` cho phần CHAT: hành động trước · đánh số bước · "
+                      "nêu lại state mỗi lượt · chặn lạc đề · ước lượng thời gian cụ thể · "
+                      "không mở bài/kết bài xã giao · list tối đa 5 mục.\n"
+                      "   NGOẠI LỆ giữ nguyên: user hỏi \"giải thích/walk me through\" → viết đủ dài; "
+                      "trước hành động phá huỷ → xác nhận đã; và TÀI LIỆU người đọc "
+                      "(ADR/proposal/README/report/HTML) vẫn theo luật văn xuôi đầy đủ của CLAUDE.md.")
+                return
+    except Exception:
+        pass
+
+
 def orient(root: Path) -> None:
     """SessionStart orientation: in NGẮN để agent BIẾT project có code-index + wiki + capabilities,
     và NHẮC query chúng để định vị nhanh (đừng grep/đọc mù). Project-relevant — KHÔNG phải FDK
     framework-dev (ADR-004 chỉ cấm auto-bơm FDK). Chỉ in khi thật sự có; fail-open tuyệt đối."""
     try:
         bits = []
-        has_cg = (root / ".graph-agent" / "index.db").is_file()
-        if not has_cg:
-            try:
-                has_cg = any((d / ".graph-agent" / "index.db").is_file()
-                             for d in root.iterdir() if d.is_dir())
-            except Exception:
-                pass
+        # QUẢNG CÁO PHẢI DỰA TRÊN THĂM DÒ, KHÔNG DỰA TRÊN FILE TỒN TẠI.
+        # Bản cũ hỏi đúng một câu: `(root/".graph-agent"/"index.db").is_file()`. DB 0 byte,
+        # DB thiếu schema, server chết — đều lọt. Hậu quả thật: code-graph hỏng nhiều tuần
+        # mà mọi phiên vẫn được lùa vào nó (đo: 37 tool-call so với 14 của grep).
+        # Nguyên tắc đảo lại: chỉ quảng cáo khi CHỨNG MINH ĐƯỢC là chạy — không chứng minh
+        # được thì im. Fail-open ở tầng hook (không bao giờ làm gãy phiên), nhưng fail-CLOSED
+        # ở tầng quảng cáo (thà thiếu một dòng gợi ý còn hơn lùa agent vào tool chết).
+        has_cg = False
+        try:
+            probe = resolve_tool(str(root), "harness/scripts/dep-health.py")
+            if probe:
+                out = subprocess.run([sys.executable, str(probe), "--root", str(root), "--json"],
+                                     capture_output=True, text=True, timeout=10)
+                deps = json.loads(out.stdout).get("deps", [])
+                has_cg = any(d.get("name") == "code-graph" and d.get("status") == "ok"
+                             for d in deps)
+        except Exception:
+            has_cg = False  # không thăm dò được → KHÔNG quảng cáo
         if has_cg:
+            # Khai RÕ phạm vi, đừng khuyên chung chung "đừng grep mù". Đo A/B 2026-07-20
+            # (harness/metrics/code-graph-ab.json, 5 task × 2 nhánh, sau khi sửa bug 2727ede):
+            #   · tra HÀM/LỚP/METHOD  → code-graph 11 vs grep 11 tool-call = HOÀ
+            #   · tra HẰNG SỐ         → code-graph 13 vs grep  5 tool-call = THUA 2.6×
+            # Vì code-graph CHỈ index function/class/method — `search_symbols("CONTENT_DIRS")`
+            # trả rỗng. Khuyên dùng nó trước cho MỌI thứ khiến mỗi lần tìm hằng số phải trả
+            # phí hai lần (thử code-graph, hụt, rồi mới grep). Một dòng hướng dẫn đúng phạm vi
+            # biến khoản thua đó thành hoà.
             bits.append("• code-index (code-graph, auto-reindex khi code đổi) — query `mcp__code-graph__*` "
-                        "(search_symbols / get_symbol_context / get_callers) để ĐỊNH VỊ code nhanh, đừng grep mù.")
+                        "cho HÀM/LỚP/METHOD (search_symbols / get_symbol_context) và nhất là "
+                        "get_callers (quan hệ gọi — grep không làm được). HẰNG SỐ · config · chuỗi "
+                        "thì grep THẲNG: code-graph không index chúng, thử trước chỉ tốn thêm lượt.")
         wiki = root / "fdk" / "wiki" if (root / "fdk" / "wiki").is_dir() else root / "llmwiki" / "wiki"
         if wiki.is_dir():
             bits.append(f"• wiki `{wiki.relative_to(root)}` — query concept/entity/sources/adr/decisions cho context.")
@@ -150,6 +198,7 @@ def main() -> None:
     if not (root / ".template-manifest.json").is_file():
         sys.exit(0)  # không phải project dùng template → bỏ qua
 
+    output_style(root)  # đầu phiên: chốt KIỂU nói chuyện (chat), trước khi nói gì
     orient(root)  # đầu phiên: cho agent BIẾT project có gì + nhắc query trước (chống 'lơ ngơ')
 
     # NOTE: KHÔNG auto-bơm context framework-dev (FDK) ở đây. Phần lớn phiên là dùng

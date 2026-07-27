@@ -43,7 +43,7 @@ rules:
     enforce_at: [session, repo]
     root_globs: ["**/wiki/*.md"]               # file .md trực tiếp dưới wiki/ (1 segment) → chặn
     allow_basenames: ["index.md", "log.md", "README.md", "active-context.md", "decisions.md"]
-    allow_subdirs: ["concepts", "entities", "sources", "draft", "architecture", "tours"]  # khớp global: subdir NGOÀI set này cũng chặn (wiki/junk/x.md)
+    allow_subdirs: ["concepts", "entities", "sources", "draft", "architecture", "tours", "skills"]  # khớp global: subdir NGOÀI set này cũng chặn (wiki/junk/x.md). "skills": cây skill-doc 68 file có từ 0363f5d (whiteboard/wiki-graph đọc + wikilink trỏ vào) — policy chép theo thực tế đã thành hình, không phải mở cửa mới.
 
   proposal_complete:
     id: R7

@@ -28,6 +28,24 @@ try:
 except Exception:
     code_imports = None   # fail-open: thiếu module → im lặng bỏ enrich imports đa-ngôn-ngữ
 
+# --- Mảnh A2: TRÍCH WIKILINK dùng chung với harness/scripts/wiki-graph.py -------------
+# Trước 2026-07-20 file này và wiki-graph.py trả lời CÙNG câu hỏi "cái gì link tới cái gì"
+# bằng hai regex khác nhau, không chia sẻ dòng code nào — và LỆCH THẬT: 208 cạnh so với
+# 164. Mỗi bên sai một kiểu: bên kia không bỏ code-fence (đếm cả [[...]] trong ví dụ
+# code), bên này bỏ code-fence đúng nhưng bỏ sót [[trang#anchor]]. Không bên nào là tập
+# cha của bên kia. Nay một nguồn chân lý: wikilink_targets() ở wiki-graph.py.
+_wg = None
+for _cand in (Path(__file__).resolve().parents[2] / "harness/scripts/wiki-graph.py",
+              Path.home() / ".claude/harness/harness/scripts/wiki-graph.py"):
+    if _cand.is_file():
+        try:
+            _s = importlib.util.spec_from_file_location("_wikigraph", _cand)
+            _wg = importlib.util.module_from_spec(_s)
+            _s.loader.exec_module(_wg)
+            break
+        except Exception:
+            _wg = None   # fail-open: hỏng thì rơi về regex local bên dưới
+
 # --- Mảnh B: bỏ code-fence + inline-code trước khi bắt [[wikilink]] (chống false-positive) ---
 _FENCE_RE = re.compile(r"```.*?```", re.DOTALL)
 _INLINE_RE = re.compile(r"`[^`\n]*`")
@@ -99,7 +117,7 @@ REL_VI = {
 }
 
 
-def scan(wiki: Path, tag: str, nodes, edges, ledger, stale):
+def scan(wiki: Path, tag: str, nodes, edges, ledger, stale, repo_root=None):
     for d in CONTENT_DIRS:
         base = wiki / d
         if not base.is_dir():
@@ -126,9 +144,26 @@ def scan(wiki: Path, tag: str, nodes, edges, ledger, stale):
             for rel, kind, tgt in REL_RE.findall(fm):
                 edges.append({"from": pid, "rel": rel, "to": tgt, "kind": kind})
             typed_to = {t for _, _, t in REL_RE.findall(fm)}
-            body = _strip_code(text[m.end():] if m else text)   # Mảnh B: bỏ code-fence/inline
-            for w in dict.fromkeys(WIKILINK_RE.findall(body)):
-                w = w.strip()
+            raw_body = text[m.end():] if m else text
+
+            # `touches` SUY RA SỐNG, không đọc từ frontmatter đã dập sẵn.
+            # Trước đây quan hệ concept→code do wiki-relations.py dập một lần rồi đóng
+            # băng ở 21 cạnh (0,8% tổng) — trong khi đây là cầu nối DUY NHẤT giữa hai
+            # thế giới (code-graph chỉ biết code↔code, wiki-link chỉ biết wiki↔wiki).
+            # Suy lại mỗi lần dựng thì nó không bao giờ cũ, đúng cơ chế của wikilink.
+            # Frontmatter vẫn thắng: path đã khai tay thì không nhân đôi.
+            if _wg is not None and repo_root:
+                for cp in _wg.touches_targets(raw_body, repo_root):
+                    if cp not in typed_to:
+                        typed_to.add(cp)
+                        edges.append({"from": pid, "rel": "touches", "to": cp, "kind": "path"})
+            # Nguồn chung nếu nạp được; regex local chỉ là lưới đỡ khi thiếu harness.
+            if _wg is not None:
+                targets = _wg.wikilink_targets(raw_body)
+            else:
+                targets = [w.strip() for w in dict.fromkeys(
+                    WIKILINK_RE.findall(_strip_code(raw_body)))]
+            for w in targets:
                 if w and w != pid and w not in typed_to:
                     edges.append({"from": pid, "rel": "wikilink", "to": w, "kind": "to"})
     lp = wiki / "ledger.jsonl"
@@ -746,11 +781,16 @@ def main() -> None:
         sys.exit(f"khong thay wiki dir: {prim}")
     ptag = prim.parent.name if prim.name == "wiki" else prim.name
     nodes, edges, ledger, stale = [], [], [], {}
-    scan(prim, ptag, nodes, edges, ledger, stale)
+    # repo_root để suy `touches` sống: gốc git nếu có, không thì thư mục cha của wiki.
+    _rr = Path(a.code_root).resolve() if a.code_root else None
+    if _rr is None:
+        _rr = prim.parent.parent if prim.name == "wiki" else prim.parent
+    scan(prim, ptag, nodes, edges, ledger, stale, _rr)
     for other in a.also:
         o = Path(other).resolve()
         if o.is_dir():
-            scan(o, o.parent.name if o.name == "wiki" else o.name, nodes, edges, ledger, stale)
+            scan(o, o.parent.name if o.name == "wiki" else o.name,
+                 nodes, edges, ledger, stale, _rr)
     add_code_nodes(nodes, edges)   # node lá cho touches → cạnh wiki→code hiện ra
     # --code-root: seed node code từ thư mục code (opt-in) → dựng import-graph đầy đủ.
     # Default OFF → graph framework không đổi (chỉ code vào qua touches như cũ).

@@ -461,7 +461,7 @@ echo "✅ Phase 1 done"
 
 Tầng truy vấn quan hệ code **chính xác theo line** bổ sung cho graph distill ở trên: `search_symbols`, `get_callers/callees` cho impact-check tức thì. Server `code-graph` (`~/.claude.json → mcpServers`) ghi 1 db SQLite mỗi repo tại `<repo>/.graph-agent/index.db`.
 
-**Khi nào chạy:** project có submodule/repo code thật (Go/TS/Py…) và server `code-graph` đang khai báo. Bỏ qua nếu không có server.
+**Khi nào chạy:** project có submodule/repo code thật (Go/TS/Py…) **và code-graph THẬT SỰ dùng được** — kiểm bằng `python3 harness/scripts/dep-health.py --json` và đòi `status == "ok"`, ĐỪNG chỉ xem nó có được khai báo trong `~/.claude.json` hay không. Khai báo trong config ≠ server sống: DB 0 byte, DB thiếu bảng `symbols`, hay server đã chết đều vẫn "đang khai báo" (bài học 2026-07-20 — code-graph hỏng nhiều tuần mà mọi phiên vẫn bị lùa vào nó). `degraded`/`absent` thì bỏ qua bước này.
 
 ```bash
 # 1. Index từng repo code (auto-detect root từ .git/go.mod/package.json).
@@ -474,7 +474,7 @@ Tầng truy vấn quan hệ code **chính xác theo line** bổ sung cho graph d
 echo "[1.7] code-graph: gọi reindex_repo cho mỗi repo code có manifest"
 ```
 
-**Durability harness:** hook SessionStart `code_graph_keeper.py` (cài kèm install-harness.sh) tự re-register repo nếu rớt registry + cảnh báo repo chưa index. Fail-open, **no-op nếu project không dùng code-graph** (không có `.graph-agent/index.db` nào). KHÔNG reindex per-edit (watcher đã lo, debounce 2s). Sau đó ghi 1 wiki concept page `concepts/code-graph-nav.md` (cách dùng tool + ví dụ caller trace) để team biết dùng.
+**Durability harness:** hook SessionStart `code_graph_keeper.py` (cài kèm install-harness.sh) tự re-register repo nếu rớt registry + cảnh báo repo chưa index. Fail-open, **no-op nếu project không dùng code-graph** — điều kiện là có `.graph-agent/index.db` **dùng được** (mở được + có bảng `symbols`/`files`), không phải chỉ có file: DB rỗng từng khiến keeper ghi nhầm registry và dập tắt luôn cảnh báo "chưa index". KHÔNG reindex per-edit (watcher đã lo, debounce 2s). Sau đó ghi 1 wiki concept page `concepts/code-graph-nav.md` (cách dùng tool + ví dụ caller trace) để team biết dùng.
 
 > Freshness sau đó tự động: edit file → watcher reindex ~2s. Không cần reindex tay trừ khi clone mới hoặc đổi hàng loạt lúc server tắt.
 

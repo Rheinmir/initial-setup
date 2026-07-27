@@ -44,6 +44,13 @@ archetypes:
     model: null
     tools: [harness-update, orca-sec-scans]
     posture: llmwiki/personas/maintainer.md
+  tester:
+    keyword: "/test"
+    phase: "verify design-first"
+    cli: claude                   # ASSUMPTION (not verified) — thiết kế test từ SPEC cần phán đoán → Claude
+    model: null
+    tools: [qc-code, wikieval]
+    posture: llmwiki/personas/tester.md
 
 # ADAPT-CHECKLIST (finalize khi đo được CLI nào hợp archetype nào):
 #   1. Dispatch thử mỗi archetype vài task → ghi CLI/model nào giao hàng tốt (orca-eval).

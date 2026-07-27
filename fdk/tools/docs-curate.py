@@ -17,6 +17,7 @@ Subcommands:
   apply [--keep-dates N]  dời nhóm ARCHIVE vào archive/, rồi reindex. N = số mốc-ngày gần nhất giữ active (mặc 2).
   reindex              chỉ chạy lại build-docs-index + index_sync --fix + ghi log.
 """
+import json
 import re
 import subprocess
 import sys
@@ -33,6 +34,27 @@ CANONICAL = ("overstack.html", "index.html", "skills-cheatsheet", "health-dashbo
 # bản bị thay thế tường minh (file → bản thay thế nó)
 SUPERSEDED = {"280626-framework-master-wiki.html": "overstack.html"}
 SKIP_DRAFT = ("README.md", "_template.md")
+TASKS = ROOT / "harness" / "metrics" / "tasks.json"
+_TASK_DONE = ("done", "completed", "shipped")
+
+
+def _task_states() -> dict:
+    """JOIN với code-logger: T-id → state. Fail-open (không có store → {})."""
+    try:
+        d = json.loads(TASKS.read_text(encoding="utf-8"))
+        return {k: (v.get("state") if isinstance(v, dict) else str(v)) for k, v in d.items()}
+    except Exception:
+        return {}
+
+
+def _draft_task(name: str):
+    """Đọc `task: T-...` trong frontmatter draft — tín hiệu vòng đời tất định."""
+    try:
+        head = (DRAFT / name).read_text(encoding="utf-8", errors="ignore")[:800]
+        m = re.search(r"^task:\s*(T-\S+)", head, re.M)
+        return m.group(1) if m else None
+    except Exception:
+        return None
 
 
 def _date_key(name: str):
@@ -96,6 +118,7 @@ def classify():
             continue
         out[h] = ("html", "report", "report/doc một-lần")
 
+    tstates = _task_states()
     for d in drafts:
         # bộ ba một feature: SPEC `<stem>.md` + PLAN `<stem>-PLAN.md` + `<stem>-seq.html`.
         # PLAN là văn bản THI HÀNH (ephemeral) — nó archive theo SPEC, KHÔNG bao giờ promote lên wiki.
@@ -107,6 +130,19 @@ def classify():
             out[d] = ("draft", "archive", "PLAN thi hành (ephemeral — không promote)")
         else:
             out[d] = ("draft", "promote?", "draft đứng-một-mình → cân nhắc LÊN wiki ADR/concept")
+        # JOIN vòng đời (2026-07-18, feedback "lint chẳng biết propose nào outdated"): draft khai
+        # `task: T-id`, code-logger biết state thật — nối hai đầu là outdated/treo thành TẤT ĐỊNH,
+        # không cần ai nhớ flip status tay.
+        tid = _draft_task(d)
+        st = tstates.get(tid) if tid else None
+        if st in _TASK_DONE:
+            out[d] = ("draft", "archive", f"OUTDATED — task {tid} đã {st}; promote bản chất (nếu có) rồi archive")
+        elif st == "rejected":
+            out[d] = ("draft", "archive", f"OUTDATED — task {tid} bị rejected (proposal chết)")
+        elif st == "superseded":
+            out[d] = ("draft", "archive", f"SUPERSEDED — task {tid} scope còn lại đã chuyển sang issue riêng, xem note trong tasks.json")
+        elif st:  # proposed/approved/dispatched — vòng còn sống, tuổi không được archive nó
+            out[d] = ("draft", "keep", f"⏱ TREO — task {tid} còn `{st}`: cần người quyết làm-tiếp hay reject, KHÔNG archive theo tuổi")
     return out
 
 

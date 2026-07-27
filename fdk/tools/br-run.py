@@ -287,34 +287,42 @@ def selftest():
         (root / "BR.md").write_text("clause S4.1\n")
         brh = _frame_lint._sha256_file(root / "BR.md")
         atest = f"{sys.executable} -c \"import sys,pathlib;sys.exit(0 if 'return True' in pathlib.Path('src/auth.py').read_text() else 1)\""
-        frame = root / "br" / "frames" / "frame-x.md"
+        frame = root / "br" / "frames" / "frame-x-login.md"
         frame.write_text(
-            "---\nschema_version: 0\nframe_id: frame-x\ncreated_by: human\nparent_br: BR.md\n"
-            f"clause_ids: [S4.1]\nparent_br_hash: {brh}\nmuc_tieu: \"login true\"\n"
+            "---\nschema_version: 0\nframe_id: frame-x-login\ncreated_by: human\nparent_br: BR.md\n"
+            f"clause_ids: [S4.1]\nparent_br_hash: {brh}\n"
+            "muc_tieu: \"Người dùng đăng nhập đúng thì login() phải trả về True\"\n"
             f"scope_code: [\"src/**\"]\nscope_test: [\"tests/**\"]\nacceptance_test: {json.dumps(atest)}\n"
-            "guards:\n  max_iter: 4\n  no_progress_k: 2\n---\n# frame-x\n", encoding="utf-8")
+            "guards:\n  max_iter: 4\n  no_progress_k: 2\n---\n"
+            "# frame-x-login\n"
+            "## Nghiệp vụ\nNgười dùng gõ đúng tài khoản/mật khẩu thì login() phải trả True thay vì False mặc định.\n"
+            "## Input\nKhông có input ngoài — auth.py tự chứa logic (selftest rút gọn, không gọi DB thật).\n"
+            "## Spec (FR/SC)\nlogin() trả True khi được gọi (bản rút gọn cho selftest, không kiểm username/password thật).\n"
+            "## Tiêu chí nghiệm thu\nacceptance_test kiểm src/auth.py chứa chuỗi 'return True' sau khi frame chạy xong.\n"
+            "## Ngoài phạm vi\nKhông làm session/token/2FA — selftest chỉ xác nhận vòng lặp run+verify+commit chạy đúng.\n",
+            encoding="utf-8")
         _git(["add", "-A"], root); _git(["commit", "-q", "-m", "base", "--no-verify"], root)
 
         # STUB revise (stands in for claude -p): edit the in-scope file so verify passes.
         stub = f"{sys.executable} -c \"import pathlib;pathlib.Path('src/auth.py').write_text('def login(): return True')\""
         rc = run(str(frame), root=str(root), baseline="HEAD", keep_worktree=True,
                  revise_cmd=stub, use_worktree=True)
-        log = json.loads((root / "br" / "frames" / "frame-x.run.json").read_text())
+        log = json.loads((root / "br" / "frames" / "frame-x-login.run.json").read_text())
         # worktree branch exists + committed there
-        branches = _git(["branch", "--list", "br-run/frame-x"], root).stdout
-        wt_commit_msg = _git(["log", "-1", "--pretty=%s", "br-run/frame-x"], root).stdout.strip()
+        branches = _git(["branch", "--list", "br-run/frame-x-login"], root).stdout
+        wt_commit_msg = _git(["log", "-1", "--pretty=%s", "br-run/frame-x-login"], root).stdout.strip()
         checks = [
             ("run returned success", rc == 0),
             ("verdict SUCCESS", log.get("verdict") == "SUCCESS"),
             ("changed_files ⊆ scope (only src)", log.get("changed_files") == ["src/auth.py"]),
             ("scope_clean True", log.get("scope_clean") is True),
             ("commit made", bool(log.get("commit"))),
-            ("worktree branch created", "br-run/frame-x" in branches),
-            ("commit on branch has frame message", wt_commit_msg.startswith("frame(frame-x):")),
+            ("worktree branch created", "br-run/frame-x-login" in branches),
+            ("commit on branch has frame message", wt_commit_msg.startswith("frame(frame-x-login):")),
             ("frame got run_log_ref", "run_log_ref:" in frame.read_text(encoding="utf-8")),
             ("main src untouched (still False)", "return False" in (root / "src" / "auth.py").read_text()),
         ]
-        remove_worktree(root, root / ".br-worktrees" / "frame-x", "br-run/frame-x")
+        remove_worktree(root, root / ".br-worktrees" / "frame-x-login", "br-run/frame-x-login")
 
         # IN-PLACE mode (the DEFAULT): change lands in the live tree + commits on the
         # CURRENT branch — "bật app lên là thấy", one working tree, no folder hunting.
@@ -325,20 +333,20 @@ def selftest():
         checks += [
             ("in-place run success", rc2 == 0),
             ("in-place: live tree updated (app sees it)", "return True" in (root / "src" / "auth.py").read_text()),
-            ("in-place: frame commit on CURRENT branch", "frame(frame-x):" in recent),
+            ("in-place: frame commit on CURRENT branch", "frame(frame-x-login):" in recent),
             ("in-place: tree clean after run (bookkeeping committed)", worktree_clean(root)),
         ]
         # CHECKPOINT wire: sổ trace có mốc frame + tree vẫn sạch (sổ đã được commit)
         led = (root / ".checkpoints.jsonl")
         checks += [
-            ("checkpoint ledger có mốc frame(frame-x)", led.exists() and "frame(frame-x)" in led.read_text(encoding="utf-8")),
+            ("checkpoint ledger có mốc frame(frame-x-login)", led.exists() and "frame(frame-x-login)" in led.read_text(encoding="utf-8")),
             ("ledger đã commit (tree sạch cho frame kế)", worktree_clean(root)),
         ]
         # TIER-GATE: frame khai tier irreversible → br-run DỪNG (exit 3) khi chưa --ack-tier
         frame_ir = root / "br" / "frames" / "frame-mail.md"
         frame_ir.write_text(frame.read_text(encoding="utf-8")
-                            .replace("frame_id: frame-x", "frame_id: frame-mail")
-                            .replace("---\n# frame-x", "tier: irreversible\n---\n# frame-mail"),
+                            .replace("frame_id: frame-x-login", "frame_id: frame-mail")
+                            .replace("---\n# frame-x-login\n", "tier: irreversible\n---\n# frame-mail\n"),
                             encoding="utf-8")
         _git(["add", "-A"], root); _git(["commit", "-q", "--no-verify", "-m", "add frame-mail"], root)
         rc4 = run(str(frame_ir), root=str(root), baseline="HEAD", revise_cmd=stub, use_worktree=False)

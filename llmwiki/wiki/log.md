@@ -65,10 +65,10 @@ Thiết kế cơ chế 'dev tự build harness riêng' (skeleton + không-chạm
 - Stale-propagation cap=1 buoc (G2, test A-B-C + chu trinh + tuoi-lai; 9.8ms/lan ghi tren 63 trang). Skill /wiki-room (G3: depth cap=1, budget, circuit breaker) — register du marketplace/LOOP_MAP/AGENT/CLAUDE, skill-registry all agree. Wiki-graph HTML: build-wiki-graph.py (13ms) -> html/wiki-graph-fdk.html + wiki-graph-llmwiki.html. Problem-tree p-11 -> solved 3/3.
 
 ## 2026-07-02 — fdk — wiki-graph het flat
-- build-wiki-graph.py ve them [[wikilink]] than bai = canh mem net dut (khong gia ngu nghia); them 12 relations co kieu that cho 6 trang loi (validator bat 1 cross-wiki dangling -> go). Demo stale: sua rule-registry -> fdk-dev-strategy stale (badge S trong graph). fdk 121 canh / llmwiki 18 canh, build 5ms/3ms.
+- build-wiki-graph.py ve them `[[wikilink]]` than bai = canh mem net dut (khong gia ngu nghia); them 12 relations co kieu that cho 6 trang loi (validator bat 1 cross-wiki dangling -> go). Demo stale: sua rule-registry -> fdk-dev-strategy stale (badge S trong graph). fdk 121 canh / llmwiki 18 canh, build 5ms/3ms.
 
 ## 2026-07-02 — propose — council-chon-de-thi-self-index
-- Draft: dung app mau NGOAI mau + harass 8 loai vector, de COUNCIL tu chon de thi (chong ludic fallacy ma council seed42 vua neu). T-260702-02. Pair md+seq.html (5 task). Derives-from [[020726-wiki-core-relations]] + [[010726-query-retrieval-eval]].
+- Draft: dung app mau NGOAI mau + harass 8 loai vector, de COUNCIL tu chon de thi (chong ludic fallacy ma council seed42 vua neu). T-260702-02. Pair md+seq.html (5 task). Derives-from [[wiki-core-relations]] + [[010726-query-retrieval-eval]].
 
 ## 2026-07-03 — council — T1 chọn đề thi self-index
 - Council seed42 (roster risk: taleb/ilya/munger/kahneman/aurelius) blind peer-rank → winner Munger (TS plugin-host ~150 file). Đề thi chốt: 10 đòn harass 8 vector + đòn âm tính (chống bịa cạnh) + ca để-trống (đo giới hạn suy-ngầm), ground-truth niêm phong chống ludic fallacy. Report council-report-010-seed42.html. T-260702-02 T1 done.
@@ -77,7 +77,7 @@ Thiết kế cơ chế 'dev tự build harness riêng' (skeleton + không-chạm
 - /last30days: cơ chế benchmark chuẩn = gold-edge interval-overlap P/R/F1 (ContextBench), triplet-F1 + hallucination/omission-rate per-triple + held-out fixed-seed (Unified-KG-Benchmark), MRR/Hits@k, LLM-judge-calibrate-với-người. Áp vào scorer plugin-host/score.py (edge P/R/F1 + hallucination-rate + negative-control + limit tách riêng, verdict gate F1>=0.7 & neg=PASS & halluc<=0.15). Kiểm chứng: engine-tốt giả→PASS 1.0, xấu→FAIL. App mẫu T2 42 file reseal hash 65f51295. T-260702-02 T2 done, T5 scorer ready.
 
 ## 2026-07-03 — T3/T4 — chạy engine thật self-index
-- adapter.py onboard app→wiki-shape, gọi build-wiki-graph.py THẬT (scan+enrich_code), map→engine-edges.json. score.py chấm mù (seal verified): core F1 0.842 (P .889/R .8), hallucination .125, negative PASS. Per-capability: MẠNH đọc 5/5 quan hệ frontmatter khai tường minh + không bịa cạnh negative + không đối-xứng-hóa contradicts; MÙ imports/touches code TS (enrich_code chỉ .py); thiếu cờ cycle/quarantine trong graph-builder; trích [[NotALink]] từ code-fence (1 false-pos). Xác nhận council seed42: robust ở mặt thiết kế, giòn ở đuôi ngoài-mẫu → chưa anti-fragile. 3 defect chờ đẩy failure-flywheel (T5). T-260702-02 T3+T4 done.
+- adapter.py onboard app→wiki-shape, gọi build-wiki-graph.py THẬT (scan+enrich_code), map→engine-edges.json. score.py chấm mù (seal verified): core F1 0.842 (P .889/R .8), hallucination .125, negative PASS. Per-capability: MẠNH đọc 5/5 quan hệ frontmatter khai tường minh + không bịa cạnh negative + không đối-xứng-hóa contradicts; MÙ imports/touches code TS (enrich_code chỉ .py); thiếu cờ cycle/quarantine trong graph-builder; trích `[[NotALink]]` từ code-fence (1 false-pos). Xác nhận council seed42: robust ở mặt thiết kế, giòn ở đuôi ngoài-mẫu → chưa anti-fragile. 3 defect chờ đẩy failure-flywheel (T5). T-260702-02 T3+T4 done.
 
 ## 2026-07-03 — T5 — distill benchmark self-index
 - Report HTML 030726-self-index-benchmark-report.html (glass, KPI + bảng năng lực + 3 defect + kết luận robust-chưa-anti-fragile + phạm vi no-silent-cap). 3 defect vào failure-flywheel (coverage-gap ×2: mù code-TS, thiếu cờ cycle/quarantine; hallucination ×1: wikilink không strip code-fence). Cập nhật concept wiki-core-relations mục "Kiểm chứng NGOÀI-MẪU". T-260702-02 T5 done → proposal 5/5 task xong.
@@ -206,6 +206,143 @@ Giải issue `030726-skill-resolve-supplychain` (trục #5 frontier-gap-scan, Ch
 
 - Hiểu ngược feedback trước (đã tăng size) → user chỉnh: phải GIẢM. Hạ 22 cỡ dưới cả mức gốc: nav 12px, body 13.5, lead 14, list/bảng 12.5, nhãn 10–10.5, h2 21, hero clamp(26,4vw,40).
 - Luật trong docs-site-macos + /fdk + memory VIẾT LẠI đúng chiều: THANG COMPACT 13″, "dễ đọc = line-height/contrast, không phải font to", ghi chú đã-đảo-chiều-một-lần để không lặp.
+## 2026-07-05 — planning GH#15 đợt 2: entity map + step Interview (phiên issue-15-br-k)
+- Proposal cặp mới: `sources/draft/050726-ralph-interview-pipeline.md` + `html/050726-ralph-interview-pipeline.html` — 9 entity dây chuyền (RAW→SPEC→QUESTIONNAIRE→ANSWERS→BR→FRAMES→LOOP→MONITOR), khung specs chuẩn S1–S10, hub slash `/br` (interview/compile đợt 1), lens-fill đóng dấu assumed + bảng "Giả định đang gánh" (fail-fast). Chờ user duyệt qua /propose.
+- Trước đó cùng phiên: council 031/032 (winner Taleb 1.0) duyệt-có-điều-kiện plan loop thin-slice; problem-tree p-22.
+
+## 2026-07-05 — planning GH#15 đợt 3: đủ 4 step dây chuyền (phiên issue-15-br-k)
+- 3 cặp proposal mới theo mẫu step-1: `050726-ralph-slice-frames` (frame schema v0 + frame-lint 5 luật + registry truy ngược, slicer người-trong-vòng-lặp), `050726-ralph-loop-gate` (6 phanh: 4 sẵn + diff-jail + test-hash fail-closed; jail 3 tầng cho claude -p; KILL viết trước; dry-run người gác), `050726-ralph-monitor` (build-line-status.py + /br status — lớp đọc tất định, chống Goodhart). Mỗi cặp .md (máy) + .html (người review). Chờ duyệt qua /propose theo thứ tự phụ thuộc 1→2→3→4.
+
+## 2026-07-05 — THI CÔNG GH#15 step 1–4 + docs site (phiên issue-15-br-k)
+- Đồ nghề tất định (selftest xanh): frame-lint.py (5 luật, 6 fixture) · loop-runner.py +2 phanh (diff-jail guard5 + test-hash guard6/PROTECT_VIOLATION exit6, selftest 5→7) · build-line-status.py (monitor 5 trạng thái + --check) · spec-template.md S1–S10.
+- Hub skill /br (interview·compile·slice·run·status) đăng ký 6 mặt (mirror·marketplace·AGENT·CLAUDE·LOOP_MAP·LOOP_GROUPS) + regen CAPABILITIES/overstack. medic --ci 0 fail.
+- Docs site /docs-site-macos: llmwiki/html/050726-ralph-pipeline-docs.html (mind map + 5 diagram kéo-thả + wiki content + nhật ký deviation). Build-report: sources/draft/050726-ralph-pipeline-build.md.
+- Deviation: frame-lint fnmatch (không pathlib **); diff-jail tận dụng no-progress (scope==state); monitor đọc BR.clauses.json; đăng ký cần 6 mặt. Việc kế: end-to-end 1 BR thật + wire adapter claude -p.
+
+## 2026-07-05 — docs-site-macos — br-huong-dan-nguoi-moi
+- llmwiki/html/050726-br-huong-dan-nguoi-moi.html: hướng dẫn /br cho NGƯỜI MỚI (6 section, mind map, 4 "ảnh chụp" mockup macOS Terminal+browser dựng từ output thật, FAQ collapse, checklist). Bổ trợ bản kỹ thuật 050726-ralph-pipeline-docs.html.
+
+## 2026-07-05 — GH#15: truy vết frame→code (A+B, theo yêu cầu user)
+- loop-runner.py: thêm changed_files (file THẬT frame đổi), commit-on-success gắn frame_id vào WORKTREE branch (không main), baseline_ref; hậu-kiểm scope_clean + FINAL SCOPE SWEEP (mọi termination revert sạch file ngoài scope → changed_files LUÔN ⊆ scope_code) + attempted_out_of_scope (lưu vết ghi lậu). Selftest 7→8 (COMMIT_ON_SUCCESS) + bằng chứng scope_clean. E2E chứng minh: frame tham lam ghi other/config.py+test → PROTECT_VIOLATION, sweep revert về gốc, changed_files=['src/auth.py'], commit=None; ca sạch → commit 'frame(...): [S4.1]'.
+- build-line-status.py: cột "file thật đã đổi @commit" + badge ✓/⚠ scope; traceback thêm changed/commit/scope_clean.
+- SKILL /br run + docs cập nhật. medic --ci 0 fail.
+
+## 2026-07-05 — GH#15: prompt file + queue resumable (theo yêu cầu user)
+- skills/br/assets/revise-prompt.md: FILE PROMPT edit được (template placeholder). fdk/tools/br-revise.py: adapter render template → claude -p (tools bó hẹp); --print xem prompt; selftest tất định (không gọi model).
+- br/queue.yaml (mẫu skills/br/assets/queue.example.yaml): danh sách frame, mỗi mục prompt_file HOẶC prompt inline. fdk/tools/br-queue.py: chạy tuần tự, ghi status back sau mỗi mục → chạy lại = bỏ qua done, chạy tiếp (resume). selftest chứng minh resume + inline-vs-file. claude -p là ranh giới verified:false (BNAL).
+- SKILL /br run cập nhật. medic --ci 0 fail.
+
+## 2026-07-05 — GH#15: /br run tất định (worktree + revise wired)
+- fdk/tools/br-run.py: driver /br run — frame-lint → kiểm tree sạch → tạo git worktree branch br-run/<id> từ baseline → loop-runner với revise TRỎ tới br-revise.py → commit-on-success vào branch (không main) → tóm tắt 1 dòng → ghi run_log_ref vào frame. selftest end-to-end 9/9 (stub revise, không cần model): worktree tạo, changed_files ⊆ scope, scope_clean, commit branch gắn frame message, MAIN không đụng.
+- harness/loop-runner.config.yaml revise: comment wiring trỏ br-revise (cmd giữ null = no-op an toàn cho raw run; br-run override per-frame). verified:false chỉ còn ở cú gọi claude -p.
+- Mắt xích cuối đã nối: chỉ cần `claude` CLI là bấm chạy thật. medic --ci 0 fail; 6 selftest xanh.
+
+## 2026-07-05 — GH#15 PIVOT theo feedback user: in-place là mặc định, bỏ worktree-per-frame
+- Lý do (user): N frame = N worktree = N folder ma; luồng người thường = bật app rà lỗi → trỏ khúc lỗi → tìm frame/prompt phụ trách → sửa prompt → chạy lại frame. Kiểm soát không-phạm-scope bằng HARNESS, không bằng cô lập thư mục.
+- br-run.py: default IN-PLACE (một cây duy nhất, app thấy ngay; frame xanh → commit nhánh hiện tại gắn frame_id — mốc revert/blame); --worktree thành opt-in. Selftest 12/12 (thêm 3 case in-place).
+- br-find.py MỚI: trỏ file/từ khoá → frame + clause + vị trí prompt (inline queue / prompt_file / template) + lệnh re-run. Selftest 5/5.
+- frame-lint R6 exclusive-scope MỚI: 2 frame giẫm cùng file thật → FAIL (đảm bảo "1 lỗi → đúng 1 frame"). Selftest 8 fixture xanh.
+- SKILL /br: mode run in-place + mode find. Mọi selftest + medic 0 fail.
+
+## 2026-07-05 — GH#15: SỔ PROMPT tổng br/prompts.md (user sửa tay, không qua model)
+- fdk/tools/br-prompts.py: MỘT file br/prompts.md, mỗi frame một mục `## <frame_id>` — user mở, tìm, sửa/thêm nội dung prompt bằng tay. `sync` thêm mục cho frame mới, KHÔNG đè mục đã sửa (selftest chứng minh hand-edit sống sót); mồ côi báo không xoá; heading template demote ### để `##` chỉ còn là frame.
+- Ưu tiên runtime (br-revise): sổ prompt > queue inline > prompt_file > template mặc định — selftest "sổ thắng template" xanh. br-find giờ trỏ thẳng vào mục sổ. 8/8 tool selftest xanh.
+
+## 2026-07-06 — GH#15 DREAM-RUN: test trọn luồng bằng bản interview "trong mơ"
+- br/dream-demo/ (git riêng, gitignored): app Điểm Danh — docs thô → spec-filled S1–S10 đủ (S7.2 lens-assumed) → interview 001 (questions.html + answers điền) → BR.md + clauses.json (bảng Giả định) → slice 3 frame scope độc lập (frame-lint 6 luật xanh, test-first ĐỎ) → prompts.md (user sửa tay 2 mục) → run.
+- Kịch bản chạy: frame-001 SUCCESS (2 vòng, commit gắn frame) · frame-002 stub lởm+tham lam → diff-jail revert docs/hack.txt + ESCALATE 3 vòng → NGƯỜI br-find → sửa sổ prompt → re-run SUCCESS · frame-003 SUCCESS. Nghiệm thu S10.1: 6/6 test xanh. git log mỗi frame 1 commit.
+- Gap lộ ra & vá: run-log + run_log_ref sinh SAU commit của loop → tree bẩn chặn frame kế → br-run thêm bookkeeping commit (chore(frame): run-log). R1 chặn agent ghi raw/ đúng luật → demo dùng docs/.
+- Trang xem: llmwiki/html/060726-dream-line-status.html.
+
+## 2026-07-06 — GH#15 STRESS-TEST 40 STEP: mini-POS 40 frame chạy trọn dây chuyền
+- br/dream-40 (git riêng, gitignored): 40 nghiệp vụ POS, 40 frame scope độc lập, frame-lint 40/40 xanh (1.8s, R6 pairwise 780 cặp). Queue 3 hồi: hồi 1 kẹt f13 (kịch bản) → user br-find + sửa → hồi 2 lộ f15 kẹt THẬT (bug banker's rounding trong solution) + gap nghẽn dòng → hồi 3 chạy nốt: 40/40 done, 40 test xanh, 40 commit frame(fNN), ~18s tổng runtime queue.
+- 3 GAP QUY MÔ phát hiện & vá (selftest lại xanh): (1) queue write-back làm bẩn tree chặn frame kế → br-queue commit chore(queue) sau mỗi mục; (2) frame FAIL để diff dở → nghẽn 27 frame sau → br-run lưu .failed.patch + revert scope cho dòng chảy tiếp; (3) br-queue trước gọi loop-runner thẳng (thiếu gate/bookkeeping) → giờ delegate br-run.
+- build-line-status thêm toggle sáng/tối + localStorage + chống FOUC (feedback html-theme-toggle-required). Trang: llmwiki/html/060726-dream40-line-status.html.
+
+## 2026-07-06 — GH#15 HARASS-TEST 5×30 frame + council test-plan
+- Harass: 5 dự án × 30 frame (~150 frame-run) với 11 kiểu revise xấu + cổng bad-frame + resume. Runner harass_gen/harass_run (scratchpad) soi false-green/tree-dirty/tool-crash không thoả hiệp.
+- 3 BUG THẬT fixed + regression selftest: (1) stale .pyc → false verdict → PYTHONDONTWRITEBYTECODE trong loop-runner+frame-lint (selftest stale-pyc guard); (2) tree bẩn cộng dồn (1 kẹt chặn 27) → .failed.patch + revert + bookkeeping; (3) FLAKY/false-green "SUCCESS changed_files rỗng" → guard 7 CONFIRM (br-run --confirm 2, verdict FLAKY exit 7, selftest FLAKY_CONFIRM). loop-runner selftest 7→10, tất cả xanh, medic 0 fail.
+- Council 033 (Feynman senior-tester · Linus · Socrates, đồng thuận C>B>A): rủi ro #1 = false-GREEN qua oracle non-hermetic. KIỂM CHỨNG GAP test-hash-transitive của council → đã bịt bởi diff-jail blanket-revert (test thật: revise tamper conftest bắc cầu → revert → NO_PROGRESS). Plan /propose: sources/draft/060726-br-test-harness-plan.md (CI 3 tầng, property/mutation/cassette/chaos, test-independence).
+
+## 2026-07-07 — Distill skill checkpoint-trace từ SHEPHERD (reversible traces)
+- Nguồn: SHEPHERD "Reversible Agentic Execution Traces" (arxiv 2605.10913, shepherd-agents.ai) — agent-run = git-like trace, mọi state reachable, effect phân 3 reversibility tier, work là held-proposal (fork→merge/discard). Substrate của ta = git.
+- fdk/tools/checkpoint.py (selftest 7 check): save (checkpoint + tier vào .checkpoints.jsonl append-only) · list · rollback <seq|hash> về BẤT KỲ mốc (giữ lịch sử, ghi rollback thành step mới) · tier-gate (reversible→0/compensable→3/irreversible→4, gate trước materialize). Bug tự bắt khi làm: checkout cuốn sổ về quá khứ → fix giữ sổ chỉ-tăng.
+- skills/checkpoint-trace/SKILL.md — distill self-contained, ghi công nguồn, KHÁC /br (per-frame) và loop-runner (per-iteration): rollback TOÀN LƯỢT + kỷ luật tier. Đăng ký 6 mặt, regen CAPABILITIES/overstack, medic 0 fail. Demo: trace 3 mốc → rollback #1 khôi phục cây + cảnh báo email irreversible.
+
+## 2026-07-07 — Cứu công việc GH#15 + tool upstream-drift (visibility repo gốc)
+- Commit 6082a8f: rescue toàn bộ GH#15 (br pipeline + checkpoint-trace + harass fixes + docs), 48 file, medic --ci gate. Branch trước đó UNCOMMITTED trên nền chậm 28 commit sau origin/orca.
+- fdk/tools/upstream-drift.py (selftest 6 check): MỘT lệnh thấy local vs repo gốc — behind/ahead, commit gom theo type (feat/fix ⭐), + cờ ĐỤNG file mình đang sửa (upstream-changed ∩ local committed/dirty) = xung đột merge. Không tự pull.
+- Chạy thật: chậm 28 (11 feat + 5 fix), đụng 9 file (build-overstack-docs.py, overstack.html, index/log...). Phát hiện: đã build lệch upstream — theme-toggle upstream đã luật-hoá trong docs-site SKILL, ta tự chế trong build-line-status.py; wiki-sync/travel-policy v4/wiki-graph hữu ích chưa kéo.
+
+## 2026-07-07 — Merge origin/orca (28 commit upstream) vào branch, ưu tiên upstream
+- Kéo trọn 28 commit; sau merge: ngang upstream (behind 0, ahead 3). 6 xung đột giải: harness.yml/foundation ← upstream; ledger/log union 2 bên; CAPABILITIES+overstack regen; problem-tree lấy upstream + node Ralph đổi p-22→p-23 (đụng p-22 wiki-sync upstream); bỏ dead-link council-report ephemeral (upstream gitignore council).
+- Kéo về hữu ích: wiki-sync (code→wiki drift), wiki-graph.html, travel-policy v4 + global-shared engine (ADR-017), feature-inventory, reachability guard skill→tool, theme-toggle+font-floor rule.
+- GH#15 giữ nguyên: br + checkpoint-trace + upstream-drift còn đăng ký; 10/10 tool selftest xanh; medic 0 fail. Test-project dirs (br/dream-demo, br/dream-40, br/harass) gitignored, không track.
+
+## 2026-07-07 — Adapt checkpoint-trace (SHEPHERD) vào /br run: per-frame checkpoint + tier-gate
+- Chọn kiểu adapt: wire vào /br run per-frame (standalone không ai nhớ gọi; per-iteration thừa vì loop đã có revert/sweep). Nguyên tắc: KHÔNG double-commit — checkpoint.py thêm mode `record` (ghi sổ trỏ commit CÓ SẴN) + rollback theo LABEL (frame_id, không cần nhớ seq/hash). Selftest checkpoint 7→9.
+- br-run: (0) TIER-GATE — frame khai `tier: compensable|irreversible` bị chặn (exit 3) tới khi người `--ack-tier` (SHEPHERD gate-before-materialize); (7) sau run record mốc vào .checkpoints.jsonl + commit sổ ngay (né bài học tree-bẩn harass). Selftest br-run 13→17 (ledger có mốc, tree sạch, gate chặn, ack cho qua).
+- Demo dream-demo: record không commit mới; `checkpoint.py rollback frame-001` quay pipeline theo TÊN frame. SKILL br + checkpoint-trace cập nhật; medic 0 fail.
+
+## 2026-07-07 — docs-site-macos — huong-dan-repo-files
+- llmwiki/html/070726-huong-dan-repo-files.html: bản đồ tương tác file repo (file NGƯỜI sửa / MÁY sinh / sổ append-only + trace, bảng lệnh↔file, luật hàng rào, checklist). Lần đầu áp spec theme NÚT GẠT + font compact từ upstream. Output-report: sources/draft/070726-huong-dan-repo-files.md.
+
+## 2026-07-07 — Chạy APP THẬT từ frames để test chất lượng (dream-demo) — vòng khép kín trọn vẹn
+- run_demo.py: mô phỏng 1 buổi sáng điểm danh (login, khoá 5 lần sai, check-in, báo cáo trễ). BẮT ĐƯỢC lỗi chất lượng THẬT ngoài unit test: bấm nhầm check-in 2 lần → ghi 2 bản, vi phạm S5.2 (clause có trong BR nhưng chưa được test).
+- Vòng khép kín diễn đúng thiết kế: chạy app thấy lỗi → br-find "check-in" → frame-002 + mục sổ prompt → NGƯỜI thêm acceptance test S5.2 (đỏ, commit) → re-run frame-002 (stub vai claude, 2 vòng + 2 confirm, scope sạch, commit 233dfd5) → chạy lại app: 1 bản ghi/ngày ✓ ĐẠT, 7/7 test xanh. Checkpoint trace ghi mốc #3.
+- Finding #2 ghi backlog BR (không lặng lẽ bỏ): S3.3 khoá "15 phút" thực tế khoá VĨNH VIỄN — cần frame-004-unlock + test thời gian.
+- Gotcha lộ ra: test main-block nằm GIỮA file → test thêm sau không chạy ("OK 2 test" giả) — main-block phải ở CUỐI; đáng đưa vào spec-template ghi chú viết test.
+
+## 2026-07-07 — Fix app dream-demo tới CHUẨN PRODUCT (goal-driven autonomous loop)
+- Audit app Điểm Danh vs BR → 6 finding (br/dream-demo/br/FINDINGS.md): F-01 khoá vĩnh viễn thay 15' (S3.3), F-02 mật khẩu plaintext (S7.2), F-03 thiếu login log, F-04 input validation crash, F-05 data model thiếu ten/phong_ban (S5.1), F-06 boundary is_late chưa test.
+- Fix theo dây chuyền (R6 exclusive-scope: auth→frame-001, checkin→frame-002, report→frame-003): mỗi finding = người viết acceptance test (đỏ) → re-run frame (stub vai claude, 2 vòng + confirm hermeticity, scope sạch) → xanh. 6/6 FIXED.
+- Nghiệm thu S10.1: 18 unit test xanh (8 auth + 6 checkin + 4 report) + run_demo.py smoke test 11 invariant chất lượng xanh (hash không plaintext, tự mở khoá 15', input bẩn không sập, dedup ngày, báo cáo đúng, data model đủ).
+- Gotcha pipeline lộ ra: sửa BR.md (thêm findings) → R4 orphan mọi frame → phải re-anchor parent_br_hash (BR tiến hoá là hợp lệ; findings nên ở FINDINGS.md riêng, không trong BR đã hash). Known-limitation ghi trung thực: in-memory không thread-safe (trong scope demo S8.1).
+
+## 2026-07-07 — Đưa UI vào dây chuyền: frame-004-ui (trả lời "UI xấu vô frame nào sửa")
+- Phát hiện gap: serve.py (UI) là ORPHAN — br-find "serve.py" ra "không frame nào khớp" vì UI dựng làm demo-harness NGOÀI dây chuyền, không có kỷ luật/test.
+- Fix đúng cách (không sửa lụi): thêm clause S4.4 (màn hình web, chuẩn UI: token/app-bar/responsive/toggle/a11y) vào BR → slice frame-004-ui (scope serve.py, test tests/test_ui.py, R6 không đè frame nào) → re-anchor.
+- Người viết test_ui.py chuẩn UI (8 assert: viewport, design-token ≥8 --var, app-bar thương hiệu, @media max-width, data-theme toggle, aria a11y, 3 flow, status pill) → ĐỎ. Re-run frame-004-ui: iter1 escalate (viewport thiếu nháy) → sửa 1 chỗ → SUCCESS 2 vòng + confirm, scope sạch. UI mới: liquid-glass light-blue, app-bar, thẻ, toggle sáng/tối localStorage, responsive.
+- Giờ br-find "serve.py" → frame-004-ui. 4/4 file test xanh (auth/checkin/report/ui). App chạy http://localhost:8790 với UI đạt chuẩn.
+- Re-scope trang `llmwiki/html/070726-huong-dan-repo-files.html` (ghi đè): từ guide "5 vùng repo" tổng quát → THUẦN dây chuyền loop-engineering (feedback user "cái dây chuyền ấy"). 6 section mới: bản đồ dây chuyền (diagram raw→interview→compile→slice→run→status+checkpoint) · 5 mode /br · loop-runner 6 phanh · checkpoint & 3 tier khả-đảo · file runtime br/ & lệnh · 6 luật dây chuyền + checklist. Giữ nguyên khung theme (nút gạt dark/light, mindmap, draggable diagram). Cập nhật draft provenance khớp.
+- Dây chuyền MỚI `br/payroll/` (PRD Payroll & Timesheet Unicons v2.1 từ raw/): PLANNING xong, CHƯA run. Sản phẩm: mockup.html (10 màn hình, data draft nhúng), 15 CSV data-draft (định mức/DM/tờ trình/bảng công mẫu — gap tự bù đánh dấu ASSUMED), BR.md 26 clause + bảng 10 Giả định đang gánh, 28 frame CỠ NGHIỆP VỤ (frame-lint ALL PASS, p22 khóa-kỳ khai tier compensable), queue 28 pending + prompts.md + line-status. Khác att40 (40 frame = 40 hàm stress-test): payroll slice theo nghiệp vụ trọn vẹn. Điều kiện run: HR xác nhận 10 giả định + viết test thật thay stub đỏ.
+
+## 2026-07-11 — propose — br-assembly-provenance-isolation
+Vá #40 ở tầng /br (assembly frame + provenance manifest + assumption-gate + localizer + paraphrase/adversarial); giữ truy vết bug→frame→clause + cô lập fix sau agent tổng.
+
+- 2026-07-11 T-260711-01 Mốc A (T1): thêm lệnh `frame-lint manifest` sinh `_manifest.json` thuần từ frontmatter (file→frame_id→clause_ids); 1-chủ đã do R6 gác, manifest từ chối ghi nếu còn va. Self-test +2 check (disjoint/collision) ALL PASS. Sinh thật br/payroll/br/frames/_manifest.json = 32 file. Proposal thêm Prior-art loop-engineering + T6/T7 + 3 Milestones.
+
+- 2026-07-12 T-260711-01 Mốc B+C (buildable): frame-lint +R8 assemble-scope (T2, assemble cấm sở hữu file component) +R9 assumption-gate (T3, --ship chặn khi assumption verified:false severity block); +kind/rollout/assumptions field. Tạo frame-p99-lap-rap (kind=assemble, RED sạch) + app/pipeline.py stub (RED, blocked ground-truth Excel). Tạo tool loop-cost.py (T7, ước token trước run, exit1 nếu vượt budget). Self-test: frame-lint 15/15, loop-cost 4/4 PASS. HOÃN (data/ceremony): assemble pipeline chạy thật (thiếu ground-truth), T4 localizer runtime, T5 adversarial, T6 rollout display ở build-line-status, đăng ký skill /loop-* chính thức.
+
+## 2026-07-12 — docs-site-macos — codebase-map-payroll
+Render CODEBASE-MAP.md → llmwiki/html/120726-codebase-map-payroll.html (6 section, giải thích ground-truth + bản đồ /br).
+
+## 2026-07-12 — br-sync + guide — ccpm distill
+Tool br-sync.py (frame ↔ GitHub sub-issue, distill ccpm) + Mode 6 trong br.md + cẩm nang HTML 120726-huong-dan-br-pipeline.html.
+
+## 2026-07-12 — ui-contract — form chuẩn frame/screen/route
+frTemplate +ui_role/ui_screen; br/ui-layout.yaml; br-contract.py (md+html, selftest); Mode 7 /br contract. Payroll: 31 frame·7 màn·7 route·0 lệch.
+
+## 2026-07-12 — clone-memos-flow — reference + gap analysis
+Docs-site luồng I→O clone Memos thành module/microservice; 3 gap lệnh tự phát hiện (G1 ingest-repo, G2 reverse BR, G3 modularize).
+
+## 2026-07-12 — nghiệm thu + council + friction
+App payroll chạy :8770; council 3 ghế (ĐẠT-CÓ-ĐIỀU-KIỆN); harass 17/17; fix ui-layout về route thật (11 route 0 lệch); raise 3 gap; friction log + nghiem-thu-output.
+
+## 2026-07-12 — memos pipeline run
+Chạy full /br trên memos: reverse-BR 13 clause + 12 frame + contract 0 lệch; build từ source & chạy standalone :5230; docs 120726-memos-pipeline-run.html.
+
+## 2026-07-12 — memos: neumorphism theme + file-first PoC
+BR +N03(theme)+N04(file-first); 14 frame (n03/n04); contract 0 lệch. Neumorphism build lại UI memos (live :5230, token override + dual-shadow). mdstore.py file-first PoC: export DB→md round-trip lossless (10 memo thật).
+
+## 2026-07-12 — Lume rebrand + neumorphism spec thật
+BR +N05; bỏ tên Memos+logo vẹt → Lume (logo SVG neumorphic); neumorphism.css viết lại theo spec superdesign (dual-shadow 9px/18px #bec3c9/#fff, inset, CTA phẳng #4d6bfe, focus-ring, AA) nhắm class thật .bg-card/[data-slot=button]/input. Rebuild+serve verify: title Lume, CSS markers đúng. Screenshot extension lỗi localhost (app serve 200 OK).
+
+## 2026-07-14 — propose — br-proactive-fill
+Draft SPEC T-260714-01: /br interview --proactive (fill-chain default→spec-kit→lens, trần 5 câu, carve-out) + compile checksum G1 + slice DAG (ATG mảnh 1). Chờ duyệt gate.
+
+## 2026-07-14 — orca-workflow — br-proactive-fill thi công xong
+T-260714-01 done: defaults.yaml (26 điều kiện + spec-kit) + br-fill.py (fill/check-contract/selftest) + SKILL.md Mode1 --proactive + Mode2 gate G1. Đo payroll: 12 câu → 4 câu, S7.5 máy điền, SC-001/004 PASS, medic KHOẺ.
 
 ## 2026-07-06 — Proposal: nền chuẩn thiết kế AI-elite chống AI-slop
 - Distill `raw/design-tip-of-someone-on-internet.md` → bảng 13 tip (3 trục: ĐO ĐƯỢC/QUY TRÌNH/PHÁN ĐOÁN).
@@ -262,7 +399,7 @@ Giải issue `030726-skill-resolve-supplychain` (trục #5 frontier-gap-scan, Ch
 
 ## 2026-07-15 — sổ nợ unknown: fill-first-find-out-later (T-260715-03)
 - Tầng thứ ba giữa (default) và [CẦN LÀM RÕ]: default rủi ro điền để KHÔNG chặn việc, ghi thành nợ có sổ truy được.
-- /propose: interview LUÔN có đáp án cuối "điền mặc định bây giờ, tìm hiểu sau"; tag (default, find-out-later → [[unknown-x]] U-NN). + luồng trả nợ.
+- /propose: interview LUÔN có đáp án cuối "điền mặc định bây giờ, tìm hiểu sau"; tag (default, find-out-later → `[[unknown-x]]` U-NN). + luồng trả nợ.
 - Folder llmwiki/wiki/draft/unknown/ + _template.md; harness/scripts/unknown-ledger.py (list/add/resolve/trace, --self-test PASS, audit giữ cả 2 giá trị); /lint 8c hiện nợ (báo cáo không chặn). p-33 solved 3/3.
 - UAT hai pha PASS (unknown-ledger): canary (3 trụ 5/5, harness 74/74, /propose fill-first tới tay) → main-URL smoke (đường mặc định, 74/74, /propose reachable, unknown-ledger.py --self-test PASS ở global harness — engine travel thật). p-33 đóng 3/3.
 

@@ -45,6 +45,19 @@ harness/metrics/sweep-marker.json
 
 # ephemeral — không push (council 2026-07-03)
 scratchpad/
+# br/ = OUTPUT khi dev/test /br (sub-project sinh ra) — artifact cục bộ, KHÔNG push.
+# "Xương" scaffold /br sống ở skills/br/assets/ (defaults + template); README ở br/ giữ lại.
+br/*/
+llmwiki/raw/*.xlsx
+
+# ── APP TEST — không thuộc framework, KHÔNG push lên kit (audit 17/07/26) ──
+# lume/ = app "Memos" (bên thứ 3) dùng làm TARGET cho /br dựng tính năng vào (br/lume/br/frames/*).
+# 1052 file, không file framework nào import — chỉ adapt-registry QUÉT qua (nguồn false-positive
+# `endpoint` đã xử). Merge nó vào orca = đổ nguyên một app lạ vào kit.
+lume/
+# tài liệu nghiệp vụ KHÁCH HÀNG dùng làm input test /br (có file [Confidential]) — không lên remote
+llmwiki/raw/payroll requirement/
+qa-shots/
 fdk/docs/superpowers/
 
 # flywheel success-flywheel raw history (local)

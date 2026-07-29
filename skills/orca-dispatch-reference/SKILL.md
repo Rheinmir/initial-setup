@@ -148,7 +148,7 @@ rtk hooks install --agent opencode
 rtk stats --today
 ```
 
-> Xem [[concepts/RTK]] để biết chi tiết.
+> Xem concepts/RTK để biết chi tiết.
 
 ---
 

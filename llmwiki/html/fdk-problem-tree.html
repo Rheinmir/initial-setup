@@ -939,6 +939,106 @@
   "date": "2026-07-20",
   "solvedBy": "travel-policy: medic.py framework_only → global_shared/engine_core (phiên 2026-07-20)",
   "session": "/fdk orca-handover"
+ },
+ {
+  "id": "p-23-br",
+  "parent": null,
+  "title": "Dây chuyền Ralph (GH#15): plan thin-slice một-frame đã qua council, chưa thi công",
+  "desc": "Planning cho GH#15 (BR-kỹ → frames gắn-chặt-code → mỗi frame là loop có harness). Council 031/032 (Rams·Ada·Linus·Taleb·Lão Tử, 3 judge chấm kín, winner Taleb mean-rank 1.0 tuyệt đối): plan v0 ĐẠT CÓ ĐIỀU KIỆN với 6 sửa bắt buộc trước khi chạy — (1) chống xanh-giả: tách scope_test khỏi scope_code + hash test file trước/sau (fail-closed); (2) diff-jail tất định: git diff --name-only so glob scope_code, tràn scope → revert + no_progress (đề cử guard thứ 5 của loop-runner); (3) jail mức OS: chạy trong worktree riêng, quyền tối thiểu, scope không đụng harness/hook/CI; (4) định nghĩa trước điều kiện KILL thí nghiệm (via negativa); (5) working-tree sạch trước khi loop; (6) cắt thừa (bỏ monitor HTML/slicer khỏi bước 5). Đồng thuận 5/5: BR mẫu = task THẬT trong repo overstack (không app đồ chơi); prompt-dặn KHÔNG đủ làm scope-jail. Frame schema thêm: schema_version, scope_test, depends_on, parent_br+clause_id+parent_br_hash, created_by, env/setup_cmd, baseline_ref, run_log_ref+outcome. Report: llmwiki/html/council/council-report-032-seed42.html. [05/07] Planning HOÀN CHỈNH 4 step theo mẫu user: 4 cặp proposal .md+.html — (1) Interview (/br interview: raw→spec S1–S10→hỏi bù HTML+MD, lens-fill assumed), (2) Slice (frame schema v0 + frame-lint 5 luật + registry truy ngược, người duyệt từng lát), (3) Loop+Gate (6 phanh: +diff-jail +test-hash fail-closed, jail 3 tầng, KILL via-negativa, dry-run), (4) Monitor (build-line-status.py + /br status, lớp đọc tất định chống Goodhart). Hub slash MỘT tên /br. [05/07 THI CÔNG] Đã dựng đồ nghề tất định cả 4 step + selftest xanh: frame-lint.py (5 luật, 6 fixture BAD/GOOD) · loop-runner.py +2 phanh (diff-jail guard5 + test-hash guard6 PROTECT_VIOLATION exit6, selftest 5→7) · build-line-status.py (monitor 5 trạng thái + traceback + --check) · spec-template S1–S10 · hub skill /br đăng ký 6 mặt. Docs site 050726-ralph-pipeline-docs.html (mind map + 5 diagram kéo-thả + wiki + nhật ký deviation). medic --ci 0 fail. Deviation: frame-lint fnmatch, diff-jail tận dụng no-progress sẵn có (scope==state), monitor đọc BR.clauses.json, đăng ký cần 6 mặt. CÒN: end-to-end 1 BR THẬT (cần user chọn tài liệu vào raw/) + wire adapter claude -p (verified:false) + demo phá-scope trên đường thật.",
+  "status": "partial",
+  "scope": [
+   "harness",
+   "skills"
+  ],
+  "date": "2026-07-05",
+  "solvedBy": "frame-lint.py + loop-runner.py guard5/6 + build-line-status.py + skills/br + docs 050726-ralph-pipeline-docs.html; council-report-032",
+  "session": "orca-fdk issue-15 build"
+ },
+ {
+  "id": "p-auto-13-br",
+  "parent": null,
+  "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
+  "desc": "Bề mặt bị chạm: llmwiki/html/wiki-graph.html, llmwiki/wiki/ledger.jsonl, llmwiki/wiki/log.md, llmwiki/wiki/sources/draft/070726-huong-dan-repo-files.md. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát).",
+  "status": "open",
+  "scope": [],
+  "date": "09/07/26",
+  "session": "c610b991",
+  "pending": true
+ },
+ {
+  "id": "p-auto-14-br",
+  "parent": null,
+  "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
+  "desc": "Bề mặt bị chạm: llmwiki/html/wiki-graph.html, llmwiki/wiki/log.md. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát).",
+  "status": "open",
+  "scope": [],
+  "date": "09/07/26",
+  "session": "c6d85432",
+  "pending": true
+ },
+ {
+  "id": "p-visual-qa",
+  "parent": null,
+  "title": "Không nghiệm thu được UI app local (extension MCP lỗi 'error page' trên localhost)",
+  "desc": "Khi rebuild giao diện app do /br sinh (memos→Lume), Chrome-extension MCP không chụp được localhost nên agent sửa UI mù, ra kết quả 'xấu'. Giải: skill visual-qa — luồng headless (playwright-core + Chrome hệ thống) login rồi chụp từng route → agent đọc ảnh → FINDINGS.md tự bật vòng sửa.",
+  "status": "solved",
+  "scope": [
+   "skills"
+  ],
+  "date": "13/07/26",
+  "solvedBy": "skill visual-qa (route-shots.mjs) + FINDINGS.md loop",
+  "session": "goal-memos"
+ },
+ {
+  "id": "p-unknown",
+  "parent": null,
+  "title": "Unknown/mơ hồ làm reasoning('think') rối nhưng không được bắt & dễ quên",
+  "desc": "Chỗ chưa chắc trong phiên khiến model đoán bừa → sai lan (vd UI khai pass chưa nhìn; chỗ lưu chưa rõ). Không có cơ chế bắt+làm rõ+lưu, phiên sau quên. Giải: skill /unknown — bắt → phỏng vấn (AskUserQuestion) → ledger jsonl per-project (~/.claude/unknowns) → surface qua MEMORY.md mỗi phiên (chống-quên đi ké recall memory) → promote cố ý memory/wiki. Universal mọi project, không /br/wiki.",
+  "status": "solved",
+  "scope": [
+   "skills"
+  ],
+  "date": "13/07/26",
+  "solvedBy": "skill /unknown (unknown.py ledger)",
+  "session": "fdk-unknown"
+ },
+ {
+  "id": "p-proactive-fill",
+  "parent": null,
+  "title": "Interview bắt user điền tay toàn bộ answers.md — friction nặng nhất dây chuyền /br; field default (S7.5…) vẫn lọt (G1)",
+  "desc": "12 câu/vòng trên payroll, user không-dev bỏ cuộc; bảng 26 điều kiện mặc định chỉ là HTML người đọc nên máy không dùng được. Giải: /br interview --proactive — fill-chain tất định (br-fill.py) tra registry defaults.yaml (loop-26 + spec-kit), carve-out cấm điền, trần 5 câu; compile gate check-contract (vá G1: mọi required field S1–S10 có clause đối ứng).",
+  "status": "solved",
+  "scope": [
+   "skills",
+   "harness"
+  ],
+  "date": "14/07/26",
+  "solvedBy": "T-260714-01: fdk/tools/br-fill.py + skills/br/assets/defaults.yaml + SKILL.md Mode1 3b / Mode2 gate",
+  "session": "issue-15-br-k / orca-workflow proactive-fill"
+ },
+ {
+  "id": "p-auto-15-br",
+  "parent": null,
+  "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
+  "desc": "Bề mặt bị chạm: llmwiki/html/wiki-graph.html, llmwiki/raw/payroll, llmwiki/wiki/log.md. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát).",
+  "status": "open",
+  "scope": [],
+  "date": "15/07/26",
+  "session": "15a64d8b",
+  "pending": true
+ },
+ {
+  "id": "p-ui-geometry-blind",
+  "parent": null,
+  "title": "QA thị giác MÙ với lỗi hình học lúc render — nút đè nhau + lệch chiều cao lọt qua /redesign (2 lần) + 161 unit-test + flywheel",
+  "desc": "Payroll: badge vai đè nút Sáng/Tối (position:fixed magic-offset), và 3 pill topbar lệch chiều cao — user phải chỉ tay 3 lần. Vì sao mù: /redesign đọc CSS TĨNH (không đo được rect render); unit-test kiểm NỘI DUNG+MÀU (không kiểm toạ độ); visual-qa CÓ render nhưng chỉ có rule MÀU (contrast/rogue-slab), thiếu rule HÌNH HỌC, lại chưa wire vào acceptance của frame UI; flywheel phản ứng, chưa ai nạp. Giải: thêm 2 rule geometry (overlap ≥4px cả 2 chiều; row-misalign chiều cao lệch >3px cùng hàng) vào DESIGN_AUDIT của route-shots.mjs — đo bằng getBoundingClientRect, chạy thật chứng minh bắt đúng cả 2 bug (overlap 19×30px, lệch 14px) và 0 false-positive trên app đã sửa. Ngưỡng overlap KHÔNG dùng %-diện-tích (bug thật = 18% dt, ngưỡng % nào cũng lọt — phát hiện khi chạy thật, sửa 25%→4px tuyệt đối).",
+  "status": "solved",
+  "scope": [
+   "skills"
+  ],
+  "date": "15/07/26",
+  "solvedBy": "route-shots.mjs +rule overlap/row-misalign + visual-qa SKILL.md",
+  "session": "issue-15-br-k / redesign payroll topbar"
  }
 ]</script>
 

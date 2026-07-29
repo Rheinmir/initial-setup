@@ -1,0 +1,152 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Council Stage-4 report — blind peer-rank. Deterministic từ council.transcript.json.">
+<title>Council · báo cáo Stage-4</title><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23232028'/><path d='M8 22h16M16 7l7 5H9z' stroke='%23c9a24b' stroke-width='2' fill='none' stroke-linejoin='round'/></svg>">
+<style>
+:root{--paper:#f4f1ea;--ink:#26221c;--dim:#7a7266;--faint:#a79e90;--line:rgba(60,52,40,.13);
+ --card:rgba(255,253,249,.74);--stroke:rgba(255,255,255,.9);--accent:#8a6d2f;--shadow:24px 40px 24px rgba(60,48,28,.10)}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font:15px/1.6 Georgia,Cambria,"Times New Roman",ui-serif,serif;color:var(--ink);background:var(--paper);
+ background-image:radial-gradient(120% 80% at 15% -5%,rgba(214,198,160,.35),transparent 55%),radial-gradient(90% 70% at 100% 0%,rgba(150,168,178,.22),transparent 50%);
+ min-height:100dvh;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;opacity:.5;mix-blend-mode:multiply;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
+.wrap{max-width:940px;margin:0 auto;padding:56px 22px 90px}
+.tabnum{font-variant-numeric:tabular-nums}
+.body-sans{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.eyebrow{font:600 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-weight:600;font-size:clamp(30px,5vw,44px);line-height:1.04;letter-spacing:-.015em;margin:12px 0 10px;text-wrap:balance;max-width:22ch}
+.q{color:var(--dim);font-size:16px;max-width:60ch;text-wrap:pretty}
+.meta{margin-top:14px;font:500 12.5px/1 ui-monospace,Menlo,monospace;color:var(--faint)}
+.warn{background:rgba(176,106,44,.09);border:1px solid rgba(176,106,44,.32);border-left:3px solid #b06a2c;border-radius:13px;
+ padding:14px 16px;margin:26px 0 8px;font-size:13.5px;color:#5f4a2e;font-family:ui-sans-serif,system-ui,sans-serif}
+.sect{margin:46px 0 18px;display:flex;align-items:baseline;gap:14px}
+.sect .n{font-size:26px;color:var(--accent);line-height:1} .sect h2{font-weight:600;font-size:21px;margin:0;letter-spacing:-.01em}
+.sect .rule{flex:1;height:1px;background:var(--line)}
+.pcard{background:var(--card);border:1px solid var(--stroke);border-radius:20px;padding:22px 24px;margin:18px 0;position:relative;overflow:hidden;
+ box-shadow:0 1px 0 rgba(255,255,255,.7) inset,var(--shadow);transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 1px 0 rgba(255,255,255,.8) inset,32px 54px 30px rgba(60,48,28,.14)}
+.phead{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.pav{width:46px;height:46px;border-radius:14px;color:#fff;font-weight:600;font-size:20px;display:grid;place-items:center;flex:0 0 46px;font-family:ui-sans-serif,system-ui,sans-serif}
+.pname{font-size:19px;font-weight:700;letter-spacing:-.01em;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}
+.plens{margin-top:3px;font:italic 500 13px/1.35 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+ color:var(--ac);opacity:.92}
+.rankpill{font:600 11.5px/1 ui-monospace,Menlo,monospace;color:var(--dim);margin-left:6px}
+.blindtag{margin-left:auto;align-self:flex-start;font:600 11px/1 ui-monospace,Menlo,monospace;color:var(--ac);
+ border:1px solid var(--ac);border-radius:7px;padding:5px 9px}
+.ansbody{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.66;max-width:66ch}
+.ansbody p{margin:9px 0;color:#3a342c}
+.ansbody .lead{font-size:14px;font-weight:600;color:var(--ink);margin:0 0 9px}
+.ansbody b.pt{font-weight:600;color:var(--ink)} .lead b.pt{font-weight:700}
+.ansbody p:first-child{margin-top:0}
+ol.ans{margin:10px 0 2px;padding-left:0;list-style:none;counter-reset:a}
+ol.ans li{position:relative;padding-left:30px;margin-bottom:11px;line-height:1.62}
+ol.ans li::before{counter-increment:a;content:counter(a);position:absolute;left:0;top:1px;width:18px;height:18px;border-radius:6px;
+ background:var(--ac);color:#fff;font:700 11px/18px ui-monospace,Menlo,monospace;text-align:center}
+.tblwrap{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(255,253,249,.6);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-family:ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--line)} tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .18s} tbody tr:hover{background:rgba(138,109,47,.06)}
+th{color:var(--faint);font:600 11px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;background:rgba(60,52,40,.03)}
+.mono{font-family:ui-monospace,Menlo,monospace} .dim{color:var(--dim)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:color-mix(in srgb,var(--c) 12%,var(--paper));
+ border:1px solid color-mix(in srgb,var(--c) 55%,transparent);color:var(--c);border-radius:9px;padding:5px 11px;margin:9px 8px 0 0;
+ font:600 12.5px/1 ui-sans-serif,system-ui,sans-serif;transition:transform .2s}
+.chip:hover{transform:translateY(-2px)} .chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:0 0 18px}
+@media(max-width:640px){.kpi{grid-template-columns:1fr}}
+.kpi div{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);transition:transform .26s}
+.kpi div:hover{transform:translateY(-3px)}
+.kpi b{display:block;font-size:22px;font-weight:600;margin:5px 0 3px;text-transform:capitalize}
+.kpi span{color:var(--faint);font:600 10.5px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.07em}
+.kpi em{font-style:normal;color:var(--dim);font-size:12px;font-family:ui-sans-serif,system-ui,sans-serif}
+.synth{background:linear-gradient(158deg,rgba(138,109,47,.10),rgba(63,125,116,.06));border:1px solid rgba(138,109,47,.26);
+ border-radius:20px;padding:24px 26px;margin-top:16px;box-shadow:var(--shadow)}
+.synth .lbl{font:600 11px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.09em;color:var(--accent)}
+.synth p{margin:7px 0;font-size:13.5px;line-height:1.6;font-family:ui-sans-serif,system-ui,sans-serif}
+ul.synlist{margin:6px 0 10px;padding:0;list-style:none;counter-reset:s;font-family:ui-sans-serif,system-ui,sans-serif}
+ul.synlist li{position:relative;padding-left:26px;margin-bottom:8px;font-size:13.5px;line-height:1.55}
+ul.synlist li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:18px;height:18px;border-radius:6px;
+ background:var(--accent);color:#fff;font:700 11px/18px ui-monospace,Menlo,monospace;text-align:center}
+.reveal{margin-top:16px} .reveal .lbl{font:600 11px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;text-align:center;
+ font-family:ui-sans-serif,system-ui,sans-serif}
+a:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+</style></head><body><div class="wrap">
+<header>
+  <div class="eyebrow">🏛 Council · Stage-4</div>
+  <h1>Hội đồng chấm mù</h1>
+  <p class="q">Đánh giá plan thin-slice Ralph một-frame (issue #15): thiếu/thừa/rủi ro gì; Q1 chọn BR mẫu, Q2 scope-jail adapter revise, Q3 forward-compat frame schema</p>
+  <div class="meta tabnum">seed 42 · council.py/1.0 · 3 giám khảo · 5 ghế</div>
+</header>
+
+<section><div class="sect"><span class="n tabnum">1</span><h2>Ý kiến hội đồng</h2><span class="rule"></span></div>
+    <article class="pcard" style="--ac:#7a5c86">
+      <div class="phead">
+        <div class="pav" style="background:#7a5c86">N</div>
+        <div><div class="pname">Nassim Taleb <span class="rankpill tabnum">🥇 #1 · mean 1.0</span></div><div class="plens">Phản mong manh &amp; rủi ro đuôi</div></div>
+        <div class="blindtag">nhãn C</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li>Chấm plan qua lăng kính đuôi. Plan này về cơ bản ĐÚNG tinh thần phản mong manh: cược nhỏ, lỗ giới hạn (dry-run, không commit), lời không giới hạn (học được cách chạy dây chuyền). Guards tất định là &quot;circuit breaker&quot; — tốt. Nhưng nó thiết kế cho kịch bản TRUNG BÌNH (loop hội tụ hoặc dừng đẹp), chưa cho ĐUÔI. <b class="pt">Thiếu</b>: (a) rủi ro đuôi lớn nhất không phải &quot;loop chạy quá lâu&quot; mà là &quot;verify XANH GIẢ&quot; — acceptance_test pass nhưng adapter đã gian lận (sửa chính test, hardcode output, xoá assert). Phải khoá scope test khỏi scope_code ghi được, hoặc hash test file trước/sau. (b) Blast radius của `claude -p` không bị chặn bởi prompt: nó có thể chạy lệnh phụ (rm, git, network). Cần sandbox mức OS/quyền, không chỉ mức diff. (c) Thiếu &quot;kịch bản vứt&quot;: tiêu chí XONG chỉ định nghĩa thành công; hãy định nghĩa trước điều kiện KILL thí nghiệm (via negativa). <b class="pt">Thừa</b>: wikieval ở Bước 4 có lẽ chưa cần cho thin-slice một-frame — bớt bộ phận là bớt điểm gãy.</li><li><b class="pt">Q1</b>: Task THẬT trong repo overstack — nhưng chỉ vì dry-run + git đã cắt đuôi lỗ. <b class="pt">App đồ chơi cho tín hiệu giả</b>: nó không có skin in the game, không lộ được các tương tác xấu (hook, medic, cấu trúc wiki) — chính những thứ sẽ nổ ở production. Học từ đồ chơi là &quot;naive interventionism&quot;: tự tin tăng, hiểu biết không. <b class="pt">Điều kiện</b>: task thật nhưng ở nhánh riêng, scope không đụng harness/hook/CI — đừng để frame đầu tiên sửa chính bộ phanh. <b class="pt">Q2</b>: Prompt-dặn KHÔNG BAO GIỜ đủ — đó là ràng buộc mềm, và mọi rủi ro đuôi đều chui qua ràng buộc mềm. <b class="pt">Bắt buộc check tất định</b>: sau mỗi iteration, `git diff --name-only` so với scope_code glob; file ngoài scope → revert sạch iteration đó + tính là no-progress. <b class="pt">Cộng thêm</b>: test file read-only đối với adapter, và chạy `claude -p` với quyền tối thiểu (không network nếu được). Fail đóng, không fail mở. <b class="pt">Q3</b>: Trường thiếu cho forward-compat: `schema_version` (quan trọng nhất — thiếu nó là mọi thay đổi sau này thành breaking); `parent_br_hash` (BR đổi sau khi slice → frame mồ côi phát hiện được); `depends_on: [frame_id]` (slicer sẽ sinh DAG, không phải frame đơn); `scope_test` tách khỏi `scope_code` (chống xanh giả ở trên); `rollback_cmd` hoặc `baseline_ref` (điểm quay về tất định); `generated_by: human|slicer` + `risk_tier`. Thêm rẻ bây giờ, đổi đắt sau này — optionality.</li><li><b class="pt">Phán quyết</b>: plan đạt, với 3 sửa bắt buộc trước khi chạy: khoá test khỏi scope ghi, diff-jail tất định (fail-closed), và định nghĩa trước điều kiện vứt. Một frame chạy trơn tru KHÔNG chứng minh hệ an toàn — vắng bằng chứng gãy không phải bằng chứng vắng gãy; giá trị thật của thin-slice là ép cái đuôi lộ mặt sớm khi còn rẻ.</li></ol></div>
+    </article>
+    <article class="pcard" style="--ac:#3f7d74">
+      <div class="phead">
+        <div class="pav" style="background:#3f7d74">L</div>
+        <div><div class="pname">Linus Torvalds <span class="rankpill tabnum">🥈 #2 · mean 2.0</span></div><div class="plens">Kỹ thuật thực dụng</div></div>
+        <div class="blindtag">nhãn B</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li><b class="pt">Chấm plan — nói thẳng</b>: plan này ĐƯỢC, vì nó nhỏ và mọi cổng đều tất định. <b class="pt">Điểm mạnh</b>: test viết trước, exit-code là trọng tài, người commit — không có chỗ cho LLM &quot;tự chấm bài mình&quot;. <b class="pt">Thiếu</b>: (a) KHÔNG có check tất định &quot;diff nằm trong scope_code&quot; — đây là lỗ hổng chết người, xem Q2; (b) chưa nói loop chạy từ working-tree bẩn hay sạch — phải bắt buộc `git status` sạch trước khi chạy, không thì diff-review ở bước 4 là rác; (c) acceptance_test phải chạy được CẢ khi red lẫn green trong môi trường tái lập (pin dependency), không thì &quot;verify xanh&quot; vô nghĩa. <b class="pt">Thừa</b>: Bước 5 nói tới monitor HTML, problem-tree — vứt hết khỏi thin-slice, đó là việc SAU khi có dữ liệu. <b class="pt">Rủi ro chính</b>: adapter revise là hộp đen duy nhất; đừng gia cố gì quanh nó ngoài guard đã có — cứ chạy và xem nó vỡ kiểu gì.</li><li><b class="pt">Q1</b>: Task THẬT trong repo overstack. App đồ chơi là tự lừa mình — mày học được &quot;loop chạy trên đồ chơi&quot;, một thông tin vô giá trị. <b class="pt">Blast-radius đã bằng 0 rồi</b>: dry-run, không commit, người gác cổng, git checkout là xong. Nếu còn sợ thì chạy trong worktree riêng — đó là cách hạ rủi ro đúng, không phải làm giả bài toán. <b class="pt">Q2</b>: Prompt-dặn KHÔNG BAO GIỜ đủ. &quot;Dặn LLM đừng sửa file khác&quot; cũng như dặn mèo đừng lên bàn. <b class="pt">Cần check tất định</b>: sau mỗi iteration, `git diff --name-only` so với scope_code glob; có file ngoài scope → revert file đó + fail iteration (tính vào no_progress). 10 dòng code, không thương lượng. Chạy trong worktree riêng để jail bằng filesystem luôn thì càng tốt.</li><li><b class="pt">Q3</b>: Forward-compat cho slicer — <b class="pt">thêm ngay các trường rẻ</b>: `schema_version` (bắt buộc, thiếu là sau này khóc), `depends_on: []` (frame sau sẽ có thứ tự), `env/setup_cmd` (acceptance_test cần điều kiện tiên quyết), `parent_br_hash` (BR đổi thì frame stale — <b class="pt">phát hiện được), `created_by</b>: human|slicer` và `test_files` (tách test khỏi scope_code — LLM không được sửa chính bài kiểm tra của nó, cũng phải check tất định). Đừng thêm gì &quot;phòng xa&quot; hơn nữa — schema đẻ ra từ nhu cầu thật, không từ họp hành. <b class="pt">Tóm lại</b>: ship cái thin-slice này TUẦN NÀY, thêm mỗi diff-jail tất định và test_files bất khả xâm phạm, còn lại để code thật dạy mày.</li></ol></div>
+    </article>
+    <article class="pcard" style="--ac:#4a6d99">
+      <div class="phead">
+        <div class="pav" style="background:#4a6d99">A</div>
+        <div><div class="pname">Ada Lovelace <span class="rankpill tabnum">🌱 #3 · mean 3.333333</span></div><div class="plens">Hệ hình thức &amp; trừu tượng</div></div>
+        <div class="blindtag">nhãn D</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li>Cái gì cơ-giới-hoá được — plan đã đặt đúng ranh giới. Điểm mạnh nhất của thin-slice này là nó tách rõ hai lớp: lớp tất định (acceptance-test exit-code, 4 guard, medic, wikieval) và lớp không tất định (adapter revise). <b class="pt">Đây chính là nguyên lý Máy Phân tích</b>: máy chỉ dệt được cái đã được biểu diễn thành ký hiệu và phép toán trên ký hiệu. Frame chính là &quot;thẻ đục lỗ&quot; — và plan làm đúng khi ép nó thành schema có acceptance_test là shell cmd (một vị từ quyết định được). <b class="pt">Nhưng plan còn MỘT lỗ hổng hình thức</b>: scope_code hiện chỉ là dữ liệu mô tả, chưa là ràng buộc được thực thi. Một trường trong schema không có bộ kiểm nào đọc nó thì chỉ là chú thích, không phải luật. <b class="pt">Thiếu</b>: bước tất định &quot;diff ⊆ scope_code&quot; sau mỗi iteration. <b class="pt">Thừa</b>: không có gì đáng bỏ; escalate_after_iter=2 với max_iter=3 hơi chồng lấn nhưng vô hại ở dry-run.</li><li>Q1 — Task thật trong repo overstack. Tín hiệu học cao nhất đến từ nơi mô hình hình thức va vào thực tại: app đồ chơi chỉ kiểm chứng rằng máy chạy, không kiểm chứng rằng ký hiệu (frame) biểu diễn ĐỦ thực tại (hook, medic, wiki-parity, R15). Dry-run + người-bấm-nút đã là blast-radius gần 0 rồi; đừng trả thêm phí trừu tượng cho đồ chơi. <b class="pt">Q2 — Prompt-dặn KHÔNG đủ, về nguyên lý</b>: chỉ dẫn ngôn ngữ tự nhiên không phải ràng buộc hình thức; máy không &quot;hiểu&quot;, máy chỉ bị chặn bởi vị từ. <b class="pt">Cần check tất định</b>: sau mỗi iteration, `git diff --name-only` so với scope_code glob; file ngoài scope → revert phần tràn (hoặc fail iteration, tính vào no_progress). Đây nên là guard thứ 5 của loop-runner, cùng hạng với 4 guard kia — <b class="pt">vì nó cùng bản chất</b>: điều kiện quyết định được bằng máy. Prompt-dặn giữ lại làm lớp giảm nhiễu, không phải lớp an toàn.</li><li><b class="pt">Q3 — Forward-compat</b>: slicer tự sinh frame nghĩa là frame phải trở thành ngôn ngữ hình thức khép kín. <b class="pt">Thiếu</b>: (a) `schema_version` — không có nó thì mọi migration sau này là đoán mò; (b) `depends_on: [frame_id]` — nhiều frame tất yếu có thứ tự, DAG phải biểu diễn được từ ngày đầu; (c) `inputs/artifacts` (file frame được ĐỌC nhưng không sửa — tách read-scope khỏi write-scope); (d) `verify_env` (cwd, lệnh setup) để acceptance_test tái lập được ngoài máy người soạn; (e) `run_log_ref` + `outcome` — status thôi không đủ truy ngược; (f) `generated_by: manual|slicer` để phân tích sau này phân biệt hai quần thể. Thêm trường rỗng bây giờ rẻ; đổi schema khi đã có N frame là đắt.</li></ol></div>
+    </article>
+    <article class="pcard" style="--ac:#5f7a3f">
+      <div class="phead">
+        <div class="pav" style="background:#5f7a3f">D</div>
+        <div><div class="pname">Dieter Rams <span class="rankpill tabnum">#4 #4 · mean 3.666667</span></div><div class="plens">Thiết kế lấy người dùng</div></div>
+        <div class="blindtag">nhãn E</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li>Chấm plan qua lăng kính &quot;ít hơn, nhưng tốt hơn&quot;:
+
+Plan v0 về cơ bản đúng tinh thần Rams — 5 bước, không skill mới, người là người quyết. Nhưng vẫn còn chỗ thừa và một lỗ hổng dùng-được:
+
+- THỪA: Bước 5 nhắc trước tới &quot;/br, slicer, monitor HTML&quot; — đó là thiết kế cho tương lai chưa ai cần. Cắt khỏi plan; chỉ ghi lesson. Sản phẩm tốt không hứa hẹn tính năng chưa tồn tại.
+- THIẾU (nghiêm trọng nhất): plan không có cơ chế TẤT ĐỊNH giữ diff trong scope_code. &quot;Người đọc diff&quot; ở Bước 4 là gánh nặng đổ lên người dùng — thiết kế tốt phải làm việc đó thay họ (xem Q2).
+- THIẾU: Bước 4 chưa định nghĩa &quot;người duyệt&quot; thấy gì. Run-log JSON thô là giao diện xấu; <b class="pt">tối thiểu cần một dòng tóm tắt</b>: termination reason, số iter, diffstat, lệnh verify cuối. Ít thông tin hơn, nhưng đúng thông tin.
+- RỦI RO: dry-run sửa working-tree nhưng không nói rõ điều kiện tiền đề &quot;working-tree phải SẠCH trước khi chạy&quot; — nếu bẩn, người duyệt không phân biệt nổi diff của loop với diff của mình. Thêm 1 check trước Bước 3.</li><li><b class="pt">Trả lời Q1–Q3</b>:
+
+Q1 — Task THẬT trong repo overstack. <b class="pt">App đồ chơi cho tín hiệu giả</b>: người duyệt sẽ không đọc diff nghiêm túc vì không có gì để mất, và ta không học được điểm đau thật (medic, wikieval, cấu trúc repo). Blast-radius đã được kiểm soát bằng dry-run + không-commit rồi — đó chính là lý do thin-slice tồn tại. Đừng thêm lớp an toàn thứ hai làm loãng bài học.
+
+Q2 — Prompt-dặn KHÔNG đủ. <b class="pt">Nguyên tắc</b>: an toàn phải là thuộc tính của hệ thống, không phải của lời hứa. <b class="pt">Cần check tất định sau mỗi iteration</b>: `git diff --name-only` so với scope_code glob; file ngoài scope → revert phần tràn (hoặc fail iteration) + ghi lý do vào run-log. Đây là ~10 dòng shell, rẻ, và biến &quot;người đọc diff&quot; từ kiểm tra bắt buộc thành xác nhận nhẹ nhàng. Prompt-dặn giữ làm lớp một, check là lớp chốt.
+
+<b class="pt">Q3 — Thêm tối thiểu, đúng chỗ</b>: `schema_version` (bắt buộc — mọi forward-compat bắt đầu từ đây), `created_by` (human|slicer), `parent_br_id` + `frame_index/total` (slicer sinh nhiều frame cần thứ tự và quan hệ), `depends_on: []` (frame phụ thuộc frame), và `env` (lệnh setup trước acceptance_test). KHÔNG thêm trường ước lượng, độ ưu tiên, hay metadata &quot;có thể cần&quot; — schema phình là cách nhanh nhất để slicer sau này bịa dữ liệu lấp chỗ trống.</li><li><b class="pt">Kết</b>: giữ 5 bước, cắt phần nhìn xa ở Bước 5, thêm scope-check tất định + điều kiện working-tree sạch + tóm tắt một-dòng cho người duyệt. Weniger, aber besser.</li></ol></div>
+    </article>
+    <article class="pcard" style="--ac:#9a5560">
+      <div class="phead">
+        <div class="pav" style="background:#9a5560">L</div>
+        <div><div class="pname">Lão Tử <span class="rankpill tabnum">#5 #5 · mean 5.0</span></div><div class="plens">Vô vi &amp; để tự nhiên nảy</div></div>
+        <div class="blindtag">nhãn A</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li>Vô vi chấm plan — chỗ nào LÀM ÍT hơn thì tốt hơn. <b class="pt">Plan v0 nhìn chung đã thuận đạo</b>: soạn frame bằng tay, không vội build skill /br hay slicer — <b class="pt">đó chính là &quot;vô vi&quot;</b>: để nhu cầu tự lộ ra qua một lần chạy thật rồi mới đẽo công cụ. <b class="pt">Chỗ THỪA</b>: guards 4 tham số (max_iter, budget, no_progress_k, escalate_after_iter) cho một frame đầu tiên là quá tinh chỉnh — nước chưa chảy đã đào bốn con kênh; chỉ cần max_iter=3 và budget là đủ, hai guard kia hãy để lần chạy đầu dạy ta có cần không. Mục &quot;status&quot; trong schema cũng chưa cần machine-readable — người đọc là người. <b class="pt">Chỗ THIẾU duy nhất đáng làm</b>: bước 5 nên ghi cả điều KHÔNG xảy ra (loop có thử phá scope không, prompt có bị hiểu sai không) — quan sát tự nhiên vận hành mới là mục đích thật của thin-slice, không phải diff xanh. <b class="pt">Rủi ro lớn nhất</b>: hào hứng thấy 1 frame xanh rồi nhảy ngay sang tự động hoá cả dây chuyền — trái với &quot;ít mà chắc&quot;.</li><li><b class="pt">Q1 — chọn BR mẫu</b>: task THẬT trong repo overstack, nhưng nhỏ. App đồ chơi là &quot;hữu vi&quot; <b class="pt">trá hình</b>: ta dựng sân khấu vô trùng rồi học được bài học của sân khấu, không phải của đời. Blast-radius đã = 0 nhờ dry-run không commit + người gác cổng; tín hiệu học từ độ nhám của repo thật (path lạ, test flaky, wiki convention) chính là thứ đồ chơi không cho. Đất thật mới biết cây có mọc.</li><li>Q2 &amp; Q3.
+Q2 — prompt-dặn KHÔNG đủ. Nhưng giải pháp vô vi không phải là xây tường phức tạp, mà là một luật tất định nhỏ, bất động: sau mỗi iteration chạy `git diff --name-only` so với scope_code glob; có file ngoài scope → fail iteration đó (revert phần tràn hoặc đếm như no-progress). Một câu lệnh, không sandbox, không container — hàng rào thấp nhất mà nước không tràn. Tin lời dặn là làm ít quá chỗ cần; xây jail phức tạp là làm nhiều quá chỗ chưa cần.
+Q3 — kháng lại cám dỗ điền trước schema cho slicer chưa tồn tại (đó là làm hộ tương lai — hữu vi). Chỉ thêm những trường mà chính thin-slice này cũng dùng được: `parent_br` + `clause_id` tách riêng (thay vì gộp trong br_ref, để máy sau này parse), `created_by: <b class="pt">human|slicer`, và `schema_version</b>: 0`. <b class="pt">Trường cuối là quan trọng nhất</b>: có version thì schema ĐƯỢC PHÉP thiếu — forward-compat thật sự không phải đoán đủ mọi trường, mà là chừa cửa cho thay đổi. Đừng lấp đầy cái bình; chỗ trống của bình mới là chỗ dùng được.</li></ol></div>
+    </article></section>
+<section><div class="sect"><span class="n tabnum">2</span><h2>Bỏ phiếu kín</h2><span class="rule"></span></div>
+<div class="tblwrap"><table><thead><tr><th>Giám khảo</th><th>Xếp hạng (nhãn ẩn)</th><th>Thứ tự trình bày · chống thiên vị vị trí</th></tr></thead><tbody><tr><td>seat-1</td><td class="mono">C › B › E › D › A</td><td class="mono dim">C → E → D → B → A</td></tr><tr><td>seat-2</td><td class="mono">C › B › D › E › A</td><td class="mono dim">B → D → A → C → E</td></tr><tr><td>seat-3</td><td class="mono">C › B › D › E › A</td><td class="mono dim">A → C → B → D → E</td></tr></tbody></table></div>
+<div class="reveal"><span class="lbl">Bản lộ danh — chỉ lộ ở cuối</span><br><span class="chip" style="--c:#7a5c86">C = Nassim Taleb</span><span class="chip" style="--c:#3f7d74">B = Linus Torvalds</span><span class="chip" style="--c:#4a6d99">D = Ada Lovelace</span><span class="chip" style="--c:#5f7a3f">E = Dieter Rams</span><span class="chip" style="--c:#9a5560">A = Lão Tử</span></div></section>
+<section><div class="sect"><span class="n tabnum">3</span><h2>Dashboard chốt</h2><span class="rule"></span></div>
+<div class="kpi">
+ <div><span>Quán quân</span><b>🥇 Nassim Taleb</b><em class="tabnum">nhãn C · điểm TB 1.0</em></div>
+ <div><span>Gây tranh cãi nhất</span><b>Ada Lovelace</b><em class="tabnum">nhãn D · phân tán 0.222222</em></div>
+ <div><span>Đồng thuận</span><b class="tabnum">3 GK</b><em>phân hoá</em></div>
+</div>
+<div class="tblwrap"><table><thead><tr><th>Nhãn ẩn</th><th>Uỷ viên</th><th>Điểm hạng TB</th><th>Hạng từng GK</th></tr></thead><tbody><tr><td class="mono"><b>C</b></td><td>🥇 Nassim Taleb</td><td class="mono tabnum">1.0</td><td class="mono dim tabnum">[1, 1, 1]</td></tr><tr><td class="mono"><b>B</b></td><td>🥈 Linus Torvalds</td><td class="mono tabnum">2.0</td><td class="mono dim tabnum">[2, 2, 2]</td></tr><tr><td class="mono"><b>D</b></td><td>🌱 Ada Lovelace</td><td class="mono tabnum">3.333333</td><td class="mono dim tabnum">[4, 3, 3]</td></tr><tr><td class="mono"><b>E</b></td><td> Dieter Rams</td><td class="mono tabnum">3.666667</td><td class="mono dim tabnum">[3, 4, 4]</td></tr><tr><td class="mono"><b>A</b></td><td> Lão Tử</td><td class="mono tabnum">5.0</td><td class="mono dim tabnum">[5, 5, 5]</td></tr></tbody></table></div>
+
+</section>
+<footer>Mọi số liệu từ council.transcript.json — report chỉ là lớp trình bày, không thêm phán xét mới.</footer>
+</div></body></html>

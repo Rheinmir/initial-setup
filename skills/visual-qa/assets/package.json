@@ -1,0 +1,11 @@
+{
+  "name": "visual-qa-driver",
+  "private": true,
+  "type": "module",
+  "description": "Deps của gate visual-qa. Không có file này thì `node route-shots.mjs` chết ngay ở dòng import — gate không chạy được từ repo sạch = GATE CHẾT. Cài: npm i --prefix skills/visual-qa/assets",
+  "dependencies": {
+    "playwright-core": "^1.49.0",
+    "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0"
+  }
+}

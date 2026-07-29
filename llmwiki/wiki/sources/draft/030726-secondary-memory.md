@@ -4,7 +4,6 @@ title: "030726-secondary-memory — bộ nhớ thứ cấp 3-tầng (auto scratc
 status: proposed
 tags: [secondary-memory, provenance, traceability, file-first, no-rag, output-report]
 timestamp: 2026-07-03
-task: T-260703-03
 relations:
   - {rel: derives-from, to: 030726-session-provenance}
   - {rel: touches, path: harness/scripts/code-logger.py}

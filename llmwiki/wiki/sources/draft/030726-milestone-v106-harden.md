@@ -4,7 +4,6 @@ title: "030726-milestone-v106 — hardening (medic 17/17 + framework-touch hook)
 status: proposed
 tags: [milestone, v1.0.6, medic, fdk-hardening, query, retrieval, output-report]
 timestamp: 2026-07-03
-task: T-260703-02
 relations:
   - {rel: derives-from, to: 030726-eval-report}
   - {rel: touches, path: harness/scripts/harness-doctor.py}

@@ -1,0 +1,38 @@
+# QUEUE prompt cho /br run — DANH SÁCH frame để chạy (resumable).
+#
+# Driver: fdk/tools/br-queue.py. Chạy: `python3 fdk/tools/br-queue.py run --queue br/queue.yaml`
+# Chạy LẠI queue → nó BỎ QUA mục status: done và chạy tiếp mục còn lại (resume).
+#
+# THỨ TỰ CHẠY KHÔNG PHẢI THỨ TỰ BẠN GÕ. Driver đọc `depends_on` trong frontmatter của từng
+# frame và sắp lịch theo ĐỒ THỊ (topo order; frame không phụ thuộc gì thì giữ nguyên thứ tự
+# khai). Hệ quả: một frame đỏ sẽ CHẶN cả nhánh dưới nó (status: blocked — vì input đã hỏng,
+# chạy tiếp chỉ tốn lượt model), còn nhánh không liên quan vẫn chạy bình thường.
+#
+# Sửa một frame → chạy lại ĐÚNG nhánh của nó, không phải cả dây chuyền:
+#   python3 fdk/tools/br-queue.py affected frame-002-validate --queue br/queue.yaml --reset
+#   python3 fdk/tools/br-queue.py run --queue br/queue.yaml
+#
+# Mỗi mục:
+#   frame:        (bắt buộc) đường dẫn file frame — quyết định scope_code/scope_test/acceptance_test
+#                 VÀ depends_on (phụ thuộc khai trong frame, không khai ở đây — một nguồn chân lý).
+#   prompt_file:  (tuỳ chọn) file template prompt cho frame này. Bỏ trống → dùng mặc định
+#                 skills/br/assets/revise-prompt.md.
+#   prompt:       (tuỳ chọn) GHI TEXT PROMPT TRỰC TIẾP vào đây (ưu tiên hơn prompt_file).
+#                 Vẫn hỗ trợ placeholder {{muc_tieu}} {{scope_code}} {{verify_output}}…
+#   status:       pending | done | failed | blocked  (driver TỰ cập nhật + ghi lại — không sửa tay).
+#   verdict/commit/blocked_by: (driver điền sau khi chạy — chỉ đọc).
+
+- frame: br/frames/frame-001-login.md
+  prompt_file: skills/br/assets/revise-prompt.md   # dùng template chung
+  status: pending
+
+- frame: br/frames/frame-002-validate.md
+  prompt: |                                        # prompt VIẾT TAY riêng cho frame này
+    Sửa hàm kiểm tra mật khẩu cho ĐẠT {{verify_cmd}}.
+    Chỉ đụng {{scope_code}}, tuyệt đối không sửa {{scope_test}}.
+    Output đỏ gần nhất:
+    {{verify_output}}
+  status: pending
+
+- frame: br/frames/frame-003-perm.md               # không khai prompt → dùng template mặc định
+  status: pending

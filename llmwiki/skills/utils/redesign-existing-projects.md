@@ -172,6 +172,31 @@ Apply changes in this order for maximum visual impact with minimum risk:
 6. **Add loading, empty, and error states** — makes it feel finished
 7. **Polish typography scale and spacing** — the premium final touch
 
+## Verify rendered geometry — reading CSS is BLIND to it (lesson 2026-07-15)
+
+The audit above reads code. It **cannot see** where elements actually land once
+rendered — two failures that slipped past this skill twice in one session:
+
+- **Overlapping controls.** A `position:fixed` pill at `right:100px` overlaps another
+  at `right:16px` the moment its content is wider than the 84px gap. You cannot tell
+  from the CSS because it depends on the rendered width of variable content.
+- **Mismatched pill heights.** Two controls side by side with different `padding`/
+  `font-size` render at different heights. Reading two rules doesn't compute "these
+  end up 30px vs 44px tall".
+
+Both are **rendered-geometry** bugs. Static reading, and content-only unit tests, are
+structurally blind to them. After you finish redesigning, **run the geometry gate** —
+`visual-qa` route-shots now emits two hard-fail rules that measure `getBoundingClientRect`:
+`overlap` (interactive controls whose rects intersect ≥4px in both axes) and
+`row-misalign` (same-row controls whose heights differ >3px). If you cannot run headless
+(no chrome / localhost blocked), at minimum eyeball the running app — never sign off a
+layout change on code-read alone.
+
+Anti-pattern this catches: **magic-number offsets on `position:fixed` siblings** (each
+element positioned by hand-tuned `top/left/right` px). Prefer ONE flex/grid bar
+(`display:flex; justify-content:space-between`) — a flex row cannot make its children
+overlap, and equal-height is one `height`/`align-items` away, eliminating the whole class.
+
 ## Rules
 
 - Work with the existing tech stack. Do not migrate frameworks or styling libraries.
@@ -180,6 +205,8 @@ Apply changes in this order for maximum visual impact with minimum risk:
 - If the project uses Tailwind, check the version (v3 vs v4) before modifying config.
 - If the project has no framework, use vanilla CSS.
 - Keep changes reviewable and focused. Small, targeted improvements over big rewrites.
+- **A layout change is not done until its rendered geometry is verified** (see section
+  above) — reading CSS is not proof; overlaps and misaligned heights only show when measured.
 
 
 ---

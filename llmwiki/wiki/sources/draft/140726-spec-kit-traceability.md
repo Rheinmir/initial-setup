@@ -17,7 +17,7 @@ Hấp thụ ba thứ tốt nhất của `github/spec-kit` vào `/propose` + `/pl
 ## Context
 Đã query wiki + đọc nguồn ngoài trước khi soạn (force-query, R7-f):
 
-- `[[ADR-003-skill-as-single-source-of-truth]]` — hành vi propose/plan chỉ định nghĩa ở `skills/<tên>/SKILL.md`; mirror sinh bằng `sync-skill.sh`.
+- `ADR-003 (skill-as-single-source-of-truth)` — hành vi propose/plan chỉ định nghĩa ở `skills/<tên>/SKILL.md`; mirror sinh bằng `sync-skill.sh`.
 - SPEC `140726-propose-plan-split-superpowers` (đã giao, commit `36cf02e`) — vừa dựng bộ ba SPEC/PLAN/HTML, R7 hai nhánh, R18 travel downstream. Đề xuất này **xây tiếp trên đó**, không xây lại.
 - `skills/plan/SKILL.md` § Self-review mục 1 ("phủ SPEC — lướt từng yêu cầu, chỉ ra được task nào thực hiện nó") — hiện là **lời hứa của model**, không có gì cưỡng chế. Đây chính là chỗ đề xuất này biến thành cổng.
 - `skills/br/SKILL.md` — `/br compile` đã sinh **`clause_id`** cho từng điều khoản BR. Khái niệm "id ổn định để truy vết" **đã tồn tại trong framework**, chỉ chưa có ở đường `/propose` nhẹ.

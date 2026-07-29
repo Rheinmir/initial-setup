@@ -105,6 +105,14 @@ GENERIC_KEYS = {
     # parallel BNAL adapters legitimately share these schema keys (e.g. failure-flywheel ↔
     # success-flywheel both carry recurrence_threshold + distill.prompt) — not a leak.
     "recurrence_threshold", "prompt",
+    # loop-guard schema: PER-FRAME guards (frame-lint frame template) are a schema
+    # deliberately separate from the GLOBAL loop-runner defaults (loop-runner.config.yaml
+    # documents this: guards set per-frame by /br) — sharing the key names is by-design,
+    # values even differ (global max_iter:6 vs frame default 3). Same key ≠ leaked guess.
+    "max_iter", "budget_seconds", "no_progress_k", "escalate_after_iter",
+    # generic config key colliding across unrelated subsystems (web-crawl assumption vs the
+    # lume/ Go LLM clients' `endpoint = defaultEndpoint` const-ref) — name clash, not a copy.
+    "endpoint",
 }
 
 

@@ -4,7 +4,6 @@ title: "020726-council-chọn-đề-thi — dựng app mẫu ngoài mẫu + hara
 status: superseded  # T-260702-02 superseded — phần còn lại là GH#81
 tags: [council, self-index, wiki-core, relations, eval, harass, dogfood, output-report]
 timestamp: 2026-07-02
-task: T-260702-02
 relations:
   - {rel: derives-from, to: 020726-wiki-core-relations}
   - {rel: derives-from, to: 010726-query-retrieval-eval}

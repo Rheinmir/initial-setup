@@ -1,9 +1,16 @@
 <!-- SINH BẰNG CODE: build-capabilities.py — ĐỪNG sửa tay; chạy lại để cập nhật. -->
 # CAPABILITIES — toàn bộ đồ nghề (luôn-mới, đếm từ đĩa)
 
-**84 skill · 18 rule · 19 fdk-tool · 63 harness-script.** Agent: đây là danh sách ĐẦY ĐỦ những gì bạn có để dùng. Tìm nhanh: `python3 fdk/tools/build-skill-search.py` rồi `find-skill "<việc cần làm>"`. Phát triển framework: gọi `/fdk`.
+**88 skill · 18 rule · 35 fdk-tool · 63 harness-script.** Agent: đây là danh sách ĐẦY ĐỦ những gì bạn có để dùng. Tìm nhanh: `python3 fdk/tools/build-skill-search.py` rồi `find-skill "<việc cần làm>"`. Phát triển framework: gọi `/fdk`.
 
 ## Skills (gọi bằng `/<tên>`)
+
+> **HAI cách tiếp cận KHÁC NHAU HOÀN TOÀN — chọn trước khi bới danh sách:**
+> - **`/br` (oneshot mockup)** — nhắm *một phát ra MOCKUP* từ dữ liệu tổng hợp sẵn có (`raw/`), rồi *sửa agile NGAY trên mockup*. Đi bề rộng nhanh. Dùng khi có tài liệu thô và cần sản phẩm chạy được sớm để bàn tiếp. (`/br auto` = interview tự-điền.)
+> - **`/orca-workflow` (plan + spec)** — xử lý *task PLAN + SPEC chức năng* bài bản: khi làm dần *từng phần* dự án, hoặc *sửa vài chức năng trên dự án cũ*. Đi bề sâu, gate từng bước (propose→gate→dispatch→verify).
+>
+> KHÔNG thay thế nhau: `/br` = oneshot rồi agile trên mockup · `/orca-workflow` = plan/spec truy vết từng bước. Các skill dev-loop bên dưới phần lớn là *bước con* do `/orca-workflow` điều phối.
+
 
 ### wiki-loop (5)
 - **`/ingest`** — Process new file in llmwiki/raw/ and distill into wiki pages
@@ -12,8 +19,11 @@
 - **`/record-episode`** — Ghi một SESSION EPISODE có cấu trúc (tầng nhớ episodic) vào memory store để phiên sau truy…
 - **`/wiki-room`** — Mở room (subagent 1 tầng) nạp chi tiết wiki khi context phiên chính đã rot
 
-### dev-loop (16)
+### dev-loop (20)
+- **`/br`** — Hub MỘT TÊN cho dây chuyền sản xuất kiểu Ralph (GH#15): biến tài liệu thô của user thành s…
 - **`/build-now-adapt-later`** — When a task is blocked by missing or unverified information (an undocumented protocol, an …
+- **`/checkpoint-trace`** — Cỗ máy thời gian cho một lượt chạy agent trên codebase
+- **`/design-twice`** — Thiết kế MỘT thứ (interface, module, hoặc MÀN HÌNH/UI) bằng 2-3 phương án RADICALLY KHÁC N…
 - **`/failure-flywheel`** — Capture each agent failure, bucket and count it deterministically, and when a failure clas…
 - **`/impact-check`** — Map all callers and dependents of a symbol before modifying shared code
 - **`/loop-runner`** — Deterministic guardrailed agent-loop driver
@@ -23,6 +33,7 @@
 - **`/plan`** — Mở rộng một draft SPEC ĐÃ ĐƯỢC DUYỆT thành kế hoạch thi hành được
 - **`/propose`** — Plan a feature before coding
 - **`/qc-code`** — Review code phong cách SENIOR 10 năm
+- **`/qc-uiux`** — Audit UI/UX phong cách SENIOR
 - **`/safe-change`** — Modify shared code without breaking existing callers
 - **`/ship`** — Workflow chốt PUSH/RELEASE/PR/MR
 - **`/skill-provenance`** — Ghi và kiểm provenance (nguồn + sha256 checksum) cho skill
@@ -30,10 +41,9 @@
 - **`/verify-before-commit`** — Gate every commit
 - **`/wikieval`** — Turn wiki golden pages into a CI-blocking eval suite with a cheap→expensive assertion casc…
 
-### orchestrate (13)
+### orchestrate (11)
 - **`/council`** — Run a Karpathy-style LLM council (3-stage multi-agent evaluation) on top of the existing o…
 - **`/jenkins-agent-l3-deploy`** — Deploy a docker-compose app via a Jenkins INBOUND AGENT running on the target server (no S…
-- **`/orca-cli`** — Use the public `orca` CLI to operate Orca-managed worktrees/workspaces, terminals, repos, …
 - **`/orca-dispatch-reference`** — Reference for Antigravity/OpenCode dispatch, skill installation, AgentMemory, RTK token pr…
 - **`/orca-eval`** — Quét N session Claude Code gần nhất, distill best practices thành report md + đề xuất acti…
 - **`/orca-handover`** — Sinh MỘT file .md bàn giao đủ dày để một phiên KHÁC (người hoặc agent, không có context nà…
@@ -41,11 +51,10 @@
 - **`/orca-onboard`** — Parallel codebase onboarding
 - **`/orca-sec-scans`** — Quét bảo mật mã nguồn bằng Trivy
 - **`/orca-workflow`** — Daily propose → gate → dispatch workflow with Orca
-- **`/orchestration`** — Use Orca orchestration for structured multi-agent coordination: threaded messages, blockin…
 - **`/trace-grader`** — Score the PATH an agent took (tool choice, ordering, retries, repeatability, grounding)
 - **`/wayfinder`** — Lập bản đồ cho một chunk việc QUÁ LỚN với một phiên agent và còn MÙ MỜ
 
-### utils (50)
+### utils (52)
 - **`/agent-reach`** — MUST USE when user wants to research/search/look up/find anything on the internet
 - **`/brandkit`** — Premium brand-kit image generation skill for creating high-end brand-guidelines boards, lo…
 - **`/cavecrew`** — Decision guide for delegating to caveman-style subagents
@@ -56,7 +65,6 @@
 - **`/caveman-review`** — Ultra-compressed code review comments
 - **`/caveman-stats`** — Show real token usage and estimated savings for the current session
 - **`/check-approve`** — Sinh sẵn 1-liner để trace 1 lệnh approve/return/reject của DMS trên log BE (docker) + FE p…
-- **`/computer-use`** — Use Orca's computer-use CLI to inspect and operate local desktop app windows through acces…
 - **`/cursor-animated-sites`** — Build an interactive "cursor-animated walkthrough" page on top of the /docs-site-macos gla…
 - **`/design-taste-frontend`** — Anti-slop frontend skill for landing pages, portfolios, and redesigns
 - **`/design-taste-frontend-v1`** — The original v1 taste-skill, preserved for projects depending on its exact behavior
@@ -65,6 +73,7 @@
 - **`/extract-site`** — Extract and convert a website or docs site into clean markdown
 - **`/fable5`** — Reasoning protocol distilled from Claude Fable 5
 - **`/fdk`** — Front-door on-demand cho phát triển framework HOẶC distill/author một skill
+- **`/fdk-poc`** — POC luồng /br: tạo PROJECT THẬT trong Orca (orca-cli) → CURL cài overstack từ REMOTE (đườn…
 - **`/fdk-uat`** — UAT THẬT cho một bản framework sắp phát hành
 - **`/find-skills`** — Helps users discover and install agent skills when they ask questions like "how do I do X"…
 - **`/frontier-scan`** — Quét biên giới agent-framework 30 ngày qua và đối chiếu overstack theo 8 trục (frontier-ga…
@@ -94,6 +103,8 @@
 - **`/tour-guide`** — Thêm một in-app product tour (spotlight onboarding overlay) tự viết, KHÔNG cần thư viện (k…
 - **`/tour-guide-supademo`** — Style thiết kế Supademo cho in-app product tour (dùng kèm skill tour-guide
 - **`/uat-nonit-testcase`** — Tạo bộ test case / checklist UAT cho người dùng nghiệp vụ NON-IT (C&B, kế toán, vận hành)
+- **`/unknown`** — Bắt + làm rõ + lưu UNKNOWN (chỗ mơ hồ làm reasoning/"think" rối) cho MỌI project (không cầ…
+- **`/visual-qa`** — WORKFLOW tự-kiểm THỊ GIÁC khép kín cho SPA local (app do /br sinh, hoặc bất kỳ web app): c…
 - **`/web-clone`** — Clone a website
 - **`/web-crawl`** — Crawl/scrape a website or single page into clean LLM-ready MARKDOWN
 
@@ -119,22 +130,38 @@
 
 ## FDK tools (`python3 fdk/tools/<x>`)
 - `artifacts.py`
+- `br-contract.py`
+- `br-fill.py`
+- `br-find.py`
+- `br-prompts.py`
+- `br-queue.py`
+- `br-rail.py`
+- `br-revise.py`
+- `br-run.py`
+- `br-sync.py`
 - `build-capabilities.py`
 - `build-cheatsheet.py`
 - `build-docs-index.py`
 - `build-health-dashboard.py`
+- `build-line-status.py`
 - `build-overstack-docs.py`
 - `build-skill-search.py`
 - `build-wiki-graph.py`
+- `checkpoint.py`
 - `code-state.py`
 - `code_imports.py`
 - `docs-curate.py`
+- `fdk-poc.py`
+- `frame-lint.py`
 - `frontend-antipattern.py`
+- `loop-cost.py`
 - `medic.py`
 - `memory-map.py`
 - `new-skill.py`
 - `skill-provenance.py`
 - `skill-usage.py`
+- `unknown.py`
+- `upstream-drift.py`
 - `whiteboard-skill-map.py`
 - `wiki-relations.py`
 
@@ -203,10 +230,10 @@
 - `wiki-sync.py`
 - `wikieval.py`
 
-## Neo bằng chứng — 209/209 năng lực có neo KHAI BÁO
+## Neo bằng chứng — 229/229 năng lực có neo KHAI BÁO
 **Đọc cho đúng: đây KHÔNG phải bằng chứng năng lực còn SỐNG.** Mỗi năng lực được map tất định tới một *điểm neo* bằng chứng trên đĩa (frontmatter `proof:` > rule-map > tests > self-test > golden > medic). Việc map là **tĩnh** — nó kiểm file/chuỗi có mặt, **không thực thi gì cả**. Nó bắt được ca 'năng lực này chẳng có test/golden/rule nào neo vào' (hữu ích thật), nhưng KHÔNG bắt được ca 'test có mà đỏ' hay 'engine có mà chết'. Muốn biết một dependency ngoài còn sống thì hỏi `harness/scripts/dep-health.py`. Chi tiết neo: `build-capabilities.py --capproof-json`.
 
-## TRÙNG-ỨNG-VIÊN (19) — máy phát hiện, NGƯỜI phán (dedupe = vòng /propose riêng)
+## TRÙNG-ỨNG-VIÊN (23) — máy phát hiện, NGƯỜI phán (dedupe = vòng /propose riêng)
 - `mech:medic` ↔ `mech:medic-mirror` — name-token: medic
 - `script:embed-ollama.py` ↔ `script:embed-voyage.py` — desc-jaccard 0.82
 - `script:failure-flywheel.py` ↔ `script:flywheel.py` — name-token: flywheel
@@ -218,13 +245,17 @@
 - `script:orca-dispatch.py` ↔ `skill:orca-dispatch-reference` — name-token: dispatch
 - `script:query-log.py` ↔ `skill:query` — name-token: query
 - `script:query-proxy.py` ↔ `skill:query` — name-token: query
+- `script:unknown-ledger.py` ↔ `skill:unknown` — name-token: unknown
+- `script:unknown-ledger.py` ↔ `tool:unknown.py` — name-token: unknown
 - `script:wiki-graph.py` ↔ `tool:build-wiki-graph.py` — name-token: graph
 - `skill:caveman` ↔ `skill:caveman-commit` — name-token: caveman
 - `skill:caveman` ↔ `skill:caveman-compress` — name-token: caveman
 - `skill:caveman` ↔ `skill:caveman-help` — name-token: caveman
 - `skill:caveman` ↔ `skill:caveman-review` — name-token: caveman
 - `skill:caveman` ↔ `skill:caveman-stats` — name-token: caveman
+- `skill:checkpoint-trace` ↔ `tool:checkpoint.py` — name-token: checkpoint
 - `skill:design-taste-frontend` ↔ `skill:design-taste-frontend-v1` — name-token: design+frontend
+- `skill:lint` ↔ `tool:frame-lint.py` — name-token: lint
 - `skill:tour-guide` ↔ `skill:tour-guide-supademo` — name-token: guide+tour
 
 ## Origin

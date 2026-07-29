@@ -4,7 +4,6 @@ title: "Query L0→L1: eval truy-hồi + telemetry + tool có-lọc (land chung,
 status: promoted
 tags: [query, retrieval, eval, telemetry, wikieval, council, output-report]
 proposed: 2026-07-01
-task: T-260701-01
 id: 010726-query-retrieval-eval
 ---
 

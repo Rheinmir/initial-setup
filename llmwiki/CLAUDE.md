@@ -82,11 +82,16 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `web-crawl` | Crawl/scrape a URL or site into LLM-ready markdown | `skills/utils/web-crawl.md` | utils |
 | `web-clone` | Clone a website — snapshot (1-file offline copy) or reconstruct (rebuild as editable Next.js code, canonical home for the full-clone pipeline) | `skills/utils/web-clone.md` | utils |
 | `fdk` | Đang phát triển CHÍNH framework (skill/rule/validator/hook/wiki) | `skills/utils/fdk.md` | utils |
+| `fdk-poc` | POC luồng /br chạy THẬT: tạo project mới, chạy vòng đời bằng lệnh thật + đo giờ + sentinel + LOG từng bước → HTML visualize (lệnh nào·nhanh không·nhớ mấy hub). KHÁC fdk-uat (test nhanh xanh/đỏ) | `skills/utils/fdk-poc.md` | utils |
 | `fdk-uat` | UAT thật một bản sắp phát hành — dựng dự án TRỐNG, cài bằng curl từ remote (đường người-mới), kiểm năng lực MỚI có tới tay không; không pass thì GỠ commit khỏi remote | `skills/utils/fdk-uat.md` | utils |
 | `medic` | Cổng sức khoẻ tổng — 1 lệnh chứng minh hệ còn khoẻ (luật cắn/drift/docs/code/eval); trước commit, sau pull, nghi rule không chặn | `skills/utils/medic.md` | utils |
 | `new-skill` | Scaffold một skill mới (canonical+mirror+lệnh register) | `skills/dev-loop/new-skill.md` | dev-loop |
 | `skill-provenance` | Ghi/kiểm provenance (nguồn + sha256) khi cài skill ngoài — audit supply-chain, phát hiện skill bị sửa lén | `skills/dev-loop/skill-provenance.md` | dev-loop |
+| `qc-uiux` | Audit UI/UX phong cách senior — 4 mục (a11y/hierarchy/consistency/antipattern) điểm/10 + verdict; phần tất định reuse geometry-audit của visual-qa (overlap/misalign) auto-chạy 0-token. Gọi sau khi có mockup/UI | `skills/dev-loop/qc-uiux.md` | dev-loop |
 | `loop-runner` | Vòng lặp agent có guardrail (propose→verify→revise, termination) | `skills/dev-loop/loop-runner.md` | dev-loop |
+| `br` | Hub dây chuyền Ralph: interview→compile→slice→run→status (BR-kỹ → frames gắn code → loop có 6 phanh) | `skills/dev-loop/br.md` | dev-loop |
+| `design-twice` | Thiết kế 2-3 phương án KHÁC NHAU TẬN GỐC rồi so sánh/tổng hợp (Design It Twice) — BẮT BUỘC trước khi code frame UI | `skills/dev-loop/design-twice.md` | dev-loop |
+| `checkpoint-trace` | Cỗ máy thời gian codebase: rollback về BẤT KỲ trạng thái + tier khả-đảo (distill SHEPHERD) | `skills/dev-loop/checkpoint-trace.md` | dev-loop |
 | `failure-flywheel` | Gom lỗi lặp → đề xuất rule/skill mới (error-analysis) | `skills/dev-loop/failure-flywheel.md` | dev-loop |
 | `council` | Hội đồng nhiều model đánh giá → câu trả lời tốt nhất (Karpathy) | `skills/orchestrate/council.md` | orchestrate |
 | `trace-grader` | Chấm ĐƯỜNG ĐI của agent (tool/thứ tự/pass^k), không chỉ kết quả | `skills/orchestrate/trace-grader.md` | orchestrate |
@@ -106,7 +111,6 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `caveman-review` | Ultra-compressed code review comments. | `skills/utils/caveman-review.md` | utils |
 | `caveman-stats` | Show real token usage and estimated savings for the current session. | `skills/utils/caveman-stats.md` | utils |
 | `check-approve` | Sinh sẵn 1-liner để trace 1 lệnh approve/return/reject của DMS trên log BE… | `skills/utils/check-approve.md` | utils |
-| `computer-use` | Use Orca's computer-use CLI to inspect and operate local desktop app… | `skills/utils/computer-use.md` | utils |
 | `cursor-animated-sites` | Build an interactive "cursor-animated walkthrough" page on top of the… | `skills/utils/cursor-animated-sites.md` | utils |
 | `design-taste-frontend` | Anti-slop frontend skill for landing pages, portfolios, and redesigns. | `skills/utils/design-taste-frontend.md` | utils |
 | `design-taste-frontend-v1` | The original v1 taste-skill, preserved for projects depending on its exact… | `skills/utils/design-taste-frontend-v1.md` | utils |
@@ -129,17 +133,17 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `agent-reach` | Với-tới internet 15 nền (X/Reddit/YT/GitHub/Bilibili/XHS…), zero-API-fee, doctor self-heal — external-pull | `skills/utils/agent-reach.md` | utils |
 | `minimalist-ui` | Clean editorial-style interfaces. | `skills/utils/minimalist-ui.md` | utils |
 | `new-project-setup` | Deploy llmwiki từ đầu vào project mới — template pull, skill install, RTK,… | `skills/dev-loop/new-project-setup.md` | dev-loop |
-| `orca-cli` | Use the public `orca` CLI to operate Orca-managed worktrees/workspaces,… | `skills/orchestrate/orca-cli.md` | orchestrate |
 | `orca-dispatch-reference` | Reference for Antigravity/OpenCode dispatch, skill installation,… | `skills/orchestrate/orca-dispatch-reference.md` | orchestrate |
 | `orca-eval` | Quét N session Claude Code gần nhất, distill best practices thành report… | `skills/orchestrate/orca-eval.md` | orchestrate |
 | `orca-sec-scans` | Quét bảo mật mã nguồn bằng Trivy — tự check/cài Trivy nếu chưa có, quét… | `skills/orchestrate/orca-sec-scans.md` | orchestrate |
-| `orchestration` | Use Orca orchestration for structured multi-agent coordination: threaded… | `skills/orchestrate/orchestration.md` | orchestrate |
 | `redesign-existing-projects` | Upgrades existing websites and apps to premium quality. | `skills/utils/redesign-existing-projects.md` | utils |
 | `snapshot-push` | Push bonbon-ai outer repo as full snapshot, including be/ and fe/ content | `skills/utils/snapshot-push.md` | utils |
 | `stitch-design-taste` | Semantic Design System Skill for Google Stitch. | `skills/utils/stitch-design-taste.md` | utils |
 | `tour-guide` | Thêm một in-app product tour (spotlight onboarding overlay) tự viết, KHÔNG… | `skills/utils/tour-guide.md` | utils |
 | `tour-guide-supademo` | Style thiết kế Supademo cho in-app product tour (dùng kèm skill tour-guide… | `skills/utils/tour-guide-supademo.md` | utils |
 | `uat-nonit-testcase` | Tạo bộ test case / checklist UAT cho người dùng nghiệp vụ NON-IT (C&B, kế… | `skills/utils/uat-nonit-testcase.md` | utils |
+| `visual-qa` | QA thị giác: chụp headless từng route SPA local → FINDINGS.md tự bật vòng sửa (khi extension lỗi localhost / sau đổi theme) | `skills/utils/visual-qa.md` | utils |
+| `unknown` | Bắt+làm rõ+lưu chỗ mơ hồ làm think rối (mọi project); phỏng vấn → ledger jsonl → surface qua MEMORY.md chống-quên → promote memory/wiki | `skills/utils/unknown.md` | utils |
 
 ## Invocation rules
 - New file in `raw/` → invoke `ingest` immediately

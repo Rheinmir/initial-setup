@@ -16,6 +16,16 @@
           }
         ],
         "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash"
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/llmwiki-validate.py\" ] && exec python3 \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/llmwiki-validate.py\" claude-hook || exit 0",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -24,6 +34,16 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/llmwiki/.claude/hooks/post_tool_use.py\""
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/harness-events.py\" audit 2>/dev/null || true",
+            "timeout": 10
           }
         ],
         "matcher": "Write|Edit|MultiEdit"
@@ -37,6 +57,15 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/llmwiki/.claude/hooks/stop.py\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/harness-events.py\" ] && exec python3 \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/harness-events.py\" stop || exit 0",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -47,6 +76,15 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/llmwiki/.claude/hooks/session_end.py\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/harness-events.py\" session-end 2>/dev/null || true",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -55,6 +93,26 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/llmwiki/.claude/hooks/session_start.py\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/harness-events.py\" session 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/harness/poc-vendor-neutral/bin/harness-events.py\" docs 2>/dev/null || true",
+            "timeout": 10
           }
         ]
       }

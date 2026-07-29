@@ -15,7 +15,7 @@ description: >-
 ## Purpose
 Một lệnh gọi là xong cho dự án CŨ: cài/update harness stack (L0–L4) và tự động trả nợ wiki legacy thay user. KHÔNG dùng cho project chưa có gì + cần populate wiki từ code — đó là `/new-project-setup` (case A).
 
-**< 30s:** dùng cờ `--self-heal` — installer tự backfill nợ (Origin + index + OKF) ngay trong process rồi re-audit 1 lần. Agent chỉ gọi 1 lệnh, đọc 1 kết quả, báo cáo. KHÔNG còn vòng lặp re-run phía agent (đó là cái làm chậm bản cũ — xem [[230626-harness-update-sub30s]]).
+**< 30s:** dùng cờ `--self-heal` — installer tự backfill nợ (Origin + index + OKF) ngay trong process rồi re-audit 1 lần. Agent chỉ gọi 1 lệnh, đọc 1 kết quả, báo cáo. KHÔNG còn vòng lặp re-run phía agent (đó là cái làm chậm bản cũ — xem 230626-harness-update-sub30s).
 
 ## Steps
 

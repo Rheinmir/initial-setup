@@ -8,7 +8,7 @@ description: Sinh sẵn 1-liner để trace 1 lệnh approve/return/reject của
 
 ## Purpose
 
-Khi 1 request DMS "ấn approve mà bị treo" / không rõ lệnh duyệt có tới BE chưa, user cần **1 lệnh 1 dòng** để paste lên **product server** (`ubuntu@hcm-bonbon-sv03`) — agent KHÔNG có SSH tới product nên KHÔNG tự chạy, chỉ sinh lệnh ([[feedback_product_server_debug]]). Skill này sinh sẵn lệnh BE + FE, ghi ra file `.sh` (tránh lỗi xuống dòng khi copy) và in inline.
+Khi 1 request DMS "ấn approve mà bị treo" / không rõ lệnh duyệt có tới BE chưa, user cần **1 lệnh 1 dòng** để paste lên **product server** (`ubuntu@hcm-bonbon-sv03`) — agent KHÔNG có SSH tới product nên KHÔNG tự chạy, chỉ sinh lệnh (feedback_product_server_debug). Skill này sinh sẵn lệnh BE + FE, ghi ra file `.sh` (tránh lỗi xuống dòng khi copy) và in inline.
 
 ## Triggers
 
@@ -55,12 +55,12 @@ docker logs <FE_CONTAINER> --since 120m 2>&1 | grep -i -e "dms-proxy" -e BAF-CTD
 ## Đọc kết quả
 
 - **Có** `POST /api/ApproveSummary/Approve` (hoặc `UpdateGenTask`, `UpdateRequestByApproveGroup`) kèm mã request → lệnh duyệt ĐÃ tới BE.
-- **Không có** dòng POST nào dù FE báo đã ấn → request treo ở FE / proxy, chưa gọi BE → soi tiếp [[concepts/approve-action-flow]] và proxy.
-- Endpoint per-module xem [[entities/dms-modules]] (BAF/VEN01/CashAdv… khác nhau).
+- **Không có** dòng POST nào dù FE báo đã ấn → request treo ở FE / proxy, chưa gọi BE → soi tiếp concepts/approve-action-flow và proxy.
+- Endpoint per-module xem entities/dms-modules (BAF/VEN01/CashAdv… khác nhau).
 
 ## Giới hạn
 
-- KHÔNG tự SSH/chạy lệnh trên product — chỉ sinh lệnh ([[feedback_product_server_debug]]).
+- KHÔNG tự SSH/chạy lệnh trên product — chỉ sinh lệnh (feedback_product_server_debug).
 - Mặc định trace trên **product** (hcm-bonbon-sv03), không phải local.
 
 ## Origin

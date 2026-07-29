@@ -4,7 +4,6 @@ title: "030726-medic — cổng sức khoẻ tổng / tuyến phòng thủ cuố
 status: proposed
 tags: [medic, health-gate, enforcement, harness-doctor, hub, output-report]
 timestamp: 2026-07-03
-task: T-260703-01
 relations:
   - {rel: derives-from, to: harness-doctor}
   - {rel: touches, path: fdk/tools/medic.py}

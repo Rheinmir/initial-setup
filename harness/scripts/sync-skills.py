@@ -23,12 +23,16 @@ LLMWIKI = REPO / "llmwiki" / "skills"    # mirror (bundle llmwiki / sync-templat
 
 # name → loop (thư mục trong llmwiki/skills/). Skill mới không khai → 'utils'.
 LOOP_MAP = {
+    "unknown": "utils",
+    "visual-qa": "utils",
     # dev-loop
     "impact-check": "dev-loop", "new-project-setup": "dev-loop", "onboard-codebase": "dev-loop",
     "propose": "dev-loop", "plan": "dev-loop", "safe-change": "dev-loop",
     "verify-before-commit": "dev-loop", "build-now-adapt-later": "dev-loop", "ship": "dev-loop",
     "new-skill": "dev-loop", "loop-runner": "dev-loop", "failure-flywheel": "dev-loop", "wikieval": "dev-loop",
-    "skill-provenance": "dev-loop", "qc-code": "dev-loop", "teach-me": "dev-loop",
+    "br": "dev-loop", "checkpoint-trace": "dev-loop", "design-twice": "dev-loop",
+    "skill-provenance": "dev-loop", "qc-code": "dev-loop", "qc-uiux": "dev-loop",
+    "teach-me": "dev-loop",
     # orchestrate
     "orca-dispatch-reference": "orchestrate", "orca-onboard": "orchestrate", "orca-issue": "orchestrate",
     "orca-handover": "orchestrate",
@@ -44,13 +48,13 @@ LOOP_MAP = {
     "i-have-adhd": "utils", "caveman-commit": "utils", "caveman-compress": "utils",
     "caveman-help": "utils", "caveman-review": "utils", "caveman-stats": "utils",
     "extract-site": "utils", "harness-tour": "utils",
-    "harness-update": "utils", "health-check": "utils", "fdk": "utils", "fdk-uat": "utils", "medic": "utils", "md-to-html": "utils",
+    "agent-reach": "utils", "harness-update": "utils", "health-check": "utils", "fdk": "utils", "fdk-uat": "utils", "fdk-poc": "utils", "medic": "utils", "md-to-html": "utils",
     "docs-curate": "utils", "raise-issue": "utils",
     "frontier-scan": "utils", "ovs-notes": "utils",
     "sync-template": "utils", "uat-nonit-testcase": "utils", "cursor-animated-sites": "utils",
     # publish 260626 — skill trước LOCAL-ONLY (đẩy vào repo để không mất khi cài máy/dự án khác)
-    "orca-cli": "orchestrate", "orchestration": "orchestrate", "jenkins-agent-l3-deploy": "orchestrate",
-    "brandkit": "utils", "check-approve": "utils", "computer-use": "utils",
+    "jenkins-agent-l3-deploy": "orchestrate",
+    "brandkit": "utils", "check-approve": "utils",
     "design-taste-frontend": "utils", "design-taste-frontend-v1": "utils", "docs-site-macos": "utils",
     "web-crawl": "utils", "web-clone": "utils", "hallmark": "utils",
     "find-skills": "utils", "full-output-enforcement": "utils", "gpt-taste": "utils",

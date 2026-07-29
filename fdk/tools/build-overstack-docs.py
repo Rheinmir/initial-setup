@@ -127,7 +127,8 @@ LOOP_GROUPS = {
          "build-now-adapt-later": "edit",
          "new-project-setup": "build", "onboard-codebase": "build", "new-skill": "build",
          "skill-provenance": "build",
-         "wikieval": "eval", "ship": "eval", "loop-runner": "eval", "failure-flywheel": "eval"}),
+         "wikieval": "eval", "ship": "eval", "loop-runner": "eval", "failure-flywheel": "eval",
+         "br": "eval", "checkpoint-trace": "eval", "design-twice": "edit", "qc-uiux": "edit"}),
     "orchestrate": (
         [("dispatch", "🐳 điều phối"), ("eval", "📊 đánh giá"), ("ops", "🚀 vận hành & deploy")],
         {"orca-workflow": "dispatch", "orca-onboard": "dispatch", "orchestration": "dispatch",
@@ -149,13 +150,14 @@ LOOP_GROUPS = {
          "imagegen-frontend-web": "imagegen",
          "cavecrew": "caveman", "caveman": "caveman", "caveman-commit": "caveman", "caveman-compress": "caveman",
          "caveman-help": "caveman", "caveman-review": "caveman", "caveman-stats": "caveman",
-         "fdk": "fdk", "fdk-uat": "fdk", "medic": "fdk", "harness-tour": "fdk", "harness-update": "fdk", "health-check": "fdk",
+         "fdk": "fdk", "fdk-uat": "fdk", "fdk-poc": "fdk", "medic": "fdk", "harness-tour": "fdk", "harness-update": "fdk", "health-check": "fdk",
          "snapshot-push": "fdk", "sync-template": "fdk", "docs-curate": "fdk",
          "agent-reach": "utility",
          "check-approve": "utility", "computer-use": "utility", "find-skills": "utility",
          "full-output-enforcement": "utility", "join-project": "utility", "last30days": "utility",
          "raise-issue": "utility", "ovs-notes": "utility", "frontier-scan": "utility",
-         "uat-nonit-testcase": "utility", "fable5": "utility", "i-have-adhd": "utility"}),
+         "uat-nonit-testcase": "utility", "visual-qa": "utility", "unknown": "utility",
+         "fable5": "utility", "i-have-adhd": "utility"}),
 }
 
 
@@ -513,10 +515,17 @@ def sections(root: Path):
         "<p>Lệnh này kéo cả <b>3 nền tảng</b> — <b>harness</b> (rào chắn), <b>skills</b> (kỹ năng), <b>llmwiki</b> (nền tri thức) — và bật guardrail ngay. Dự án cũ đã có wiki? Gọi <code>/harness-update</code> để migrate + tự trả nợ.</p>",
         "<h3>2. Cứ làm việc bình thường với agent</h3>",
         "<p>Agent (Claude Code, Cursor, opencode…) giờ bị overstack gác: không ghi bậy vào <code>raw/</code>, mọi trang wiki buộc có nguồn gốc (<code>## Origin</code>), index/log tự cập-nhật-bằng-code. Bạn không phải nhớ luật — hàng rào tự cắn.</p>",
-        "<h3>3. Muốn một tính năng/đổi thay? gọi <code>/orca-workflow</code></h3>",
-        "<p>Đây là lệnh bạn dùng nhiều nhất. <code>/orca-workflow</code> tự chạy trọn vòng <b>propose → gate → dispatch → verify</b>: vẽ kế hoạch (file ảnh hưởng, cái gì có thể vỡ, sequence diagram) + DỪNG chờ bạn duyệt, rồi giao việc cho các agent chạy song song, rồi đối chiếu kết quả. Các skill con (<code>propose</code>, <code>safe-change</code>, <code>verify-before-commit</code>…) do nó <b>điều phối</b> — bạn hiếm khi gọi tay từng cái.</p>",
+        "<h3>3. Muốn một sản phẩm/đổi thay? có <b>HAI cách tiếp cận khác nhau hoàn toàn</b> — chọn theo mục tiêu</h3>",
+        "<div class=\"grid\">"
+        "<div class=\"card\"><h4>A · <code>/br</code> — oneshot ra mockup nhanh</h4>"
+        "<p style=\"margin:0\">Nhắm <b>một phát ra MOCKUP</b> từ <b>dữ liệu tổng hợp sẵn có</b> (folder <code>raw/</code>), rồi <b>sửa agile NGAY trên mockup</b>. Dùng khi cần thấy sản phẩm chạy được sớm để đối thoại/điều chỉnh — không dừng ở kế hoạch. 5 mode: <code>interview → compile → slice → run → status</code> (<code>/br auto</code> = interview tự-điền, không hỏi).</p></div>"
+        "<div class=\"card\"><h4>B · <code>/orca-workflow</code> — plan + spec chuẩn</h4>"
+        "<p style=\"margin:0\">Xử lý <b>task PLAN + SPEC chức năng</b> bài bản: khi <b>làm dần từng phần</b> của dự án, hoặc <b>sửa vài chức năng trên dự án cũ</b>. Tự chạy vòng <b>propose → gate → dispatch → verify</b>: vẽ kế hoạch (file ảnh hưởng, cái gì có thể vỡ, sequence diagram) + DỪNG chờ duyệt, rồi giao agent chạy song song + đối chiếu. Các skill con (<code>propose</code>, <code>safe-change</code>, <code>verify-before-commit</code>…) do nó điều phối.</p></div>"
+        "</div>",
+        "<div class=\"note\"><h4>Chọn nhanh — A hay B?</h4><p style=\"margin:0\"><b>Có tài liệu thô, cần mockup để bàn tiếp →</b> <code>/br</code>. <b>Cần dựng/sửa chức năng bài bản, có plan+spec truy vết →</b> <code>/orca-workflow</code>. Hai cách KHÔNG thay thế nhau: <code>/br</code> đi bề rộng nhanh (oneshot rồi agile), <code>/orca-workflow</code> đi bề sâu có gate từng bước.</p></div>",
         "<div class=\"note\"><h4>Lệnh bạn gọi TRỰC TIẾP nhiều nhất</h4><ul class=\"s\">"
-        "<li><code>/orca-workflow</code> — dựng/đổi một tính năng (điều phối cả propose→gate→dispatch→verify).</li>"
+        "<li><code>/br</code> — oneshot tài liệu thô → mockup, sửa agile trên mockup.</li>"
+        "<li><code>/orca-workflow</code> — dựng/đổi một tính năng có plan+spec (điều phối cả propose→gate→dispatch→verify).</li>"
         "<li><code>/orca-onboard</code> — onboard codebase (một hay nhiều) song song vào wiki.</li>"
         "<li><code>/harness-update</code> — tự bảo trì: cập nhật overstack + trả nợ wiki + health-check.</li>"
         "<li><code>find-skills \"&lt;việc&gt;\"</code> — không chắc có sẵn kỹ năng gì? hỏi nó.</li></ul></div>",
@@ -717,6 +726,7 @@ def sections(root: Path):
         "<li><b>dispatch</b> — giao việc cho các agent (chọn CLI theo bảng chi phí); chạy song song.</li>"
         "<li><b>verify</b> — <code>dispatch-verify</code> đối chiếu \"khai done\" với file thật; <code>/trace-grader</code> chấm cả ĐƯỜNG ĐI.</li></ol>",
         "<div class=\"note\"><h4>Hai lệnh điều phối bạn gọi trực tiếp</h4><p style=\"margin:0\"><code>/orca-workflow</code> (một tính năng) và <code>/orca-onboard</code> (onboard nhiều codebase song song). Các skill dev-loop (<code>propose</code> · <code>impact-check</code> · <code>safe-change</code> · <code>verify-before-commit</code>) là bước CON trong các flow này — gọi tay chỉ khi muốn chạy lẻ một bước.</p></div>",
+        "<div class=\"note\"><h4>Đây là CÁCH B (plan+spec) — đừng nhầm với <code>/br</code></h4><p style=\"margin:0\">Vòng propose→gate→dispatch→verify ở trên hợp khi <b>làm dần từng phần</b> hoặc <b>sửa chức năng dự án cũ</b> — cần plan/spec truy vết. Nếu chỉ cần <b>oneshot ra mockup</b> từ tài liệu tổng hợp rồi <b>sửa agile trên mockup</b> thì dùng <b><code>/br</code></b> (cách A) — quy trình khác hẳn, xem tab Quickstart.</p></div>",
     ]))
 
     _agents = [("claude", "#0a84ff"), ("opencode", "#30b0c7"), ("agy/kiro", "#ff9500")]

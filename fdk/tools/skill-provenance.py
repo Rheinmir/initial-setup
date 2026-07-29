@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
@@ -50,13 +51,26 @@ def _sha256(p: Path) -> str:
 
 
 def skill_files(name: str) -> dict[str, str]:
-    """{relpath-trong-skill-dir: sha256} cho mọi file thường trong skills/<name>/."""
+    """{relpath-trong-skill-dir: sha256} cho file skill được PUBLISH (= file có trong git).
+
+    Chỉ băm file GIT TRACKED. Trước đây `rglob("*")` băm mọi thứ trên đĩa, gồm cả artifact
+    KHÔNG commit — vd `skills/visual-qa/assets/node_modules/` (13 MB, 0 file tracked, có symlink):
+    máy dev đã `npm install` thì hash có nó, CI clone sạch thì không ⇒ **MODIFIED lệch vĩnh viễn,
+    không ai sửa được**. Sổ provenance là "nguồn gốc của thứ ship ra", nên phải bám git — thứ
+    không được publish thì không thuộc chủ quyền của sổ. (Bắt 17/07/26 khi CI PR #78 đỏ.)
+    Fail-open: git lỗi → quay về quét đĩa (giữ hành vi cũ, không chặn).
+    """
     root = SKILLS / name
-    out = {}
-    for p in sorted(root.rglob("*")):
-        if p.is_file():
-            out[str(p.relative_to(root))] = _sha256(p)
-    return out
+    try:
+        out = subprocess.run(["git", "ls-files", "-z", "--", f"skills/{name}"],
+                             cwd=REPO, capture_output=True, text=True, check=True).stdout
+        rels = [x for x in out.split("\0") if x]
+        if rels:
+            return {str(Path(r).relative_to(f"skills/{name}")): _sha256(REPO / r)
+                    for r in sorted(rels) if (REPO / r).is_file()}
+    except Exception:
+        pass
+    return {str(p.relative_to(root)): _sha256(p) for p in sorted(root.rglob("*")) if p.is_file()}
 
 
 def load_store() -> dict:

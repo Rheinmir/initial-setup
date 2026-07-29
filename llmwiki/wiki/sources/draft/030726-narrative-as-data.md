@@ -4,7 +4,6 @@ title: "narrative-as-data + medic narrative-drift probe (council-025)"
 status: implemented  # ship v1.0.6 (narrative-as-data + code-state)
 tags: [overstack-docs, narrative-drift, medic, anti-drift, council-025]
 timestamp: 2026-07-03
-task: T-260703-04
 relations:
   - {rel: derives-from, to: council-report-025}
   - {rel: touches, path: fdk/tools/build-overstack-docs.py}

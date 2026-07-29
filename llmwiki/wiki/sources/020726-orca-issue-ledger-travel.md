@@ -4,7 +4,6 @@ title: "orca-issue loop + problem-tree travel (p-02, p-04)"
 status: implemented
 tags: [propose, orca-issue, problem-tree, distribution, systems-thinking]
 timestamp: 2026-07-02
-task: T-260702-01
 id: 020726-orca-issue-ledger-travel
 ---
 

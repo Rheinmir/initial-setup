@@ -74,15 +74,23 @@
 | [030726-orca-independence-planb](sources/draft/archive/analysis/030726-orca-independence-planb.md) | draft | Orca-independence — tự-build orchestration optional làm Plan B |
 | [030726-skill-usage-dashboard](sources/draft/archive/analysis/030726-skill-usage-dashboard.md) | draft | Thống kê skill-usage thực tế → dashboard HTML báo cáo hàng tuần |
 <!-- index:auto:start -->
-| [030726-memory-episodic-vector](sources/draft/archive/analysis/030726-memory-episodic-vector.md) | issue | Issue: Memory — llmwiki mới có ~1.5/4 tầng nhớ |
-| [030726-observability-runtime](sources/draft/archive/analysis/030726-observability-runtime.md) | issue | Issue: Thiếu observability/eval lúc chạy |
-| [030726-orchestration-scale](sources/draft/archive/analysis/030726-orchestration-scale.md) | issue | Issue: Orchestration mới ở mức CHỚM về quy mô |
-| [030726-ralph-br-frame-production-line](sources/draft/archive/analysis/030726-ralph-br-frame-production-line.md) | issue | Issue: Dây chuyền sản xuất ứng dụng khép kín (Ralph BR→frame→loop) chạy trên har |
-| [030726-self-evolving-skills](sources/draft/archive/analysis/030726-self-evolving-skills.md) | issue | Issue: Skill chưa tự tiến hoá & thiếu eval-per-skill |
-| [030726-skill-resolve-supplychain](sources/draft/archive/analysis/030726-skill-resolve-supplychain.md) | issue | Issue: Nhập nhằng skill + supply-chain chưa được đo/chặn |
-| [030726-retrieval-eval-baseline-rot](sources/draft/archive/analysis/030726-retrieval-eval-baseline-rot.md) | issue | Issue: retrieval-eval baseline rot + guard-rail quá giòn |
-| [040726-precommit-slow-fragile-on-commit](sources/draft/archive/analysis/040726-precommit-slow-fragile-on-commit.md) | issue | Issue: pre-commit chậm + giòn khi bị ngắt |
-| [040726-episodic-vector-plan](sources/draft/archive/analysis/040726-episodic-vector-plan.md) | draft | Draft: đạt 4/4 tầng nhớ cho llmwiki (issue #9) |
+| [030726-memory-episodic-vector](sources/draft/030726-memory-episodic-vector.md) | issue | Issue: Memory — llmwiki mới có ~1.5/4 tầng nhớ |
+| [030726-observability-runtime](sources/draft/030726-observability-runtime.md) | issue | Issue: Thiếu observability/eval lúc chạy |
+| [030726-orchestration-scale](sources/draft/030726-orchestration-scale.md) | issue | Issue: Orchestration mới ở mức CHỚM về quy mô |
+| [030726-ralph-br-frame-production-line](sources/draft/030726-ralph-br-frame-production-line.md) | issue | Issue: Dây chuyền sản xuất ứng dụng khép kín (Ralph BR→frame→loop) chạy trên har |
+| [030726-self-evolving-skills](sources/draft/030726-self-evolving-skills.md) | issue | Issue: Skill chưa tự tiến hoá & thiếu eval-per-skill |
+| [030726-skill-resolve-supplychain](sources/draft/030726-skill-resolve-supplychain.md) | issue | Issue: Nhập nhằng skill + supply-chain chưa được đo/chặn |
+| [030726-retrieval-eval-baseline-rot](sources/draft/030726-retrieval-eval-baseline-rot.md) | issue | Issue: retrieval-eval baseline rot + guard-rail quá giòn |
+| [040726-precommit-slow-fragile-on-commit](sources/draft/040726-precommit-slow-fragile-on-commit.md) | issue | Issue: pre-commit chậm + giòn khi bị ngắt |
+| [040726-episodic-vector-plan](sources/draft/040726-episodic-vector-plan.md) | draft | Draft: đạt 4/4 tầng nhớ cho llmwiki (issue #9) |
+| [050726-ralph-interview-pipeline](sources/draft/050726-ralph-interview-pipeline.md) | draft | Draft: entity map dây chuyền Ralph + step Interview (/br, GH#15) |
+| [050726-ralph-slice-frames](sources/draft/050726-ralph-slice-frames.md) | draft | Draft: step 2 Slice — BR → frames + frame-lint + registry truy ngược (GH#15) |
+| [050726-ralph-loop-gate](sources/draft/050726-ralph-loop-gate.md) | draft | Draft: step 3 Loop+Gate — 6 phanh (2 mới: diff-jail, test-hash), dry-run, người gác (GH#15) |
+| [050726-ralph-monitor](sources/draft/050726-ralph-monitor.md) | draft | Draft: step 4 Monitor — build-line-status.py + /br status, lớp đọc tất định (GH#15·#11) |
+| [050726-ralph-pipeline-build](sources/draft/050726-ralph-pipeline-build.md) | draft | Build-report: thi công đồ nghề step 1–4 + docs site (GH#15), selftest xanh |
+| [060726-br-test-harness-plan](sources/draft/060726-br-test-harness-plan.md) | draft | Plan test/harass moi vấn đề dây chuyền /br — council 033, 3 bug fixed (GH#15) |
+| [070726-huong-dan-repo-files](sources/draft/070726-huong-dan-repo-files.md) | draft | Docs: hướng dẫn tương tác file trong repo (người/máy/sổ sách + lệnh↔file) |
+| [050726-br-huong-dan-nguoi-moi](sources/draft/050726-br-huong-dan-nguoi-moi.md) | draft | Docs: hướng dẫn /br cho người mới, có ảnh chụp mockup (GH#15) |
 | [ep-ci-tech-debt](sources/evals/episodic/ep-ci-tech-debt.md) | eval | Episodic golden: đóng tech-debt CI |
 | [ep-episodic-wire](sources/evals/episodic/ep-episodic-wire.md) | eval | Episodic golden: nối episodic + vector retrieval |
 | [caveman-commit](sources/evals/skill-resolve/caveman-commit.md) | auto | skill-resolve golden: caveman-commit |
@@ -113,12 +121,25 @@
 | [050726-map-not-territory-fable5-unknowns](sources/draft/archive/analysis/050726-map-not-territory-fable5-unknowns.md) | issue | Issue: Map-is-not-Territory — tìm unknowns đối chiếu & vá overstack (GH#40) |
 | [060726-wiki-sync-openwiki-distill](sources/draft/archive/analysis/060726-wiki-sync-openwiki-distill.md) | draft | 060726-wiki-sync-openwiki-distill |
 <!-- index:auto:end -->
+| [110726-br-assembly-provenance-isolation](sources/draft/110726-br-assembly-provenance-isolation.md) | draft | 2026-07-11 |
+| [120726-codebase-map-payroll](sources/draft/120726-codebase-map-payroll.md) | draft | 2026-07-12 |
+| [120726-br-sync-plus-guide](sources/draft/120726-br-sync-plus-guide.md) | draft | 2026-07-12 |
+| [120726-ui-contract](sources/draft/120726-ui-contract.md) | draft | 2026-07-12 |
+| [120726-clone-memos-flow](sources/draft/120726-clone-memos-flow.md) | draft | 2026-07-12 |
+| [120726-pipeline-gaps-raised](sources/draft/120726-pipeline-gaps-raised.md) | issue | 2026-07-12 |
+| [120726-pipeline-friction](sources/draft/120726-pipeline-friction.md) | draft | 2026-07-12 |
+| [120726-nghiem-thu-output](sources/draft/120726-nghiem-thu-output.md) | draft | 2026-07-12 |
+| [120726-memos-pipeline-run](sources/draft/120726-memos-pipeline-run.md) | draft | 2026-07-12 |
+| [140726-atomic-task-graph-distill](sources/draft/140726-atomic-task-graph-distill.md) | issue | Issue: Distill Atomic Task Graph (arXiv 2607.01942) — plan = DAG atomic task, sửa cục bộ subgraph, tái dùng subgraph |
+| [140726-br-proactive-fill](sources/draft/140726-br-proactive-fill.md) | draft | 2026-07-14 |
+| [140726-br-proactive-fill-PLAN](sources/draft/140726-br-proactive-fill-PLAN.md) | draft | 2026-07-14 |
+| [140726-br-proactive-fill-report](draft/orca/140726-br-proactive-fill-report.md) | draft | 2026-07-14 |
+| [150726-qc-code-skill](sources/draft/archive/proposals/150726-qc-code-skill.md) | draft | Thêm skill /qc-code: review senior 4 mục (security/performance/naming/logic) chấm điểm + verdict, mỗi bug logic sinh test tái hiện auto-chạy qua hook tất định |
+| [160726-br-ui-stream-spec-distill](sources/draft/160726-br-ui-stream-spec-distill.md) | draft | 2026-07-16 |
+| [170726-skills-ref-hardcode-canary-mu](sources/draft/170726-skills-ref-hardcode-canary-mu.md) | draft | 2026-07-17 |
+| [170726-deny-rule-raw-no-op](sources/draft/170726-deny-rule-raw-no-op.md) | draft | 2026-07-17 |
 | [140726-propose-plan-split-superpowers](sources/draft/140726-propose-plan-split-superpowers.md) | draft | Tách vòng đời đề xuất thành SPEC (/propose, người duyệt) và PLAN (/plan mới, agent mù thi hành), mở rộng R7 cắn cả hai |
 | [110726-shipped-vs-documented-parity](sources/draft/110726-shipped-vs-documented-parity.md) | draft | Issue: tài liệu hứa 74 skill nhưng npx chỉ giao 67 trong im lặng — cần cổng so hứa với giao ở fresh-install-smoke --remote |
-| [130726-session-provenance](sources/130726-session-provenance.md) | source | Auto-distill phiên c82ce215: fix bỏ dòng secondary-memory bị trùng do resolve merge sai (32 file dirty) |
-| [140726-session-provenance](sources/140726-session-provenance.md) | source | Auto-distill phiên 36e6562b: parity hứa↔giao phải chạy ở MỌI mode smoke, không thì cổng required mù với nó (#77) |
-| [060726-ponytail-distill-PLAN](sources/draft/archive/proposals/060726-ponytail-distill-PLAN.md) | draft | Plan chưng cất ponytail (anti-over-engineering, MIT) vào overstack: the ladder 7 bậc + carve-out + marker nợ, bỏ phần bao bì phân phối |
-| [070726-ponytail-distill](sources/draft/archive/analysis/070726-ponytail-distill.md) | draft | Issue: overstack chưa có luật chống over-engineering áp LÚC VIẾT code — chưng cất ladder 7 bậc + marker nợ từ ponytail |
 | [110726-anti-fabrication-observed-metrics](sources/draft/110726-anti-fabrication-observed-metrics.md) | draft | Issue: claim-receipts chỉ chống bịa reference file/API, chưa bắt agent tự bịa số đo về người-dùng/thế-giới không quan sát được |
 | [110726-auto-wire-eval-loop](sources/draft/110726-auto-wire-eval-loop.md) | draft | Issue: các guard chống-lạc-quan (council/wikieval/trace-grader/claim-receipts) đều là skill gọi tay, thiếu loop tự-kích khép kín qua hook |
 | [110726-eval-blinding-grader-context](sources/draft/110726-eval-blinding-grader-context.md) | draft | Issue: grader nội bộ (wikieval/trace-grader) thấy toàn bộ transcript sinh output nên bị mồi lạc quan — cần contract blind theo context |
@@ -127,13 +148,16 @@
 | [skill-craft](concepts/skill-craft.md) | concept | Bộ từ vựng viết/soi skill: context-load vs cognitive-load, information hierarchy, completion criterion, leading word (chưng cất từ mattpocock/skills) |
 | [issue-tracker](sources/issue-tracker.md) | reference | Hợp đồng adapter cho issue tracker của repo — ledger ISSUES.md là gốc, GitHub là mirror, 5 nhãn triage + frontier.py |
 | [150726-mattpocock-absorb](sources/draft/archive/proposals/150726-mattpocock-absorb.md) | draft | Hấp thụ mattpocock/skills: cắt context-load (tắt model-invocation hàng loạt), thêm nhãn ready-for-agent/blocked_by/claim cho ledger issue, thêm /wayfinder |
-| [150726-session-provenance](sources/150726-session-provenance.md) | source | Auto-distill phiên 36e6562b: tạo concept design-foundation + skill-craft, soạn 4 draft (hallmark-design-foundation/mattpocock-absorb/qc-code-skill/unknown-ledger) |
 | [design-foundation](concepts/design-foundation.md) | concept | hallmark (Together AI) là sàn chung 6 discipline + slop-test cho mọi UI; skill design khác là flavour đứng trên, docs-site-macos là ngoại lệ nội bộ |
 | [150726-hallmark-design-foundation](sources/draft/archive/proposals/150726-hallmark-design-foundation.md) | draft | Hấp thụ Nutlope/hallmark làm nền design chung: nâng cổng tất định frontend-antipattern.py bằng slop-test cơ học + nối catalog vào /propose làm fill-default |
-| [290626-failure-spec-violation](sources/draft/archive/analysis/290626-failure-spec-violation.md) | draft | Rule stub từ failure-flywheel: spec-violation tái diễn 3× (scanner R3/R9 không skip file gitignored) — chờ người distill thành rule |
 | [150726-unknown-ledger](sources/draft/archive/proposals/150726-unknown-ledger.md) | draft | Biến default lặng khi model tự điền gap thành sổ nợ unknown-ledger truy vết được: lựa chọn fill-first-find-out-later + file wiki/draft/unknown/ |
-| [150726-qc-code-skill](sources/draft/archive/proposals/150726-qc-code-skill.md) | draft | Thêm skill /qc-code: review senior 4 mục (security/performance/naming/logic) chấm điểm + verdict, mỗi bug logic sinh test tái hiện auto-chạy qua hook tất định |
 | [160726-teach-me-skill](sources/draft/archive/proposals/160726-teach-me-skill.md) | draft | Thêm skill /teach-me: giải thích một thứ ở 2 cấp (hệ thống + code) + bộ ba vấn-đề/workflow/chi-tiết, chứng bằng runtime thật (breakpoint/instrument) thay vì đoán tĩnh |
+| [130726-session-provenance](sources/130726-session-provenance.md) | source | Auto-distill phiên c82ce215: fix bỏ dòng secondary-memory bị trùng do resolve merge sai (32 file dirty) |
+| [140726-session-provenance](sources/140726-session-provenance.md) | source | Auto-distill phiên 36e6562b: parity hứa↔giao phải chạy ở MỌI mode smoke, không thì cổng required mù với nó (#77) |
+| [060726-ponytail-distill-PLAN](sources/draft/archive/proposals/060726-ponytail-distill-PLAN.md) | draft | Plan chưng cất ponytail (anti-over-engineering, MIT) vào overstack: the ladder 7 bậc + carve-out + marker nợ, bỏ phần bao bì phân phối |
+| [070726-ponytail-distill](sources/draft/archive/analysis/070726-ponytail-distill.md) | draft | Issue: overstack chưa có luật chống over-engineering áp LÚC VIẾT code — chưng cất ladder 7 bậc + marker nợ từ ponytail |
+| [150726-session-provenance](sources/150726-session-provenance.md) | source | Auto-distill phiên 36e6562b: tạo concept design-foundation + skill-craft, soạn 4 draft (hallmark-design-foundation/mattpocock-absorb/qc-code-skill/unknown-ledger) |
+| [290626-failure-spec-violation](sources/draft/archive/analysis/290626-failure-spec-violation.md) | draft | Rule stub từ failure-flywheel: spec-violation tái diễn 3× (scanner R3/R9 không skip file gitignored) — chờ người distill thành rule |
 | [160726-session-provenance](sources/160726-session-provenance.md) | source | Auto-distill phiên 36e6562b: tiếp tục design-foundation/skill-craft, thêm draft teach-me-skill vào bộ proposal absorb |
 | [170726-session-provenance](sources/170726-session-provenance.md) | source | Auto-distill phiên 246fa7ac: chạy capability-stamp (medic gương-soi) sau khi dùng framework, ghi unknown-frontend-design + draft absorb-six-sources |
 | [170726-absorb-six-sources](sources/draft/archive/proposals/170726-absorb-six-sources.md) | draft | Absorb HÒA TAN 6 nguồn GitHub vào 5 bề mặt sẵn có (qc-code/orca-sec-scans/mem-rank/design-foundation/orca-issue), không thêm skill mới |

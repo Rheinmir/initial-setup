@@ -312,6 +312,15 @@ def build(root: Path) -> str:
 
     LOOP_ORDER = ["wiki-loop", "dev-loop", "orchestrate", "utils"]
     out.append("## Skills (gọi bằng `/<tên>`)")
+    out += [
+        "",
+        "> **HAI cách tiếp cận KHÁC NHAU HOÀN TOÀN — chọn trước khi bới danh sách:**",
+        "> - **`/br` (oneshot mockup)** — nhắm *một phát ra MOCKUP* từ dữ liệu tổng hợp sẵn có (`raw/`), rồi *sửa agile NGAY trên mockup*. Đi bề rộng nhanh. Dùng khi có tài liệu thô và cần sản phẩm chạy được sớm để bàn tiếp. (`/br auto` = interview tự-điền.)",
+        "> - **`/orca-workflow` (plan + spec)** — xử lý *task PLAN + SPEC chức năng* bài bản: khi làm dần *từng phần* dự án, hoặc *sửa vài chức năng trên dự án cũ*. Đi bề sâu, gate từng bước (propose→gate→dispatch→verify).",
+        ">",
+        "> KHÔNG thay thế nhau: `/br` = oneshot rồi agile trên mockup · `/orca-workflow` = plan/spec truy vết từng bước. Các skill dev-loop bên dưới phần lớn là *bước con* do `/orca-workflow` điều phối.",
+        "",
+    ]
     for loop in LOOP_ORDER + [l for l in by_loop if l not in LOOP_ORDER]:
         if loop not in by_loop:
             continue

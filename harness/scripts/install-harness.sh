@@ -213,7 +213,17 @@ tpl = {
     "UserPromptSubmit": {"matcher": None, "script": "user_prompt_submit.py"},
 }
 cur.setdefault("permissions", {}).setdefault("deny", [])
-for d in ["Write(./llmwiki/raw/**)", "Edit(./llmwiki/raw/**)", "MultiEdit(./llmwiki/raw/**)"]:
+# CHỈ `Edit(path)` khớp file-permission check của Claude Code — `Write(...)` KHÔNG khớp và
+# `MultiEdit` không phải tool có thật ("matches no known tool"). Giữ 2 cái đó = 2/3 luật chặn
+# raw/ là NO-OP + spam cảnh báo mọi phiên. Edit-rule đã phủ mọi tool sửa file. (Bắt 17/07/26.)
+# PRUNE trước: installer chỉ append-nếu-chưa-có ⇒ máy đã cài giữ rule chết VĨNH VIỄN, cảnh báo
+# không bao giờ hết. Phải chủ động gỡ (bắt được vì VERIFY sau khi sửa, không tin lời).
+_dead = ["Write(./llmwiki/raw/**)", "MultiEdit(./llmwiki/raw/**)"]
+_n = len(cur["permissions"]["deny"])
+cur["permissions"]["deny"] = [x for x in cur["permissions"]["deny"] if x not in _dead]
+if len(cur["permissions"]["deny"]) != _n:
+    print("  ✓ gỡ %d deny-rule chết (Write/MultiEdit raw) — chỉ Edit() mới khớp" % (_n - len(cur["permissions"]["deny"])))
+for d in ["Edit(./llmwiki/raw/**)"]:
     if d not in cur["permissions"]["deny"]:
         cur["permissions"]["deny"].append(d)
 cur.setdefault("hooks", {})
@@ -371,7 +381,8 @@ import json, os, sys
 path = sys.argv[1]
 prefix = "llmwiki/"
 hooks_dir = '$CLAUDE_PROJECT_DIR/llmwiki/.claude/hooks'
-deny = [f"Write(./{prefix}raw/**)", f"Edit(./{prefix}raw/**)", f"MultiEdit(./{prefix}raw/**)"]
+# chỉ Edit(path) khớp — xem ghi chú ở nhánh global phía trên
+deny = [f"Edit(./{prefix}raw/**)"]
 def h(script, matcher=None):
     d = {"hooks": [{"type": "command", "command": f'python3 "{hooks_dir}/{script}"'}]}
     if matcher: d["matcher"] = matcher

@@ -23,6 +23,14 @@ SKIP_BASENAMES = {"README.md", "_template.md",
 CONTENT_DIRS = ("concepts", "entities", "sources", "draft", "architecture", "tours")
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]")
 MDLINK_RE = re.compile(r"\]\(([^)#\s]+\.md)\)")
+# fenced blocks (``` / ~~~) + inline code spans — a [[..]] shown INSIDE code is a
+# syntax example, not a real link. Strip them before scanning so demos don't count.
+CODE_FENCE_RE = re.compile(r"^[ \t]*(```|~~~).*?^[ \t]*\1[ \t]*$", re.MULTILINE | re.DOTALL)
+INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
+
+
+def strip_code(text: str) -> str:
+    return INLINE_CODE_RE.sub(" ", CODE_FENCE_RE.sub("\n", text))
 
 _LO_CACHE: dict = {}
 
@@ -70,18 +78,6 @@ def all_pages(wiki: Path) -> list[Path]:
                   if f.name not in SKIP_BASENAMES and not _archived(f.relative_to(wiki)))
 
 
-_CODE_FENCE_RE = re.compile(r"```.*?```", re.S)
-_CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
-
-
-def prose_only(text: str) -> str:
-    """Bỏ fenced code block + inline code trước khi quét wikilink.
-
-    [[...]] trong code là cú-pháp-ví-dụ hoặc bash test ([[ "$1" == x ]]) —
-    không phải liên kết; quét cả code từng sinh ~20 broken-link giả."""
-    return _CODE_SPAN_RE.sub("", _CODE_FENCE_RE.sub("", text))
-
-
 def git_last_commit_ts(repo_cwd: Path, file: Path):
     try:
         out = subprocess.run(
@@ -107,18 +103,19 @@ def main() -> None:
         sys.exit(1)
 
     pages = content_files(wiki)
-    # đích wikilink = MỌI trang trong cây wiki (kể cả skills/) — trước chỉ lấy CONTENT_DIRS
-    # nên [[fdk]]/[[failure-flywheel]] (trang thật dưới skills/) bị báo broken oan;
-    # orphan/index vẫn đo trên content_files như cũ.
-    stems = {p.stem: p for p in all_pages(wiki)}
-    stems.update({p.stem: p for p in pages})
     rel = {p: p.relative_to(wiki).as_posix() for p in pages}
+    # RESOLVE against every page (skills/ are wiki pages too — [[failure-flywheel]]
+    # points at skills/dev-loop/failure-flywheel.md). Key by stem AND by full
+    # relative path (no .md) so path-style [[concepts/RTK]] resolves as well.
+    everypage = all_pages(wiki)
+    stems = {p.stem: p for p in everypage}
+    stems.update({p.relative_to(wiki).as_posix()[:-3]: p for p in everypage})
 
     # 1. broken wikilinks + inbound graph
     broken = []
     inbound = {p: 0 for p in pages}
     for src in all_pages(wiki):
-        text = prose_only(src.read_text(encoding="utf-8", errors="replace"))
+        text = strip_code(src.read_text(encoding="utf-8", errors="replace"))
         for name in WIKILINK_RE.findall(text):
             name = name.strip()
             target = stems.get(name)

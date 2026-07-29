@@ -1,0 +1,113 @@
+# defaults.yaml — registry mặc định của dây chuyền /br (T-260714-01)
+#
+# Nguồn chân lý cho fill-chain của `/br interview --proactive`:
+# field S1–S10 nào `missing` mà có entry ở đây thì máy được đề xuất điền,
+# LUÔN kèm `filled_by` + `verified: false` (kỷ luật lens-fill áp cho mọi tầng).
+#
+# Hai nguồn:
+#   loop-26  — bảng 26 điều kiện mặc định của dây chuyền
+#              (llmwiki/html/140726-br-dieu-kien-day-chuyen.html, commit c9dc13d;
+#              refs A*/B*/C* trỏ đúng hàng trong bảng đó)
+#   spec-kit — convention của GitHub spec-kit (github.com/github/spec-kit):
+#              constitution (test-first, simplicity/YAGNI, spec không chứa
+#              implementation detail) + spec template (given-when-then,
+#              edge cases, priority must/should/could)
+#
+# Project override: đặt `br/defaults.yaml` cùng schema — entry trùng `field`
+# thì project THẮNG. Cập nhật registry này bằng tay khi nguồn đổi (không theo
+# dõi upstream tự động — quyết định ở SPEC 140726-br-proactive-fill).
+
+schema_version: 0
+
+# Field KHÔNG BAO GIỜ được máy điền — một default sai ở đây là hỏng kiến trúc
+# hoặc hỏng người dùng. Luôn thành câu hỏi thật cho user, kể cả khi vượt trần 5
+# (carve-out được ưu tiên chiếm suất hỏi trước).
+carveout:
+  - field: S2.2
+    reason: "vai trò & quyền của từng nhóm = cơ chế phân quyền — carve-out auth"
+  - field: S7.2
+    reason: "bảo mật & phân quyền (ai thấy/sửa được gì) — carve-out auth + dữ liệu"
+  - field: S6.1
+    reason: "API/hệ thống bên thứ ba = ranh giới tin cậy — carve-out trust boundary"
+  - field: S6.2
+    reason: "hệ thống nội bộ phải tương thích = ranh giới tin cậy — carve-out trust boundary"
+  - field: S8.3
+    reason: "ngân sách / nguồn lực = tiền — carve-out money"
+
+defaults:
+  - field: S7.5
+    source: loop-26
+    refs: [A1, A2, A9]
+    value: >-
+      UI theo skills/br/assets/design-template.md (khung Google design-doc +
+      design system kế thừa /high-end-visual-design): vibe mặc định Neumorphism
+      cho app nghiệp vụ; bắt buộc dark/light toggle + localStorage + chống FOUC
+      trong <head>; BR chốt một clause NFR trỏ br/DESIGN.md, không chép luật
+      design vào BR.
+    note: "A1 (UI ⇒ design-template + clause trỏ DESIGN.md) · A2 (vibe Neumorphism) · A9 (toggle/FOUC). Đây chính là field đã lọt ở G1."
+
+  - field: S10.1
+    source: loop-26
+    refs: [C1, C8, C9]
+    value: >-
+      Mỗi kịch bản nghiệm thu phải kiểm-chứng-được bằng máy (điều kiện để slice
+      frame); test viết TRƯỚC và phải ĐỎ trước khi frame chạy (R3 test-first);
+      test/fixture do NGƯỜI viết — model chỉ viết code; nghiệm thu đối chiếu
+      ground-truth thật, không để model tự chấm.
+    note: "C1 (test-first) · C8 (người là cổng cuối) · C9 (ground-truth thật)."
+
+  - field: S10.2
+    source: loop-26
+    refs: [C9]
+    value: >-
+      Dữ liệu nghiệm thu lấy từ dữ liệu bàn giao thật của user (file Excel/DB/log
+      thực tế trong raw/), không dựng fixture bịa; ground-truth là cột kết quả
+      có sẵn trong dữ liệu bàn giao.
+    note: "C9 — 'nghiệm thu bằng ground-truth thật'."
+
+  - field: S1.4
+    source: spec-kit
+    refs: [constitution-simplicity]
+    value: >-
+      Mặc định theo nguyên tắc simplicity/YAGNI của constitution: sản phẩm không
+      phục vụ nhu-cầu-suy-diễn; mọi đối tượng/tính năng không có clause trong BR
+      coi như ngoài tầm nhìn cho tới khi có yêu cầu thật.
+    note: "spec-kit constitution: simplicity, anti-speculation."
+
+  - field: S9.1
+    source: spec-kit
+    refs: [constitution-simplicity]
+    value: >-
+      Mọi tính năng không có clause_id trong BR là out-of-scope (chống phình);
+      spec không chứa quyết định implementation (tech-stack/thư viện thuộc S8,
+      không lặp ở đây).
+    note: "spec-kit: 'specifications don't serve code — code serves specifications' + no implementation details in spec."
+
+  - field: S3.3
+    source: spec-kit
+    refs: [spec-template-edge-cases]
+    value: >-
+      Mỗi flow chính liệt kê tối thiểu: luồng lỗi khi input không hợp lệ, luồng
+      khi hệ ngoài không phản hồi, và hành vi khi user hủy giữa chừng — viết
+      dạng given-when-then để kiểm-chứng-được.
+    note: "spec-kit spec template: user scenarios given-when-then + edge cases bắt buộc liệt kê."
+
+  - field: S4.3
+    source: spec-kit
+    refs: [spec-template-priority]
+    value: >-
+      Feature chưa được user xếp hạng thì mặc định phân lớp must/should/could:
+      must = có clause acceptance trong S10; should = có acceptance riêng nhưng
+      không chặn nghiệm thu tổng; could = còn lại.
+    note: "spec-kit: priority triage trong spec template."
+
+  - field: S7.1
+    source: loop-26
+    refs: [B7]
+    value: >-
+      Ngưỡng khung khi raw không nói gì: thao tác UI phản hồi < 2 giây; job nền /
+      batch toàn bộ dữ liệu < 5 phút; mọi con số phải truy vết được về công thức
+      + tham số (route /trace hoặc tương đương).
+    note: >-
+      ĐÂY LÀ NGƯỠNG KHUNG mặc định — không phải số đo từ domain của user; người
+      duyệt PHẢI xác nhận hoặc sửa ở bảng "Giả định đang gánh". B7 (truy vết).

@@ -14,7 +14,7 @@ After any impl task, before `git commit`.
 1. `RUN: <type-check-cmd>` — detect from repo: `npx tsc --noEmit` (package.json) / `go build ./...` (go.mod). Fix all errors.
 2. `RUN: <lint-cmd>` — detect: `npx eslint src/` / `go vet ./...`. Fix errors; note warnings.
 3. `RUN: <test-cmd>` — detect: `npm test` / `go test ./...`. Fix failures.
-3b. **Test tái hiện qc-code (nếu có harness):** `RUN: [ -f harness/scripts/qc-regression.py ] && python3 harness/scripts/qc-regression.py --run` — chạy các test `qc-*` do `/qc-code` sinh (tái hiện bug đã tìm). ĐỎ = một bug đã fix nay tái phát, hoặc chưa fix. Tất định, 0-token, KHÔNG gọi LLM. Fail-open nếu chưa có test `qc-*` nào (dự án chưa dùng qc-code) — không chặn.
+3b. **Test tái hiện qc-code/qc-uiux (nếu có harness):** `RUN: [ -f harness/scripts/qc-regression.py ] && python3 harness/scripts/qc-regression.py --run` — chạy các test `qc-*` do `/qc-code` (+ `/qc-uiux`) sinh (tái hiện bug/antipattern đã tìm). ĐỎ = một lỗi đã fix nay tái phát, hoặc chưa fix. Tất định, 0-token, KHÔNG gọi LLM. Fail-open nếu chưa có test `qc-*` nào — không chặn.
 4. **Trụ 3 gate (nếu có harness):** `RUN: [ -f harness/validators/task_lifecycle.py ] && python3 harness/validators/task_lifecycle.py --root .` — chặn cứng nếu task-ID đi sai state-machine (lùi/nhảy/né gate) hoặc draft trỏ task lạ. Không có file (install cũ) → bỏ qua. Đây là bản CỨNG của step 8 best-effort bên dưới.
 5. Smoke check: verify golden path end-to-end.
 6. Commit with message: *why*, not *what*.

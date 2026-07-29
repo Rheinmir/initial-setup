@@ -1,0 +1,121 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Council Stage-4 report — blind peer-rank. Deterministic từ council.transcript.json.">
+<title>Council · báo cáo Stage-4</title><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23232028'/><path d='M8 22h16M16 7l7 5H9z' stroke='%23c9a24b' stroke-width='2' fill='none' stroke-linejoin='round'/></svg>">
+<style>
+:root{--paper:#f4f1ea;--ink:#26221c;--dim:#7a7266;--faint:#a79e90;--line:rgba(60,52,40,.13);
+ --card:rgba(255,253,249,.74);--stroke:rgba(255,255,255,.9);--accent:#8a6d2f;--shadow:24px 40px 24px rgba(60,48,28,.10)}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font:15px/1.6 Georgia,Cambria,"Times New Roman",ui-serif,serif;color:var(--ink);background:var(--paper);
+ background-image:radial-gradient(120% 80% at 15% -5%,rgba(214,198,160,.35),transparent 55%),radial-gradient(90% 70% at 100% 0%,rgba(150,168,178,.22),transparent 50%);
+ min-height:100dvh;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;opacity:.5;mix-blend-mode:multiply;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
+.wrap{max-width:940px;margin:0 auto;padding:56px 22px 90px}
+.tabnum{font-variant-numeric:tabular-nums}
+.body-sans{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.eyebrow{font:600 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-weight:600;font-size:clamp(30px,5vw,44px);line-height:1.04;letter-spacing:-.015em;margin:12px 0 10px;text-wrap:balance;max-width:22ch}
+.q{color:var(--dim);font-size:16px;max-width:60ch;text-wrap:pretty}
+.meta{margin-top:14px;font:500 12.5px/1 ui-monospace,Menlo,monospace;color:var(--faint)}
+.warn{background:rgba(176,106,44,.09);border:1px solid rgba(176,106,44,.32);border-left:3px solid #b06a2c;border-radius:13px;
+ padding:14px 16px;margin:26px 0 8px;font-size:13.5px;color:#5f4a2e;font-family:ui-sans-serif,system-ui,sans-serif}
+.sect{margin:46px 0 18px;display:flex;align-items:baseline;gap:14px}
+.sect .n{font-size:26px;color:var(--accent);line-height:1} .sect h2{font-weight:600;font-size:21px;margin:0;letter-spacing:-.01em}
+.sect .rule{flex:1;height:1px;background:var(--line)}
+.pcard{background:var(--card);border:1px solid var(--stroke);border-radius:20px;padding:22px 24px;margin:18px 0;position:relative;overflow:hidden;
+ box-shadow:0 1px 0 rgba(255,255,255,.7) inset,var(--shadow);transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 1px 0 rgba(255,255,255,.8) inset,32px 54px 30px rgba(60,48,28,.14)}
+.phead{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.pav{width:46px;height:46px;border-radius:14px;color:#fff;font-weight:600;font-size:20px;display:grid;place-items:center;flex:0 0 46px;font-family:ui-sans-serif,system-ui,sans-serif}
+.pname{font-size:19px;font-weight:700;letter-spacing:-.01em;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}
+.plens{margin-top:3px;font:italic 500 13px/1.35 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+ color:var(--ac);opacity:.92}
+.rankpill{font:600 11.5px/1 ui-monospace,Menlo,monospace;color:var(--dim);margin-left:6px}
+.blindtag{margin-left:auto;align-self:flex-start;font:600 11px/1 ui-monospace,Menlo,monospace;color:var(--ac);
+ border:1px solid var(--ac);border-radius:7px;padding:5px 9px}
+.ansbody{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.66;max-width:66ch}
+.ansbody p{margin:9px 0;color:#3a342c}
+.ansbody .lead{font-size:14px;font-weight:600;color:var(--ink);margin:0 0 9px}
+.ansbody b.pt{font-weight:600;color:var(--ink)} .lead b.pt{font-weight:700}
+.ansbody p:first-child{margin-top:0}
+ol.ans{margin:10px 0 2px;padding-left:0;list-style:none;counter-reset:a}
+ol.ans li{position:relative;padding-left:30px;margin-bottom:11px;line-height:1.62}
+ol.ans li::before{counter-increment:a;content:counter(a);position:absolute;left:0;top:1px;width:18px;height:18px;border-radius:6px;
+ background:var(--ac);color:#fff;font:700 11px/18px ui-monospace,Menlo,monospace;text-align:center}
+.tblwrap{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(255,253,249,.6);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-family:ui-sans-serif,system-ui,sans-serif}
+th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--line)} tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .18s} tbody tr:hover{background:rgba(138,109,47,.06)}
+th{color:var(--faint);font:600 11px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;background:rgba(60,52,40,.03)}
+.mono{font-family:ui-monospace,Menlo,monospace} .dim{color:var(--dim)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:color-mix(in srgb,var(--c) 12%,var(--paper));
+ border:1px solid color-mix(in srgb,var(--c) 55%,transparent);color:var(--c);border-radius:9px;padding:5px 11px;margin:9px 8px 0 0;
+ font:600 12.5px/1 ui-sans-serif,system-ui,sans-serif;transition:transform .2s}
+.chip:hover{transform:translateY(-2px)} .chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:0 0 18px}
+@media(max-width:640px){.kpi{grid-template-columns:1fr}}
+.kpi div{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);transition:transform .26s}
+.kpi div:hover{transform:translateY(-3px)}
+.kpi b{display:block;font-size:22px;font-weight:600;margin:5px 0 3px;text-transform:capitalize}
+.kpi span{color:var(--faint);font:600 10.5px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.07em}
+.kpi em{font-style:normal;color:var(--dim);font-size:12px;font-family:ui-sans-serif,system-ui,sans-serif}
+.synth{background:linear-gradient(158deg,rgba(138,109,47,.10),rgba(63,125,116,.06));border:1px solid rgba(138,109,47,.26);
+ border-radius:20px;padding:24px 26px;margin-top:16px;box-shadow:var(--shadow)}
+.synth .lbl{font:600 11px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.09em;color:var(--accent)}
+.synth p{margin:7px 0;font-size:13.5px;line-height:1.6;font-family:ui-sans-serif,system-ui,sans-serif}
+ul.synlist{margin:6px 0 10px;padding:0;list-style:none;counter-reset:s;font-family:ui-sans-serif,system-ui,sans-serif}
+ul.synlist li{position:relative;padding-left:26px;margin-bottom:8px;font-size:13.5px;line-height:1.55}
+ul.synlist li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:18px;height:18px;border-radius:6px;
+ background:var(--accent);color:#fff;font:700 11px/18px ui-monospace,Menlo,monospace;text-align:center}
+.reveal{margin-top:16px} .reveal .lbl{font:600 11px/1 ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;text-align:center;
+ font-family:ui-sans-serif,system-ui,sans-serif}
+a:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+</style></head><body><div class="wrap">
+<header>
+  <div class="eyebrow">🏛 Council · Stage-4</div>
+  <h1>Hội đồng chấm mù</h1>
+  <p class="q">Thiết kế plan test/harass đầy đủ moi ra vấn đề dây chuyền /br (GH#15)</p>
+  <div class="meta tabnum">seed 42 · council.py/1.0 · 3 giám khảo · 3 ghế</div>
+</header>
+
+<section><div class="sect"><span class="n tabnum">1</span><h2>Ý kiến hội đồng</h2><span class="rule"></span></div>
+    <article class="pcard" style="--ac:#3f7d74">
+      <div class="phead">
+        <div class="pav" style="background:#3f7d74">F</div>
+        <div><div class="pname">Feynman <span class="rankpill tabnum">🥇 #1 · mean 1.0</span></div><div class="plens">Gỡ lỗi từ nguyên lý đầu</div></div>
+        <div class="blindtag">nhãn C</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li><b class="pt">Q1 — Vùng rủi ro cao nhất</b>: false-GREEN qua oracle verify bị lừa, không phải adapter thật. false-RED chỉ tốn budget rồi escalate — hỏng NHÌN THẤY, an toàn. false-GREEN sinh commit gắn frame_id trông đúng, trôi xuôi dòng → hỏng ÂM THẦM, cộng dồn. test-hash chỉ băm file test literal — kẻ phá làm test xanh mà KHÔNG đụng file đó. Test moi ra (metamorphic/mutation trên oracle): frame chỉ pass nhờ sửa conftest.py/fixture; sửa helper dùng-chung mà test import; sitecustomize/sys.path/pytest plugin auto-load; monkeypatch/env/ghi __pycache__; sửa test đã commit của frame KHÁC thành trivially-true. <b class="pt">Kỳ vọng</b>: RED/quarantine. <b class="pt">Kiểm</b>: test-hash có bao TRỌN mọi file test import bắc cầu không.</li><li><b class="pt">Q2 — Scaffolding VĨNH VIỄN</b>: Property/invariant test (Hypothesis, stateful) trên 6 phanh — mọi chuỗi revise → diff cuối ⊆ scope; mutation file-test → fail-closed; chỉ commit khi verify xanh trên CODE HIỆN TẠI; loop luôn dừng. Golden/characterization byte-for-byte (bắt lỗi PYTHONHASHSEED). Fuzz filesystem giải scope (dấu cách, symlink, unicode, ../, glob rộng). Mutation testing trên chính loop-runner (đột biến phanh → phải có test đỏ). <b class="pt">Idempotency</b>: kill mọi bước → resume → cùng trạng thái. <b class="pt">CI</b>: seed cố định, property/golden mỗi PR (chặn push); nightly fuzz + scale 100–500; job riêng gated chạy claude -p thật smoke, cho phép flaky, KHÔNG chặn.</li><li><b class="pt">Q3 — Giả định tail-risk</b>: verdict verify là hàm THẬT, TẤT ĐỊNH, chỉ phụ thuộc code-in-scope + test đã commit (hermetic). Bug .pyc chứng minh nó mong manh. <b class="pt">Test trực tiếp — harness hermeticity</b>: chạy CÙNG verify hai lần, môi trường sạch vs bẩn, verdict phải GIỐNG (có/không .pyc; PYTHONHASHSEED khác; đảo thứ tự test; cắt mạng; lệch clock; container mới vs cây bẩn; song song cạnh hàng xóm ồn). Phân kỳ = non-hermetic = quarantine, KHÔNG commit.</li></ol></div>
+    </article>
+    <article class="pcard" style="--ac:#3f7d74">
+      <div class="phead">
+        <div class="pav" style="background:#3f7d74">L</div>
+        <div><div class="pname">Linus Torvalds <span class="rankpill tabnum">🥈 #2 · mean 2.0</span></div><div class="plens">Kỹ thuật thực dụng</div></div>
+        <div class="blindtag">nhãn B</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li>Q1 — Adapter claude -p THẬT vẫn verified:false. Toàn bộ 150 frame-run đều đóng vai bằng STUB — bạn test cái test-double, chưa test hệ thật. <b class="pt">Stub không tái hiện</b>: refusal giữa chừng, output cắt ngang JSON/patch, LLM sửa lan man đúng-cú-pháp sai-ngữ-nghĩa, diff áp không sạch. <b class="pt">Test</b>: (a) ghi lại 200–500 phiên claude -p THẬT vào cassette (record/replay) rồi replay tất định trong CI; (b) fault-injection tầng adapter: chèn truncated/empty/rác-quanh-diff/timeout/exit≠0 → khẳng định 6 phanh bắt, KHÔNG false-GREEN. Adapter thật làm sập bất kỳ invariant nào thì con số harass cũ vô nghĩa.</li><li><b class="pt">Q2 — Property test (Hypothesis)</b>: invariant bất biến qua mọi revise ngẫu nhiên — không commit đụng file ngoài scope; test-hash đổi ⇒ fail-closed; tree cuối == tree đầu + đúng diff in-scope. Golden/cassette cho BR→frames và frame-run→verdict, bắt regression im lặng (như stale-.pyc). Fuzz path/scope. Mỗi bug fix = 1 test vĩnh viễn (cái .pyc đã có, giữ nguyên tắc). <b class="pt">CI 3 tầng</b>: fast (property+selftest mọi push), medium (cassette-replay nightly), slow (100–500 scale + kill-giữa-loop weekly). <b class="pt">Fail-closed</b>: CI đỏ ⇒ chặn push. Không có cassette-replay thì CI xanh giả.</li><li><b class="pt">Q3 — Giả định</b>: verify là oracle đáng tin, XANH = code ĐÚNG. Sai (flaky, test tự-thoả-mãn, pass nhờ file dùng-chung không ai sở hữu) ⇒ loop hội tụ về RÁC vẫn commit gắn frame_id — false-GREEN lan, hỏng ngầm, tệ hơn crash. <b class="pt">Test</b>: (a) mỗi verify 3–5 lần, verdict không nhất quán ⇒ flaky, KHÔNG commit; (b) để LLM sửa file shared ngoài mọi scope rồi hỏi frame nào sở hữu — không ai thì phanh chặn; (c) test-independence: chạy test frame X trong tree CHƯA có sửa của X — vẫn xanh ⇒ test tự-thoả-mãn, oracle vô dụng.</li></ol></div>
+    </article>
+    <article class="pcard" style="--ac:#3f7d74">
+      <div class="phead">
+        <div class="pav" style="background:#3f7d74">S</div>
+        <div><div class="pname">Socrates <span class="rankpill tabnum">🌱 #3 · mean 3.0</span></div><div class="plens">Phá giả định</div></div>
+        <div class="blindtag">nhãn A</div>
+      </div>
+      <div class="ansbody"><ol class='ans'><li>Q1 — Chưa hỏi tận gốc làm sao BIẾT verdict xanh là ĐÚNG. Hệ tin test pass ⇒ code đúng, nhưng đó chỉ là test pass ⇒ test hài lòng. stale-.pyc đã chứng minh verify từng chấm CODE CŨ mà vẫn tự tin. <b class="pt">Niềm tin nguy hiểm nhất</b>: false-GREEN tinh vi qua file dùng-chung không frame nào sở hữu. <b class="pt">Test moi ra</b>: cặp frame có phụ thuộc ẩn — frame B xanh CHỈ vì frame A đã sửa file chung; chạy B CÔ LẬP (revert A) — còn xanh không? Xanh mà không nên xanh ⇒ verdict nói dối. Mọi verdict xanh phải tái lập từ cây SẠCH.</li><li>Q2 — Mỗi phanh cần một chứng nhân sống. Ai gác người gác? (a) Property cho bất biến cốt lõi — diff sau revise ⊆ scope; test-hash bất biến ⇒ verdict không đổi; <b class="pt">revise stateless</b>: xáo thứ tự vòng không đổi kết quả — CI mọi commit. (b) Metamorphic/golden: đổi thứ tự-dấu-cách-symlink path, verdict PHẢI y hệt. (c) Fuzz revise-output (unicode/cắt cụt/rác) kiểm fail-closed. (d) Chaos: kill -9 GIỮA loop rồi resume — commit-hash phản ánh đúng frame_id. <b class="pt">Mỗi test kèm câu hỏi</b>: test này có thể xanh trong khi hệ đã hỏng không? CÓ ⇒ vô dụng; phải có ≥1 mutation cố ý khiến nó ĐỎ.</li><li><b class="pt">Q3 — Giả định tail-risk</b>: verify TẤT ĐỊNH và cô lập (cùng code ⇒ cùng verdict). Sai — .pyc đã cho thấy từng sai, adapter thật phi tất định, test flaky bản chất ngẫu nhiên — thì mọi phanh lý luận trên tín hiệu nhiễu: hệ hội tụ tới xanh giả, commit, gắn frame_id, lan lỗi có chữ ký đã-kiểm-chứng. <b class="pt">Test</b>: chạy CÙNG frame chưa đổi N lần (≥50) trên cây bất động, đo entropy verdict — kỳ vọng 0. Rồi bơm phi-tất-định có kiểm soát (hashseed/thời gian/thứ tự file/flaky) và hỏi phanh nào PHÁT HIỆN. Cần build trước tiên một máy-đo-niềm-tin: cờ verdict này có tái lập không, chứ không thêm phanh trên nền cát.</li></ol></div>
+    </article></section>
+<section><div class="sect"><span class="n tabnum">2</span><h2>Bỏ phiếu kín</h2><span class="rule"></span></div>
+<div class="tblwrap"><table><thead><tr><th>Giám khảo</th><th>Xếp hạng (nhãn ẩn)</th><th>Thứ tự trình bày · chống thiên vị vị trí</th></tr></thead><tbody><tr><td>seat-1</td><td class="mono">C › B › A</td><td class="mono dim">B → C → A</td></tr><tr><td>seat-2</td><td class="mono">C › B › A</td><td class="mono dim">A → B → C</td></tr><tr><td>seat-3</td><td class="mono">C › B › A</td><td class="mono dim">A → B → C</td></tr></tbody></table></div>
+<div class="reveal"><span class="lbl">Bản lộ danh — chỉ lộ ở cuối</span><br><span class="chip" style="--c:#3f7d74">C = Feynman</span><span class="chip" style="--c:#3f7d74">B = Linus Torvalds</span><span class="chip" style="--c:#3f7d74">A = Socrates</span></div></section>
+<section><div class="sect"><span class="n tabnum">3</span><h2>Dashboard chốt</h2><span class="rule"></span></div>
+<div class="kpi">
+ <div><span>Quán quân</span><b>🥇 Feynman</b><em class="tabnum">nhãn C · điểm TB 1.0</em></div>
+ <div><span>Gây tranh cãi nhất</span><b>Socrates</b><em class="tabnum">nhãn A · phân tán 0.0</em></div>
+ <div><span>Đồng thuận</span><b class="tabnum">3 GK</b><em>nhất trí tuyệt đối ✓</em></div>
+</div>
+<div class="tblwrap"><table><thead><tr><th>Nhãn ẩn</th><th>Uỷ viên</th><th>Điểm hạng TB</th><th>Hạng từng GK</th></tr></thead><tbody><tr><td class="mono"><b>C</b></td><td>🥇 Feynman</td><td class="mono tabnum">1.0</td><td class="mono dim tabnum">[1, 1, 1]</td></tr><tr><td class="mono"><b>B</b></td><td>🥈 Linus Torvalds</td><td class="mono tabnum">2.0</td><td class="mono dim tabnum">[2, 2, 2]</td></tr><tr><td class="mono"><b>A</b></td><td>🌱 Socrates</td><td class="mono tabnum">3.0</td><td class="mono dim tabnum">[3, 3, 3]</td></tr></tbody></table></div>
+
+</section>
+<footer>Mọi số liệu từ council.transcript.json — report chỉ là lớp trình bày, không thêm phán xét mới.</footer>
+</div></body></html>

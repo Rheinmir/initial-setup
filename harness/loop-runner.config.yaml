@@ -56,5 +56,24 @@ run_log:
 # To adapt: set revise.cmd to the LLM call, run the loop on a known-failing case,
 # then flip the two `verified:` flags. Keep this value ONLY here.
 revise:
-  cmd: null              # ASSUMPTION (NOT VERIFIED): LLM revise step not wired. null = no-op stub.
-  verified: false        # ASSUMPTION: the revise step has not been validated end-to-end.
+  # WIRED to the /br run adapter (GH#15). The revise step is fdk/tools/br-revise.py, which
+  # renders the editable prompt skills/br/assets/revise-prompt.md and calls `claude -p`
+  # with bounded tools. Because the real command needs PER-FRAME args (--frame /
+  # --verify-output / --cwd), fdk/tools/br-run.py BUILDS the concrete invocation for each
+  # frame and passes it as loop-runner's --revise (overriding this default). The template
+  # below documents the wiring; edit the PROMPT (not this) at skills/br/assets/revise-prompt.md.
+  cmd: null              # null = safe no-op stub for a raw loop-runner run. /br run (br-run.py)
+                         #        overrides with: python3 fdk/tools/br-revise.py run --frame <F>
+                         #        --template skills/br/assets/revise-prompt.md --verify <cmd>
+                         #        --verify-output <out> --cwd <worktree>
+  verified: false        # ASSUMPTION: the `claude -p` call itself not yet validated end-to-end
+                         #        (template + render + worktree flow ARE selftested: br-revise/br-run/br-queue).
+
+# ── Guards 5 & 6: scope diff-jail + protected-file (test) hashing ────────────
+# verified: false for these two — they are set PER-FRAME by the /br run orchestrator
+# from the frame's scope_code / scope_test (GH#15). Left empty here = guards OFF, so
+# the existing selftest and any non-frame loop are unaffected. The engine itself is
+# deterministic + selftested (scenarios SCOPE_JAIL@3, PROTECT@1).
+scope:
+  code_globs: []      # ASSUMPTION (per-frame): globs the agent MAY edit; edits outside are reverted.
+  protect_globs: []   # ASSUMPTION (per-frame): globs the agent must NOT edit (its own tests); change → fail-closed.

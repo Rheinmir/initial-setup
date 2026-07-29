@@ -259,7 +259,111 @@ echo "$CAP" | grep -qi "chưa neo 0" \
 
 ---
 
-### Task TT6: Nối 5 test vào cổng, và UAT đường người mới
+### Task TT7: Acceptance — chấm lại bài nghiệm thu §X của PDF
+
+**Thoả:** thước đo cuối của PDF §X — *"Every important output can be traced to an objective, a plan, an artifact, a source, a graph path, an evaluator decision, and a bounded execution record"*. Trước T1–T7 overstack đạt **5/7**, đứt ở `graph path` (không edge ID) và nửa `evaluator decision` (rubric theo suite, không theo output). Task này đo lại bằng lệnh thật, không bằng cảm tính.
+
+**Vì sao tách khỏi TT1:** TT1 hỏi *"các module có nói chuyện được với nhau không"*. TT7 hỏi *"một auditor lạ có truy được toàn bộ chuỗi từ một output ngẫu nhiên không"* — câu hỏi của người dùng cuối, không phải của lập trình viên. Một hệ có thể xanh hết integration mà vẫn trượt §X.
+
+**Files:**
+- Tạo: `harness/tests/ge-acceptance-test.sh`
+
+**Interfaces:**
+- Consumes: `harness/scripts/wiki-graph.py` (`cite`), `hub.py` (`lineage`, `log`), `grounding-check.py`, `provenance-log.py` (`read-events`), `harness/metrics/*.json`, một trang wiki thật làm mẫu.
+- Produces: script in **bảng chấm 7 mắt xích** (`✓`/`✗` + lệnh chứng minh cho từng mắt xích) và exit 2 nếu điểm **thấp hơn** ngưỡng khai trong script (`EXPECT_LINKS=6`) — tức là hồi quy traceability bị chặn, không chỉ được ghi nhận.
+
+- [ ] **Step 1: chấm 7 mắt xích bằng lệnh thật**
+
+```bash
+hdr "§X — truy vết một output qua 7 mắt xích"
+SCORE=0
+link() {  # link <tên> <lệnh chứng minh>
+  if eval "$2" >/dev/null 2>&1; then SCORE=$((SCORE+1)); ok "$1"; else bad "$1" "không truy được: $2"; fi
+}
+PAGE="concepts/commit-dag-hub.md"
+link "1. objective — SPEC gốc tồn tại"        "test -f llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md"
+link "2. plan step — PLAN có task tương ứng"  "grep -q '### Task 7' llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md"
+link "3. artifact version — commit tạo file"  "git log --oneline --diff-filter=A -- harness/scripts/hub.py | grep -q ."
+link "4. source — trang wiki có ## Origin"    "grep -q '^## Origin' llmwiki/wiki/$PAGE"
+link "5. graph path — cite ra edge ID"        "python3 harness/scripts/wiki-graph.py cite ${PAGE%.md} | grep -qE '^e:[0-9a-f]{8}'"
+link "6. evaluator — verdict có rubric-schema" "echo '{\"decision\":\"approve\",\"claim\":\"c\",\"reason\":\"r\"}' | python3 harness/scripts/grounding-check.py --check -"
+link "7. execution record — chi phí/độ trễ"   "test -s harness/metrics/cost-by-session.json"
+printf '\n  §X SCORE: %d/7  (ngưỡng chặn hồi quy: %d)\n' "$SCORE" "${EXPECT_LINKS:-6}"
+[ "$SCORE" -ge "${EXPECT_LINKS:-6}" ] || bad "§X acceptance" "tụt xuống $SCORE/7"
+```
+
+- [ ] **Step 2: mắt xích 5 phải là đường THẬT, không phải chuỗi bất kỳ** — lấy eid từ `cite`, feed ngược vào `wiki-graph.py edge <eid>` và assert `from`/`to` khớp đúng trang đang xét. Một eid trả về mà không resolve ngược được thì mắt xích 5 là giả — đây chính là lỗi "fluent answers citing irrelevant edges" mà PDF §VII.3 cảnh báo.
+- [ ] **Step 3: ghi điểm vào metrics để theo XU HƯỚNG** — append `{"ts", "score", "expect"}` vào `harness/metrics/acceptance-x.jsonl` (fail-open). PDF §7.4: theo dõi xu hướng chứ không phải điểm đơn lẻ; lần sau tụt điểm sẽ thấy ngay thay vì phát hiện muộn.
+
+---
+
+### Task TT8: Test MỤC ĐÍCH — từng thay đổi có làm đúng việc nó sinh ra để làm không
+
+**Thoả:** khoảng cách giữa *"chạy đúng như viết"* và *"đạt mục đích"*. Self-test hiện tại chứng minh vế đầu. Task này tấn công vế sau bằng ca đối kháng — thứ PDF §VII.2 gọi là adversarial case và xếp ngang hàng gold set.
+
+**Files:**
+- Tạo: `harness/tests/ge-purpose-test.sh`
+
+**Interfaces:**
+- Consumes: cả 6 engine của T1–T7.
+- Produces: script cùng khuôn; mỗi assert gắn với **một câu mục đích** viết thành lời, để khi đỏ thì biết *mục đích nào* vỡ chứ không chỉ *hàm nào* lỗi.
+
+- [ ] **Step 1: ratchet phải GIỮ ĐƯỢC CÁI TỐT NHẤT, không phải cái cuối cùng**
+
+```bash
+hdr "T1 mục đích: 'giữ cái tốt hơn, vứt cái tệ hơn' — thử với metric NHIỄU"
+# điểm đi theo dãy 5 → 9 → 3 → 4: đỉnh nằm ở GIỮA, không phải cuối.
+cat > noisy.py <<'PY'
+import pathlib
+p = pathlib.Path("i"); i = int(p.read_text() or 0); p.write_text(str(i + 1))
+print([5, 9, 3, 4][i % 4])
+PY
+python3 "$SRC/harness/scripts/loop-runner.py" run --verify 'false' \
+  --metric-cmd "python3 noisy.py" --direction max --max-iter 4 \
+  --log "$TMP/noisy.json" --cwd "$TMP/w" >/dev/null 2>&1
+BEST=$(python3 -c "
+import json; its=json.load(open('$TMP/noisy.json'))['iterations']
+kept=[i for i in its if i.get('ratchet')=='kept']
+print(max((i.get('score') or 0) for i in kept) if kept else -1)")
+[ "$BEST" = "9.0" ] || [ "$BEST" = "9" ] \
+  && ok "đỉnh 9 được giữ, hai vòng tệ sau đó bị revert (không trôi theo cái cuối)" \
+  || bad "T1 mục đích" "kept cao nhất = $BEST, đáng lẽ 9"
+```
+
+- [ ] **Step 2: bốn mục đích còn lại, mỗi cái một ca đối kháng**
+
+```bash
+hdr "T7 mục đích: 'thất bại vẫn tra cứu được' — sống sót qua git gc"
+python3 "$SRC/harness/scripts/hub.py" push --agent x --hypothesis "ý bỏ đi" \
+  --metric 0.1 --status discarded --root "$TMP/w" >/dev/null
+git -C "$TMP/w" reset -q --hard HEAD~1                  # commit rời khỏi mọi nhánh
+git -C "$TMP/w" gc --prune=now --quiet 2>/dev/null       # gc thật, không nương tay
+REF=$(git -C "$TMP/w" for-each-ref refs/hub --format='%(objectname)' | head -1)
+git -C "$TMP/w" cat-file -e "$REF" 2>/dev/null \
+  && ok "commit đã bỏ VẪN sống sau gc — ref giữ object, thất bại tra cứu được" \
+  || bad "T7 mục đích" "gc nuốt mất thí nghiệm đã bỏ ⇒ hub không giữ được lineage"
+
+hdr "T4 mục đích: 'nhìn ổn là schema-invalid' — thử các biến thể lách"
+for v in '"LGTM"' \
+         '{"decision":"approve","claim":"  ","reason":"r"}' \
+         '{"decision":"revise","claim":"c","reason":"r","required_evidence":["  "]}' \
+         '{"decision":"ok","claim":"c","reason":"r"}'; do
+  echo "$v" | python3 "$SRC/harness/scripts/grounding-check.py" --check - >/dev/null 2>&1
+  [ $? -eq 2 ] && ok "chặn được: $v" || bad "T4 mục đích" "lọt biến thể lách: $v"
+done
+
+hdr "T2 mục đích: 'trích dẫn được' — eid phải ỔN ĐỊNH qua các lần dựng lại"
+A=$(python3 "$SRC/harness/scripts/wiki-graph.py" export --json | python3 -c "import json,sys;print(json.load(sys.stdin)['edges'][0]['eid'])")
+B=$(python3 "$SRC/harness/scripts/wiki-graph.py" export --json | python3 -c "import json,sys;print(json.load(sys.stdin)['edges'][0]['eid'])")
+[ "$A" = "$B" ] && ok "eid ổn định giữa 2 lần build ($A)" \
+                || bad "T2 mục đích" "eid đổi giữa 2 lần build ⇒ trích dẫn vô nghĩa"
+```
+
+- [ ] **Step 3: T5 và T6** — T5 mục đích *"trần phải CHẶN được, không chỉ cảnh báo"*: dựng config `mode: block`, record vượt trần, `check <session>` phải **exit 2** (mode `warn` thì exit 0 — chứng minh công tắc thật sự có hiệu lực). T6 mục đích *"agent sau học được từ việc agent trước đã bỏ"*: post 3 hypothesis từ 2 writer khác nhau, rồi đọc lại bằng `read-hypotheses --discarded-only` từ một tiến trình riêng — phải thấy đủ, đúng thứ tự mới-trước, kèm `ref`. Đây là kiểm chứng cho chính lý do T6 tồn tại (PDF §III.E: học từ thí nghiệm hỏng mà không chép transcript).
+
+---
+
+### Task TT6: Nối 7 test vào cổng, và UAT đường người mới
 
 **Thoả:** bài học repo "thêm feature mà quên hàng rào → gate không biết"; `/fdk-uat` canary trước khi công bố
 
@@ -278,8 +382,10 @@ echo "$CAP" | grep -qi "chưa neo 0" \
         "bash harness/tests/ge-backcompat-test.sh . >/dev/null && "
         "bash harness/tests/ge-killswitch-test.sh . >/dev/null && "
         "bash harness/tests/ge-travel-test.sh . >/dev/null && "
-        "bash harness/tests/ge-reachability-test.sh . >/dev/null"],
-     "T1–T7: tích hợp · hồi quy · kill-switch · travel · reachability"),
+        "bash harness/tests/ge-reachability-test.sh . >/dev/null && "
+        "bash harness/tests/ge-acceptance-test.sh . >/dev/null && "
+        "bash harness/tests/ge-purpose-test.sh . >/dev/null"],
+     "T1–T7: tích hợp · hồi quy · kill-switch · travel · reachability · §X acceptance · mục đích"),
 ```
 
 - [ ] **Step 2: chạy cổng đầy đủ** — `python3 harness/scripts/fdk-gate.py` phải KHÔNG đỏ thêm so với baseline (2 step đỏ pre-existing đã biết: `index-sync`, `skill cross-surface`); `python3 fdk/tools/medic.py --ci` giữ 0 fail.
@@ -289,7 +395,7 @@ echo "$CAP" | grep -qi "chưa neo 0" \
 
 ## Thứ tự thi hành
 
-`TT2 → TT1 → TT3` (hồi quy trước: biết cái cũ còn sống rồi mới kiểm cái mới ghép) → `TT4 → TT5` (song song được) → `TT6` (gom cổng, phải sau cùng). TT1 và TT3 cần T7 đã merge; TT2/TT4/TT5 chạy được ngay bây giờ.
+`TT2 → TT1 → TT3 → TT8` (hồi quy trước, rồi ghép, rồi kill-switch, rồi mục đích) → `TT4 ∥ TT5 ∥ TT7` (độc lập) → `TT6` (gom cổng, phải sau cùng). Tất cả 7 task đầu chạy được ngay vì T1–T7 đã merge.
 
 ## Ngoài phạm vi
 

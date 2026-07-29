@@ -678,5 +678,19 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 | 2026-07-29 14:44:23 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=472fa993 |
 | 2026-07-29 14:44:44 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=93767117 |
 | 2026-07-29 14:44:44 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=c221399e |
+| 2026-07-29 15:07:04 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=ba53f99eafb442e04 |
+| 2026-07-29 15:07:04 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=6178ca5078cadf494 |
+| 2026-07-29 15:32:51 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=945982b189f10b0b5d |
+| 2026-07-29 15:32:51 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=5f50c3a01bbcb9dbe0 |
+| 2026-07-29 15:33:02 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=ec7917ea0bb5569e85 |
+| 2026-07-29 15:33:02 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=acf57e6dbd6af7991f |
+| 2026-07-29 22:01:15 | `file.write` | skills/query/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=516a6ece0a5e1efbc3a4db44fa1e523110b05074556b1c |
+| 2026-07-29 22:01:15 | `file.write` | skills/query/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=af1804dcfddfdd712b1819d0e38090f381e50ced3b3f6b |
+| 2026-07-29 22:02:29 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a5daea5d1f9c9105588ec7d84d44ae0ab4ebad6e |
+| 2026-07-29 22:02:29 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c6d4a698fbac3734dbf2d12ee3aa1d303f81918e |
+| 2026-07-29 22:10:38 | `file.write` | harness/tests/ge-backcompat-test.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=ee98f87f000a8f7ea47e48920ad858b3 |
+| 2026-07-29 22:10:38 | `file.write` | harness/tests/ge-backcompat-test.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=780cdd47302fb4cf2492c272ca53f900 |
+| 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9228d52155404cae856a141a251e3858bea61 |
+| 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9edfbe677ae61150f30380f7d00ab6db7803c |
 
 <!-- log:auto:end -->

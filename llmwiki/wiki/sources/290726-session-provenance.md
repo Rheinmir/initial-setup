@@ -18,6 +18,7 @@ session: 1319b8e1-576f-488b-bd70-09ef6f2d877a
 
 - `draft/orca/280726-onboard-setup.md`
 - `lmwiki/html/wiki-graph.html`
+- `sources/draft/290726-ge-test-PLAN.md`
 - `sources/draft/290726-graph-engineering-PLAN.md`
 - `sources/draft/290726-overstack-source-map.md`
 - `sources/draft/290726-spec-vs-overstack.md`

@@ -42,6 +42,16 @@ When user asks question requiring synthesis across multiple wiki pages or raw so
    `python3 harness/scripts/query-log.py --record --question "<câu hỏi>" --pages "<slug1,slug2>" --tokens <ước tính token đã đọc> --tier <1|2|3>`
    `--pages` = các trang wiki thực sự đọc; `--tier` = tầng sâu nhất chạm tới (1 quét / 2 đọc full / 3 wikilinks). Script fail-open — không bao giờ làm gãy phiên. Giới hạn đã biết: chỉ đo khi skill `query` được gọi, không đo lượt model tự Read thẳng.
 
+9. **Evidence — trích cạnh, không chỉ trích trang.** Với MỖI trang wiki đã dùng làm căn cứ, chạy:
+   `python3 harness/scripts/wiki-graph.py cite <page>`
+   rồi đính mục `## Evidence` vào cuối câu trả lời, liệt kê **eid của những cạnh thật sự chống lưng** kết luận — không liệt kê cạnh chỉ vì nó tồn tại:
+   ```
+   ## Evidence
+   - e:4b65f8c5  concepts/decision-anchoring.md -> concepts/adapt-modes.md  (wikilink)
+   - e:988aa19d  index.md -> concepts/example-concept.md  (mdlink)
+   ```
+   Không cạnh nào chống lưng → ghi thẳng `Evidence: none (page-level only)`. Trung thực hơn bịa một đường đi. Cạnh có kiểu (`supports`/`contradicts`/`supersedes`/`derives-from`/`depends-on`) khai trong frontmatter `relations:` của trang, mạnh hơn `wikilink` trần vì nó nói RÕ quan hệ.
+
 ## Rules
 - **OKF v0.1 (R9):** any new wiki page starts with a YAML frontmatter block (`---`) with a non-empty `type`; copy the matching `_template.md` and keep the `## Origin` section.
 - Never invent facts. Synthesize from wiki and `raw/` only.

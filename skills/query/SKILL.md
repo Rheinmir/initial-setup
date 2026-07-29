@@ -1,6 +1,6 @@
 ---
 name: query
-description: Synthesize answer from wiki; persist new insights as wiki entries
+description: Synthesize answer from wiki; persist new insights as wiki entries. Trả lời kèm mục Evidence trích dẫn edge ID (eid) của các cạnh trong đồ thị wiki thật sự chống lưng kết luận — dùng khi cần biết "căn cứ nào", "trích dẫn cạnh nào", "đường đi trong graph", "cite evidence".
 ---
 
 # Skill: query

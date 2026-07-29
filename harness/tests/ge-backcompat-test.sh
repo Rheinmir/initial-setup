@@ -76,22 +76,23 @@ for k in ("ratchet", "score", "commit", "hub_ref"):
 PY
 
 # Config CŨ (chưa có mục ratchet:/hub: mà T1/T7 thêm) vẫn nạp được và vẫn ra schema cũ.
-cat > "$TMP/old-config.yaml" <<'YAML'
-verified: true
-guards:
-  max_iter: 2
-  budget_seconds: 60
-  no_progress_k: 2
-  escalate_after_iter: 0
-progress:
-  state_paths: []
-reflexion:
-  enabled: true
-run_log:
-  path: null
-revise:
-  cmd: null
-YAML
+# Sinh từ CHÍNH config thật rồi cắt hai mục mới — KHÔNG chép tay hằng số guard sang đây:
+# chép tay là rò giá trị quarantine ra khỏi adapter (adapt-registry leak-gate cắn), và làm
+# test lệch khi ai đó chỉnh guard trong config thật.
+python3 - "$SRC/harness/loop-runner.config.yaml" "$TMP/old-config.yaml" <<'PY'
+import re, sys
+src, dst = sys.argv[1], sys.argv[2]
+out, skip = [], False
+for line in open(src, encoding="utf-8"):
+    if re.match(r"^(ratchet|hub):", line):        # mục do T1/T7 thêm → bản "cũ" không có
+        skip = True
+        continue
+    if skip and re.match(r"^\S", line):           # hết khối thụt lề = hết mục cần cắt
+        skip = False
+    if not skip:
+        out.append(line)
+open(dst, "w", encoding="utf-8").write("".join(out))
+PY
 python3 "$SRC/harness/scripts/loop-runner.py" run --verify 'true' \
   --config "$TMP/old-config.yaml" --log "$TMP/oldcfg.json" --cwd "$TMP/proj" >/dev/null 2>&1
 python3 - "$TMP/oldcfg.json" <<'PY' && ok "config cũ (không mục ratchet/hub): chạy được, không field mới" \

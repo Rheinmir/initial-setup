@@ -53,6 +53,15 @@ STEPS = [
      "mọi script có --self-test ĐỀU được fdk-gate chạy (anti-drift: thêm feature quên gate → đỏ)"),
     ("policy↔converters drift", ["bash", "harness/tests/policy-converters-drift-test.sh"],
      "adapter sinh khớp policy.yaml"),
+    ("graph-engineering tests", ["bash", "-c",
+        "bash harness/tests/ge-backcompat-test.sh . >/dev/null && "
+        "bash harness/tests/ge-integration-test.sh . >/dev/null && "
+        "bash harness/tests/ge-killswitch-test.sh . >/dev/null && "
+        "bash harness/tests/ge-travel-test.sh . >/dev/null && "
+        "bash harness/tests/ge-reachability-test.sh . >/dev/null && "
+        "bash harness/tests/ge-acceptance-test.sh . >/dev/null && "
+        "bash harness/tests/ge-purpose-test.sh . >/dev/null"],
+     "T1–T7: hồi quy · tích hợp · kill-switch · travel · reachability · §X acceptance · mục đích"),
     ("vendor-neutral demo", ["bash", "harness/poc-vendor-neutral/demo.sh"],
      "self-test lõi (demo)"),
     ("vendor-neutral broad", ["bash", "harness/poc-vendor-neutral/test-broad.sh"],

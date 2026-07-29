@@ -93,7 +93,8 @@ STEPS = [
         "python3 harness/scripts/decision-liveness.py --self-test >/dev/null && "
         "python3 harness/scripts/dep-health.py --self-test >/dev/null && "
         "python3 harness/scripts/orca-dispatch.py --self-test >/dev/null && "
-        "python3 harness/scripts/orca-reconcile.py --self-test >/dev/null"],
+        "python3 harness/scripts/orca-reconcile.py --self-test >/dev/null && "
+        "python3 harness/scripts/hub.py --self-test >/dev/null"],
      "33 chức năng BNAL — self-test phải còn PASS (giữ verified trung thực)"),
 ]
 

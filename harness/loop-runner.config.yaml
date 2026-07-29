@@ -41,6 +41,21 @@ ratchet:
   min_delta: 0.0              # ASSUMPTION: vùng chết — thay đổi nhỏ hơn ngưỡng này KHÔNG tính là
                               #   cải thiện. 0.0 = mọi cải thiện đều tính (chưa calibrate với metric nhiễu).
 
+# ── Commit-DAG hub LOCAL (OPT-IN, MẶC ĐỊNH TẮT) ─────────────────────────────
+# Đây là CÔNG TẮC DUY NHẤT của hub. `enabled: false` = hệ chạy y hệt như chưa từng có
+# hub: loop-runner không nạp harness/scripts/hub.py, không tạo ref nào, run-log không
+# thêm field nào. Bật lên thì mỗi Trial của ratchet còn được ghi thành một node commit
+# `refs/hub/<agent>/<seq>` kèm `git notes`, để sau này hỏi được "kết quả giữ lại nào có
+# metric tốt nhất" và "đã vứt những gì trên đường tới đó".
+# Cờ CLI --hub / --no-hub ghi đè giá trị này cho một lần chạy.
+# Các ngưỡng riêng của hub (prune) nằm ở harness/hub.config.yaml.
+# Cách tắt và cách gỡ bỏ hoàn toàn: llmwiki/wiki/concepts/commit-dag-hub.md
+hub:
+  enabled: false              # ASSUMPTION (chưa calibrate): mặc định TẮT là lựa chọn có chủ ý —
+                              #   chi phí giữ tính năng này bằng 0 khi không ai bật.
+  agent: "loop-runner"        # ASSUMPTION: tên agent gắn vào ref/notes; đổi khi nhiều loop chạy
+                              #   song song và cần tách cây thí nghiệm của từng loop.
+
 # ── Progress detection (deterministic) ──────────────────────────────────────
 # The loop hashes these paths each iteration. Hash changed → reset the streak;
 # unchanged → grow the streak. Fail-safe: an EMPTY list DISABLES no-progress

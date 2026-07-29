@@ -14,6 +14,10 @@ DETERMINISTIC, built-and-tested now (this file):
   • progress detection                     sha256 state-hash of workspace-relevant paths
   • the ratchet (opt-in, --metric-cmd)     score each iter; beat the best → `git commit` (keep),
                                            else `git reset --hard` back to the last keep (revert)
+  • the commit-DAG hub (opt-in, OFF)       --hub → each Trial also becomes a `refs/hub/*` node.
+                                           Loaded by PATH from hub.py, never imported at the
+                                           top of this file: delete hub.py and the loop is
+                                           unchanged (llmwiki/wiki/concepts/commit-dag-hub.md).
   • the run-log artifact                   JSON: iterations, verdicts, termination reason
   • reflexion                              append a one-line "lesson" to a wiki episodic page
 
@@ -33,6 +37,7 @@ Usage
                      [--max-iter N] [--budget-seconds S] [--no-progress-k K]
                      [--escalate-after N] [--episodic <path>] [--cwd <dir>] [--quiet]
                      [--metric-cmd "<cmd>"] [--direction max|min] [--no-improve-k N] [--min-delta F]
+                     [--hub | --no-hub]
   loop-runner.py selftest        # 8 deterministic scenarios, no LLM, no external deps
 
 CLI flags override config; config provides the (quarantined) defaults.
@@ -78,6 +83,7 @@ DEFAULTS = {
         "no_improve_k": 3,
         "min_delta": 0.0,
     },
+    "hub": {"enabled": False, "agent": "loop-runner"},
     "progress": {"state_paths": []},
     "reflexion": {"episodic_memory_page": None, "enabled": True},
     "run_log": {"path": None},
@@ -230,6 +236,33 @@ def git_revert_to(sha, cwd):
     _git(["reset", "--hard", sha], cwd)
 
 
+# ── Commit-DAG hub: OPT-IN, default OFF, removable ──────────────────────────
+_HUB_MODULE = {}
+
+
+def _load_hub():
+    """Load `harness/scripts/hub.py` BY PATH, lazily, and only when the hub is enabled.
+
+    There is deliberately NO `import hub` at the top of this file: delete hub.py and this
+    returns None, the hub branch below becomes a no-op, and the loop runs exactly as it did
+    before T7. That one-way, path-based dependency IS the "removes cleanly" guarantee.
+    """
+    if "mod" not in _HUB_MODULE:
+        mod = None
+        try:
+            import importlib.util
+
+            p = Path(__file__).resolve().parent / "hub.py"
+            if p.is_file():
+                spec = importlib.util.spec_from_file_location("hub", p)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+        except Exception:
+            mod = None  # fail-open: a broken hub.py must never break the loop
+        _HUB_MODULE["mod"] = mod
+    return _HUB_MODULE["mod"]
+
+
 def run_loop(
     *,
     verify_cmd,
@@ -242,6 +275,8 @@ def run_loop(
     direction="max",
     no_improve_k=3,
     min_delta=0.0,
+    hub_enabled=False,
+    hub_agent="loop-runner",
     state_paths=None,
     episodic_page=None,
     reflexion_enabled=True,
@@ -347,6 +382,23 @@ def run_loop(
                     git_revert_to(last_kept_sha, cwd)
                 no_improve += 1
             rec["score"] = score
+            # HUB (opt-in, default OFF) — record this Trial as a commit-DAG node so a later
+            # run can ask "which kept result scored best, and what was discarded on the way".
+            # Loaded by path (see _load_hub): no hub.py → no-op, loop unchanged.
+            if hub_enabled and rec.get("ratchet") in ("kept", "reverted"):
+                hub = _load_hub()
+                if hub is not None:
+                    try:
+                        rec["hub_ref"] = hub.hub_push(
+                            cwd,
+                            agent=hub_agent,
+                            hypothesis=f"iter {it}: {verify_cmd}",
+                            metric=rec.get("score"),
+                            status="kept" if rec["ratchet"] == "kept" else "discarded",
+                            commit=rec.get("commit"),
+                        )
+                    except Exception:
+                        pass  # fail-open: a broken hub must never break the ratchet
             # GUARD 5 — R-1.4: stop after K measurements in a row without improvement.
             if no_improve_k and no_improve >= no_improve_k:
                 verdict, reason = NO_PROGRESS, f"{no_improve} lần liên tiếp không cải thiện metric"
@@ -410,6 +462,8 @@ def run_loop(
             "best_score": best_score,
             "last_kept_commit": last_kept_sha,
         }
+    if hub_enabled:  # only present on hub runs — hub-off run-logs stay byte-identical
+        log["hub"] = {"enabled": True, "agent": hub_agent}
     if log_path:
         lp = Path(log_path)
         lp.parent.mkdir(parents=True, exist_ok=True)
@@ -461,6 +515,7 @@ def cmd_run(args):
     cfg = load_config(args.config)
     g = cfg["guards"]
     rt = cfg.get("ratchet") or {}
+    hb = cfg.get("hub") or {}
     settings = dict(
         verify_cmd=args.verify,
         revise_cmd=args.revise if args.revise is not None else cfg["revise"].get("cmd"),
@@ -472,6 +527,8 @@ def cmd_run(args):
         direction=args.direction if args.direction is not None else rt.get("direction", "max"),
         no_improve_k=args.no_improve_k if args.no_improve_k is not None else rt.get("no_improve_k", 3),
         min_delta=args.min_delta if args.min_delta is not None else rt.get("min_delta", 0.0),
+        hub_enabled=args.hub if args.hub is not None else bool(hb.get("enabled", False)),
+        hub_agent=hb.get("agent") or "loop-runner",
         state_paths=args.state if args.state else cfg["progress"].get("state_paths") or [],
         episodic_page=args.episodic if args.episodic is not None else cfg["reflexion"].get("episodic_memory_page"),
         reflexion_enabled=cfg["reflexion"].get("enabled", True),
@@ -713,6 +770,10 @@ def build_parser():
                    help="stop after K consecutive iterations that do not beat the best score (0 = off)")
     r.add_argument("--min-delta", type=float, default=None,
                    help="dead band: a score move smaller than this is not an improvement")
+    r.add_argument("--hub", dest="hub", action="store_true", default=None,
+                   help="record each ratchet Trial as a commit-DAG node (opt-in; needs hub.py)")
+    r.add_argument("--no-hub", dest="hub", action="store_false",
+                   help="force the commit-DAG hub off, whatever the config says")
     r.add_argument("--episodic", default=None, help="episodic-memory wiki page for reflexion lessons")
     r.add_argument("--cwd", default=".", help="working directory for verify/revise commands")
     r.add_argument("--quiet", action="store_true")

@@ -1,0 +1,35 @@
+# harness/hub.config.yaml — adapter của commit-DAG hub LOCAL (harness/scripts/hub.py).
+#
+# Hub MẶC ĐỊNH TẮT. Công tắc bật/tắt KHÔNG nằm ở đây mà ở `hub.enabled` trong
+# harness/loop-runner.config.yaml — một công tắc, một chỗ, để "tắt hub" chỉ có đúng
+# một nơi phải sửa. File này chỉ giữ các con số điều chỉnh của riêng hub, và chúng
+# chỉ có tác dụng khi hub đã được bật.
+#
+# Cơ chế thì tất định và đã kiểm: `python3 harness/scripts/hub.py --self-test` dựng
+# sandbox git thật rồi assert push/children/leaves/lineage/prune/purge. Cái chưa chắc
+# là các NGƯỠNG dưới đây — chúng phụ thuộc nhịp chạy thật của từng dự án.
+
+verified: true         # VERIFIED 2026-07-29: push/notes + bốn truy vấn DAG + prune/purge đều
+                       # được `hub.py --self-test` chứng minh trên sandbox git thật (ALL PASS).
+                       # Các ngưỡng bên dưới vẫn là phỏng đoán, đánh dấu ASSUMPTION từng dòng.
+
+# ── Chặn nợ "DAG phình vô hạn" (PDF §IX.C) ──────────────────────────────────
+# `hub.py prune` giữ lại K node điểm cao nhất và xoá phần còn lại. Mặc định là DRY-RUN;
+# phải thêm --yes mới thi hành thật.
+prune:
+  keep_top: 20         # ASSUMPTION (chưa calibrate): giữ 20 thí nghiệm điểm cao nhất là đủ để
+                       #   truy lại vì sao chọn nhánh này. Nguồn: đoán, chưa đo trên dự án thật.
+  older_than_days: 0   # ASSUMPTION (chưa calibrate): 0 = không xét tuổi, chỉ xét thứ hạng metric.
+                       #   Đặt > 0 nếu muốn node mới luôn được giữ dù điểm thấp.
+
+# ── Hiển thị ────────────────────────────────────────────────────────────────
+log:
+  limit: 50            # ASSUMPTION (chưa calibrate): 50 dòng đủ cho một lượt đọc `hub.py log`.
+                       #   Ghi đè bằng --limit.
+
+# ADAPT-CHECKLIST (chốt lại khi đã chạy hub trên một dự án thật đủ lâu):
+#   1. Đo số node hub sinh ra mỗi tuần; chỉnh prune.keep_top cho khớp nhịp đó.
+#   2. Quyết định có cần older_than_days không (dự án nhiều agent chạy song song thì nên có).
+#   3. Chạy: python3 harness/scripts/hub.py --self-test  (phải PASS).
+#   4. Nếu quyết định KHÔNG dùng hub nữa: xem mục "Cách tắt và cách gỡ bỏ hoàn toàn"
+#      trong llmwiki/wiki/concepts/commit-dag-hub.md — ba tầng tắt / xoá dữ liệu / gỡ code.

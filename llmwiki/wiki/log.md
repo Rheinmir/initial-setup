@@ -612,57 +612,63 @@ Thêm bước 8f vào `skills/lint/SKILL.md` (canonical — nhớ đúng bài h�
 
 Tạo `llmwiki/wiki/concepts/provenance-log.md` — concept đầy đủ (CAP/AP, ranh giới với `touches`/`correlate()`, bài học `/fable5` writer_id, bằng chứng thật 98 event/53 code.change/44 docs.change/1 decision.confirm đo lúc viết). `medic --ci` 0 fail sau khi regen `build-overstack-docs.py` (docs drift từ skill-listing đổi, không liên quan trực tiếp).
 
+## 2026-07-24 — fdk-uat/fdk-poc — gate cứng bắt buộc tạo workspace Orca thật
+
+User nhắc lần thứ 2 (2026-07-21 → 2026-07-24, cùng lỗi tái diễn ở cả /fdk-uat lẫn /fdk-poc): agent tự ý chạy filesystem-only (curl vào thư mục tạm, test CLI thuần) rồi báo hoàn tất, bỏ qua việc dựng workspace Orca thật — "không visual = không dùng được". Root cause: bước dựng workspace trong `skills/fdk-uat/SKILL.md` được đánh dấu "(tuỳ chọn)" — nhớ tay đã fail 2 lần liền, đúng dấu hiệu cần đổi cấu trúc thay vì nhắc thêm.
+
+Vá `skills/fdk-uat/SKILL.md` (canonical, sync mirror+installed, parity xác nhận `diff`): bỏ chữ "tuỳ chọn", thêm block assert chạy `orca worktree list` verify đúng tên worktree vừa tạo có mặt — fail thì DỪNG, không được báo PASS. Vá tương tự bản CÀI của `fdk-poc` (`~/.claude/skills/fdk-poc/SKILL.md`) — nhưng canonical thật của skill này nằm trên nhánh `Rheinmir/issue-15-br-k`, không sửa được sạch từ `orca`; ghi rõ giới hạn này để không tưởng nhầm đã vá triệt để (bản cài sẽ mất vá nếu `npx skills add` cài lại từ nguồn gốc).
+
+## 2026-07-28 — orca-onboard — onboard-setup
+
+Onboard chính repo overstack (853 file tracked, commit 9032ae4). Pipeline distill: static parse 0-token cho graph, Claude main thread cho layers/tour/domain, opencode+DeepSeek cho wiki/HTML render.
+
+## 2026-07-29 — docs-site-macos — overstack-source-map
+
+Sinh `llmwiki/html/290726-overstack-source-map.html` (138,7 KB, 7 section, self-contained) bằng generator python đọc thẳng knowledge-graph.json + domain-graph.json + policy.yaml. Kiểm chứng bằng cách mở thật trong Chrome: console sạch, 0 request ngoài, mind map/sơ đồ kéo-thả/master-detail/toggle theme đều chạy.
+
+Phát hiện và sửa một bug rò CSS dark sang light: prefix `html[data-theme=dark]` chỉ dán vào selector đầu của danh sách phẩy nên `.steps li` ăn nền tối ở cả light mode. Bản vá đầu cũng sai (nối liền thành `html[data-theme=dark].card`, và `split(",")` xé selector chứa `rgba()`); cách sửa cuối là giữ selector dạng list rồi prefix từng phần tử.
+
+## 2026-07-29 — docs-site-macos — spec-vs-overstack
+
+Đối chiếu overstack (commit 9032ae4) với `graph-engineering-implementation-spec.md` v0.1 trên 67 mục thuộc 8 trục, sinh trang so sánh `llmwiki/html/290726-spec-vs-overstack.html` (94 KB, self-contained).
+
+Kết quả: 15 đủ · 36 một phần · 15 thiếu · 1 khác-thiết-kế. 15 chỗ thiếu quy về ba gốc — (1) loop-runner không ratchet theo điểm số (grep `git reset` ra 0 kết quả, không có bản ghi Trial); (2) cạnh wiki vô danh và không có edge ID, kéo theo 5/11 loại cạnh spec và mắt xích 5 của bài nghiệm thu §10; (3) không có dịch vụ commit-DAG nên không giữ nhiều lineage thí nghiệm sống song song.
+
+Chiều ngược lại, bảy thứ overstack có mà spec không nhắc: chặn trước hành động 0 token, fire-drill chứng minh luật còn cắn, nguyên tắc "tồn tại ≠ dùng được", chống drift ba bản skill, capproof, claim-receipts, hạ tầng bằng không.
+
+## 2026-07-29 — gap-check — pdf-goc-graph-engineering
+
+Đọc PDF gốc `Graph-Engineering-Athropic-Karpathy-Loop.pdf` (11 trang) — nguồn mà spec md derive ra. Không lật kết luận nào của bản đối chiếu 67 mục; bổ sung GỐC THIẾU THỨ 4: graph của overstack là DOCS-graph (chỉ xem/lint/vẽ), PDF đòi RUNTIME-graph (TABLE I: gate signal / classifier input / shared surface / shared memory / grounding layer trong từng workflow pattern). Kèm 2 món rẻ: grounding feedback có schema `required_evidence[]`, và message-board cho giả thuyết đã bỏ. Điểm mạnh nhất theo PDF: persistent world model 7/9 tick ("the agent forgets, the wiki does not"); thiếu temporal facts. Vị trí build path: ~Week 2 + mảnh Month 1. Cập nhật vào draft 290726-spec-vs-overstack.
+
+## 2026-07-29 — docs-site-macos — pdf-gap-html
+
+Sinh trang riêng `llmwiki/html/290726-pdf-gap-overstack.html` (81 KB, 7 section, self-contained) giải thích bằng HTML phần đối chiếu PDF gốc Graph Engineering: tiến trình vibe→agentic→graph với vị trí overstack, 5 cơ chế externalize bottleneck, 4 gốc thiếu kèm bằng chứng file thật, TABLE I runtime-graph (4/6 vai trò chưa có) + diagram DOCS-graph vs RUNTIME-graph, TABLE VI checklist (3✅ 4🟡 2🔴) + 14 bước chuẩn (thiếu 5 bước graph), persistent world model 6✅/2🟡/1🔴, build path ~Week 2, và 3 chỗ chính PDF khuyên ĐỪNG. Generator `.orca-onboard/tmp/build_pdf_gap.py` tái dùng shell build_source_map. Kiểm trong Chrome: console sạch, 0 request ngoài. Footer có đường dẫn tuyệt đối (R16).
+
+## 2026-07-29 — plan — graph-engineering-PLAN
+
+Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engiering" của user thành tên đúng). Viết `sources/draft/290726-graph-engineering-PLAN.md` — 6 task đóng gap theo PDF: T1 ratchet điểm số cho loop-runner (metric-cmd + direction + git keep/revert + Trial, PDF R-1.1/1.3/1.4) · T2 edge ID sha1 + typed edges đọc frontmatter relations (thêm supports/contradicts/supersedes) · T3 /query đính mục Evidence trích eid · T4 grounding-check.py schema {decision, claim, reason, required_evidence[]} wire vào /qc-code · T5 bốn trần budget mới trong token-budget (model calls, sub-agents, workers, graph-writes) · T6 provenance-log post-hypothesis/read-hypotheses. Mỗi task TDD self-test-trước, mọi cờ optional giữ backward-compat, ngưỡng mới đều ASSUMPTION trong config adapter. Ngoài phạm vi CÓ TRIGGER: commit-DAG hub (chờ đau thật ≥2 lineage), KG extraction LLM (PDF §VIII.C tự khuyên đừng), temporal facts, verification-wave khác vai. R7 plan-executable cắn 3 lần lúc viết (Task 2/5/6 thiếu code block) — bổ sung đủ code thật mới qua.
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-23 16:51:24 | `file.write` | llmwiki/wiki/sources/draft/190726-graph-lessons-grapuco.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=bc6daf67f |
-| 2026-07-23 16:51:29 | `file.write` | llmwiki/wiki/sources/draft/190726-graph-lessons-grapuco.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=85cb37509 |
-| 2026-07-23 16:51:34 | `file.write` | llmwiki/wiki/sources/draft/200726-orchestration-loop-closure.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=f6db |
-| 2026-07-23 16:51:38 | `file.write` | llmwiki/wiki/sources/draft/200726-orchestration-loop-closure.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=9ba9 |
-| 2026-07-23 16:51:47 | `file.write` | llmwiki/wiki/sources/draft/190726-travel-gap-forcing-functions.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=3a |
-| 2026-07-23 16:55:18 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=b64437e5205ddfc9c58a5dcd81c1f08fc928575a |
-| 2026-07-23 16:58:07 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=84271e8cd486d2fdaa251f4d86b5bd6040 |
-| 2026-07-23 16:58:18 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=7d1fd67db3325b8bc3ebcdd015216cbad1 |
-| 2026-07-24 08:46:53 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog.md · tool=Edit · session=765fc26c · actor=agent · prev=5c |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=3 · human=['llmwiki/wiki/sources/210726-session-provenance.md', 'fdk/CAPABILITIES. |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=0 · prev=06f0468baf94455dcfd1886b3db26f2efbf8d760347b6bb3cd71d14f70163d66 · h=de87 |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/skills/utils/extract-site.md'] · prev=de875b1fd0ec34d68a8bff0f |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/innovation/230726-innovation.md', 'llmwiki/wiki/sources/230726 |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/sources/draft/210721-decision-anchoring-adoption-metric.m |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/wiki/draft/unknown/unknown-context-hygiene.md'] · prev=dbc90fc |
-| 2026-07-24 08:55:17 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md · tool=Write · session=765fc26c · actor=agent · p |
-| 2026-07-24 08:55:29 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md · tool=Edit · session=765fc26c · actor=agent · pr |
-| 2026-07-24 08:55:47 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=765fc26c · actor=agent · prev=0c6675fe2842ebf235ea01bfe009b6524883d7a0260a5e |
-| 2026-07-24 08:56:00 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=96b25e265daf6c0104aa49c11ea452b7d1e132a33 |
-| 2026-07-24 08:57:20 | `file.write` | harness/scripts/provenance-log.py · tool=Write · session=765fc26c · actor=agent · prev=ed61abaa4cf228bc1aa12b288354873b4 |
-| 2026-07-24 08:57:40 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=63d7c49cf13ceb8dfa9248f93c19843113 |
-| 2026-07-24 08:58:26 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=7a118f76188601aaaab06ba6e885cd0 |
-| 2026-07-24 08:58:38 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=22a974ddb854008c8b6da248c754acf |
-| 2026-07-24 08:59:01 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=ed25b8c81025aee1e43ffd737e0404a |
-| 2026-07-24 08:59:19 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=e0486f7da005b63533194ea0672f947 |
-| 2026-07-24 08:59:32 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=11f2022e8f8289b13e1d82cc6b760a3 |
-| 2026-07-24 08:59:57 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=15edb18d5cc945fd7f2a1f06c38c9a79dc401392b97118b8008954161f2935d8 · h=1a85 |
-| 2026-07-24 08:59:58 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/scripts/decision-liveness.py'] · prev=1a858d16bd7f18b4fe319d8c |
-| 2026-07-24 09:00:15 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=765fc26c · actor=agent · prev=39c48863af5321cb15ee1a506f7a6fa10c43eb |
-| 2026-07-24 09:03:57 | `file.write` | llmwiki/innovation/240726-innovation.md · tool=Write · session=bfce9765 · actor=agent · prev=96e7a747818f92f48d6f599d12c |
-| 2026-07-24 09:04:28 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['fdk/CAPABILITIES.md', 'llmwiki/wiki/log.md', 'harness/version.json', ' |
-| 2026-07-24 09:04:28 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['harness/mechanisms.yaml', 'llmwiki/wiki/sources/draft/220722-artifact- |
-| 2026-07-24 09:24:49 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=10d23019252ac6ab513480492bd611b497 |
-| 2026-07-24 09:25:09 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=eaacfef826c3c69569432cec8bf8274b5a |
-| 2026-07-24 09:25:58 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=e6b912c8f260f6f80f40fe142620fde98d6c37286 |
-| 2026-07-24 09:36:10 | `file.write` | skills/lint/SKILL.md · tool=Edit · session=765fc26c · actor=agent · prev=b363dd7a107410d2575c9c3e39bc529d66a5d493b072f92 |
-| 2026-07-24 09:37:25 | `file.write` | llmwiki/wiki/concepts/provenance-log.md · tool=Write · session=765fc26c · actor=agent · prev=a8fa6b46f0effbe95cb6463362e |
-| 2026-07-24 09:37:41 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=765fc26c · actor=agent · prev=a4cbb1a77f96a8f91cc29ccb43cc56e74eeff332224dcf |
-| 2026-07-24 09:39:16 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=f221708e0d75c533ec4da00960d68b4073dc0385f |
-| 2026-07-24 09:39:16 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/skills/wiki-loop/lint.md'] · prev=9d22c4136892038c8495ed4c0aee |
+| 2026-07-29 00:00:00 | `file.write` | llmwiki/wiki/draft/orca/280726-onboard-setup.md · tool=Write · session=1319b8e1 · actor=agent · prev=genesis · h=bcc3135 |
+| 2026-07-29 08:36:02 | `file.write` | llmwiki/wiki/sources/draft/290726-overstack-source-map.md · tool=Write · session=1319b8e1 · actor=agent · prev=bcc31350b |
+| 2026-07-29 10:23:42 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Write · session=1319b8e1 · actor=agent · prev=6e4f15ea6e9e |
+| 2026-07-29 10:23:42 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Write · session=1319b8e1 · actor=agent · prev=a5c97331bcbd |
+| 2026-07-29 10:44:34 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=69b503771f54c |
+| 2026-07-29 10:44:34 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=ee1409196d352 |
+| 2026-07-29 10:51:08 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=bd51fd9dd5032 |
+| 2026-07-29 10:51:08 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=ac543b24ac10d |
+| 2026-07-29 11:24:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=05549b8 |
+| 2026-07-29 11:24:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=87fe994 |
+| 2026-07-29 11:25:02 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=28f8218a |
+| 2026-07-29 11:25:02 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=eec0dcbf |
+| 2026-07-29 11:25:25 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=8ed378e7 |
+| 2026-07-29 11:25:25 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=dc95169e |
+| 2026-07-29 11:25:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=6a51c1d2 |
+| 2026-07-29 11:25:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=bf0281d7 |
 
 <!-- log:auto:end -->
-
-## 2026-07-24 — fdk-uat/fdk-poc — gate cứng bắt buộc tạo workspace Orca thật
-
-User nhắc lần thứ 2 (2026-07-21 → 2026-07-24, cùng lỗi tái diễn ở cả /fdk-uat lẫn /fdk-poc): agent tự ý chạy filesystem-only (curl vào thư mục tạm, test CLI thuần) rồi báo hoàn tất, bỏ qua việc dựng workspace Orca thật — "không visual = không dùng được". Root cause: bước dựng workspace trong `skills/fdk-uat/SKILL.md` được đánh dấu "(tuỳ chọn)" — nhớ tay đã fail 2 lần liền, đúng dấu hiệu cần đổi cấu trúc thay vì nhắc thêm.
-
-Vá `skills/fdk-uat/SKILL.md` (canonical, sync mirror+installed, parity xác nhận `diff`): bỏ chữ "tuỳ chọn", thêm block assert chạy `orca worktree list` verify đúng tên worktree vừa tạo có mặt — fail thì DỪNG, không được báo PASS. Vá tương tự bản CÀI của `fdk-poc` (`~/.claude/skills/fdk-poc/SKILL.md`) — nhưng canonical thật của skill này nằm trên nhánh `Rheinmir/issue-15-br-k`, không sửa được sạch từ `orca`; ghi rõ giới hạn này để không tưởng nhầm đã vá triệt để (bản cài sẽ mất vá nếu `npx skills add` cài lại từ nguồn gốc).

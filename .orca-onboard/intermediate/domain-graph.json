@@ -1,0 +1,386 @@
+{
+  "meta": {
+    "project": "overstack (rheinmir/setup)",
+    "generatedBy": "/orca-onboard Phase 2 — Claude main thread",
+    "generatedAt": "2026-07-28",
+    "gitCommitHash": "9032ae42fbe1e74115bf852decd12c6ca57d467e",
+    "note": "Entry point ở repo này KHÔNG phải HTTP endpoint mà là: (a) lệnh CLI curl|bash, (b) hook event của vendor, (c) slash-command skill, (d) CI job. Mọi file:line đã đối chiếu với đĩa tại commit trên."
+  },
+  "domains": [
+    {
+      "id": "domain:installation",
+      "name": "Installation & Distribution",
+      "description": "Đưa ba trụ (harness / skills / llmwiki) vào một dự án đích bằng một dòng lệnh, và gỡ ra sạch. Đây là bề mặt tiếp xúc duy nhất với người dùng mới.",
+      "entryPoints": [
+        "CLI: curl -fsSL .../bootstrap.sh | bash",
+        "CLI: bash harness/poc-vendor-neutral/install.sh",
+        "CLI: bash harness/scripts/install-harness.sh [. | --global]",
+        "CLI: bash harness/poc-vendor-neutral/uninstall.sh"
+      ],
+      "flows": [
+        {
+          "id": "flow:bootstrap-three-pillars",
+          "name": "Bootstrap cả ba trụ (đường người mới)",
+          "trigger": "curl | bash trong thư mục gốc dự án đích",
+          "steps": [
+            { "order": 0.1, "id": "step:strict-mode", "name": "Bật strict mode, khai báo helper log", "file": "harness/poc-vendor-neutral/bootstrap.sh", "line": 16 },
+            { "order": 0.2, "id": "step:parse-flags", "name": "Đọc cờ --harness-only / --clean / --vendor; mặc định WANT_FULL=1", "file": "harness/poc-vendor-neutral/bootstrap.sh", "line": 33 },
+            { "order": 0.3, "id": "step:pillar-harness", "name": "Trụ 1 — gọi install.sh cài lõi + validators + hook", "file": "harness/poc-vendor-neutral/install.sh", "line": 12 },
+            { "order": 0.4, "id": "step:pillar-skills", "name": "Trụ 2 — npx skills add rheinmir/setup#orca --global --all", "file": "harness/poc-vendor-neutral/bootstrap.sh", "line": 29 },
+            { "order": 0.5, "id": "step:pillar-llmwiki", "name": "Trụ 3 — seed khung llmwiki/ vào dự án", "file": "harness/scripts/install-harness.sh", "line": 257 },
+            { "order": 0.6, "id": "step:status-board", "name": "In bảng TRẠNG THÁI 3 TRỤ (mỗi trụ ✓ hoặc bỏ qua)", "file": "harness/poc-vendor-neutral/bootstrap.sh", "line": 19 }
+          ]
+        },
+        {
+          "id": "flow:wire-vendor-hooks",
+          "name": "Nối hook vào settings.json của vendor",
+          "trigger": "bên trong install.sh, sau khi chép lõi",
+          "steps": [
+            { "order": 0.1, "id": "step:detect-vendor", "name": "Dò vendor đang có (claude / opencode); has() khớp danh sách VENDORS", "file": "harness/poc-vendor-neutral/install.sh", "line": 32 },
+            { "order": 0.2, "id": "step:ensure-claude-dir", "name": "Tạo .claude/settings.json kể cả khi dự án chưa có .claude/", "file": "harness/poc-vendor-neutral/install.sh", "line": 64 },
+            { "order": 0.3, "id": "step:merge-hooks", "name": "Merge khối hooks vào settings.json (giữ backup .bak)", "file": "harness/poc-vendor-neutral/install.sh", "line": 98 },
+            { "order": 0.4, "id": "step:confirm-wire", "name": "In xác nhận đã merge — kiểm bằng /hooks, KHÔNG phải /mcp", "file": "harness/poc-vendor-neutral/install.sh", "line": 123 }
+          ]
+        },
+        {
+          "id": "flow:install-harness-global",
+          "name": "Cài harness GLOBAL (một lần, bảo vệ mọi project llmwiki trên máy)",
+          "trigger": "bash harness/scripts/install-harness.sh --global",
+          "steps": [
+            { "order": 0.1, "id": "step:resolve-root", "name": "--global → ROOT=$HOME; ngược lại ROOT=thư mục dự án", "file": "harness/scripts/install-harness.sh", "line": 41 },
+            { "order": 0.2, "id": "step:verify-source", "name": "src_ok(): nguồn phải có harness/validators và llmwiki/.claude/hooks", "file": "harness/scripts/install-harness.sh", "line": 71 },
+            { "order": 0.3, "id": "step:global-branch", "name": "Nhánh GLOBAL: ghi hook vào ~/.claude/settings.json kèm shell guard [ -d $CLAUDE_PROJECT_DIR/llmwiki ]", "file": "harness/scripts/install-harness.sh", "line": 119 },
+            { "order": 0.4, "id": "step:merge-global-settings", "name": "Merge JSON + backup .bak.*", "file": "harness/scripts/install-harness.sh", "line": 193 },
+            { "order": 0.5, "id": "step:validate-json", "name": "Parse lại settings.json — hỏng thì khôi phục backup rồi exit 1", "file": "harness/scripts/install-harness.sh", "line": 244 },
+            { "order": 0.6, "id": "step:copy-core", "name": "Chép L0 policy + validators + scripts + evals (lõi vendor-neutral)", "file": "harness/scripts/install-harness.sh", "line": 266 }
+          ]
+        },
+        {
+          "id": "flow:propagate-subrepos",
+          "name": "Nhân gate pre-push ra mọi subrepo đã harnessed (R12 v3)",
+          "trigger": "install-harness.sh --all-subrepos",
+          "steps": [
+            { "order": 0.1, "id": "step:list-subrepos", "name": "Liệt kê subrepo có harness", "file": "harness/poc-vendor-neutral/bin/list-subrepos.py", "line": 1 },
+            { "order": 0.2, "id": "step:fanout-gate2", "name": "Cài gate2 (pre-push) vào từng subrepo", "file": "harness/scripts/install-harness.sh", "line": 86 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domain:rule-enforcement",
+      "name": "Rule Enforcement (runtime guardrail)",
+      "description": "Chặn hành động sai của agent bằng code tất định, 0 token, trước khi hậu quả xảy ra. Lõi đọc policy.yaml; vendor chỉ là caller mỏng. Mọi hook fail-open.",
+      "entryPoints": [
+        "hook PreToolUse (Write|Edit|MultiEdit|NotebookEdit|Bash)",
+        "hook PostToolUse (Write|Edit|MultiEdit)",
+        "hook Stop",
+        "hook SessionStart / SessionEnd",
+        "hook UserPromptSubmit"
+      ],
+      "flows": [
+        {
+          "id": "flow:pretooluse-block",
+          "name": "Chặn một Write/Edit/Bash vi phạm",
+          "trigger": "agent gọi Write/Edit/MultiEdit/NotebookEdit/Bash",
+          "steps": [
+            { "order": 0.1, "id": "step:hook-main", "name": "Hook nhận event JSON qua stdin", "file": "llmwiki/.claude/hooks/pre_tool_use.py", "line": 73 },
+            { "order": 0.2, "id": "step:egress-guard", "name": "Với Bash: chạy egress-guard trước (chặn rò dữ liệu ra ngoài)", "file": "llmwiki/.claude/hooks/pre_tool_use.py", "line": 35 },
+            { "order": 0.3, "id": "step:run-local-validators", "name": "Chạy validator local theo tool + target", "file": "llmwiki/.claude/hooks/pre_tool_use.py", "line": 55 },
+            { "order": 0.4, "id": "step:core-entry", "name": "Lõi vendor-neutral: mode_claude_hook đọc payload hook", "file": "harness/poc-vendor-neutral/bin/llmwiki-validate.py", "line": 229 },
+            { "order": 0.5, "id": "step:load-policy", "name": "Nạp policy.yaml — nguồn chân lý 18 rule", "file": "harness/poc-vendor-neutral/bin/llmwiki-validate.py", "line": 60 },
+            { "order": 0.6, "id": "step:apply-rule", "name": "apply_rule(): khớp từng rule với (path, content, command)", "file": "harness/poc-vendor-neutral/bin/llmwiki-validate.py", "line": 203 },
+            { "order": 0.7, "id": "step:r1-deny-raw", "name": "R1 no-write-raw — chặn ghi llmwiki/raw/", "file": "harness/poc-vendor-neutral/bin/llmwiki-validate.py", "line": 81 },
+            { "order": 0.8, "id": "step:r2-origin", "name": "R2 origin-required — trang wiki phải có '## Origin'", "file": "harness/poc-vendor-neutral/bin/llmwiki-validate.py", "line": 96 },
+            { "order": 0.9, "id": "step:r9-frontmatter", "name": "R9 okf-frontmatter — frontmatter đúng schema", "file": "harness/poc-vendor-neutral/bin/llmwiki-validate.py", "line": 159 },
+            { "order": 1.0, "id": "step:record-bite", "name": "Ghi 'luật đã cắn' vào metrics để chứng minh guardrail còn sống", "file": "llmwiki/.claude/hooks/pre_tool_use.py", "line": 18 }
+          ]
+        },
+        {
+          "id": "flow:stop-index-gate",
+          "name": "Chặn kết thúc lượt nếu index.md lệch đĩa (R3)",
+          "trigger": "hook Stop — Claude sắp kết thúc lượt",
+          "steps": [
+            { "order": 0.1, "id": "step:stop-main", "name": "main(): vào cổng Stop", "file": "llmwiki/.claude/hooks/stop.py", "line": 264 },
+            { "order": 0.2, "id": "step:wiki-changed", "name": "wiki_changed(): phiên này có sửa wiki không — không thì bỏ qua", "file": "llmwiki/.claude/hooks/stop.py", "line": 253 },
+            { "order": 0.3, "id": "step:debounce", "name": "_debounced(): guard chống lặp vô hạn khi hook tự kích lại", "file": "llmwiki/.claude/hooks/stop.py", "line": 49 },
+            { "order": 0.4, "id": "step:auto-index", "name": "Self-heal: tự thêm row cho file wiki MỚI vào index.md", "file": "llmwiki/.claude/hooks/stop.py", "line": 293 },
+            { "order": 0.5, "id": "step:index-sync-check", "name": "Chạy index_sync.py chiều stale (xoá file mà còn row) — lệch thì exit 2 chặn dừng", "file": "llmwiki/.claude/hooks/stop.py", "line": 302 },
+            { "order": 0.6, "id": "step:regen-docs", "name": "Sinh lại docs (overstack.html, capabilities) khi nội dung đổi", "file": "llmwiki/.claude/hooks/stop.py", "line": 89 },
+            { "order": 0.7, "id": "step:secondary-memory", "name": "Ghi bộ nhớ thứ cấp (mem-rank episodic) cho phiên sau truy hồi", "file": "llmwiki/.claude/hooks/stop.py", "line": 150 },
+            { "order": 0.8, "id": "step:medic-mirror", "name": "Soi gương medic cho framework repo", "file": "llmwiki/.claude/hooks/stop.py", "line": 211 }
+          ]
+        },
+        {
+          "id": "flow:posttooluse-audit",
+          "name": "Ghi audit và sinh log.md (R4)",
+          "trigger": "hook PostToolUse sau Write/Edit/MultiEdit",
+          "steps": [
+            { "order": 0.1, "id": "step:post-main", "name": "Nhận kết quả tool đã chạy", "file": "llmwiki/.claude/hooks/post_tool_use.py", "line": 10 },
+            { "order": 0.2, "id": "step:audit-append", "name": "m_audit(): append audit.jsonl kèm timestamp", "file": "harness/poc-vendor-neutral/bin/harness-events.py", "line": 91 },
+            { "order": 0.3, "id": "step:gen-logmd", "name": "Sinh llmwiki/wiki/log.md từ audit — log bằng máy, không nhờ model nhớ", "file": "harness/poc-vendor-neutral/bin/harness-events.py", "line": 37 }
+          ]
+        },
+        {
+          "id": "flow:session-start-report",
+          "name": "Báo trạng thái đầu phiên (R8) và định hướng agent",
+          "trigger": "hook SessionStart",
+          "steps": [
+            { "order": 0.1, "id": "step:session-main", "name": "main(): vào cổng SessionStart", "file": "llmwiki/.claude/hooks/session_start.py", "line": 190 },
+            { "order": 0.2, "id": "step:harness-integrity", "name": "harness_integrity(): đếm rule đang gác, cảnh báo nếu hook rớt", "file": "llmwiki/.claude/hooks/session_start.py", "line": 28 },
+            { "order": 0.3, "id": "step:wiki-drift", "name": "wiki_drift(): code đã đổi bao nhiêu commit kể từ lần sync wiki", "file": "llmwiki/.claude/hooks/session_start.py", "line": 58 },
+            { "order": 0.4, "id": "step:output-style", "name": "output_style(): áp style output (caveman / i-have-adhd) cho phiên", "file": "llmwiki/.claude/hooks/session_start.py", "line": 84 },
+            { "order": 0.5, "id": "step:orient", "name": "orient(): in bản đồ wiki + CAPABILITIES để agent QUERY trước khi grep", "file": "llmwiki/.claude/hooks/session_start.py", "line": 110 },
+            { "order": 0.6, "id": "step:wikigraph-reminder", "name": "wikigraph_reminder(): nhắc vẽ lại vector khi wiki/code đổi", "file": "llmwiki/.claude/hooks/session_start.py", "line": 160 }
+          ]
+        },
+        {
+          "id": "flow:docs-gate-nudge",
+          "name": "Nhắc sinh docs định kỳ (R10)",
+          "trigger": "hook UserPromptSubmit, mỗi N prompt",
+          "steps": [
+            { "order": 0.1, "id": "step:docs-event", "name": "m_docs(): inject directive gọi /docs-site-macos", "file": "harness/poc-vendor-neutral/bin/harness-events.py", "line": 130 },
+            { "order": 0.2, "id": "step:event-dispatch", "name": "main(): định tuyến subcommand stop/audit/session/docs/session_end", "file": "harness/poc-vendor-neutral/bin/harness-events.py", "line": 204 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domain:knowledge-loop",
+      "name": "Knowledge Loop (llmwiki)",
+      "description": "Vòng nạp — chưng cất — truy hồi tri thức. Wiki là bộ nhớ dài hạn agent đọc trước khi hành động; index.md và log.md được luật ép khớp đĩa.",
+      "entryPoints": [
+        "skill /ingest", "skill /query", "skill /lint", "skill /record-episode", "skill /wiki-room"
+      ],
+      "flows": [
+        {
+          "id": "flow:ingest-distill",
+          "name": "Nạp file thô rồi chưng cất thành trang wiki",
+          "trigger": "/ingest — có file mới trong llmwiki/raw/",
+          "steps": [
+            { "order": 0.1, "id": "step:ingest-skill", "name": "Đọc quy trình ingest", "file": "skills/ingest/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:raw-readonly", "name": "R1 chặn mọi Write vào raw/ — raw là read-only tuyệt đối", "file": "harness/validators/no_write_raw.py", "line": 1 },
+            { "order": 0.3, "id": "step:write-concept", "name": "Ghi concept/entity kèm '## Origin' (R2) và frontmatter (R9)", "file": "harness/validators/origin_required.py", "line": 1 },
+            { "order": 0.4, "id": "step:folder-guard", "name": "R5 chặn tạo thư mục lạ — chỉ concepts/ entities/ sources/", "file": "harness/validators/folder_structure.py", "line": 1 },
+            { "order": 0.5, "id": "step:index-row", "name": "Thêm row vào index.md, nếu quên thì Stop hook chặn (R3)", "file": "harness/validators/index_sync.py", "line": 1 }
+          ]
+        },
+        {
+          "id": "flow:wiki-health-lint",
+          "name": "Rà sức khoẻ wiki (orphan, link gãy, drift code→wiki)",
+          "trigger": "/lint",
+          "steps": [
+            { "order": 0.1, "id": "step:lint-skill", "name": "Quy trình lint, bước 0 là cổng no-op tất định 0 token", "file": "skills/lint/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:wiki-sync-check", "name": "wiki-sync --check: code đổi bao nhiêu commit kể từ neo", "file": "harness/scripts/wiki-sync.py", "line": 1 },
+            { "order": 0.3, "id": "step:detect-cycles", "name": "Phát hiện chu trình derives-from / depends-on trong graph wiki", "file": "fdk/tools/build-wiki-graph.py", "line": 69 },
+            { "order": 0.4, "id": "step:duplicate-slug", "name": "Bắt slug wiki trùng giữa các thư mục", "file": "harness/validators/duplicate_basename.py", "line": 1 }
+          ]
+        },
+        {
+          "id": "flow:wiki-vector-render",
+          "name": "Vẽ vector quan hệ concept ↔ code",
+          "trigger": "Stop hook khi wiki/code đổi, hoặc gọi tay build-wiki-graph.py",
+          "steps": [
+            { "order": 0.1, "id": "step:scan-wiki", "name": "scan(): đọc llmwiki/wiki/*.md, dựng node + edge từ wikilink", "file": "fdk/tools/build-wiki-graph.py", "line": 120 },
+            { "order": 0.2, "id": "step:add-code-nodes", "name": "add_code_nodes(): đưa file code vào graph", "file": "fdk/tools/build-wiki-graph.py", "line": 340 },
+            { "order": 0.3, "id": "step:enrich-code", "name": "enrich_code(): suy cạnh imports từ code thật (0 token)", "file": "fdk/tools/build-wiki-graph.py", "line": 368 },
+            { "order": 0.4, "id": "step:layout", "name": "_layout(): force-directed 340 vòng trên canvas 1680×1080", "file": "fdk/tools/build-wiki-graph.py", "line": 185 },
+            { "order": 0.5, "id": "step:render-html", "name": "build_html(): xuất llmwiki/html/wiki-graph.html self-contained", "file": "fdk/tools/build-wiki-graph.py", "line": 439 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domain:dev-loop",
+      "name": "Dev Loop — propose → gate → dispatch",
+      "description": "Vòng làm việc hằng ngày. Human-in-the-loop nằm ở CỔNG (skill dừng bằng cấu trúc), không nằm ở lời nhắc. Agent không thể quên hỏi.",
+      "entryPoints": ["/propose", "/plan", "/orca-workflow", "/verify-before-commit", "/ship", "/orca-issue"],
+      "flows": [
+        {
+          "id": "flow:propose-gate",
+          "name": "Đề xuất rồi DỪNG chờ người duyệt",
+          "trigger": "/propose",
+          "steps": [
+            { "order": 0.1, "id": "step:propose-skill", "name": "Viết draft vào llmwiki/wiki/sources/draft/DDMMYY-<tên>.md", "file": "skills/propose/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:proposal-complete", "name": "R7 chặn draft thiếu bảng Agent + seq per-task", "file": "harness/validators/proposal_complete.py", "line": 1 },
+            { "order": 0.3, "id": "step:decision-adr", "name": "R13: quyết định architecture phải ref một ADR trong fdk/wiki/sources/adr/", "file": "harness/validators/decision_adr.py", "line": 1 },
+            { "order": 0.4, "id": "step:stop-and-ask", "name": "DỪNG — không code cho tới khi người gật ở cổng", "file": "skills/propose/SKILL.md", "line": 1 }
+          ]
+        },
+        {
+          "id": "flow:plan-expand",
+          "name": "Mở draft đã duyệt thành brief thi hành được",
+          "trigger": "/plan (sau khi người duyệt)",
+          "steps": [
+            { "order": 0.1, "id": "step:plan-skill", "name": "Sinh DDMMYY-<tên>-PLAN.md: đường dẫn chính xác + bước 2–5 phút", "file": "skills/plan/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:interfaces-block", "name": "Khối Interfaces (Consumes/Produces) để task hàng xóm khớp chữ ký", "file": "skills/plan/SKILL.md", "line": 1 },
+            { "order": 0.3, "id": "step:r18-executable", "name": "R18 plan-executable: PLAN mơ hồ bị chặn", "file": "harness/policy.yaml", "line": 68 }
+          ]
+        },
+        {
+          "id": "flow:dispatch-parallel",
+          "name": "Giao việc cho nhiều agent chạy song song",
+          "trigger": "/orca-workflow",
+          "steps": [
+            { "order": 0.1, "id": "step:workflow-skill", "name": "Chọn agent/model rẻ theo loại việc; reasoning giữ ở main thread", "file": "skills/orca-workflow/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:dispatch-ref", "name": "Cú pháp dispatch opencode/agy — nguồn chân lý duy nhất", "file": "skills/orca-dispatch-reference/SKILL.md", "line": 1 },
+            { "order": 0.3, "id": "step:worktree", "name": "Tách worktree/workspace Orca để agent không giẫm chân nhau", "file": "skills/orca-cli/SKILL.md", "line": 1 }
+          ]
+        },
+        {
+          "id": "flow:verify-and-promote",
+          "name": "Kiểm rồi promote draft thành wiki thật, mở cổng commit (R6)",
+          "trigger": "/verify-before-commit",
+          "steps": [
+            { "order": 0.1, "id": "step:verify-skill", "name": "typecheck + lint + smoke trước khi cho commit", "file": "skills/verify-before-commit/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:promote-draft", "name": "Promote draft → concepts/entities, điền Origin.Commit + ngày", "file": "skills/verify-before-commit/SKILL.md", "line": 1 },
+            { "order": 0.3, "id": "step:no-ai-attrib", "name": "R15 chặn ghi công AI vào commit message", "file": "harness/validators/no_ai_attribution.py", "line": 1 },
+            { "order": 0.4, "id": "step:precommit-backstop", "name": "pre-commit gate chạy lại validator — sàn vendor-neutral", "file": ".pre-commit-config.yaml", "line": 21 }
+          ]
+        },
+        {
+          "id": "flow:issue-repro-first",
+          "name": "Xử lý sự cố — chưa tái hiện được thì chưa được sửa",
+          "trigger": "/orca-issue",
+          "steps": [
+            { "order": 0.1, "id": "step:triage", "name": "Triage rồi vào cổng repro-first", "file": "skills/orca-issue/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:impact", "name": "Khoanh vùng caller/dependent trước khi sửa code dùng chung", "file": "skills/impact-check/SKILL.md", "line": 1 },
+            { "order": 0.3, "id": "step:safe-change", "name": "Sửa qua safe-change với bằng chứng đỏ→xanh", "file": "skills/safe-change/SKILL.md", "line": 1 },
+            { "order": 0.4, "id": "step:flywheel", "name": "Distill: đếm lớp lỗi, tái diễn quá ngưỡng thì scaffold rule mới", "file": "skills/failure-flywheel/SKILL.md", "line": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domain:framework-maintenance",
+      "name": "Framework Maintenance (FDK)",
+      "description": "Đồ nghề phát triển CHÍNH overstack. Không travel xuống dự án con (ADR-004/008). Nguyên tắc xuyên suốt: chứng minh bằng thăm dò thật, không kiểm sự tồn tại.",
+      "entryPoints": ["/fdk", "/medic", "/fdk-uat", "python3 harness/scripts/fdk-gate.py", "python3 fdk/tools/medic.py"],
+      "flows": [
+        {
+          "id": "flow:fdk-gate",
+          "name": "Definition-of-done cho mọi thay đổi framework",
+          "trigger": "python3 harness/scripts/fdk-gate.py",
+          "steps": [
+            { "order": 0.1, "id": "step:gate-main", "name": "main(): chạy tuần tự các step gate", "file": "harness/scripts/fdk-gate.py", "line": 109 },
+            { "order": 0.2, "id": "step:gate-run", "name": "run(): thực thi từng lệnh con, thu exit code", "file": "harness/scripts/fdk-gate.py", "line": 98 }
+          ]
+        },
+        {
+          "id": "flow:medic-health",
+          "name": "Cổng sức khoẻ tổng — chứng minh luật CÒN CẮN",
+          "trigger": "/medic hoặc python3 fdk/tools/medic.py",
+          "steps": [
+            { "order": 0.1, "id": "step:p-rules", "name": "p_rules(): fire-drill — cố tình vi phạm, xác nhận bị chặn", "file": "fdk/tools/medic.py", "line": 40 },
+            { "order": 0.2, "id": "step:p-coverage", "name": "p_coverage(): mỗi rule có validator tương ứng không", "file": "fdk/tools/medic.py", "line": 57 },
+            { "order": 0.3, "id": "step:p-backstop", "name": "p_backstop(): pre-commit + CI còn sống", "file": "fdk/tools/medic.py", "line": 73 },
+            { "order": 0.4, "id": "step:p-docs", "name": "p_docs(): docs sinh ra có khớp đĩa không", "file": "fdk/tools/medic.py", "line": 91 },
+            { "order": 0.5, "id": "step:p-code", "name": "p_code(): mọi .py compile được", "file": "fdk/tools/medic.py", "line": 261 },
+            { "order": 0.6, "id": "step:p-eval", "name": "p_eval(): eval không regress dưới sàn", "file": "fdk/tools/medic.py", "line": 279 },
+            { "order": 0.7, "id": "step:p-freshinstall", "name": "p_freshinstall(): đường cài từ đầu còn chạy", "file": "fdk/tools/medic.py", "line": 306 }
+          ]
+        },
+        {
+          "id": "flow:build-capabilities",
+          "name": "Sinh bản đồ năng lực từ đĩa (không viết tay)",
+          "trigger": "python3 fdk/tools/build-capabilities.py",
+          "steps": [
+            { "order": 0.1, "id": "step:detect-root", "name": "detect_root(): xác định repo framework", "file": "fdk/tools/build-capabilities.py", "line": 29 },
+            { "order": 0.2, "id": "step:parse-skills", "name": "parse_frontmatter_desc(): đọc mô tả từng SKILL.md", "file": "fdk/tools/build-capabilities.py", "line": 65 },
+            { "order": 0.3, "id": "step:capproof", "name": "capproof(): mỗi năng lực quảng cáo phải có BẰNG CHỨNG nguồn", "file": "fdk/tools/build-capabilities.py", "line": 215 },
+            { "order": 0.4, "id": "step:build-md", "name": "build(): xuất fdk/CAPABILITIES.md (84 skill · 18 rule · 19 tool · 63 script)", "file": "fdk/tools/build-capabilities.py", "line": 273 }
+          ]
+        },
+        {
+          "id": "flow:build-docs-site",
+          "name": "Sinh overstack.html self-contained từ đĩa",
+          "trigger": "Stop hook regen_docs, hoặc gọi tay",
+          "steps": [
+            { "order": 0.1, "id": "step:load-loops", "name": "load_loops(): nhóm skill theo loop (wiki/dev/orchestrate/utils)", "file": "fdk/tools/build-overstack-docs.py", "line": 56 },
+            { "order": 0.2, "id": "step:skills-by-loop", "name": "skills_by_loop(): đếm skill thật trên đĩa", "file": "fdk/tools/build-overstack-docs.py", "line": 65 },
+            { "order": 0.3, "id": "step:read-rules", "name": "rules(): đọc thẳng policy.yaml — bảng rule không thể nói dối", "file": "fdk/tools/build-overstack-docs.py", "line": 82 },
+            { "order": 0.4, "id": "step:load-mechanisms", "name": "load_mechanisms() + load_foundation(): nạp cơ chế và nền tảng", "file": "fdk/tools/build-overstack-docs.py", "line": 356 }
+          ]
+        },
+        {
+          "id": "flow:sync-skills-mirror",
+          "name": "Giữ canonical ↔ mirror không lệch",
+          "trigger": "python3 harness/scripts/sync-skills.py",
+          "steps": [
+            { "order": 0.1, "id": "step:pairs", "name": "pairs(): ghép skills/<tên>/SKILL.md ↔ llmwiki/skills/<loop>/<tên>.md", "file": "harness/scripts/sync-skills.py", "line": 69 },
+            { "order": 0.2, "id": "step:loop-of", "name": "loop_of(): quyết định skill thuộc loop nào", "file": "harness/scripts/sync-skills.py", "line": 65 },
+            { "order": 0.3, "id": "step:sync-main", "name": "main(): đồng bộ và báo drift", "file": "harness/scripts/sync-skills.py", "line": 79 },
+            { "order": 0.4, "id": "step:parity-check", "name": "Bảng skill trong AGENT.md phải khớp CLAUDE.md", "file": "harness/validators/agent_claude_parity.py", "line": 1 }
+          ]
+        },
+        {
+          "id": "flow:uat-canary",
+          "name": "UAT thật trên nhánh canary trước khi merge",
+          "trigger": "/fdk-uat",
+          "steps": [
+            { "order": 0.1, "id": "step:push-canary", "name": "Đẩy lên nhánh tạm uat/<ts>, curl từ raw của chính nhánh đó", "file": "skills/fdk-uat/SKILL.md", "line": 1 },
+            { "order": 0.2, "id": "step:real-workspace", "name": "Gate CỨNG: bắt buộc tạo + verify workspace Orca thật (không filesystem-only)", "file": "skills/fdk-uat/SKILL.md", "line": 1 },
+            { "order": 0.3, "id": "step:main-url-smoke", "name": "Sau merge: chạy đúng lệnh người mới gõ, KHÔNG override biến nào", "file": "skills/fdk-uat/SKILL.md", "line": 1 },
+            { "order": 0.4, "id": "step:contract", "name": "Đối chiếu hợp đồng downstream", "file": "harness/downstream-contract.yaml", "line": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domain:ci-backstop",
+      "name": "CI & Repo Backstop",
+      "description": "Sàn vendor-neutral chạy khi hook bị tắt hoặc bị bỏ qua. Ba tầng chồng nhau để một tầng hỏng vẫn còn chặn.",
+      "entryPoints": ["git commit (pre-commit)", "PR / push lên orca (GitHub Actions)"],
+      "flows": [
+        {
+          "id": "flow:precommit-gate",
+          "name": "Gate mọi commit bất kể agent nào gõ",
+          "trigger": "git commit",
+          "steps": [
+            { "order": 0.1, "id": "step:pc-origin", "name": "R2 wiki file phải có '## Origin'", "file": ".pre-commit-config.yaml", "line": 21 },
+            { "order": 0.2, "id": "step:pc-frontmatter", "name": "R9 concept phải có YAML frontmatter + type (OKF v0.1)", "file": ".pre-commit-config.yaml", "line": 27 },
+            { "order": 0.3, "id": "step:pc-folder", "name": "R5 file wiki đúng subfolder", "file": ".pre-commit-config.yaml", "line": 33 },
+            { "order": 0.4, "id": "step:pc-proposal", "name": "R7 proposal phải có bảng Agent + seq per-task", "file": ".pre-commit-config.yaml", "line": 39 },
+            { "order": 0.5, "id": "step:pc-parity", "name": "AGENT.md ↔ CLAUDE.md bảng skill khớp", "file": ".pre-commit-config.yaml", "line": 45 },
+            { "order": 0.6, "id": "step:pc-adr", "name": "R13 quyết định architecture phải ref ADR", "file": ".pre-commit-config.yaml", "line": 51 },
+            { "order": 0.7, "id": "step:pc-glass", "name": "R11 seq html phải theo design system glass", "file": ".pre-commit-config.yaml", "line": 57 },
+            { "order": 0.8, "id": "step:pc-local", "name": "harness-local: rule RIÊNG dự án (P-namespace, sync-safe)", "file": ".pre-commit-config.yaml", "line": 63 }
+          ]
+        },
+        {
+          "id": "flow:ci-harness",
+          "name": "GitHub Actions — validator + self-test mỗi PR",
+          "trigger": "pull_request, push lên orca",
+          "steps": [
+            { "order": 0.1, "id": "step:ci-selftest", "name": "job selftest: demo.sh 13 + test-broad.sh 54 = 67 assertion", "file": ".github/workflows/harness.yml", "line": 16 },
+            { "order": 0.2, "id": "step:ci-reachability", "name": "wiki-graph + memory-map user-reachability (chặn bẫy dev-only)", "file": ".github/workflows/harness.yml", "line": 29 },
+            { "order": 0.3, "id": "step:ci-validate", "name": "job validate-content: chạy validator trên file .md thay đổi", "file": ".github/workflows/harness.yml", "line": 34 },
+            { "order": 0.4, "id": "step:ci-repohealth", "name": "job repo-health: gate fresh-clone (trước nay chỉ pre-commit, bypass được)", "file": ".github/workflows/harness.yml", "line": 62 },
+            { "order": 0.5, "id": "step:ci-index-sync", "name": "R3 index-sync git-aware cho cả fdk/wiki và llmwiki/wiki", "file": ".github/workflows/harness.yml", "line": 73 },
+            { "order": 0.6, "id": "step:ci-code-health", "name": "code-health: mọi .py compile, ruff nếu có", "file": ".github/workflows/harness.yml", "line": 88 },
+            { "order": 0.7, "id": "step:ci-drift", "name": "policy ↔ converters drift — adapter phải khớp rule", "file": ".github/workflows/harness.yml", "line": 104 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domain:project-scaffold",
+      "name": "New Project Scaffold",
+      "description": "Dựng một dự án mới từ con số 0 bằng cách dán một prompt. Agent tự cài overstack, hỏi 3 câu, dựng knowledge base, scaffold MVP, dừng đúng chỗ cần người quyết.",
+      "entryPoints": ["dán nội dung 00-New-Project.md vào agent"],
+      "flows": [
+        {
+          "id": "flow:new-project",
+          "name": "Bốn pha dựng dự án mới",
+          "trigger": "dán 00-New-Project.md",
+          "steps": [
+            { "order": 0.1, "id": "step:np-install", "name": "Pha 0 — agent tự cài overstack bằng bootstrap", "file": "00-New-Project.md", "line": 1 },
+            { "order": 0.2, "id": "step:np-kickoff", "name": "Pha 1 — kickoff: hỏi 3 câu rồi dừng", "file": "01-Project-Kickoff.md", "line": 1 },
+            { "order": 0.3, "id": "step:np-kb", "name": "Pha 2 — dựng knowledge base ban đầu trong llmwiki/wiki/", "file": "02-Setup-Knowledge-Base.md", "line": 1 },
+            { "order": 0.4, "id": "step:np-scaffold", "name": "Pha 3 — scaffold MVP", "file": "03-Scaffold-Application.md", "line": 1 },
+            { "order": 0.5, "id": "step:np-detail", "name": "Chi tiết + bản từng pha", "file": "setup.md", "line": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

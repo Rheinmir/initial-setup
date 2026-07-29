@@ -170,3 +170,8 @@
 | [210726-session-provenance](sources/210726-session-provenance.md) | source | Auto-distill scratch-log phiên 765fc26c ngày 21/07 |
 | [220726-session-provenance](sources/220726-session-provenance.md) | source | Auto-distill scratch-log phiên 501779e7 ngày 22/07 |
 | [230726-session-provenance](sources/230726-session-provenance.md) | source | Auto-distill scratch-log phiên 3c7d0f9c ngày 23/07 |
+| [280726-onboard-setup](draft/orca/280726-onboard-setup.md) | draft | Onboard chính repo overstack: knowledge graph 846 node/2905 cạnh/15 tầng (static parse 0 token), domain-graph 7 miền 124 bước có file:line thật, HTML onboarding + vector wiki-graph |
+| [290726-session-provenance](sources/290726-session-provenance.md) | source | Auto-distill scratch-log phiên 1319b8e1 ngày 29/07 — phiên chạy /orca-onboard lên chính repo overstack |
+| [290726-overstack-source-map](sources/draft/290726-overstack-source-map.md) | draft | Trang HTML mô tả mã nguồn overstack: 15 tầng file, 18 luật từ policy.yaml, 7 miền với 124 bước file:line, sinh tất định từ knowledge graph |
+| [290726-spec-vs-overstack](sources/draft/290726-spec-vs-overstack.md) | draft | Đối chiếu overstack với graph-engineering-implementation-spec v0.1 trên 67 mục: 22% đủ, 54% một phần, 22% thiếu — 15 chỗ thiếu quy về 3 gốc (ratchet theo điểm, edge ID, commit-DAG) |
+| [290726-graph-engineering-PLAN](sources/draft/290726-graph-engineering-PLAN.md) | draft | PLAN thi hành 6 task đóng gap theo PDF Graph Engineering trên nhánh graph-engineering: ratchet điểm số cho loop-runner, edge ID + typed edges, /query trích evidence, grounding-check schema, 4 trần budget, sổ giả thuyết đã bỏ — commit-DAG và KG-LLM hoãn có trigger |

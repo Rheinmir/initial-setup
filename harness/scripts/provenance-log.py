@@ -10,6 +10,9 @@ slot migrate sang broker thật sau này chỉ bằng cách viết lại nội d
 CLI:
     provenance-log.py record-changed [--root DIR]     # phân loại + ghi mọi file đổi (git status)
     provenance-log.py confirm-emit --id ID [--note TEXT] [--root DIR]  # T3 dùng nội bộ
+    provenance-log.py post-hypothesis --text "..." [--discarded] [--ref PATH] [--root DIR]
+    provenance-log.py read-hypotheses [--discarded-only] [--limit N] [--root DIR]  # mới nhất trước
+    # sổ giả thuyết: ghi cả ý đã BỎ để agent sau biết ý nào hỏng trong điều kiện nào
     provenance-log.py --self-test
 """
 from __future__ import annotations
@@ -23,6 +26,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 EVENTS_PATH_REL = "harness/metrics/provenance-log.jsonl"
+
+# ASSUMPTION (chưa calibrate): 20 dòng đủ cho một lượt đọc sổ giả thuyết; chỉnh bằng --limit.
+HYPOTHESIS_READ_LIMIT = 20
 
 # Đồng bộ tay với llmwiki/.claude/hooks/stop.py::_CODE_RE — hai file khác thư mục (hooks/ vs
 # harness/scripts/), import chéo phức tạp hơn giá trị mang lại cho 1 regex; đổi 1 bên thì đổi
@@ -204,6 +210,25 @@ def record_changed(root) -> int:
     return n
 
 
+def cmd_post_hypothesis(root, text: str, discarded: bool, ref: str = None) -> int:
+    """Sổ giả thuyết (PDF §III.E): ý đã BỎ vẫn dạy được agent sau 'ý này hỏng ở điều kiện nào'."""
+    topic = "hypothesis.discarded" if discarded else "hypothesis.posted"
+    append_event(root, topic, text=text.strip(), ref=ref)  # fail-open sẵn trong append_event
+    return 0
+
+
+def cmd_read_hypotheses(root, discarded_only: bool, limit: int) -> int:
+    """In `ts · writer · status · text · ref`, mới nhất trước."""
+    evs = [e for e in read_events(root) if e.get("topic", "").startswith("hypothesis.")]
+    if discarded_only:
+        evs = [e for e in evs if e["topic"] == "hypothesis.discarded"]
+    for e in sorted(evs, key=lambda x: x.get("ts_utc", ""), reverse=True)[:limit]:
+        status = e["topic"].split(".", 1)[1]
+        print(f"{e.get('ts_utc', '')}  {e.get('writer_id', '')[:24]:<24}  "
+              f"{status:<9}  {e.get('text', '')}  {e.get('ref') or ''}")
+    return 0
+
+
 def ck(name, cond, fails):
     print(f"  {'[OK ]' if cond else '[FAIL]'} {name}")
     if not cond:
@@ -211,9 +236,11 @@ def ck(name, cond, fails):
 
 
 def self_test() -> int:
+    import io
     import shutil as sh
     import subprocess as sp
     import tempfile
+    from contextlib import redirect_stdout
 
     fails = []
 
@@ -322,8 +349,37 @@ def self_test() -> int:
         else:
             _os_env.environ["CLAUDE_CODE_SESSION_ID"] = _saved
 
+    # --- Task 6: sổ giả thuyết đã bỏ — ghi/đọc PHẢI đi qua append_event/read_events ---
+    td3 = Path(tempfile.mkdtemp())
+    (td3 / "harness" / "metrics").mkdir(parents=True)
+    cmd_post_hypothesis(td3, "cache theo path là đủ nhanh", False, None)
+    cmd_post_hypothesis(td3, "gộp provenance-log vào events.jsonl", True, "llmwiki/wiki/draft/x.md")
+    hyps = [e for e in read_events(td3) if e.get("topic", "").startswith("hypothesis.")]
+    ck("post-hypothesis ghi 2 sự kiện hypothesis.* qua đúng adapter",
+       len(hyps) == 2 and {e["topic"] for e in hyps} == {"hypothesis.posted", "hypothesis.discarded"},
+       fails)
+
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        rc_h = cmd_read_hypotheses(td3, True, HYPOTHESIS_READ_LIMIT)
+    lines = [ln for ln in buf.getvalue().splitlines() if ln.strip()]
+    ck("read-hypotheses --discarded-only chỉ trả 1 dòng, đúng giả thuyết đã bỏ (kèm ref)",
+       rc_h == 0 and len(lines) == 1 and "gộp provenance-log vào events.jsonl" in lines[0]
+       and "llmwiki/wiki/draft/x.md" in lines[0], fails)
+
+    chain = read_events(td3, writer_id=hyps[0]["writer_id"])
+    prev_h, chain_ok = "genesis", True
+    for rec in chain:
+        body = {k: v for k, v in rec.items() if k != "h"}
+        if rec.get("prev") != prev_h or _chain_hash(rec["prev"], body) != rec.get("h"):
+            chain_ok = False
+        prev_h = rec.get("h")
+    ck("hash-chain của writer vẫn liền mạch sau khi thêm topic hypothesis.*",
+       chain_ok and len(chain) == 2, fails)
+
     sh.rmtree(td, ignore_errors=True)
     sh.rmtree(td2, ignore_errors=True)
+    sh.rmtree(td3, ignore_errors=True)
 
     print(f"\nSELF-TEST: {'ALL PASS' if not fails else str(len(fails)) + ' FAIL'}")
     return 1 if fails else 0
@@ -341,6 +397,15 @@ def main():
     p_confirm.add_argument("--id", required=True)
     p_confirm.add_argument("--note", default=None)
     p_confirm.add_argument("--root", default=".")
+    p_post = sub.add_parser("post-hypothesis")
+    p_post.add_argument("--text", required=True)
+    p_post.add_argument("--discarded", action="store_true")
+    p_post.add_argument("--ref", default=None)
+    p_post.add_argument("--root", default=".")
+    p_read = sub.add_parser("read-hypotheses")
+    p_read.add_argument("--discarded-only", action="store_true")
+    p_read.add_argument("--limit", type=int, default=HYPOTHESIS_READ_LIMIT)
+    p_read.add_argument("--root", default=".")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
@@ -348,6 +413,10 @@ def main():
     if args.cmd == "confirm-emit":
         append_event(Path(args.root), "decision.confirm", ref=args.id, note=args.note)
         sys.exit(0)
+    if args.cmd == "post-hypothesis":
+        sys.exit(cmd_post_hypothesis(Path(args.root), args.text, args.discarded, args.ref))
+    if args.cmd == "read-hypotheses":
+        sys.exit(cmd_read_hypotheses(Path(args.root), args.discarded_only, args.limit))
     if args.cmd == "record-changed":
         n = record_changed(Path(args.root))
         print(f"· ghi {n} sự kiện")

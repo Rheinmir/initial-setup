@@ -6,7 +6,8 @@ no agent framework ships one. This counts tokens by code, sums per session, comp
 configured rates, and warns/blocks when a cap is crossed.
 
   record SESSION --in N --out M [--model X] [--task T]   append usage (BY CODE, fail-open).
-  --report                                               per-session totals + $ + over-cap flag.
+      [--calls N] [--subagents N] [--workers N] [--graph-writes N]   complexity counters (PDF §VIII.B).
+  --report                                               per-session totals + $ + counters + over-cap flag.
   check SESSION                                          exit 2 if over cap AND mode:block.
   --self-test                                            deterministic cost + cap logic in temp dir.
 
@@ -24,8 +25,19 @@ from pathlib import Path
 import bnal_config
 
 _FALLBACK = {"verified": False, "mode": "warn",
-             "budgets": {"per_session_tokens": 2000000, "per_task_usd": 5.0},
+             "budgets": {"per_session_tokens": 2000000, "per_task_usd": 5.0,
+                         "per_session_model_calls": 500, "per_workflow_subagents": 16,
+                         "max_concurrent_workers": 8, "per_session_graph_writes": 200},
              "rates": {"default": {"input": 0.003, "output": 0.015}}}
+
+COUNTERS = {  # cờ CLI -> (khoá trong row JSONL, khoá budget trong config)
+    "calls":        ("calls",        "per_session_model_calls"),
+    "subagents":    ("subagents",    "per_workflow_subagents"),
+    "workers":      ("workers",      "max_concurrent_workers"),
+    "graph-writes": ("graph_writes", "per_session_graph_writes"),
+}
+# shortcut: workers cộng dồn y hệt các counter khác (trần = tổng, không phải đỉnh đồng thời),
+# đổi sang max() khi có ca thật cần đo peak concurrency trong một session.
 
 
 def _metrics_file(root: Path) -> Path:
@@ -59,10 +71,14 @@ def cost_usd(in_tok, out_tok, model, rates) -> float:
     return (in_tok / 1000.0) * float(r.get("input", 0)) + (out_tok / 1000.0) * float(r.get("output", 0))
 
 
-def record(root, session, in_tok, out_tok, model=None, task=None) -> dict:
+def record(root, session, in_tok, out_tok, model=None, task=None, counters=None) -> dict:
     root = Path(root)
     rec = {"session": session or "default", "in": int(in_tok or 0), "out": int(out_tok or 0),
            "model": model or "default", "task": task or ""}
+    for key, _ in COUNTERS.values():          # counter = 0 thì không ghi -> row cũ không đổi bit nào
+        n = int((counters or {}).get(key, 0) or 0)
+        if n:
+            rec[key] = n
     try:
         _ensure_gitignored(root)
         with open(_metrics_file(root), "a", encoding="utf-8") as f:
@@ -90,11 +106,15 @@ def _read(root: Path):
 
 def totals(root, cfg):
     rates = cfg.get("rates", {})
-    by_sess = defaultdict(lambda: {"in": 0, "out": 0, "usd": 0.0})
+    zero = {"in": 0, "out": 0, "usd": 0.0}
+    zero.update({key: 0 for key, _ in COUNTERS.values()})
+    by_sess = defaultdict(lambda: dict(zero))
     for r in _read(Path(root)):
         s = by_sess[r.get("session", "default")]
         s["in"] += int(r.get("in", 0)); s["out"] += int(r.get("out", 0))
         s["usd"] += cost_usd(int(r.get("in", 0)), int(r.get("out", 0)), r.get("model", "default"), rates)
+        for key, _ in COUNTERS.values():
+            s[key] += int(r.get(key, 0))   # .get -> row JSONL cũ thiếu khoá vẫn đọc được
     return by_sess
 
 
@@ -106,6 +126,10 @@ def over_budget(sess_row, cfg):
         out.append(f"session tokens {sess_row['in']+sess_row['out']} > cap {b.get('per_session_tokens')}")
     if sess_row["usd"] > float(b.get("per_task_usd", 1e18)):
         out.append(f"session ${sess_row['usd']:.2f} > cap ${b.get('per_task_usd')}")
+    for key, budget_key in COUNTERS.values():
+        cap = b.get(budget_key)
+        if cap and sess_row.get(key, 0) > int(cap):   # .get -> row cũ thiếu khoá = 0, không bao giờ vượt
+            out.append(f"{budget_key} {sess_row.get(key, 0)} > cap {cap}")
     return out
 
 
@@ -115,7 +139,8 @@ def report(root) -> str:
     out = [f"TokenBudget — {len(by)} session(s)  (mode={cfg.get('mode')}, verified={cfg.get('verified')})"]
     for s, row in sorted(by.items()):
         flag = " ⚠ OVER" if over_budget(row, cfg) else ""
-        out.append(f"  {s:<16} in={row['in']:<9} out={row['out']:<9} ${row['usd']:.3f}{flag}")
+        ctr = " ".join(f"{key}={row.get(key, 0)}" for key, _ in COUNTERS.values())
+        out.append(f"  {s:<16} in={row['in']:<9} out={row['out']:<9} ${row['usd']:.3f}  {ctr}{flag}")
     return "\n".join(out)
 
 
@@ -127,8 +152,21 @@ def self_test() -> int:
     cost_ok = abs(c - 0.09) < 1e-9
     within = over_budget({"in": 100, "out": 100, "usd": 0.01}, cfg)
     over = over_budget({"in": 800, "out": 800, "usd": 0.2}, cfg)   # tokens 1600>1000, $0.2>0.05
-    ok = cost_ok and not within and len(over) == 2
-    print("token-budget self-test:", "PASS" if ok else "FAIL")
+    # 4 trần counter: cộng dồn per-session, chỉ trần THẬT SỰ bị vượt mới báo.
+    cfg2 = {"verified": True, "mode": "warn",
+            "budgets": {"per_session_tokens": 100000, "per_task_usd": 5.0,
+                        "per_session_model_calls": 3, "per_workflow_subagents": 16,
+                        "max_concurrent_workers": 8, "per_session_graph_writes": 200}}
+    with tempfile.TemporaryDirectory() as td:
+        record(td, "s1", 10, 10, counters={"calls": 2})
+        record(td, "s1", 10, 10, counters={"calls": 2})
+        row = totals(td, cfg2)["s1"]
+    sum_ok = row["calls"] == 4 and row["in"] == 20 and row["subagents"] == 0
+    breach = over_budget(row, cfg2)                               # calls 4>3, các trần khác trong hạn
+    calls_ok = len(breach) == 1 and "per_session_model_calls" in breach[0]
+    legacy_ok = over_budget({"in": 1, "out": 1, "usd": 0.0}, cfg2) == []   # row JSONL cũ thiếu khoá counter
+    ok = cost_ok and not within and len(over) == 2 and sum_ok and calls_ok and legacy_ok
+    print("token-budget self-test:", "ALL PASS" if ok else "FAIL")
     return 0 if ok else 1
 
 
@@ -145,15 +183,24 @@ def main() -> None:
     if r:
         root = Path(r)
     in_tok = _opt(args, "--in"); out_tok = _opt(args, "--out"); model = _opt(args, "--model"); task = _opt(args, "--task")
+    counters = {}
+    for flag, (key, _) in COUNTERS.items():
+        v = _opt(args, "--" + flag)
+        try:
+            counters[key] = int(v or 0)
+        except ValueError:                     # fail-open: counter rác thì bỏ qua, không phá phiên
+            pass
     if "--self-test" in args:
         sys.exit(self_test())
     if "--report" in args:
         print(report(root)); return
     if args and args[0] == "record":
         if len(args) < 2:
-            print("usage: token-budget.py record SESSION --in N --out M [--model X]", file=sys.stderr); sys.exit(2)
-        rec = record(root, args[1], in_tok or 0, out_tok or 0, model, task)
-        print(f"recorded {rec['session']}: in={rec['in']} out={rec['out']} model={rec['model']}"); return
+            print("usage: token-budget.py record SESSION --in N --out M [--model X] "
+                  "[--calls N] [--subagents N] [--workers N] [--graph-writes N]", file=sys.stderr); sys.exit(2)
+        rec = record(root, args[1], in_tok or 0, out_tok or 0, model, task, counters)
+        extra = "".join(f" {key}={rec[key]}" for key, _ in COUNTERS.values() if key in rec)
+        print(f"recorded {rec['session']}: in={rec['in']} out={rec['out']} model={rec['model']}{extra}"); return
     if args and args[0] == "check":
         if len(args) < 2:
             print("usage: token-budget.py check SESSION", file=sys.stderr); sys.exit(2)

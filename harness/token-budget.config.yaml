@@ -15,6 +15,12 @@ mode: warn                        # ASSUMPTION (not verified) — warn (advise, 
 budgets:
   per_session_tokens: 2000000     # ASSUMPTION (not verified) — 2M tokens/session is a guess
   per_task_usd: 5.0               # ASSUMPTION (not verified) — $5/task cap is a guess
+  # Complexity budget (PDF §VIII.B): every run declares max model calls / sub-agents / concurrent
+  # workers / graph writes. Counted per session from the `record --calls/--subagents/--workers/--graph-writes` flags.
+  per_session_model_calls: 500    # ASSUMPTION (not verified) — 500 model calls/session is a guess
+  per_workflow_subagents: 16      # ASSUMPTION (not verified) — 16 sub-agents/workflow is a guess
+  max_concurrent_workers: 8       # ASSUMPTION (not verified) — 8 concurrent workers is a guess
+  per_session_graph_writes: 200   # ASSUMPTION (not verified) — 200 graph writes/session is a guess
 
 # $ per 1K tokens. Provider numbers drift — treat as a guess, reconcile against real billing.
 rates:                            # ASSUMPTION (not verified) — illustrative; update from the provider price page
@@ -25,6 +31,7 @@ rates:                            # ASSUMPTION (not verified) — illustrative; 
 
 # ADAPT-CHECKLIST (finalize when real billing data exists):
 #   1. Reconcile rates against the provider's CURRENT price page (per model).
-#   2. Calibrate budgets (per_session_tokens, per_task_usd) against real workloads + FinOps targets.
+#   2. Calibrate budgets (tokens, $, model calls, sub-agents, workers, graph writes) against real
+#      workloads + FinOps targets.
 #   3. Run: python3 harness/scripts/token-budget.py --self-test  (must PASS).
 #   4. Flip mode: block AND verified: true. Only then does exceeding a cap actually block.

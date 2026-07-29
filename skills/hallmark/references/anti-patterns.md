@@ -246,6 +246,14 @@ A button label, nav link, footer link, breadcrumb, or CTA reads on two lines bec
 
 **Fix.** In order of preference: (1) shorten the label — *"Get started free" → "Start free"*; *"Read the documentation" → "Read docs"*. Most CTA labels are too long. (2) Set `white-space: nowrap` on the affordance and let the parent flex container reflow. (3) Drop a non-essential nav item at narrow widths via `hidden=until-found` or `display: none`. (4) Collapse the nav into a sheet/menu under a threshold. *Never* let a primary CTA or nav link wrap. *(Slop-test gate 49. See [responsive.md § Clickable text — never wraps](responsive.md).)*
 
+### Unbounded text wrap in table/list rows
+
+A data table or dense list row where a long value — a filename, a document title, an email, a description column — wraps across multiple lines inside a width-constrained cell, stretching that one row's height far past its siblings. This is the *data-cell* sibling of gate 49 (two-line clickable text): same root cause, unbounded wrap inside a fixed-width container, but it hits static content instead of an affordance, and it compounds — a `table-layout: fixed` table with no `text-overflow` on its text columns can balloon a compact 20-row page into thousands of pixels of scroll, especially once real (long, messy) data replaces placeholder text.
+
+**Why it fails.** Rows are units the eye scans vertically; one row growing to several times its siblings' height breaks that rhythm and reads as "nobody tested this with real long data." It also silently defeats client-side pagination — a page sized for N rows renders at N × (1 row's worth of height) only when every row stays single-line.
+
+**Fix.** `white-space: nowrap; overflow: hidden; text-overflow: ellipsis;` on the cell — add `max-width: 0` if the table uses `table-layout: fixed` and truncation isn't kicking in on its own. Carry the untruncated value in a `title` attribute (or a real tooltip) so the information is one hover away, not lost. *(Slop-test gate 58.)*
+
 ### Lottie shortcut
 
 Reaching for a LottieFiles community animation — the spinning logo, the checkmark draw, the loading spinner, the "loading dots" loop — when pure CSS or hand-built SVG would have produced it stronger and lighter.

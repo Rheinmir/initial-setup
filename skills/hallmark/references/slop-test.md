@@ -167,7 +167,7 @@ The CSS stamp at Step 6 should record results: `· honest: pass (46) · chrome: 
 
 ## Mobile-responsiveness — the non-negotiables
 
-Universal. Every emitted page must render flawlessly at 320 px, 375 px, 414 px, and 768 px CSS-pixel widths. Gates 34 (no horizontal scroll) and 49 (no two-line clickable text) already cover the headline cases; 50–57 below codify the patterns the marketing-site responsiveness pass uncovered. Eyeball each viewport before marking the output complete.
+Universal. Every emitted page must render flawlessly at 320 px, 375 px, 414 px, and 768 px CSS-pixel widths. Gates 34 (no horizontal scroll) and 49 (no two-line clickable text) already cover the headline cases; 50–58 below codify the patterns the marketing-site responsiveness pass uncovered. Eyeball each viewport before marking the output complete.
 
 50. **Image-bearing grid track without `minmax(0, 1fr)`.** Does any `grid-template-columns` (or `grid-template-rows`) containing a `1fr` track render an `<img>` / `<picture>` / image-bearing element inside one of those tracks? If yes, the track must be `minmax(0, 1fr)` instead. Plain `1fr` resolves to `minmax(auto, 1fr)`, where `auto` minimum is the largest content's intrinsic width — for a 1024 + px native image, that's 1024 + px minimum, which pushes the layout past viewport on phones. The fix is one character per track: `1fr` → `minmax(0, 1fr)`.
 
@@ -185,7 +185,9 @@ Universal. Every emitted page must render flawlessly at 320 px, 375 px, 414 px, 
 
 57. **Studied DNA discarded for a catalog theme.** Did a `study` diagnosis emit earlier in the conversation, AND does the build's CSS stamp's `theme:` field name a catalog theme (Specimen, Midnight, Brutal, Garden, Atelier, Newsprint, Terminal, Manifesto, Almanac, Sport, Studio, Riso, Bloom, Coral, Cobalt, Aurora, Editorial, Carnival, Lumen, Hum) rather than `studied-DNA (source: ...)` — without the user having explicitly pivoted ("use Newsprint instead", "ignore the DNA", "rotate to a different theme")? Auto-fail. The studied DNA was meant to be the system (SKILL.md § 2.6 Condition 0); defaulting back to catalog is the attractor pull. Fix: re-emit using the studied DNA's tokens directly (paper OKLCH, accent OKLCH, named candidate fonts, macrostructure, archetypes) and update the stamp to `theme: studied-DNA (source: <URL or image>)` with the inline values. This gate is trivially passed when no recent study exists in conversation scope.
 
-The CSS stamp at Step 6 records mobile pass alongside contrast: `· mobile: pass (34, 49, 50–57)`.
+58. **Unbounded text wrap in a table/list row.** Does any table cell or dense list row hold a long, variable-length value (filename, title, email, description) without `text-overflow: ellipsis` (paired with `white-space: nowrap; overflow: hidden;`, and `max-width: 0` when the table is `table-layout: fixed`)? If the value can realistically exceed the column's width — real data, not placeholder text — and nothing caps it to one line, fail. The row wraps to N lines and grows to N× its siblings' height, breaking the table's vertical scan rhythm; on `table-layout: fixed` this also silently inflates a paginated page's total height. Fix: cap the cell to one line with ellipsis, and carry the full value in a `title` attribute or tooltip so the truncation costs no information. *(See [anti-patterns.md § Unbounded text wrap in table/list rows](anti-patterns.md).)*
+
+The CSS stamp at Step 6 records mobile pass alongside contrast: `· mobile: pass (34, 49, 50–58)`.
 
 ---
 

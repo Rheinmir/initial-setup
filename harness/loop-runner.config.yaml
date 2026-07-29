@@ -25,6 +25,22 @@ guards:
   escalate_after_iter: 4      # ASSUMPTION: reach iteration N without a pass → ESCALATE (hand to human).
                               #   0 = off. Source: stakeholder policy, not yet decided.
 
+# ── Ratchet theo điểm số (deterministic, OPT-IN) ────────────────────────────
+# metric_cmd null = TẮT hoàn toàn → vòng lặp giữ nguyên hành vi verify-only cũ.
+# Bật lên thì mỗi iteration được CHẤM ĐIỂM: điểm tốt hơn best hiện tại → giữ lại
+# bằng `git commit` (keep); không tốt hơn hoặc metric crash → `git reset --hard`
+# về commit giữ gần nhất (revert). Điểm baseline được đo TRƯỚC vòng lặp.
+ratchet:
+  metric_cmd: null            # ASSUMPTION (NOT VERIFIED): shell cmd in MỘT số float ở cuối stdout
+                              #   (vd "pytest --tb=no -q | tail -1 | wc -l" hay một script bench).
+                              #   null = tắt ratchet. Nguồn: đặt theo từng task.
+  direction: max              # ASSUMPTION: "max" = điểm cao hơn là tốt hơn; "min" cho metric kiểu
+                              #   số test đỏ / latency.
+  no_improve_k: 3             # ASSUMPTION: K lần đo liên tiếp không cải thiện → dừng NO_PROGRESS.
+                              #   0 = tắt (chỉ còn max_iter/budget chặn).
+  min_delta: 0.0              # ASSUMPTION: vùng chết — thay đổi nhỏ hơn ngưỡng này KHÔNG tính là
+                              #   cải thiện. 0.0 = mọi cải thiện đều tính (chưa calibrate với metric nhiễu).
+
 # ── Progress detection (deterministic) ──────────────────────────────────────
 # The loop hashes these paths each iteration. Hash changed → reset the streak;
 # unchanged → grow the streak. Fail-safe: an EMPTY list DISABLES no-progress

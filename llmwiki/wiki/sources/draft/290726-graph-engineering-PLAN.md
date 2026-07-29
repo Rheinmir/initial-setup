@@ -321,6 +321,87 @@ def cmd_read_hypotheses(root, discarded_only: bool, limit: int) -> int:
 
 ---
 
+---
+
+### Task 7: Commit-DAG hub LOCAL — opt-in, gỡ được sạch (PDF §III, gốc 3)
+
+**Thoả:** PDF §III.C bảy lệnh `push · fetch · log · children · leaves · lineage · diff`; §III.D "the DAG is the graph" (node mang agent/hypothesis/metric/runtime/status); §IX.C nợ đã biết của AgentHub (compaction, reproducibility, indexing) — chặn ngay từ commit đầu, không để lại sau.
+
+**Nguyên tắc cốt lõi (user chỉ định):** T7 **mặc định TẮT**. Hệ chạy y hệt hôm nay khi không bật. Bật/tắt bằng một tham số, gỡ bỏ hoàn toàn bằng một lệnh + xoá một file. Không script nào khác `import hub`, không hook nào tự gọi — dependency một chiều, cắt lúc nào cũng được.
+
+**Vì sao local không cần server:** mọi Orca worktree dùng chung một `.git` object store → commit của agent A tự động thấy được từ agent B, không cần push/fetch qua mạng. "Hub" chỉ còn là ref namespace `refs/hub/*` (ngoài `refs/heads` nên không đụng nhánh, không cần main, không merge queue) + `git notes --ref=hub` cất metadata + một CLI mỏng.
+
+**Files:**
+- Tạo: `harness/scripts/hub.py`
+- Tạo: `harness/hub.config.yaml`
+- Tạo: `llmwiki/wiki/concepts/commit-dag-hub.md`
+- Sửa: `harness/scripts/loop-runner.py`
+- Sửa: `harness/loop-runner.config.yaml`
+- Sửa: `harness/scripts/fdk-gate.py`
+
+**Interfaces:**
+- Consumes: `git` qua `subprocess` (pattern `provenance-log.py::_git_sha`); `run_loop()` của loop-runner sau khi Trial có `commit` + `score` (T1 Produces).
+- Produces:
+  - `hub_push(root, agent, hypothesis, metric, status, commit=None) -> str|None` — tạo `refs/hub/<agent>/<seq>` + notes JSON; trả ref name; **fail-open tuyệt đối** (mọi Exception → trả None, không bao giờ raise vào caller).
+  - CLI: `push · log · children · leaves · lineage · diff · prune · purge · --self-test`.
+  - Notes JSON (bắt buộc có field môi trường — nợ reproducibility của §IX.C, thêm sau thì thí nghiệm cũ mất môi trường vĩnh viễn): `{agent, hypothesis, metric, status, ts_utc, python, platform, deps_sha}`.
+  - Cờ mới loop-runner: `--hub` bật, `--no-hub` tắt (override config); mặc định lấy từ `hub.enabled` trong `loop-runner.config.yaml`, **mặc định `false`**.
+
+- [ ] **Step 1: `hub.py` + `--self-test` trước (RED)** — self-test dựng sandbox git riêng (tái dùng `_mk_git_sandbox` mà T1 đã có trong loop-runner, chép sang cho hub độc lập), assert: push tạo đúng ref + notes đọc lại được; `children` thấy 2 nhánh con từ cùng một cha; `leaves` không kể commit đã có con; `lineage` trả đúng thứ tự tới gốc; `prune` giữ đúng top-K; `purge` xoá sạch `refs/hub/*` **và** `refs/notes/hub` (assert `git for-each-ref refs/hub` rỗng).
+
+```python
+HUB_REF_NS = "refs/hub"
+NOTES_REF = "refs/notes/hub"
+
+def _env_stamp(root):
+    """Môi trường phải cất NGAY từ commit đầu — thêm sau là mất vĩnh viễn (PDF §IX.C)."""
+    lock = next((p for p in ("uv.lock", "poetry.lock", "requirements.txt")
+                 if (Path(root) / p).exists()), None)
+    return {
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "deps_sha": hashlib.sha1((Path(root) / lock).read_bytes()).hexdigest()[:12] if lock else None,
+    }
+
+def hub_push(root, agent, hypothesis, metric=None, status="kept", commit=None):
+    try:
+        commit = commit or _git(["rev-parse", "HEAD"], root).stdout.strip()
+        seq = len(_git(["for-each-ref", f"{HUB_REF_NS}/{agent}"], root).stdout.splitlines()) + 1
+        ref = f"{HUB_REF_NS}/{agent}/{seq:04d}"
+        _git(["update-ref", ref, commit], root)
+        note = {"agent": agent, "hypothesis": hypothesis, "metric": metric,
+                "status": status, "ts_utc": _now_iso(), **_env_stamp(root)}
+        _git(["notes", f"--ref={NOTES_REF}", "add", "-f",
+              "-m", json.dumps(note, ensure_ascii=False), commit], root)
+        return ref
+    except Exception:
+        return None            # fail-open: hub hỏng KHÔNG được làm gãy ratchet
+```
+
+- [ ] **Step 2: bốn truy vấn DAG (GREEN)** — `children` đảo map cha→con từ `git log --all --pretty=%H %P` giới hạn trong tập hub commit; `leaves` = hub commit không là parent của hub commit nào khác (chính là biên chưa khám phá); `lineage` = `git rev-list --topo-order <hash>`; `diff` passthrough `git diff --stat a b`. `log` in bảng ref · agent · metric · status · hypothesis, sort theo metric giảm dần khi có `--by-metric` (trả lời đúng câu hỏi chữ ký của PDF: "kết quả giữ lại nào có metric tốt nhất").
+- [ ] **Step 3: kill-switch — `prune` + `purge`** — `prune --keep-top K [--older-than N]` xoá ref ngoài top-K theo metric (chặn nợ "DAG phình vô hạn"); `purge --yes` xoá **toàn bộ** `refs/hub/*` + `refs/notes/hub` rồi in số ref đã xoá. Không có `--yes` thì chỉ in thứ SẼ xoá (dry-run), không đụng gì.
+- [ ] **Step 4: wiring opt-in vào loop-runner** — trong `run_loop()`, CHỈ khi `hub_enabled` bật thì sau mỗi Trial gọi:
+
+```python
+if hub_enabled and rec.get("ratchet") in ("kept", "reverted"):
+    try:
+        import importlib.util, pathlib
+        spec = importlib.util.spec_from_file_location(
+            "hub", pathlib.Path(__file__).parent / "hub.py")
+        hub = importlib.util.module_from_spec(spec); spec.loader.exec_module(hub)
+        rec["hub_ref"] = hub.hub_push(cwd, agent=hub_agent,
+                                      hypothesis=f"iter {it}: {verify_cmd}",
+                                      metric=rec.get("score"),
+                                      status="kept" if rec["ratchet"] == "kept" else "discarded",
+                                      commit=rec.get("commit"))
+    except Exception:
+        pass                   # hub thiếu/hỏng → loop chạy tiếp như chưa có T7
+```
+
+Import động qua đường dẫn, KHÔNG `import hub` ở đầu file — xoá `hub.py` đi thì loop-runner vẫn chạy, đó chính là cơ chế gỡ-được-sạch. Thêm `--hub`/`--no-hub` vào parser; `hub.enabled: false` trong `loop-runner.config.yaml` kèm `# ASSUMPTION`.
+
+- [ ] **Step 5: doc gỡ bỏ + wire gate** — viết `llmwiki/wiki/concepts/commit-dag-hub.md` (frontmatter OKF `type: concept`, mục `## Origin`) gồm: nó giải bài gì · bốn truy vấn với ví dụ chạy thật · **mục "Cách tắt và cách gỡ bỏ hoàn toàn"** ghi rõ ba tầng (tắt bằng config/cờ · xoá dữ liệu bằng `purge --yes` · gỡ code bằng xoá 1 file + 1 block config, kèm câu lệnh `git revert` cho commit T7) · bảng bốn nợ đã biết của §IX.C và cái nào đã chặn. Thêm `python3 harness/scripts/hub.py --self-test` vào chuỗi "BNAL feature self-tests" của `fdk-gate.py`. Nghiệm thu: `python3 harness/scripts/hub.py --self-test` PASS; `python3 harness/scripts/loop-runner.py selftest` vẫn ALL PASS **khi hub tắt**; và sau `purge --yes` thì `git for-each-ref refs/hub` rỗng.
+
 ## Thứ tự thi hành & cổng
 
 `T1 → T2 → T3 → T4 → T5 → T6` (T3 phụ thuộc T2; còn lại độc lập — T4/T5/T6 dispatch song song được sau khi T2 xong). Sau mỗi task: `fdk-gate.py` + `medic --ci` xanh rồi mới commit (R6); commit message không ghi công AI (R15).
@@ -329,7 +410,7 @@ def cmd_read_hypotheses(root, discarded_only: bool, limit: int) -> int:
 
 | Gap PDF | Vì sao KHÔNG làm bây giờ | Trigger mở PLAN riêng |
 |---|---|---|
-| Commit-DAG hub (§III, gốc 3) | overstack làm việc tuyến tính, chưa từng cần ≥2 lineage thí nghiệm sống song song — xây trước là YAGNI | Lần đầu tiên một việc thật bị đau vì "không giữ được nhánh thí nghiệm thứ hai" → ghi `/raise-issue` kèm case đó |
+| ~~Commit-DAG hub (§III, gốc 3)~~ | **ĐÃ CHUYỂN THÀNH T7** (2026-07-29) sau khi tìm ra bản local không cần server: `refs/hub/*` + `git notes` + một CLI mỏng, chi phí tụt từ "dựng service" xuống ~250 dòng. Lý do hoãn cũ (YAGNI) được thay bằng **mặc định TẮT + gỡ được sạch** — chi phí giữ nó bằng 0 khi không bật | — |
 | KG extraction/resolution bằng LLM (§IV.C) | Chính PDF §VIII.C: đừng xây khi quan hệ cố định/đơn giản, sai số extraction vượt giá trị traversal | failure-flywheel ghi nhận ≥3 lần câu hỏi multi-hop mà wikilink+relations không trả lời được |
 | Temporal facts / valid-time cho wiki | SUPERSEDES (rel mới của T2) đủ cho nhu cầu hiện tại; valid-time là schema wiki mới, đụng R9 | Khi có ca thật cần hỏi "điều này đúng vào thời điểm nào" mà git blame không trả lời được |
 | Sóng kiểm chứng khác vai (§IX.D) | Cần engine swarm tự sở hữu trước đã — hiện mượn vendor | Khi overstack có primitive dispatch song song của riêng mình |

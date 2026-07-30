@@ -654,8 +654,6 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-29 00:00:00 | `file.write` | llmwiki/wiki/draft/orca/280726-onboard-setup.md · tool=Write · session=1319b8e1 · actor=agent · prev=genesis · h=bcc3135 |
-| 2026-07-29 08:36:02 | `file.write` | llmwiki/wiki/sources/draft/290726-overstack-source-map.md · tool=Write · session=1319b8e1 · actor=agent · prev=bcc31350b |
 | 2026-07-29 10:23:42 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Write · session=1319b8e1 · actor=agent · prev=6e4f15ea6e9e |
 | 2026-07-29 10:23:42 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Write · session=1319b8e1 · actor=agent · prev=a5c97331bcbd |
 | 2026-07-29 10:44:34 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=69b503771f54c |
@@ -692,5 +690,9 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 | 2026-07-29 22:10:38 | `file.write` | harness/tests/ge-backcompat-test.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=780cdd47302fb4cf2492c272ca53f900 |
 | 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9228d52155404cae856a141a251e3858bea61 |
 | 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9edfbe677ae61150f30380f7d00ab6db7803c |
+| 2026-07-30 09:16:22 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=11d82cb599180954fd424f3ae6346857a |
+| 2026-07-30 09:16:22 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=ae7c065957fbc248c2c9b6d8655d703bd |
+| 2026-07-30 09:18:25 | `file.write` | harness/poc-vendor-neutral/bootstrap-fork.sh · tool=Write · session=1319b8e1 · actor=agent · prev=1d2f180564660060ca822f |
+| 2026-07-30 09:18:25 | `file.write` | harness/poc-vendor-neutral/bootstrap-fork.sh · tool=Write · session=1319b8e1 · actor=agent · prev=c25369a05fe0985d977f79 |
 
 <!-- log:auto:end -->

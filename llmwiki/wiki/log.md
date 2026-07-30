@@ -648,6 +648,12 @@ Sinh trang riêng `llmwiki/html/290726-pdf-gap-overstack.html` (81 KB, 7 section
 
 Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engiering" của user thành tên đúng). Viết `sources/draft/290726-graph-engineering-PLAN.md` — 6 task đóng gap theo PDF: T1 ratchet điểm số cho loop-runner (metric-cmd + direction + git keep/revert + Trial, PDF R-1.1/1.3/1.4) · T2 edge ID sha1 + typed edges đọc frontmatter relations (thêm supports/contradicts/supersedes) · T3 /query đính mục Evidence trích eid · T4 grounding-check.py schema {decision, claim, reason, required_evidence[]} wire vào /qc-code · T5 bốn trần budget mới trong token-budget (model calls, sub-agents, workers, graph-writes) · T6 provenance-log post-hypothesis/read-hypotheses. Mỗi task TDD self-test-trước, mọi cờ optional giữ backward-compat, ngưỡng mới đều ASSUMPTION trong config adapter. Ngoài phạm vi CÓ TRIGGER: commit-DAG hub (chờ đau thật ≥2 lineage), KG extraction LLM (PDF §VIII.C tự khuyên đừng), temporal facts, verification-wave khác vai. R7 plan-executable cắn 3 lần lúc viết (Task 2/5/6 thiếu code block) — bổ sung đủ code thật mới qua.
 
+## 2026-07-30 — docs-site-macos — pr92-flow
+Trang HTML giải thích PR #92 (graph-engineering → orca): 3 gốc thiếu, luồng 7 tính năng T1–T7 (ratchet/edge-id/grounding-gate/token-budget/hypothesis-log/commit-dag-hub), và bảng "gọi ra ntn / khi nào kích hoạt" xác nhận bằng grep thật trên hooks — chỉ T2 (edge ID, qua stop.py) và T3 (/query) tự động, 5/7 còn lại là opt-in gọi tay không hook nào đụng tới. Nối tiếp phiên qc-code review PR #92 (verdict CẦN SỬA, 4 mục blocking).
+
+## 2026-07-30 — cursor-animated-sites — hook-skill-layers
+Walkthrough tương tác giải thích lifecycle thật của Claude Code + overstack khi user gõ 1 câu: SessionStart(1 lần/phiên) → UserPromptSubmit(mỗi câu) → Claude quyết định → nạp Skill(văn bản, không tự chạy) → PreToolUse(validators, CÓ THỂ CHẶN) → code thật(harness/scripts, tất định) → PostToolUse → lặp lại → Stop(medic --ci, CÓ THỂ CHẶN dừng) → SessionEnd. Cursor lề-trái đi qua cây file đúng thứ tự, màu theo vai trò (đọc/ghi/chặn/qua), kèm 2 ví dụ THẬT đã xảy ra ngay trong hội thoại (R16 report-show-path chặn 1 lần Write; medic --ci FAIL vì overstack.html cũ).
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
@@ -694,5 +700,19 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 | 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=4f80eefda1dd0f095c7eff87dc1f3e97fed6ea7b42e8d27 |
 | 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=b881188020e259c44deac859726d2097dcdeee64a03f702 |
 | 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=2ddd8c9f30df1cab65a944ec3bd0ec8fe0507b10ff899de |
+| 2026-07-30 10:04:54 | `file.write` | llmwiki/html/300726-pr92-flow.html · tool=Write · session=350f10dd · actor=agent · prev=genesis · h=4582f47a78269f22c649 |
+| 2026-07-30 10:04:54 | `file.write` | llmwiki/html/300726-pr92-flow.html · tool=Write · session=350f10dd · actor=agent · prev=4582f47a78269f22c649ed62249c1bec |
+| 2026-07-30 10:05:02 | `file.write` | llmwiki/html/300726-pr92-flow.html · tool=Edit · session=350f10dd · actor=agent · prev=2b5a37de4700cb9af5aaace14c314c305 |
+| 2026-07-30 10:05:02 | `file.write` | llmwiki/html/300726-pr92-flow.html · tool=Edit · session=350f10dd · actor=agent · prev=358dbc718c80eabec8d65ad8a9a67ae80 |
+| 2026-07-30 10:05:26 | `file.write` | llmwiki/wiki/sources/draft/300726-pr92-flow.md · tool=Write · session=350f10dd · actor=agent · prev=28809dcdb207c77ae8fd |
+| 2026-07-30 10:05:26 | `file.write` | llmwiki/wiki/sources/draft/300726-pr92-flow.md · tool=Write · session=350f10dd · actor=agent · prev=c8a5672ee71a2cd44bbe |
+| 2026-07-30 10:05:40 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=a617dc41336dd0097af13b4c7426c520444313b79635b6 |
+| 2026-07-30 10:05:40 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=0bf90ef45cc2043e6c9dd79a8b9572fccdbde7d05f5e91 |
+| 2026-07-30 10:31:15 | `file.write` | llmwiki/html/300726-hook-skill-layers.html · tool=Write · session=350f10dd · actor=agent · prev=963e5bd61fce1b78f5944edb |
+| 2026-07-30 10:31:15 | `file.write` | llmwiki/html/300726-hook-skill-layers.html · tool=Write · session=350f10dd · actor=agent · prev=e4b6dd5bddd68134ffdc88f8 |
+| 2026-07-30 10:31:26 | `file.write` | llmwiki/wiki/sources/draft/300726-hook-skill-layers.md · tool=Write · session=350f10dd · actor=agent · prev=77ab2b4222e8 |
+| 2026-07-30 10:31:26 | `file.write` | llmwiki/wiki/sources/draft/300726-hook-skill-layers.md · tool=Write · session=350f10dd · actor=agent · prev=af7a55acfc39 |
+| 2026-07-30 10:31:33 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=29237923b35614b7f307c038381c8fb7389739ac761c8b |
+| 2026-07-30 10:31:33 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=16c7d72d42dc12619f106f590936adaf0a06ba1dc7cae3 |
 
 <!-- log:auto:end -->

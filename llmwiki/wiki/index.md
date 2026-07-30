@@ -13,6 +13,9 @@
 | [040726-issue4-trace-grader-plan](draft/040726-issue4-trace-grader-plan.md) | plan | Plan step-by-step GH#4: sửa run.ok transcript, lọc sidechain, check grounding edited_without_read — cho dev khác làm tiếp |
 | [300626-audit-fix-docs-site-macos](draft/uiux/300626-audit-fix-docs-site-macos.md) | draft | Audit + 8 fix (a11y/head/glass) cho skill docs-site-macos, đồng bộ cả 2 bản mirror |
 | [010726-onboard-html-tabs-redesign](draft/orca/010726-onboard-html-tabs-redesign.md) | draft | Redesign tầng báo cáo HTML orca-onboard: sidebar-nav scroll-spy, tour master-detail, tab Modules DB-style tự ẩn nếu mono |
+| [300726-pr92-flow](sources/draft/300726-pr92-flow.md) | draft | Trang HTML giải thích PR #92 (graph-engineering): vấn đề, luồng 7 tính năng T1–T7, và bảng gọi-ra/khi-nào-kích-hoạt xác nhận bằng grep thật |
+| [300726-hook-skill-layers](sources/draft/300726-hook-skill-layers.md) | draft | Walkthrough tương tác 8 bước lifecycle Claude Code (SessionStart→...→SessionEnd), cursor đi qua đúng file hook/skill/script thật, 2 ví dụ đã xảy ra trong hội thoại |
+| [300726-session-provenance-test-hook](sources/300726-session-provenance-test-hook.md) | source | Auto-distill scratch-log phiên "test-hook" — tách riêng khỏi 300726-session-provenance.md sau khi 2 phiên khác nhau cùng ngày bị trùng tên file (naming collision của scratch-log.py) |
 | [010726-trupillar4-council-persona](draft/orca/010726-trupillar4-council-persona.md) | draft | Chốt cứng Trụ 4 (cổng CI code-health) + persona-lens 18 vĩ nhân cho council (BNAL) |
 | [010726-dev-harness-kit](draft/orca/010726-dev-harness-kit.md) | draft | Thiết kế 'dev tự build harness' (BNAL) + council 18 ông chọn checksum-seal; report HTML |
 | [020726-docs-site-fdk-strategy](sources/draft/archive/analysis/020726-docs-site-fdk-strategy.md) | draft | Render concept fdk-dev-strategy (Mongol pattern) thành docs site HTML liquid-glass |

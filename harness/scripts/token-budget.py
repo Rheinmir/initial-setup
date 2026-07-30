@@ -176,6 +176,60 @@ def _opt(args, flag):
     return None
 
 
+def sync_from_cost(root: Path):
+    """Đồng bộ token THẬT từ `cost-by-session.json` (code-logger.py ghi qua hook) sang sổ này.
+
+    Vì sao cần: trước bản này KHÔNG hook nào gọi `record`, nên `tokens.jsonl` chưa từng tồn
+    tại và mọi trần đều đang cap một con số luôn bằng 0 — trần không có dữ liệu thì không phải
+    trần. Nguồn token thật đã có sẵn ở cost-by-session.json; đọc lại rẻ hơn nhiều so với dựng
+    thêm một đường ghi song song (và tránh hai sổ lệch nhau).
+
+    Idempotent theo phiên: mỗi session giữ ĐÚNG một row `source=cost-sync`, chạy lại thì ghi đè
+    chứ không cộng dồn. Row do `record` tạo tay được giữ nguyên. Fail-open tuyệt đối.
+    """
+    try:
+        src = root / "harness" / "metrics" / "cost-by-session.json"
+        if not src.exists():
+            return -1, None
+        data = json.loads(src.read_text(encoding="utf-8") or "{}")
+        if not isinstance(data, dict):
+            return -1, None
+        rows, latest = [], None
+        for sid, v in data.items():
+            if not isinstance(v, dict):
+                continue
+            tk = v.get("tokens") or {}
+            # cache_read KHÔNG cộng vào input: giá khác hẳn, gộp vào là thổi phồng chi phí.
+            row = {"session": sid, "source": "cost-sync",
+                   "in": int(tk.get("input_tokens") or 0),
+                   "out": int(tk.get("output_tokens") or 0),
+                   "model": (v.get("models") or ["default"])[-1],
+                   "turns": int(v.get("turns") or 0)}
+            row["usd"] = cost_usd(row["in"], row["out"], row["model"], load_config(root).get("rates", {}))
+            # calls: xấp xỉ bằng số lượt — hook không thấy được số model-call thật, nên khai
+            # một xấp xỉ đo được còn hơn để trần treo trên số 0 vĩnh viễn.
+            row["calls"] = row["turns"]
+            rows.append(row)
+            latest = sid
+        path = _metrics_file(root)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        keep = []
+        if path.exists():
+            for line in path.read_text(encoding="utf-8").splitlines():
+                try:
+                    r = json.loads(line)
+                except Exception:
+                    continue
+                if r.get("source") != "cost-sync":      # giữ row ghi tay, chỉ thay row sync
+                    keep.append(r)
+        with path.open("w", encoding="utf-8") as f:
+            for r in keep + rows:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        return len(rows), latest
+    except Exception:
+        return -1, None                                  # fail-open: sổ tiền không được phá phiên
+
+
 def main() -> None:
     args = sys.argv[1:]
     root = Path(os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
@@ -201,6 +255,12 @@ def main() -> None:
         rec = record(root, args[1], in_tok or 0, out_tok or 0, model, task, counters)
         extra = "".join(f" {key}={rec[key]}" for key, _ in COUNTERS.values() if key in rec)
         print(f"recorded {rec['session']}: in={rec['in']} out={rec['out']} model={rec['model']}{extra}"); return
+    if args and args[0] == "sync":
+        n, sess = sync_from_cost(root)
+        if n < 0:
+            print("[token-budget] chưa có cost-by-session.json — không có gì để đồng bộ"); return
+        print(f"[token-budget] sync {n} phiên từ cost-by-session.json"
+              + (f" (mới nhất: {sess})" if sess else "")); return
     if args and args[0] == "check":
         if len(args) < 2:
             print("usage: token-budget.py check SESSION", file=sys.stderr); sys.exit(2)

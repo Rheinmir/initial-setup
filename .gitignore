@@ -35,6 +35,7 @@ harness/metrics/failures.jsonl
 # framework-dev docs-site renders (local-only; bản chất bền ở fdk/wiki)
 fdk/html/*.html
 harness/metrics/cost-by-session.json
+harness/metrics/tokens.jsonl
 .DS_Store
 harness/metrics/tasks.json
 

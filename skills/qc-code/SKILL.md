@@ -98,10 +98,12 @@ Kèm verdict văn xuôi ở trên, xuất thêm MỘT block JSON có cấu trúc
 
 - `PASS` → `decision: "approve"`. `CẦN SỬA` → `decision: "revise"` + `required_evidence` là danh sách bằng chứng CỤ THỂ cần bổ sung, mỗi mục trỏ `file:line` hoặc tên test-case.
 - `claim` và `reason` không được rỗng; field lạ chỉ bị cảnh báo, không fail (forward-compat).
-- Ghi JSON ra `/tmp/qc-verdict.json` rồi chạy:
+- Ghi JSON ra **`harness/out/qc-verdict.json`** (trong repo — KHÔNG phải `/tmp`). Hook `PostToolUse` thấy tên file kết thúc `qc-verdict.json` là **tự chạy** `grounding-check` ngay lúc ghi; verdict không hợp lệ thì tool-call bị chặn (exit 2) và stderr trả về để sửa tại chỗ.
+
+Không phải nhớ gõ lệnh — cổng nằm ở cấu trúc, không ở lời dặn. Muốn kiểm tay (file ngoài repo, hoặc verdict của người khác):
 
 ```bash
-python3 harness/scripts/grounding-check.py --check /tmp/qc-verdict.json
+python3 harness/scripts/grounding-check.py --check <file.json>
 ```
 
 exit 0 = hợp lệ; **exit 2 = verdict CHƯA hợp lệ, phải viết lại** — agent không được nộp verdict mơ hồ hay thiếu bằng chứng.

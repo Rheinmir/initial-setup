@@ -654,23 +654,6 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-29 10:23:42 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Write · session=1319b8e1 · actor=agent · prev=6e4f15ea6e9e |
-| 2026-07-29 10:23:42 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Write · session=1319b8e1 · actor=agent · prev=a5c97331bcbd |
-| 2026-07-29 10:44:34 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=69b503771f54c |
-| 2026-07-29 10:44:34 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=ee1409196d352 |
-| 2026-07-29 10:51:08 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=bd51fd9dd5032 |
-| 2026-07-29 10:51:08 | `file.write` | llmwiki/wiki/sources/draft/290726-spec-vs-overstack.md · tool=Edit · session=1319b8e1 · actor=agent · prev=ac543b24ac10d |
-| 2026-07-29 11:24:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=05549b8 |
-| 2026-07-29 11:24:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=87fe994 |
-| 2026-07-29 11:25:02 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=28f8218a |
-| 2026-07-29 11:25:02 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=eec0dcbf |
-| 2026-07-29 11:25:25 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=8ed378e7 |
-| 2026-07-29 11:25:25 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=dc95169e |
-| 2026-07-29 11:25:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=6a51c1d2 |
-| 2026-07-29 11:25:41 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=bf0281d7 |
-| 2026-07-29 13:33:03 | `file.write` | skills/query/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=8729470558af139e3e7ebb8fe9f58d06934f4a6b9ad952 |
-| 2026-07-29 13:33:03 | `file.write` | skills/query/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=a77a80e473be8c48d9ccb2b1c3b2b54837b68f442391de |
-| 2026-07-29 13:33:48 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=1319b8e1 · actor=agent · prev=1340952f7182a693aa99e907a1124a78926903ce |
 | 2026-07-29 13:33:48 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4215b149f278360ad94e4d920031b414084d57f3 |
 | 2026-07-29 14:44:23 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=24770b4f |
 | 2026-07-29 14:44:23 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=472fa993 |
@@ -694,5 +677,22 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 | 2026-07-30 09:16:22 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=ae7c065957fbc248c2c9b6d8655d703bd |
 | 2026-07-30 09:18:25 | `file.write` | harness/poc-vendor-neutral/bootstrap-fork.sh · tool=Write · session=1319b8e1 · actor=agent · prev=1d2f180564660060ca822f |
 | 2026-07-30 09:18:25 | `file.write` | harness/poc-vendor-neutral/bootstrap-fork.sh · tool=Write · session=1319b8e1 · actor=agent · prev=c25369a05fe0985d977f79 |
+| 2026-07-30 12:50:40 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c6e9190b7c284935ca7957db6fbfceb19caf |
+| 2026-07-30 12:50:40 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=ce6f6df553ed24b82379844eee4aec2ec11a |
+| 2026-07-30 12:51:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=7826e4471d80eb631c70662eaa0952cbd0a7 |
+| 2026-07-30 12:51:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a247d92aa59816067b8cf261f1b84fc0f137 |
+| 2026-07-30 12:51:59 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=d60469b36cfcb71879e27415680f6d6e098707 |
+| 2026-07-30 12:51:59 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f90a133018510e91c08bef7fc5e552e33bc462 |
+| 2026-07-30 12:52:37 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=29f9908ba292735daa51eec0f9a84 |
+| 2026-07-30 12:52:37 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=ec5d613b665f41641c6411f3f4aeb |
+| 2026-07-30 12:52:54 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=85df46e75c6d2b7448430ad77c5f4 |
+| 2026-07-30 12:52:54 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=d851b68e41f80f536ccc7fc2c5a1b |
+| 2026-07-30 12:53:16 | `file.write` | skills/qc-code/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=dcecb14d10b2aabee7d06d2c50aa9749d065dcdf1f87 |
+| 2026-07-30 12:53:16 | `file.write` | skills/qc-code/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=8608c8e6a8fc9ad7652ff28477cb4f0145f83a0e9c5b |
+| 2026-07-30 12:53:30 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=dc5ecdfa0de2c9493c98a8dc8b2bdc0266b4febd3f8041f |
+| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=3718eca4a030b3d010a0b6f3af2315f367f1dd92e4ab5e5 |
+| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=4f80eefda1dd0f095c7eff87dc1f3e97fed6ea7b42e8d27 |
+| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=b881188020e259c44deac859726d2097dcdeee64a03f702 |
+| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=2ddd8c9f30df1cab65a944ec3bd0ec8fe0507b10ff899de |
 
 <!-- log:auto:end -->

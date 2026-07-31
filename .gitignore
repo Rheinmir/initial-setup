@@ -1,3 +1,7 @@
+# Python bytecode — lọt vào từ 33e1484 do `git add -A` khi .gitignore thiếu pattern
+__pycache__/
+*.pyc
+
 # Root-level raw/ is obsolete (moved to llmwiki/raw/).
 # Block accidental recreation here.
 /raw/

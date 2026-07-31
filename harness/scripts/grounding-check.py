@@ -18,6 +18,7 @@ Dùng:
 """
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -26,9 +27,39 @@ DECISIONS = {"approve", "revise"}
 KNOWN = REQUIRED | {"required_evidence"}
 
 
-def check_verdict(obj: dict) -> list:
+def min_evidence(root=None) -> int:
+    """Cap thứ 10 của spec §5: 'minimum evidence required for finalization'.
+
+    Khác 9 cap kia — chúng là TRẦN TRÊN (đừng vượt), cái này là SÀN DƯỚI (đừng chốt khi
+    chưa đủ bằng chứng). Nên nó không sống trong bộ đếm mà ở cổng CHỐT: verdict `approve`
+    là lúc một việc được tuyên bố xong, và đó đúng chỗ hỏi "dựa vào đâu mà xong?".
+
+    Đọc từ `token-budget.config.yaml` để mọi trần nằm chung một chỗ người dùng đã được hỏi.
+    Mặc định 0 = tắt, giữ nguyên hành vi cũ (approve không cần bằng chứng) — bật lên là
+    quyết định của người dùng, không phải mặc định áp xuống.
+    """
+    try:
+        import re
+        p = Path(root or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
+        cfg = p / "harness" / "token-budget.config.yaml"
+        if not cfg.exists():
+            return 0
+        m = re.search(r"^\s*min_evidence:\s*(\d+)", cfg.read_text(encoding="utf-8"), re.M)
+        return int(m.group(1)) if m else 0
+    except Exception:
+        return 0                                  # fail-open: không đọc được cấu hình thì không siết
+
+
+def check_verdict(obj: dict, root=None) -> list:
     """Trả danh sách lỗi schema; [] = hợp lệ."""
     errs = []
+    need = min_evidence(root)
+    if need > 0:
+        ev = obj.get("required_evidence")
+        n = len([x for x in ev if str(x).strip()]) if isinstance(ev, list) else 0
+        if n < need:
+            errs.append(f"cần tối thiểu {need} bằng chứng để chốt (đang có {n}) "
+                        f"— spec §5 minimum-evidence; đổi ở token-budget.config.yaml")
     missing = REQUIRED - set(obj)
     if missing:
         errs.append("thiếu field: " + ", ".join(sorted(missing)))
@@ -117,10 +148,41 @@ def self_test():
     for label, text, want_valid in cases:
         obj, errs = load_verdict(text)
         if obj is not None:
-            errs = check_verdict(obj)
+            errs = check_verdict(obj, root="/nonexistent-so-min-evidence-tat")
         passed = (not errs) == want_valid
         print(f"  {'✓' if passed else '✗'} {label}"
               f"{'' if passed else '  → ' + ('hợp lệ' if not errs else '; '.join(errs))}")
+        ok = ok and passed
+
+    # ── cap thứ 10 spec §5: minimum evidence (SÀN dưới, không phải trần trên) ──────────
+    import tempfile
+    ev_cases = []
+    with tempfile.TemporaryDirectory() as td:
+        r = Path(td)
+        (r / "harness").mkdir()
+        cfg = r / "harness" / "token-budget.config.yaml"
+        approve_0 = {"decision": "approve", "claim": "c", "reason": "r"}
+        approve_2 = {"decision": "approve", "claim": "c", "reason": "r",
+                     "required_evidence": ["test A đỏ→xanh", "log B dòng 12"]}
+
+        cfg.write_text("budgets:\n  min_evidence: 0\n", encoding="utf-8")
+        ev_cases.append(("min_evidence=0 (mặc định): approve KHÔNG cần bằng chứng",
+                         check_verdict(approve_0, root=r) == []))
+        ev_cases.append(("min_evidence=0: đọc ra đúng 0", min_evidence(r) == 0))
+
+        cfg.write_text("budgets:\n  min_evidence: 2\n", encoding="utf-8")
+        errs2 = check_verdict(approve_0, root=r)
+        ev_cases.append(("min_evidence=2: approve TAY KHÔNG bị chặn",
+                         any("tối thiểu 2" in e for e in errs2)))
+        ev_cases.append(("min_evidence=2: approve có 2 bằng chứng thì QUA",
+                         check_verdict(approve_2, root=r) == []))
+        ev_cases.append(("min_evidence=2: 1 bằng chứng vẫn thiếu → chặn",
+                         check_verdict({**approve_2, "required_evidence": ["chỉ một"]}, root=r) != []))
+        ev_cases.append(("không có config → fail-open, KHÔNG siết",
+                         min_evidence("/nonexistent") == 0))
+
+    for label, passed in ev_cases:
+        print(f"  {'✓' if passed else '✗'} {label}")
         ok = ok and passed
     print("self-test: PASS" if ok else "self-test: FAIL")
     return 0 if ok else 1

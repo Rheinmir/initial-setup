@@ -27,7 +27,8 @@ import bnal_config
 _FALLBACK = {"verified": False, "mode": "warn",
              "budgets": {"per_session_tokens": 2000000, "per_task_usd": 5.0,
                          "per_session_model_calls": 500, "per_workflow_subagents": 16,
-                         "max_concurrent_workers": 8, "per_session_graph_writes": 200},
+                         "max_concurrent_workers": 8, "per_session_graph_writes": 200,
+                         "per_session_tool_calls": 2000, "min_evidence": 0},
              "rates": {"default": {"input": 0.003, "output": 0.015}}}
 
 COUNTERS = {  # cờ CLI -> (khoá trong row JSONL, khoá budget trong config)
@@ -35,6 +36,7 @@ COUNTERS = {  # cờ CLI -> (khoá trong row JSONL, khoá budget trong config)
     "subagents":    ("subagents",    "per_workflow_subagents"),
     "workers":      ("workers",      "max_concurrent_workers"),
     "graph-writes": ("graph_writes", "per_session_graph_writes"),
+    "tool-calls":   ("tool_calls",   "per_session_tool_calls"),
 }
 # shortcut: workers cộng dồn y hệt các counter khác (trần = tổng, không phải đỉnh đồng thời),
 # đổi sang max() khi có ca thật cần đo peak concurrency trong một session.
@@ -156,7 +158,8 @@ def self_test() -> int:
     cfg2 = {"verified": True, "mode": "warn",
             "budgets": {"per_session_tokens": 100000, "per_task_usd": 5.0,
                         "per_session_model_calls": 3, "per_workflow_subagents": 16,
-                        "max_concurrent_workers": 8, "per_session_graph_writes": 200}}
+                        "max_concurrent_workers": 8, "per_session_graph_writes": 200,
+                         "per_session_tool_calls": 2000, "min_evidence": 0}}
     with tempfile.TemporaryDirectory() as td:
         record(td, "s1", 10, 10, counters={"calls": 2})
         record(td, "s1", 10, 10, counters={"calls": 2})
@@ -184,20 +187,20 @@ def self_test() -> int:
         obs_ok = obs.get("turns") == 100 and obs.get("tokens") == 3000 and obs.get("usd", 0) > 0
 
         # Enter hết = nhận gợi ý; gợi ý phải bám SỐ ĐO (2× turns = 200 calls), không phải số đoán.
-        t = _FakeTTY(["\n"] * 6 + ["warn\n"])
+        t = _FakeTTY(["\n"] * 8 + ["warn\n"])
         configure_with(r, t)
         c1 = load_config(r)
         sug_ok = c1["budgets"]["per_session_model_calls"] == 200
         warn_ok = c1.get("mode") == "warn" and c1.get("verified") is False
 
         # chọn block ⇒ verified bật theo (chữ ký "tôi đã xem và chấp nhận các con số này")
-        t2 = _FakeTTY(["\n"] * 6 + ["block\n"])
+        t2 = _FakeTTY(["\n"] * 8 + ["block\n"])
         configure_with(r, t2)
         c2 = load_config(r)
         block_ok = c2.get("mode") == "block" and c2.get("verified") is True
 
         # giá trị gõ tay phải thắng gợi ý
-        t3 = _FakeTTY(["12345\n", "1.5\n", "7\n", "\n", "\n", "\n", "warn\n"])
+        t3 = _FakeTTY(["12345\n", "1.5\n", "7\n", "\n", "\n", "\n", "\n", "\n", "warn\n"])
         configure_with(r, t3)
         c3 = load_config(r)
         typed_ok = (c3["budgets"]["per_session_tokens"] == 12345
@@ -205,7 +208,7 @@ def self_test() -> int:
                     and c3["budgets"]["per_session_model_calls"] == 7)
 
         # nhập rác KHÔNG được phá config (giữ nguyên bản trước, không crash)
-        t4 = _FakeTTY(["không-phải-số\n"] + ["\n"] * 6)
+        t4 = _FakeTTY(["không-phải-số\n"] + ["\n"] * 8)
         rc_bad = configure_with(r, t4)
         c4 = load_config(r)
         junk_ok = rc_bad == 0 and c4["budgets"]["per_session_tokens"] == 12345
@@ -319,6 +322,7 @@ def configure_with(root: Path, tty) -> int:
     sug_tok = int(obs["tokens"] * 2) if obs.get("tokens") else b.get("per_session_tokens", 2_000_000)
     sug_usd = round(obs["usd"] * 2, 2) if obs.get("usd") else b.get("per_task_usd", 5.0)
     sug_call = int(obs["turns"] * 2) if obs.get("turns") else b.get("per_session_model_calls", 500)
+    sug_tool = int(obs["tool_calls"] * 2) if obs.get("tool_calls") else b.get("per_session_tool_calls", 2000)
 
     try:
         b["per_session_tokens"] = int(str(_ask("max tokens / phiên", sug_tok, tty)).replace(",", "").replace("_", ""))
@@ -327,6 +331,10 @@ def configure_with(root: Path, tty) -> int:
         b["per_workflow_subagents"] = int(_ask("max sub-agents / workflow", b.get("per_workflow_subagents", 16), tty))
         b["max_concurrent_workers"] = int(_ask("max worker song song", b.get("max_concurrent_workers", 8), tty))
         b["per_session_graph_writes"] = int(_ask("max graph writes / phiên", b.get("per_session_graph_writes", 200), tty))
+        b["per_session_tool_calls"] = int(_ask("max tool calls / phiên", sug_tool, tty))
+        # SÀN dưới, không phải trần trên: 0 = tắt. Ép cổng chốt phải có N bằng chứng.
+        b["min_evidence"] = int(_ask("tối thiểu bao nhiêu bằng chứng để CHỐT (0 = tắt)",
+                                     b.get("min_evidence", 0), tty))
         mode = str(_ask("vượt trần thì CHẶN hay chỉ cảnh báo? (block/warn)",
                         cfg.get("mode", "warn"), tty)).strip().lower()
         mode = mode if mode in ("block", "warn") else "warn"
@@ -376,6 +384,38 @@ def write_config(root: Path, budgets: dict, mode: str, verified: bool) -> None:
     p.write_text("\n".join(body) + "\n" + (rates_block or ""), encoding="utf-8")
 
 
+def count_tool_calls(session: str) -> int:
+    """Đếm tool-call THẬT của một phiên từ transcript.
+
+    Không lấy được từ hook: `PostToolUse` chỉ khớp `Write|Edit|MultiEdit`, nên Bash/Read/Grep
+    — phần lớn tool-call — vô hình với nó. Transcript có đủ `tool_use`, đo được 1354 hành
+    động trên phiên này. Trả 0 khi không tìm thấy: thà không có số còn hơn số sai.
+    """
+    try:
+        home = Path.home() / ".claude" / "projects"
+        if not home.exists():
+            return 0
+        n = 0
+        for slug in home.iterdir():
+            if not slug.is_dir():
+                continue
+            for f in slug.glob(f"{session}*.jsonl"):
+                with f.open(encoding="utf-8", errors="replace") as fh:
+                    for line in fh:
+                        if '"tool_use"' not in line:
+                            continue
+                        try:
+                            d = json.loads(line)
+                        except Exception:
+                            continue
+                        c = (d.get("message") or {}).get("content")
+                        if isinstance(c, list):
+                            n += sum(1 for b in c if isinstance(b, dict) and b.get("type") == "tool_use")
+        return n
+    except Exception:
+        return 0
+
+
 def sync_from_cost(root: Path):
     """Đồng bộ token THẬT từ `cost-by-session.json` (code-logger.py ghi qua hook) sang sổ này.
 
@@ -409,6 +449,7 @@ def sync_from_cost(root: Path):
             # calls: xấp xỉ bằng số lượt — hook không thấy được số model-call thật, nên khai
             # một xấp xỉ đo được còn hơn để trần treo trên số 0 vĩnh viễn.
             row["calls"] = row["turns"]
+            row["tool_calls"] = count_tool_calls(sid)   # đo thật từ transcript, 0 nếu không thấy
             rows.append(row)
             latest = sid
         path = _metrics_file(root)

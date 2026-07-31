@@ -20,7 +20,9 @@ budgets:
   per_session_model_calls: 500    # ASSUMPTION (not verified) — 500 model calls/session is a guess
   per_workflow_subagents: 16      # ASSUMPTION (not verified) — 16 sub-agents/workflow is a guess
   max_concurrent_workers: 8       # ASSUMPTION (not verified) — 8 concurrent workers is a guess
-  per_session_graph_writes: 200   # ASSUMPTION (not verified) — 200 graph writes/session is a guess
+  per_session_graph_writes: 200   # ASSUMPTION (not verified)
+  per_session_tool_calls: 2000    # ASSUMPTION (not verified) — spec §5 max tool calls
+  min_evidence: 0                 # SÀN dưới (spec §5): 0 = tắt; >0 ép verdict chốt phải có N bằng chứng   # ASSUMPTION (not verified) — 200 graph writes/session is a guess
 
 # $ per 1K tokens. Provider numbers drift — treat as a guess, reconcile against real billing.
 rates:                            # ASSUMPTION (not verified) — illustrative; update from the provider price page

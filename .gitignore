@@ -25,6 +25,7 @@ fdk/MANIFEST.md
 
 # code-logger raw event history (local)
 harness/metrics/events.jsonl
+harness/metrics/agent-trace.jsonl
 harness/metrics/unknowns.json
 graph.db
 .graph-agent/

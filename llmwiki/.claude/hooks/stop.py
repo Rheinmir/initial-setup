@@ -151,6 +151,13 @@ def regen_docs(root: str) -> None:
         if tb:
             subprocess.run([sys.executable, tb, "sync", "--root", root],
                            cwd=root, capture_output=True, timeout=30)
+        # agent-trace: chưng cất transcript phiên (chính + mọi subagent worktree) thành sổ
+        # kiểm chứng được. TỰ NO-OP khi công tắc tắt — mặc định tắt, nên hook này không tốn
+        # gì cho ai chưa bật. Bật: python3 harness/scripts/agent-trace.py on
+        at = resolve_tool(root, "harness/scripts/agent-trace.py")
+        if at:
+            subprocess.run([sys.executable, at, "collect", "--root", root],
+                           cwd=root, capture_output=True, timeout=60)
     except Exception:
         pass
 

@@ -37,6 +37,7 @@ Ví dụ:
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import io
 import json
@@ -110,6 +111,44 @@ def touches_targets(text: str, repo_root) -> list:
         if cp and cp not in seen and "/" in cp and (root / cp).exists():
             seen.add(cp)
             out.append(cp)
+    return out
+
+
+# `operationalizes` — cạnh wiki (layer: fact|mental-model) → Protocol (skill/rule).
+#
+# Cùng hình dạng với `touches` (wiki→NGOÀI 6 thư mục nội dung): suy từ thân bài, KHÔNG khai
+# tay trong `relations:`, KHÔNG vào ALLOWED_RELS — bài học lịch sử `touches` dập tay 1 lần rồi
+# đóng băng ở 0,8% coverage áp dụng y hệt ở đây. Xem llmwiki/wiki/sources/draft/
+# 010826-wiki-mental-model-taxonomy.md.
+SKILL_TOKEN_RE = re.compile(r"`([\w-]+)`")
+_RULE_ID_RE = re.compile(r"^\s*id:\s*(\S+)", re.MULTILINE)
+
+
+@functools.lru_cache(maxsize=1)
+def _policy_rule_ids(root_str: str) -> frozenset:
+    """Mọi `id: RNN` khai trong policy.yaml — cache vì scan() gọi hàm này mỗi node."""
+    p = Path(root_str) / "harness" / "poc-vendor-neutral" / "policy.yaml"
+    try:
+        text = p.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return frozenset()
+    return frozenset(_RULE_ID_RE.findall(text))
+
+
+def operationalizes_targets(text: str, repo_root) -> list:
+    """Skill/rule mà trang này nhắc trong backtick VÀ tồn tại thật — suy, không cất."""
+    root = Path(repo_root)
+    rule_ids = _policy_rule_ids(str(root))
+    out, seen = [], set()
+    for tok in SKILL_TOKEN_RE.findall(text or ""):
+        if tok in seen:
+            continue
+        if (root / "skills" / tok / "SKILL.md").exists():
+            seen.add(tok)
+            out.append(f"skills/{tok}/SKILL.md")
+        elif tok in rule_ids:
+            seen.add(tok)
+            out.append(f"rule:{tok}")
     return out
 
 
@@ -595,6 +634,18 @@ def self_test() -> int:
                                for (_s, d, t, _e) in g2.edges)))
         checks.append(("dup.md vẫn KHÔNG orphan giả — stem_all vẫn thấy để CLI dùng path đủ",
                        "concepts/dup.md" in g2.relset and "entities/dup.md" in g2.relset))
+
+    # (7) operationalizes_targets — suy quan hệ wiki→Protocol (skill/rule), KHÔNG khai tay
+    repo_root = Path(__file__).resolve().parents[2]
+    checks.append(("skill hợp lệ → sinh cạnh",
+                   "skills/propose/SKILL.md" in operationalizes_targets("Xem `propose` để bắt đầu.", repo_root)))
+    checks.append(("rule hợp lệ → sinh cạnh",
+                   "rule:R7" in operationalizes_targets("Chặn bởi `R7`.", repo_root)))
+    checks.append(("token không tồn tại → KHÔNG sinh cạnh",
+                   operationalizes_targets("Xem `khong-ton-tai-gi-ca`.", repo_root) == []))
+    checks.append(("đổi tham chiếu → cạnh đổi theo (SC-003, không cache sai)",
+                   operationalizes_targets("Xem `plan` để bắt đầu.", repo_root)
+                   == ["skills/plan/SKILL.md"]))
 
     for name, ok in checks:
         print(f"  {'ok  ' if ok else 'FAIL'} {name}")

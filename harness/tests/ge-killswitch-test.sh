@@ -189,29 +189,34 @@ else
   ok "không file .py nào trong harness/ hay fdk/ import tĩnh module hub"
 fi
 
-# ── (g) git revert commit T7 → phần còn lại vẫn xanh ────────────────────────
-hdr "(g) git revert commit T7 trong clone sandbox — ba engine anh em vẫn xanh"
-T7=$(git -C "$SRC" log --diff-filter=A --format='%H' -- harness/scripts/hub.py | head -1)
-if [ -z "$T7" ]; then
-  bad "tìm commit T7" "không tìm được commit thêm harness/scripts/hub.py"
+# ── (g) xoá hub.py trong clone sandbox → phần còn lại vẫn xanh ───────────────
+# Trước dùng `git revert` đúng commit đã THÊM hub.py — nhưng revert một commit
+# add-file cụ thể vỡ theo cơ chế git ngay khi file đó bị sửa ở BẤT KỲ commit sau
+# nào (kể cả một bugfix vô hại) vì diff-apply không còn khớp ngữ cảnh. Claim thật
+# cần kiểm là "xoá file này đi thì mọi thứ khác chạy y nguyên" — dùng `git rm`
+# trực tiếp thì bền trước mọi sửa đổi hub.py sau này, đúng khớp claim hơn revert.
+hdr "(g) xoá hub.py trong clone sandbox — ba engine anh em vẫn xanh"
+if [ ! -f "$SRC/harness/scripts/hub.py" ]; then
+  bad "tìm hub.py" "không thấy harness/scripts/hub.py trên đĩa nguồn"
 else
   git clone -q "$SRC" "$TMP/clone" >/dev/null 2>&1
   git -C "$TMP/clone" config user.email ks@test.local
   git -C "$TMP/clone" config user.name "killswitch test"
   git -C "$TMP/clone" config commit.gpgsign false
-  if git -C "$TMP/clone" revert --no-edit "$T7" >/dev/null 2>&1 \
+  if git -C "$TMP/clone" rm -q harness/scripts/hub.py >/dev/null 2>&1 \
+     && git -C "$TMP/clone" commit -q -m "killswitch test: xoá hub.py" >/dev/null 2>&1 \
      && [ ! -f "$TMP/clone/harness/scripts/hub.py" ]; then
-    ok "revert ${T7:0:7} sạch, không xung đột, hub.py biến mất khỏi cây"
+    ok "git rm hub.py sạch, không xung đột, biến mất khỏi cây"
     for e in loop-runner.py:selftest wiki-graph.py:--self-test token-budget.py:--self-test; do
       s="${e%%:*}"; a="${e##*:}"
       if ( cd "$TMP/clone" && python3 "harness/scripts/$s" "$a" ) >/dev/null 2>&1; then
-        ok "sau revert: $s $a vẫn xanh"
+        ok "sau khi xoá: $s $a vẫn xanh"
       else
-        bad "sau revert: $s" "self-test đỏ khi bỏ T7 — 'bỏ T7 nếu cần' là lời hứa suông"
+        bad "sau khi xoá: $s" "self-test đỏ khi bỏ T7 — 'bỏ T7 nếu cần' là lời hứa suông"
       fi
     done
   else
-    bad "revert T7" "revert xung đột hoặc hub.py còn sót — không bỏ T7 sạch được"
+    bad "xoá T7" "git rm xung đột hoặc hub.py còn sót — không bỏ T7 sạch được"
   fi
 fi
 

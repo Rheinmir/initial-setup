@@ -100,20 +100,21 @@ def detect_cycles(nodes, edges, rels=("derives-from", "depends-on")):
 
 CONTENT_DIRS = ("concepts", "entities", "sources", "draft", "architecture", "tours")
 FRONTMATTER_RE = re.compile(r"^---[ \t]*\n(.*?)\n---", re.DOTALL)
-LINE_RE = {k: re.compile(rf"^{k}[ \t]*:[ \t]*(\S.*?)[ \t]*$", re.MULTILINE) for k in ("id", "type", "title")}
+LINE_RE = {k: re.compile(rf"^{k}[ \t]*:[ \t]*(\S.*?)[ \t]*$", re.MULTILINE) for k in ("id", "type", "title", "layer")}
 REL_RE = re.compile(r"\{[ \t]*rel[ \t]*:[ \t]*([\w-]+)[ \t]*,[ \t]*(to|path)[ \t]*:[ \t]*([^}\s]+)[ \t]*\}")
 WIKILINK_RE = re.compile(r"\[\[([^\]\n|]+)\]\]")
 
 REL_COLORS = {
     "derives-from": "#30b0c7", "depends-on": "#5856d6", "implements": "#34c759",
     "supersedes": "#ff9500", "touches": "#8e8e93", "contradicts": "#ff2d55",
-    "imports": "#a0522d", "wikilink": "#9aa4b2",
+    "imports": "#a0522d", "wikilink": "#9aa4b2", "operationalizes": "#bf5af2",
 }
 REL_VI = {
     "derives-from": "chưng cất từ (nguồn gốc)", "depends-on": "phụ thuộc vào",
     "implements": "hiện thực (quyết định/ADR)", "supersedes": "thay thế (bản cũ)",
     "touches": "chạm file code", "contradicts": "mâu thuẫn với",
     "imports": "code import code", "wikilink": "liên quan mềm (wikilink trong thân bài)",
+    "operationalizes": "sinh ra Protocol (skill/rule) này",
 }
 
 
@@ -134,7 +135,8 @@ def scan(wiki: Path, tag: str, nodes, edges, ledger, stale, repo_root=None):
             get = lambda k: (LINE_RE[k].search(fm).group(1).strip().strip("'\"") if LINE_RE[k].search(fm) else "")
             pid = get("id") or p.stem
             node = {"id": pid, "path": p.relative_to(wiki).as_posix(), "group": d,
-                    "type": get("type") or "?", "title": get("title")[:90], "wiki": tag}
+                    "type": get("type") or "?", "title": get("title")[:90], "wiki": tag,
+                    "layer": get("layer") or ""}
             # Mảnh C: frontmatter hỏng → quarantine, KHÔNG sinh cạnh từ nó (không crash, không bịa)
             if fm and not _frontmatter_ok(fm):
                 node["quarantined"] = True
@@ -157,6 +159,14 @@ def scan(wiki: Path, tag: str, nodes, edges, ledger, stale, repo_root=None):
                     if cp not in typed_to:
                         typed_to.add(cp)
                         edges.append({"from": pid, "rel": "touches", "to": cp, "kind": "path"})
+            # `operationalizes` — cùng nguyên tắc suy sống như `touches`, chỉ khác đích:
+            # Protocol (skill/rule) thay vì code. Chỉ node đã gắn layer: fact|mental-model
+            # mới tham gia — node chưa phân loại không suy cạnh này (opt-in, không backfill).
+            if _wg is not None and repo_root and node["layer"] in ("fact", "mental-model"):
+                for target in _wg.operationalizes_targets(raw_body, repo_root):
+                    if target not in typed_to:
+                        typed_to.add(target)
+                        edges.append({"from": pid, "rel": "operationalizes", "to": target, "kind": "path"})
             # Nguồn chung nếu nạp được; regex local chỉ là lưới đỡ khi thiếu harness.
             if _wg is not None:
                 targets = _wg.wikilink_targets(raw_body)
@@ -337,13 +347,23 @@ def _mk_code_node(path):
             "title": path, "wiki": "code", "label": path.rsplit("/", 1)[-1]}
 
 
+def _mk_protocol_node(target):
+    label = target.split("/")[-2] if target.startswith("skills/") else target.split(":", 1)[-1]
+    return {"id": target, "path": target, "group": "protocol", "type": "protocol",
+            "title": target, "wiki": "protocol", "label": label}
+
+
 def add_code_nodes(nodes, edges):
-    """Thêm node lá cho target của quan hệ `touches` (đường dẫn code) để cạnh wiki→code hiện ra."""
+    """Thêm node lá cho target `touches` (path code) và `operationalizes` (skill/rule)."""
     ids = {n["id"] for n in nodes}
     seen = set()
     for e in edges:
-        if e.get("kind") == "path" and e["to"] not in ids and e["to"] not in seen:
-            seen.add(e["to"])
+        if e.get("kind") != "path" or e["to"] in ids or e["to"] in seen:
+            continue
+        seen.add(e["to"])
+        if e["rel"] == "operationalizes":
+            nodes.append(_mk_protocol_node(e["to"]))
+        else:
             nodes.append(_mk_code_node(e["to"]))
 
 
@@ -492,11 +512,13 @@ transition:left .38s cubic-bezier(.4,0,.2,1),top .38s cubic-bezier(.4,0,.2,1),op
 .nd:active{{cursor:grabbing}}
 .nd .flag{{font-size:9px;font-weight:800;border-radius:999px;padding:0 5px;margin-left:5px}}
 .nd .s{{background:rgba(255,149,0,.16);color:#f08c00}} .nd .t{{background:rgba(0,0,0,.08);color:#4a4a55}}
+.nd .fact{{background:rgba(48,176,199,.16);color:#1b7a8a}} .nd .mm{{background:rgba(191,90,242,.16);color:#7b2fb0}}
 .nd.dim{{opacity:.16}} .nd.hidden{{display:none}}
 .nd.hot{{border-color:#0a84ff;box-shadow:0 0 0 2px rgba(10,132,255,.32);z-index:5}}
 .nd.match{{border-color:#0a84ff}}
 .nd.wiki-fdk{{background:rgba(240,244,252,.9)}}  /* wiki phụ tông xám lạnh hơn */
 .nd.wiki-code{{background:rgba(30,32,40,.9);color:#cfe3fb;font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:11px;font-weight:500;border-color:rgba(120,140,180,.4)}}
+.nd.wiki-protocol{{background:rgba(191,90,242,.14);color:#7b2fb0;border-color:rgba(191,90,242,.35)}}
 #ac{{position:fixed;z-index:60;background:rgba(255,255,255,.98);border:1px solid var(--border);
 border-radius:10px;box-shadow:0 8px 28px rgba(20,40,90,.18);max-height:320px;overflow-y:auto;
 min-width:280px;display:none}}
@@ -540,7 +562,7 @@ color:var(--ink2);background:rgba(30,90,170,.08);border-radius:999px;padding:0 6
 </div>
 <div id="stage">
   <div id="world"><svg id="edges"></svg></div>
-  <div class="legend"><b>Lọc theo quan hệ</b> <span style="opacity:.7">(tick để chỉ hiện loại đó)</span>{legend}<div class="lgfoot"><span style="color:#f08c00">S</span> stale · <span style="color:#4a4a55">T</span> tombstone · <b>sáng</b>=wiki chính, <b style="opacity:.4">mờ</b>=wiki phụ</div></div>
+  <div class="legend"><b>Lọc theo quan hệ</b> <span style="opacity:.7">(tick để chỉ hiện loại đó)</span>{legend}<div class="lgfoot"><span style="color:#f08c00">S</span> stale · <span style="color:#4a4a55">T</span> tombstone · <span style="color:#1b7a8a">F</span> Fact · <span style="color:#7b2fb0">M</span> Mental Model · <b>sáng</b>=wiki chính, <b style="opacity:.4">mờ</b>=wiki phụ</div></div>
   <div id="detail"></div>
   <div class="foot"><code>{out_abs}</code></div>
 </div>
@@ -582,6 +604,8 @@ D.nodes.forEach(function(n){{
   var el=document.createElement('div');el.className='nd wiki-'+n.wiki;el.style.left=n.x+'px';el.style.top=n.y+'px';
   var flags=''; if(D.stale[n.wiki+'/'+n.path])flags+='<span class="flag s">S</span>';
   if(n.type==='tombstone')flags+='<span class="flag t">T</span>';
+  if(n.layer==='fact')flags+='<span class="flag fact" title="Fact">F</span>';
+  if(n.layer==='mental-model')flags+='<span class="flag mm" title="Mental Model">M</span>';
   el.innerHTML=(n.label||n.id)+flags;
   world.appendChild(el); n._el=el; n.hx=n.x; n.hy=n.y;  // hx/hy = vị trí gốc (để trả về khi bỏ chọn)
 }});

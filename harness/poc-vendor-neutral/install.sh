@@ -273,6 +273,19 @@ if [ -f "$BC" ]; then
 fi
 
 echo ""
+# ── Trần chi phí (spec §5): hỏi NGƯỜI DÙNG thay vì ship số đoán rồi bật chặn ──────────
+# Mọi trần trong token-budget.config.yaml đều gắn `# ASSUMPTION (not verified)`. Bật chặn
+# trên số đoán thì hoặc chặn nhầm việc thật, hoặc treo quá cao nên không bao giờ cắn — cả
+# hai đều tệ hơn không có trần vì tạo cảm giác an toàn giả. Bước này gợi ý theo workload
+# THẬT đo được trên máy, và chỉ bật `mode: block` khi người dùng tự chọn.
+# `--if-tty`: không có terminal (CI, curl|bash trong script) thì im lặng giữ mặc định,
+# TUYỆT ĐỐI không treo chờ nhập.
+TB="$ROOT/harness/scripts/token-budget.py"
+[ -f "$TB" ] || TB="$HOME/.claude/harness/harness/scripts/token-budget.py"
+if [ -f "$TB" ]; then
+  python3 "$TB" configure --if-tty --root "$ROOT" </dev/null 2>/dev/null || true
+fi
+
 log    "═══════════ TRẠNG THÁI 3 TRỤ ═══════════"
 log    "  1. Harness  ✓ cài/cập nhật   (per-project: hook validate + CI + R1–R10)"
 if [ "$WITH_SKILLS" = 1 ]; then

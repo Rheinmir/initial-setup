@@ -24,3 +24,4 @@
 {"ts": "", "session": "test-hook", "action": "auto", "file": "arness/scripts/token-budget.py", "why": "auto: chore(wiki): index row cho session-provenance 30/07 + regen docs — trích từ git (5 file dirty); agent chưa ghi why thủ công"}
 {"ts": "", "session": "350f10dd-c1a4-49f2-b839-dcbab71f4fd1", "action": "auto", "file": "lmwiki/wiki/index.md", "why": "auto: chore(wiki): index row cho session-provenance 30/07 + regen docs — trích từ git (4 file dirty); agent chưa ghi why thủ công"}
 {"ts": "", "session": "350f10dd-c1a4-49f2-b839-dcbab71f4fd1", "action": "auto", "file": "lmwiki/wiki/index.md", "why": "auto: chore(wiki): index row cho session-provenance 30/07 + regen docs — trích từ git (4 file dirty); agent chưa ghi why thủ công"}
+{"ts": "", "session": "x", "action": "auto", "file": "gitignore", "why": "auto: fix(hook): nối token-budget + grounding-check vào hook thật — trích từ git (8 file dirty); agent chưa ghi why thủ công"}

@@ -23,6 +23,13 @@ Lúc thiết kế `provenance-log.jsonl` (xem `[[220722-artifact-provenance-even
 | "Trang wiki NÀY nói về code nào?" (không phải log — QUAN HỆ suy từ nội dung) | `touches` | `harness/scripts/wiki-graph.py::touches_targets` | n/a (suy lúc query) | KHÔNG ghi gì — parse backtick-path trong nội dung mỗi lần hỏi |
 | "Task T-YYMMDD-NN đang trạng thái nào?" | `tasks.json` + event `task.new`/`task.set` | `harness/scripts/code-logger.py` | ✗ (state), ✓ transition (vào `events.jsonl`... nhưng `events.jsonl` cũng gitignored — xem lưu ý dưới) | `task_new()`/`task_set()` |
 | "Quyết định/artifact NÀY sinh lúc nào, ai, git sha nào — travel qua máy khác được?" | `provenance-log.jsonl` (**ĐỀ XUẤT, CHƯA BUILD**) | `harness/scripts/provenance-log.py` (chưa tồn tại) | ✓ (thiết kế mới) | Tự động, hook hẹp (chỉ sự kiện Ý NGHĨA artifact-level) |
+| "Agent — chính hay PHỤ — đã làm/quyết định gì trong phiên X, và tôi kiểm lại thế nào?" | `agent-trace.jsonl` | `harness/scripts/agent-trace.py` | ✗ (local: chứa đường dẫn transcript per-machine) | **Opt-in** (mặc định TẮT); hook Stop chưng cất khi bật + `note` khai tay |
+
+### Vì sao `agent-trace` không giẫm bốn sổ trên
+
+Nó là sổ duy nhất gom được **subagent**: một phiên dispatch 13 agent đẻ ra 13 transcript ở 13 slug khác nhau trong `~/.claude/projects/`, không sổ nào ở trên nhìn thấy chúng. Và nó là sổ duy nhất mang trường `verify` — một lệnh chạy lại được, nên kiểm chứng không phải là tin lời agent tự khai.
+
+**Giới hạn phải biết:** nó KHÔNG lưu được *suy nghĩ*. Đo thật 2026-07-31: transcript Claude Code có khối `thinking` (main 186, subagent ge-t7 34) nhưng **nội dung rỗng hết** — runtime không ghi chuỗi suy luận ra đĩa. Ba thứ lưu được là hành động (`tool_use`), lời agent nói ra (`text`), và quyết định agent chủ động khai. Đừng hứa với ai là nó "log suy nghĩ".
 
 ## Vì sao KHÔNG git-track hết — đây là lựa chọn có chủ ý, không phải sơ suất
 

@@ -660,22 +660,6 @@ Walkthrough tương tác giải thích lifecycle thật của Claude Code + over
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-29 13:33:48 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4215b149f278360ad94e4d920031b414084d57f3 |
-| 2026-07-29 14:44:23 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=24770b4f |
-| 2026-07-29 14:44:23 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=472fa993 |
-| 2026-07-29 14:44:44 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=93767117 |
-| 2026-07-29 14:44:44 | `file.write` | llmwiki/wiki/sources/draft/290726-graph-engineering-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=c221399e |
-| 2026-07-29 15:07:04 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=ba53f99eafb442e04 |
-| 2026-07-29 15:07:04 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Write · session=1319b8e1 · actor=agent · prev=6178ca5078cadf494 |
-| 2026-07-29 15:32:51 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=945982b189f10b0b5d |
-| 2026-07-29 15:32:51 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=5f50c3a01bbcb9dbe0 |
-| 2026-07-29 15:33:02 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=ec7917ea0bb5569e85 |
-| 2026-07-29 15:33:02 | `file.write` | llmwiki/wiki/sources/draft/290726-ge-test-PLAN.md · tool=Edit · session=1319b8e1 · actor=agent · prev=acf57e6dbd6af7991f |
-| 2026-07-29 22:01:15 | `file.write` | skills/query/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=516a6ece0a5e1efbc3a4db44fa1e523110b05074556b1c |
-| 2026-07-29 22:01:15 | `file.write` | skills/query/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=af1804dcfddfdd712b1819d0e38090f381e50ced3b3f6b |
-| 2026-07-29 22:02:29 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a5daea5d1f9c9105588ec7d84d44ae0ab4ebad6e |
-| 2026-07-29 22:02:29 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c6d4a698fbac3734dbf2d12ee3aa1d303f81918e |
-| 2026-07-29 22:10:38 | `file.write` | harness/tests/ge-backcompat-test.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=ee98f87f000a8f7ea47e48920ad858b3 |
 | 2026-07-29 22:10:38 | `file.write` | harness/tests/ge-backcompat-test.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=780cdd47302fb4cf2492c272ca53f900 |
 | 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9228d52155404cae856a141a251e3858bea61 |
 | 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9edfbe677ae61150f30380f7d00ab6db7803c |
@@ -714,5 +698,21 @@ Walkthrough tương tác giải thích lifecycle thật của Claude Code + over
 | 2026-07-30 10:31:26 | `file.write` | llmwiki/wiki/sources/draft/300726-hook-skill-layers.md · tool=Write · session=350f10dd · actor=agent · prev=af7a55acfc39 |
 | 2026-07-30 10:31:33 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=29237923b35614b7f307c038381c8fb7389739ac761c8b |
 | 2026-07-30 10:31:33 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=16c7d72d42dc12619f106f590936adaf0a06ba1dc7cae3 |
+| 2026-07-31 08:44:01 | `file.write` | harness/scripts/agent-trace.py · tool=Write · session=1319b8e1 · actor=agent · prev=7e6148c7c8e74461d04304fbf119ae813aa7 |
+| 2026-07-31 08:44:01 | `file.write` | harness/scripts/agent-trace.py · tool=Write · session=1319b8e1 · actor=agent · prev=9d5d8a0cef2bf046fd6da7a7edddf3013f21 |
+| 2026-07-31 08:45:27 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=22ce5bb631cb7e0463dbe1e7708284249a0ff0 |
+| 2026-07-31 08:45:27 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f504b5574bb3ccbd03b9209a61e769a00cfd6e |
+| 2026-07-31 08:45:48 | `file.write` | llmwiki/wiki/concepts/log-model.md · tool=Edit · session=1319b8e1 · actor=agent · prev=31a7ffab923ed1aabcb74742a046619e2 |
+| 2026-07-31 08:45:48 | `file.write` | llmwiki/wiki/concepts/log-model.md · tool=Edit · session=1319b8e1 · actor=agent · prev=a9847de6119f71cf9d8cf7ab0d2af87d9 |
+| 2026-07-31 11:21:49 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=0515dbb8b8c7d5bc53284ce75d1c946fba3d |
+| 2026-07-31 11:21:49 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=fe3d4e5e6512fa17dbf4863e6736223445d4 |
+| 2026-07-31 11:21:57 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=ecea7b481fc60c6bdfc6a3b7d68641de8858 |
+| 2026-07-31 11:21:57 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=dbcd1b36d6a61b7f727211af22d9ed2431e5 |
+| 2026-07-31 11:24:36 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9a6aa60bb214da25ac43e0d2598ebd9f84cf |
+| 2026-07-31 11:24:36 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=bd95a942ca6b8b0e69f19b05f2dbadf3cbd5 |
+| 2026-07-31 11:24:50 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=59b88f0a3b7b1f9d5f35552da5fdababe872 |
+| 2026-07-31 11:24:50 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a2a0b6ed43eb46667cd351e57d8647a11dd8 |
+| 2026-07-31 11:25:25 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=764496d6e09f255b30bacf2d8633de1c2adb |
+| 2026-07-31 11:25:25 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=260579d6e2a6fe9c3a4b16cddfdb46e0bae9 |
 
 <!-- log:auto:end -->

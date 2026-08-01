@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "template_version": "1.3.58",
+  "template_version": "1.3.60",
   "remote": "https://github.com/Rheinmir/setup.git",
   "branch": "orca",
   "generated_at": "2026-06-28",
@@ -142,6 +142,6 @@
     "llmwiki/wiki/sources/draft/README.md": "16b8e0a4d7ef1622",
     "llmwiki/wiki/sources/draft/_template.md": "c6d4059f946b9fe3"
   },
-  "capability_sha": "81e16099f3007316",
-  "capability_count": 180
+  "capability_sha": "3d4a9675c0424f8b",
+  "capability_count": 181
 }

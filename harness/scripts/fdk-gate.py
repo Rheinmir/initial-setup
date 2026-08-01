@@ -81,6 +81,7 @@ STEPS = [
         "python3 harness/scripts/token-budget.py --self-test >/dev/null && "
         "python3 harness/scripts/inject-scan.py --self-test >/dev/null && "
         "python3 harness/scripts/grounding-check.py --self-test >/dev/null && "
+        "python3 harness/scripts/agent-trace.py --self-test >/dev/null && "
         "python3 harness/scripts/wiki-graph.py --self-test >/dev/null && "
         "python3 harness/scripts/provenance-log.py --self-test >/dev/null && "
         "python3 harness/scripts/claim-receipts.py --self-test >/dev/null && "

@@ -156,3 +156,5 @@
 {"ts": "2026-07-30T10:05:26", "session": "350f10dd", "action": "add", "target": "sources/draft/300726-pr92-flow.md", "tool": "Write"}
 {"ts": "2026-07-30T10:31:26", "session": "350f10dd", "action": "add", "target": "sources/draft/300726-hook-skill-layers.md", "tool": "Write"}
 {"ts": "2026-07-30T10:31:26", "session": "350f10dd", "action": "add", "target": "sources/draft/300726-hook-skill-layers.md", "tool": "Write"}
+{"ts": "2026-07-31T08:45:48", "session": "1319b8e1", "action": "modify", "target": "concepts/log-model.md", "tool": "Edit"}
+{"ts": "2026-07-31T08:45:48", "session": "1319b8e1", "action": "modify", "target": "concepts/log-model.md", "tool": "Edit"}

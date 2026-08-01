@@ -307,6 +307,15 @@ def run_loop(
     no_improve = 0  # consecutive iterations that did not beat the best score
 
     if metric_cmd:
+        # Guard: the ratchet reverts via `git reset --hard`, which destroys any
+        # uncommitted change in cwd. Refuse to start on a dirty working tree rather
+        # than silently wiping real work on the first "reverted"/"crash" iteration.
+        dirty = _git(["status", "--porcelain"], cwd).stdout.strip()
+        if dirty:
+            raise ValueError(
+                "ratchet (--metric-cmd) requires a CLEAN working tree in cwd — "
+                "git reset --hard would destroy the uncommitted changes below:\n" + dirty
+            )
         # R-1.1 — the BASELINE Trial is measured before the loop and recorded, so
         # iteration 1 already has a bar to beat and a commit to fall back to.
         m_exit, m_out = _run_cmd(metric_cmd, cwd)
@@ -566,6 +575,15 @@ def _mk_git_sandbox(tmp):
     subprocess.run(["git", "-C", tmp, "commit", "-qm", "seed"], check=True, **q)
 
 
+def _commit(cwd, name, body):
+    """Write `name` and commit it — used to seed a CLEAN tree before ratchet scenarios
+    (run_loop now refuses to start the ratchet on a dirty working tree)."""
+    q = {"capture_output": True, "text": True}
+    (Path(cwd) / name).write_text(body)
+    subprocess.run(["git", "-C", str(cwd), "add", "-A"], **q)
+    subprocess.run(["git", "-C", str(cwd), "commit", "-qm", f"seed {name}"], **q)
+
+
 def _git_count(cwd):
     """Commits reachable from HEAD — proof that keep committed / revert did not."""
     return int(_git(["rev-list", "--count", "HEAD"], cwd).stdout.strip() or 0)
@@ -649,7 +667,7 @@ def selftest():
         #    Baseline is measured BEFORE the loop, so iter 1 already has a bar to beat.
         rk = d / "rk"
         _mk_git_sandbox(rk)
-        (rk / "n").write_text("0")
+        _commit(rk, "n", "0")  # ratchet now requires a clean tree at start (see R-1.1 guard)
         metric_up = _py(
             "import pathlib;"
             f"p=pathlib.Path({json.dumps(str(rk / 'n'))});"
@@ -660,7 +678,7 @@ def selftest():
             max_iter=3, no_progress_k=0, state_paths=[], cwd=str(rk),
             metric_cmd=metric_up, direction="max", no_improve_k=3,
         ))
-        rat["keep_commits"] = _git_count(rk)  # seed + 3 keeps
+        rat["keep_commits"] = _git_count(rk)  # seed + seed-n + 3 keeps
 
         # 7) RATCHET-REVERT — metric flat → never beats baseline by min_delta → every
         #    iter "reverted", and no_improve_k stops the loop. Nothing may be committed.
@@ -677,7 +695,7 @@ def selftest():
         #    "crash", and the workspace is reset to the last KEPT commit (iter 1's).
         rc = d / "rc"
         _mk_git_sandbox(rc)
-        (rc / "c").write_text("0")
+        _commit(rc, "c", "0")  # ratchet now requires a clean tree at start (see R-1.1 guard)
         metric_crash = _py(
             "import pathlib,sys;"
             f"p=pathlib.Path({json.dumps(str(rc / 'c'))});"
@@ -689,8 +707,25 @@ def selftest():
             max_iter=3, no_progress_k=0, state_paths=[], cwd=str(rc),
             metric_cmd=metric_crash, direction="max", no_improve_k=3,
         ))
-        rat["crash_commits"] = _git_count(rc)  # seed + the single keep
+        rat["crash_commits"] = _git_count(rc)  # seed + seed-c + the single keep
         rat["crash_head_kept"] = (rc / "c").read_text()  # reset --hard restored "2"
+
+        # 9) RATCHET-DIRTY-REFUSED — a real bug found in review: `git reset --hard`
+        #    on revert/crash silently destroyed uncommitted work that predated the
+        #    loop. run_loop must now refuse to even START the ratchet on a dirty tree.
+        rd = d / "rd"
+        _mk_git_sandbox(rd)
+        (rd / "untracked-work.txt").write_text("this must survive")  # dirty, never committed
+        dirty_refused = False
+        dirty_preserved = False
+        try:
+            run_loop(
+                verify_cmd=verify_fail, max_iter=3, no_progress_k=0, state_paths=[],
+                cwd=str(rd), metric_cmd=_py("print(1.0)"), direction="max", quiet=True,
+            )
+        except ValueError:
+            dirty_refused = True
+            dirty_preserved = (rd / "untracked-work.txt").read_text() == "this must survive"
 
         episodic_written = episodic.exists()
 
@@ -725,15 +760,17 @@ def selftest():
     extra = [
         ("baseline Trial ghi TRƯỚC vòng lặp",
          baseline.get("ratchet") == "baseline" and baseline.get("score") == 1.0),
-        ("keep: 3/3 kept, commit thật (seed+3)",
+        ("keep: 3/3 kept, commit thật (seed+seed-n+3)",
          _ratchet_seq(keep_log) == ["kept"] * 3
          and all(r.get("commit") for r in keep_log["iterations"][1:])
-         and rat["keep_commits"] == 4),
+         and rat["keep_commits"] == 5),
         ("revert: 3/3 reverted, không commit nào",
          _ratchet_seq(rev_log) == ["reverted"] * 3 and rat["revert_commits"] == 1),
         ("crash: kept→crash→crash, reset về keep cuối",
          _ratchet_seq(crash_log) == ["kept", "crash", "crash"]
-         and rat["crash_commits"] == 2 and rat["crash_head_kept"] == "2"),
+         and rat["crash_commits"] == 3 and rat["crash_head_kept"] == "2"),
+        ("dirty tree bị TỪ CHỐI trước khi ratchet chạy (không git reset --hard đè uncommitted work)",
+         dirty_refused and dirty_preserved),
     ]
     for label, passed in extra:
         ok = ok and passed

@@ -216,6 +216,7 @@ class Graph:
         self.pages: list = []          # mọi relpath (nguồn tiềm năng của cạnh)
         self.content: set = set()      # relpath thuộc 6 content dir (đích hợp lệ + xét orphan)
         self.stem_content: dict = {}   # stem -> relpath (chỉ content) — phân giải wikilink
+        self.ambiguous_stems: set = set()  # stem trùng ≥2 trang content — TỪ CHỐI phân giải bare-stem
         self.stem_all: dict = {}       # stem -> relpath (mọi trang) — phân giải tham số <page>
         self.relset: set = set()       # set mọi relpath
         self.edges: list = []          # list[(src, dst, type, eid)]; type: wikilink|mdlink|<rel>
@@ -238,8 +239,17 @@ def build_graph(wiki: Path) -> Graph:
     g.content = {rel(p) for p in content}
     g.pages = [rel(p) for p in allp]
     g.relset = set(g.pages)
-    for p in content:                       # content thắng khi trùng stem (phân giải wikilink)
-        g.stem_content[p.stem] = rel(p)
+    # content thắng khi trùng stem (phân giải wikilink) — NHƯNG 2 trang content trùng stem ở
+    # khác thư mục (vd concepts/foo.md và entities/foo.md) không được ghi đè âm thầm: đích sẽ
+    # bị BIND NHẦM và sinh eid trỏ sai trang mà không ai biết. Đánh dấu ambiguous, từ chối
+    # phân giải bare-stem cho các stem đó (wikilink rơi vào broken thay vì trỏ nhầm).
+    _stem_counts: dict = {}
+    for p in content:
+        _stem_counts.setdefault(p.stem, []).append(rel(p))
+    g.ambiguous_stems = {stem for stem, paths in _stem_counts.items() if len(paths) > 1}
+    for stem, paths in _stem_counts.items():
+        if stem not in g.ambiguous_stems:
+            g.stem_content[stem] = paths[0]
     for p in allp:                          # đã sort → deterministic; setdefault giữ bản đầu
         g.stem_all.setdefault(p.stem, rel(p))
     # Index path tuyệt đối cho md-link (chỉ content, như wiki-health) → tra cứu O(1).
@@ -315,6 +325,8 @@ def resolve_page(arg: str, g: Graph):
         return a
     if a + ".md" in g.relset:
         return a + ".md"
+    if stem in g.ambiguous_stems:
+        return None  # 2+ trang content trùng stem — bắt buộc chỉ định đường dẫn có thư mục
     if stem in g.stem_content:
         return g.stem_content[stem]
     if stem in g.stem_all:
@@ -558,6 +570,31 @@ def self_test() -> int:
         _lines, back = cmd_backlinks(g, "a")
         checks.append(("backlinks thấy cạnh typed",
                        any(b["type"] == "supports" for b in back["backlinks"])))
+
+    # (6) bug thật đã tìm thấy: 2 trang content TRÙNG STEM ở khác thư mục từng bị ghi đè âm
+    # thầm trong stem_content → wikilink/relations trỏ NHẦM trang mà không ai biết. Giờ phải
+    # bị coi là ambiguous và TỪ CHỐI phân giải bare-stem (rơi vào broken, không bind nhầm).
+    with tempfile.TemporaryDirectory() as td2:
+        wiki2 = Path(td2) / "wiki"
+        (wiki2 / "concepts").mkdir(parents=True)
+        (wiki2 / "entities").mkdir(parents=True)
+        (wiki2 / "concepts" / "dup.md").write_text("# Dup concept\n", encoding="utf-8")
+        (wiki2 / "entities" / "dup.md").write_text("# Dup entity\n", encoding="utf-8")
+        (wiki2 / "concepts" / "z.md").write_text(
+            "---\ntype: concept\nrelations:\n  - {rel: supports, to: dup}\n---\n\n"
+            "# Z\n\nxem [[dup]]\n", encoding="utf-8")
+        g2 = build_graph(wiki2)
+        checks.append(("stem trùng 2 trang content → đánh dấu ambiguous",
+                       "dup" in g2.ambiguous_stems))
+        checks.append(("resolve_page('dup') TỪ CHỐI (None), không bind nhầm 1 trong 2",
+                       resolve_page("dup", g2) is None))
+        checks.append(("wikilink [[dup]] rơi vào broken thay vì trỏ nhầm trang",
+                       any(b["wikilink"] == "dup" for b in g2.broken)))
+        checks.append(("relations to:dup KHÔNG sinh cạnh (đích mơ hồ, không đoán)",
+                       not any(d in ("concepts/dup.md", "entities/dup.md") and t == "supports"
+                               for (_s, d, t, _e) in g2.edges)))
+        checks.append(("dup.md vẫn KHÔNG orphan giả — stem_all vẫn thấy để CLI dùng path đủ",
+                       "concepts/dup.md" in g2.relset and "entities/dup.md" in g2.relset))
 
     for name, ok in checks:
         print(f"  {'ok  ' if ok else 'FAIL'} {name}")

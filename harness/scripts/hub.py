@@ -409,7 +409,7 @@ def self_test() -> int:
     else:
         wr = tmp / "wire"
         _mk_git_sandbox(wr)
-        (wr / "n").write_text("0")
+        _commit(wr, "n", "0")  # loop-runner's ratchet now requires a clean tree at start
         metric_up = lr._py(
             "import pathlib;"
             f"p=pathlib.Path({json.dumps(str(wr / 'n'))});"

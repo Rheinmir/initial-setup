@@ -13,8 +13,16 @@ Schema (điều kiện hard-fail):
   field lạ            chỉ CẢNH BÁO, không fail (forward-compat)
 
 Dùng:
-  grounding-check.py --check FILE   # FILE = '-' đọc stdin; exit 0 hợp lệ, exit 2 + liệt kê lỗi
+  grounding-check.py --check FILE   # FILE = '-' đọc stdin
   grounding-check.py --self-test
+
+Exit code (BA giá trị PHÂN BIỆT — một cổng CI chỉ coi 0 là "đã chấm và hợp lệ"):
+  0 = verdict hợp lệ theo schema
+  2 = verdict ĐỌC ĐƯỢC nhưng schema sai (thiếu field / decision lạ / …)
+  3 = hạ tầng lỗi — KHÔNG đọc được FILE (chưa ai ghi verdict). Trước bản vá này, case
+      này trả về 0 giống hệt "hợp lệ", nên một cổng chỉ check `rc==0` không phân biệt
+      được "chưa ai chấm" với "đã chấm PASS" — gate coi như bị bypass bằng cách không
+      sinh output. KHÔNG dùng return 0 ở đây nữa.
 """
 import argparse
 import json
@@ -110,9 +118,11 @@ def cmd_check(src: str) -> int:
         try:
             text = Path(src).read_text(encoding="utf-8")
         except OSError as e:
-            # hạ tầng lỗi (không đọc được file) → fail-open, không phá phiên
-            print(f"grounding-check: không đọc được {src} ({e}) — bỏ qua (fail-open)", file=sys.stderr)
-            return 0
+            # hạ tầng lỗi: KHÔNG trả 0 — 0 nghĩa là "verdict hợp lệ", và file thiếu nghĩa là
+            # chưa ai chấm gì cả. Một cổng CI chỉ check rc==0 phải phân biệt được 2 ca này,
+            # nếu không "quên ghi verdict" trở thành cách bypass gate không tốn công.
+            print(f"grounding-check: không đọc được {src} ({e}) — KHÔNG có verdict để chấm", file=sys.stderr)
+            return 3
     obj, errs = load_verdict(text)
     if obj is not None:
         errs = check_verdict(obj)
@@ -184,6 +194,21 @@ def self_test():
     for label, passed in ev_cases:
         print(f"  {'✓' if passed else '✗'} {label}")
         ok = ok and passed
+
+    # ── bug thật đã tìm thấy: file verdict KHÔNG tồn tại từng trả rc=0, giống hệt hợp lệ ──
+    rc_missing = cmd_check("/nonexistent-verdict-file-xyz.json")
+    missing_ok = rc_missing == 3 and rc_missing != 0
+    print(f"  {'✓' if missing_ok else '✗'} file verdict thiếu → rc=3 (KHÔNG phải 0, không giả PASS)")
+    ok = ok and missing_ok
+
+    with tempfile.TemporaryDirectory() as td3:
+        valid_file = Path(td3) / "v.json"
+        valid_file.write_text('{"decision":"approve","claim":"c","reason":"r"}', encoding="utf-8")
+        rc_valid = cmd_check(str(valid_file))
+        three_way_ok = rc_valid == 0 and rc_missing == 3 and rc_valid != rc_missing
+        print(f"  {'✓' if three_way_ok else '✗'} 3 mã thoát phân biệt được nhau: hợp lệ=0, hạ tầng lỗi=3")
+        ok = ok and three_way_ok
+
     print("self-test: PASS" if ok else "self-test: FAIL")
     return 0 if ok else 1
 

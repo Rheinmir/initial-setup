@@ -5,12 +5,6 @@
   "ts": "2026-07-20T14:24:54",
   "session": null
  },
- "concepts/wiki-core-relations.md": {
-  "by": "fdk/wiki/log.md",
-  "action": "code-drift",
-  "ts": "2026-07-20T14:24:54",
-  "session": null
- },
  "concepts/skill-craft.md": {
   "by": "fdk/CAPABILITIES.md (+3)",
   "action": "code-drift",
@@ -346,5 +340,11 @@
   "action": "code-drift",
   "ts": "2026-07-20T14:24:54",
   "session": null
+ },
+ "sources/draft/020726-council-chon-de-thi-self-index.md": {
+  "by": "concepts/wiki-core-relations.md",
+  "action": "modify",
+  "ts": "2026-08-01T18:09:33",
+  "session": "3061dd52"
  }
 }

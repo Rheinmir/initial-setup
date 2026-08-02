@@ -8,16 +8,18 @@
 # violation) is deterministic and built now (--self-test). The actual allow-list and the
 # enforce/advise decision are project-specific guesses -> quarantined here.
 
-verified: false                   # ASSUMPTION (not verified) — allow_domains is an EMPTY guess (every project differs); mode stays 'warn' so an un-calibrated list never blocks a real session. Flip to 'block' only AFTER the allow-list is real.
+verified: true                     # CALIBRATED 29/07/2026 — allow_domains derived from grepping every real curl/wget in this repo's own code (bootstrap, sync-template, fresh-install-smoke, trivy installer): only github.com + raw.githubusercontent.com found. Re-run the grep in the ADAPT-CHECKLIST below before trusting this on a fork with different tooling.
 
 # warn  -> detect + advise on stderr, exit 0 (fail-safe for usability: a wrong/empty allow-list
 #          must not break dev). block -> exit 2 on violation (turn on AFTER calibration).
-mode: warn                        # ASSUMPTION (not verified) — 'warn' until the allow-list is real; then 'block'
+mode: block                       # CALIBRATED 29/07/2026 — allow-list is real now, enforce for real.
 
 egress:
-  # Domains an agent's network command may reach. EMPTY = nothing is verified-safe yet; the
-  # project fills its real allow-list. (Under mode:warn an empty list only advises, never blocks.)
-  allow_domains: []               # ASSUMPTION (not verified) — project MUST list its real egress allow-list
+  # Domains an agent's network command may reach. Derived from: grep -rn 'curl |wget ' --include=*.sh
+  # --include=*.py . | grep -oE 'https?://[a-zA-Z0-9._-]+' | sort -u (excludes egress-guard's own
+  # self-test fixtures evil.tld/x). Widen here, don't just switch back to mode:warn, if this blocks
+  # a legitimate new domain.
+  allow_domains: [github.com, raw.githubusercontent.com]
   # Commands that can move data off-box -> any of these reaching a non-allow-listed domain is flagged.
   net_commands: [curl, wget, nc, ncat, telnet, scp, sftp, rsync]   # ASSUMPTION (not verified) — starter set; widen per stack
 

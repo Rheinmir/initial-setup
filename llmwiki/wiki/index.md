@@ -180,3 +180,4 @@
 | [300726-session-provenance](sources/300726-session-provenance.md) | source | Auto-distill scratch-log phiên 1319b8e1 ngày 30/07 — phiên thi hành T1–T7 graph-engineering, 8 bộ test, UAT canary bắt lỗi hardcode owner |
 | [010826-session-provenance](sources/010826-session-provenance.md) | source | Auto-distill scratch-log phiên 350f10dd ngày 01/08 — vá 3 bug blocking loop-runner/wiki-graph/grounding-check, merge PR#92 vào orca, cập nhật khung teach-me thành bảy bước |
 | [310726-session-provenance](sources/310726-session-provenance.md) | source | Auto-distill scratch-log phiên 1319b8e1 ngày 31/07 — vá hook token-budget/grounding, dựng agent-trace, đủ 10/10 cap spec §5 |
+| [020826-session-provenance](sources/020826-session-provenance.md) | source | Auto-distill scratch-log phiên 1319b8e1 ngày 02/08 — pull 9 commit upstream (gồm 3 bug fix từ review PR#92), thêm provider Azure Foundry askctd vào opencode |

@@ -19,7 +19,11 @@ egress:
   # --include=*.py . | grep -oE 'https?://[a-zA-Z0-9._-]+' | sort -u (excludes egress-guard's own
   # self-test fixtures evil.tld/x). Widen here, don't just switch back to mode:warn, if this blocks
   # a legitimate new domain.
-  allow_domains: [github.com, raw.githubusercontent.com]
+  # +2026-08-02: thêm host Azure AI Foundry khi tích hợp provider askctd. Đây là mở
+  # đường egress có chủ đích cho một endpoint LLM cụ thể, KHÔNG phải wildcard *.azure.com
+  # — thêm resource khác thì thêm dòng khác, để mỗi lần mở đều là một quyết định.
+  allow_domains: [github.com, raw.githubusercontent.com,
+                  askctd-resource.services.ai.azure.com]
   # Commands that can move data off-box -> any of these reaching a non-allow-listed domain is flagged.
   net_commands: [curl, wget, nc, ncat, telnet, scp, sftp, rsync]   # ASSUMPTION (not verified) — starter set; widen per stack
 

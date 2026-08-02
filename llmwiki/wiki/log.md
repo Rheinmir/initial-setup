@@ -654,16 +654,6 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-29 22:10:38 | `file.write` | harness/tests/ge-backcompat-test.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=780cdd47302fb4cf2492c272ca53f900 |
-| 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9228d52155404cae856a141a251e3858bea61 |
-| 2026-07-29 23:00:06 | `file.write` | harness/scripts/sync-skills.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9edfbe677ae61150f30380f7d00ab6db7803c |
-| 2026-07-30 09:16:22 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=11d82cb599180954fd424f3ae6346857a |
-| 2026-07-30 09:16:22 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=1319b8e1 · actor=agent · prev=ae7c065957fbc248c2c9b6d8655d703bd |
-| 2026-07-30 09:18:25 | `file.write` | harness/poc-vendor-neutral/bootstrap-fork.sh · tool=Write · session=1319b8e1 · actor=agent · prev=1d2f180564660060ca822f |
-| 2026-07-30 09:18:25 | `file.write` | harness/poc-vendor-neutral/bootstrap-fork.sh · tool=Write · session=1319b8e1 · actor=agent · prev=c25369a05fe0985d977f79 |
-| 2026-07-30 12:50:40 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c6e9190b7c284935ca7957db6fbfceb19caf |
-| 2026-07-30 12:50:40 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=ce6f6df553ed24b82379844eee4aec2ec11a |
-| 2026-07-30 12:51:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=7826e4471d80eb631c70662eaa0952cbd0a7 |
 | 2026-07-30 12:51:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a247d92aa59816067b8cf261f1b84fc0f137 |
 | 2026-07-30 12:51:59 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=d60469b36cfcb71879e27415680f6d6e098707 |
 | 2026-07-30 12:51:59 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f90a133018510e91c08bef7fc5e552e33bc462 |
@@ -694,5 +684,15 @@ Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engi
 | 2026-07-31 11:24:50 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a2a0b6ed43eb46667cd351e57d8647a11dd8 |
 | 2026-07-31 11:25:25 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=764496d6e09f255b30bacf2d8633de1c2adb |
 | 2026-07-31 11:25:25 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=260579d6e2a6fe9c3a4b16cddfdb46e0bae9 |
+| 2026-07-31 14:06:53 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=2af546a7e283a58197855e80ffd1a6421bc5 |
+| 2026-07-31 14:06:53 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=0294603d1fdf028c26f6a9af33163e297113 |
+| 2026-07-31 14:07:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=872254341437d7bdb5e24198335b72e9e308 |
+| 2026-07-31 14:07:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4a028010b093f4167e4e786aa4eb89aa09f9 |
+| 2026-07-31 14:07:26 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=adbe374df9612144b586016ad6a4e8585400 |
+| 2026-07-31 14:07:26 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c253a4a672a6f5ddefd469ba598360dd9840 |
+| 2026-07-31 14:08:00 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=120a26031bd792d034e3273dd4e29d7c9 |
+| 2026-07-31 14:08:00 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=e8452613698b3022cd29351e65ec6c00d |
+| 2026-07-31 14:08:45 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=802246725d06d02eafe92cebaa01a3ba2 |
+| 2026-07-31 14:08:45 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=7ba495cdccace5f28e91724db8c0e6ec2 |
 
 <!-- log:auto:end -->

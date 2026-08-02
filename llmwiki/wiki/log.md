@@ -663,18 +663,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-30 12:51:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a247d92aa59816067b8cf261f1b84fc0f137 |
-| 2026-07-30 12:51:59 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=d60469b36cfcb71879e27415680f6d6e098707 |
-| 2026-07-30 12:51:59 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f90a133018510e91c08bef7fc5e552e33bc462 |
-| 2026-07-30 12:52:37 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=29f9908ba292735daa51eec0f9a84 |
-| 2026-07-30 12:52:37 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=ec5d613b665f41641c6411f3f4aeb |
-| 2026-07-30 12:52:54 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=85df46e75c6d2b7448430ad77c5f4 |
-| 2026-07-30 12:52:54 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=1319b8e1 · actor=agent · prev=d851b68e41f80f536ccc7fc2c5a1b |
-| 2026-07-30 12:53:16 | `file.write` | skills/qc-code/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=dcecb14d10b2aabee7d06d2c50aa9749d065dcdf1f87 |
-| 2026-07-30 12:53:16 | `file.write` | skills/qc-code/SKILL.md · tool=Edit · session=1319b8e1 · actor=agent · prev=8608c8e6a8fc9ad7652ff28477cb4f0145f83a0e9c5b |
-| 2026-07-30 12:53:30 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=dc5ecdfa0de2c9493c98a8dc8b2bdc0266b4febd3f8041f |
-| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=3718eca4a030b3d010a0b6f3af2315f367f1dd92e4ab5e5 |
-| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=4f80eefda1dd0f095c7eff87dc1f3e97fed6ea7b42e8d27 |
 | 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=b881188020e259c44deac859726d2097dcdeee64a03f702 |
 | 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=2ddd8c9f30df1cab65a944ec3bd0ec8fe0507b10ff899de |
 | 2026-07-31 08:44:01 | `file.write` | harness/scripts/agent-trace.py · tool=Write · session=1319b8e1 · actor=agent · prev=7e6148c7c8e74461d04304fbf119ae813aa7 |
@@ -703,5 +691,17 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-07-31 14:08:00 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=e8452613698b3022cd29351e65ec6c00d |
 | 2026-07-31 14:08:45 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=802246725d06d02eafe92cebaa01a3ba2 |
 | 2026-07-31 14:08:45 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=7ba495cdccace5f28e91724db8c0e6ec2 |
+| 2026-08-02 13:03:05 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=cbb217c7cbb175aba150a5b38413fc66bdb0 |
+| 2026-08-02 13:03:05 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=38ee71c7625ebd6e537300c58c969c28a005 |
+| 2026-08-02 13:03:24 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=8b1449848fad09e58cdbef9829403e8c49ac |
+| 2026-08-02 13:03:24 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4de4116204da85f6b68306cee6cf9cea9002 |
+| 2026-08-02 13:03:50 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=80c055df166d41702937abcb56f15fc89d4a |
+| 2026-08-02 13:03:50 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=01a82e2a4b34d6387408da71db13c861069e |
+| 2026-08-02 13:06:11 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=d73c8db2a8e9dd8a342804008954038ae9b4 |
+| 2026-08-02 13:06:11 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c2c09e3bb7b45e6bb0d93aafcdd3feb85baf |
+| 2026-08-02 13:06:28 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a2378db87364acf7ae4645bc5825927b99df |
+| 2026-08-02 13:06:28 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=3c209ceda31faff26797ce83c4050f919b7f |
+| 2026-08-02 13:06:39 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4a4d0968c891f743a4f60b971bf9da741bf8 |
+| 2026-08-02 13:06:39 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f92693694b8f9d5fd920f970ba465a0ba5cd |
 
 <!-- log:auto:end -->

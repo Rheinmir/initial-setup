@@ -667,55 +667,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 - `030826-evidence-terminal-chain-PLAN.md`: 9 task thi hành, 12/12 FR có task nhận, R18 rc=0.
 - Công tắc theo khuôn kill-switch sẵn có của repo: cờ `--no-evidence-chain` > env `OVERSTACK_EVIDENCE_TERMINAL` > `enabled` trong config; tắt ở bất kỳ tầng nào vẫn in dòng báo lên stderr (chống cổng câm).
 
-<!-- log:auto:start -->
-
-### 🤖 Log tự-động (code-logger, không do agent ghi)
-
-| Thời điểm | Event | Chi tiết |
-|---|---|---|
-| 2026-08-03 06:40:04 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=be6620d90361d49866fca121a029e7c5b439a5a5530374 |
-| 2026-08-03 06:40:04 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=180165ce379567d2ac973f0595eb10eda47c369f414b09 |
-| 2026-08-03 13:07:31 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=92dfbe3aa34dd47d8ef7ac1f49d4809971fa54bb90229020f60f45b21d86b8d3 · h=a0d6 |
-| 2026-08-03 13:07:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/sources/030826-session-provenance.md', 'llmwiki/wiki/inde |
-| 2026-08-03 13:07:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=fa4b97ee5c3958cc0c038679c8ee5cc32116c0278 |
-| 2026-08-03 16:11:37 | `task.new` |  · task=T-260803-01 · title=evidence-terminal-chain · state=proposed · actor=agent · prev=784dba4bd0eb571944bd3d37a83bd0 |
-| 2026-08-03 16:14:55 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Write · session=b8afb386 · actor=agent · pre |
-| 2026-08-03 16:14:55 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Write · session=b8afb386 · actor=agent · pre |
-| 2026-08-03 16:18:45 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Write · session=b8afb386 · actor=agent · prev=57029686163895 |
-| 2026-08-03 16:18:45 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Write · session=b8afb386 · actor=agent · prev=310421dd303d42 |
-| 2026-08-03 16:19:15 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:19:15 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:19:24 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=871a82fc2a8e8e0 |
-| 2026-08-03 16:19:24 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=ec6a387a2c362ff |
-| 2026-08-03 16:19:29 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=2f9bad82f311ada |
-| 2026-08-03 16:19:29 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=e6a024e1c70e138 |
-| 2026-08-03 16:19:59 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=965e98a687935309febdaf66805685c5f1a86d4038775e |
-| 2026-08-03 16:19:59 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=d7e8f43e4e44544d281a42b30bb569b71a61e48678c2d6 |
-| 2026-08-03 16:23:59 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:23:59 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:24:08 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:24:08 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:24:20 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:24:20 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:24:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:24:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:24:51 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=32c19c4cc7dad6e |
-| 2026-08-03 16:24:51 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=341cfd861988170 |
-| 2026-08-03 16:24:59 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=b1c6d6c5d2a5fff |
-| 2026-08-03 16:24:59 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=f4478b0f46f3be0 |
-| 2026-08-03 16:25:07 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:25:07 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:25:19 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:25:19 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:25:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:25:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
-| 2026-08-03 16:31:22 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Write · session=b8afb386 · actor=agent · prev=7 |
-| 2026-08-03 16:31:22 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Write · session=b8afb386 · actor=agent · prev=9 |
-| 2026-08-03 16:31:53 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Edit · session=b8afb386 · actor=agent · prev=c1 |
-| 2026-08-03 16:31:53 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Edit · session=b8afb386 · actor=agent · prev=ea |
-
-<!-- log:auto:end -->
-
 ## 2026-08-03 — R19 Task 1 — trang concept evidence-terminal-chain
 - `llmwiki/wiki/concepts/evidence-terminal-chain.md`: schema khối `evidence-chain`, bảng 6 loại điểm cuối, ví dụ xanh/đỏ phiên 03/08, và mục GIỚI HẠN nói rõ validator kiểm path resolve chứ không kiểm nội dung có chống lưng.
 
@@ -724,3 +675,59 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 - Công tắc 3 tầng: `--no-evidence-chain` > `OVERSTACK_EVIDENCE_TERMINAL` > `enabled`; tắt tầng nào cũng in dòng báo lên stderr.
 - Đối chứng chống test-giả: vô hiệu luật tầng chuỗi → 7/8 (ca `parametric đơn độc` đỏ); khôi phục → 8/8.
 - capability-stamp 1.3.61 → 1.3.62; capproof 212 → 213 neo.
+
+<!-- log:auto:start -->
+
+### 🤖 Log tự-động (code-logger, không do agent ghi)
+
+| Thời điểm | Event | Chi tiết |
+|---|---|---|
+| 2026-08-03 17:02:02 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/wiki/sources/030826-session-provenance.md'] · prev=2fdbc5932d0 |
+| 2026-08-03 17:02:02 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=57184d2bae2611411fc11aed81fb5269f24d2b32c |
+| 2026-08-03 17:03:06 | `file.write` | llmwiki/wiki/concepts/evidence-terminal-chain.md · tool=Write · session=b8afb386 · actor=agent · prev=723546b12733f04b63 |
+| 2026-08-03 17:03:06 | `file.write` | llmwiki/wiki/concepts/evidence-terminal-chain.md · tool=Write · session=b8afb386 · actor=agent · prev=6c78d938e2ad3ed80c |
+| 2026-08-03 17:03:27 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/wiki/index.md', 'llmwiki/wiki/log.md'] · prev=f0acd28d8dd3bc54 |
+| 2026-08-03 17:04:09 | `file.write` | harness/validators/evidence_terminal.py · tool=Write · session=b8afb386 · actor=agent · prev=7cbbf094b02f33e6fd0133f6661 |
+| 2026-08-03 17:04:09 | `file.write` | harness/validators/evidence_terminal.py · tool=Write · session=b8afb386 · actor=agent · prev=71685fdd485a11e97575e043dcc |
+| 2026-08-03 17:04:34 | `file.write` | harness/validators/evidence_leaf.py · tool=Write · session=b8afb386 · actor=agent · prev=06c9ac4b2f51184922bcf021d3df689 |
+| 2026-08-03 17:04:34 | `file.write` | harness/validators/evidence_leaf.py · tool=Write · session=b8afb386 · actor=agent · prev=c91fca6083028ef42f7a3f24eb7728c |
+| 2026-08-03 17:04:47 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=a812f217d9edace8da3d2c0fe3b5 |
+| 2026-08-03 17:04:47 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=d5666691dfe1940ab545bf860501 |
+| 2026-08-03 17:04:58 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=6d7fbf5267db3864ad0fc00751319ba36edbb315bc48e48bc915bc4415a509c3 · h=1b25 |
+| 2026-08-03 17:05:15 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=1b251df59d7e8b6c2547a9eb144a |
+| 2026-08-03 17:05:15 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=1789dea33ba132118a4bdcaf90d7 |
+| 2026-08-03 17:05:41 | `file.write` | harness/validators/evidence_leaf.py · tool=Edit · session=b8afb386 · actor=agent · prev=c9bf943859bc4a5dab999be5fb1f90e0 |
+| 2026-08-03 17:05:41 | `file.write` | harness/validators/evidence_leaf.py · tool=Edit · session=b8afb386 · actor=agent · prev=1e420ec14e8e040bca08db224be72b25 |
+| 2026-08-03 17:05:49 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=d1774c73f316209c18501c680d80f1288e4031bb63076b30a391f208f4c099ac · h=76ee |
+| 2026-08-03 17:06:06 | `file.write` | harness/evidence-terminal.config.yaml · tool=Write · session=b8afb386 · actor=agent · prev=76eece1041b74a2c8553a73622fa3 |
+| 2026-08-03 17:06:06 | `file.write` | harness/evidence-terminal.config.yaml · tool=Write · session=b8afb386 · actor=agent · prev=efe5a95386f4e5306f8baefeb2bb2 |
+| 2026-08-03 17:06:13 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=e54a89b3570601cce34f1ddc5814b15d57bb9039084eca3eb68ff46011ca7d2d · h=ee5d |
+| 2026-08-03 17:06:26 | `file.write` | harness/poc-vendor-neutral/policy.yaml · tool=Edit · session=b8afb386 · actor=agent · prev=ee5d92b906e727ddbc26462c1c908 |
+| 2026-08-03 17:06:26 | `file.write` | harness/poc-vendor-neutral/policy.yaml · tool=Edit · session=b8afb386 · actor=agent · prev=a32f133d652f21403a63be9590cfa |
+| 2026-08-03 17:06:40 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=c7e69e23f84f72c6a58760d390ad27177e478a3a589e2ffa353b1c6ebe7d8eae · h=3d72 |
+| 2026-08-03 17:07:31 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=b8afb386 · actor=agent · prev=3d72db5acd7653475ec1c6d7e77f99114 |
+| 2026-08-03 17:07:31 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=b8afb386 · actor=agent · prev=f0940f64b82d39c2bbd26461337d2385b |
+| 2026-08-03 17:08:02 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=b8afb386 · actor=agent · prev=798649d55002f0675b1cd85764fc4bd72 |
+| 2026-08-03 17:08:02 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=b8afb386 · actor=agent · prev=28268948266388b7045fc4e73e56cea44 |
+| 2026-08-03 17:08:10 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=b8afb386 · actor=agent · prev=679cf1fe0f1453f589cd5819af2f54699 |
+| 2026-08-03 17:08:10 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=b8afb386 · actor=agent · prev=23fda55613639350a93ad61b5b18cc9c1 |
+| 2026-08-03 17:08:27 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=a5ff2aa5c23038825b4008cce8d402a14c0e481864adc2390320883385a28444 · h=d4e9 |
+| 2026-08-03 17:09:15 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/AGENT.md', 'llmwiki/CLAUDE.md'] · prev=d4e9f551dbe0383ab0e8d45 |
+| 2026-08-03 17:09:43 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=6b524ea06235aa9b502017d30a4 |
+| 2026-08-03 17:09:43 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=b9169029b98b18306cb07d4a607 |
+| 2026-08-03 17:11:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['harness/scripts/harness-doctor.py', 'harness/travel-policy.yaml'] · pr |
+| 2026-08-03 17:11:21 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=682e69ce5c6b4b87f7b46da1096f |
+| 2026-08-03 17:11:21 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=39187145370dcb8e9b6dac961e07 |
+| 2026-08-03 17:11:41 | `file.write` | llmwiki/wiki/concepts/evidence-terminal-chain.md · tool=Edit · session=b8afb386 · actor=agent · prev=3da967576bc665b1526 |
+| 2026-08-03 17:11:41 | `file.write` | llmwiki/wiki/concepts/evidence-terminal-chain.md · tool=Edit · session=b8afb386 · actor=agent · prev=f6e10ea4783be8c12e0 |
+| 2026-08-03 17:12:51 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['fdk/CAPABILITIES.md', 'harness/version.json'] · prev=a8a6ddb383a4e107c |
+| 2026-08-03 17:12:51 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=752a596cd8c6ee131b0becb18a4c8f571d75b5ff1 |
+
+<!-- log:auto:end -->
+
+## 2026-08-03 — R19 bật mặc định (advisory → strict)
+- Đo trước khi lật: 217 file .md trong llmwiki/wiki, 2 có khối evidence-chain, **2/2 bị bắt** — cả hai là tài liệu DẠY chính định dạng này (ref ví dụ cố ý không tồn tại). Thêm ngoại lệ `r19_meta: true` cùng khuôn `r7_meta` → báo oan 0/2. Lật `strictness: strict` + `verified: true`.
+- Bịt hai lỗ nghiêm trọng phát hiện lúc bật:
+  - **Cổng câm**: `post_tool_use.py` dispatch bằng danh sách hằng số, không đọc policy → R19 khai `enforce_at:[session]` mà KHÔNG ai gọi. Đã thêm vào dispatch + thêm hợp đồng stdin-JSON cho validator.
+  - **Luật tự tắt ở bản deploy**: `ROOT = parents[2]` suy root theo vị trí bản đang chạy; bản tier-2 `llmwiki/.claude/hooks/validators/` tính ra `llmwiki/.claude` → không thấy config → rơi fallback advisory. Đổi sang suy root theo MỐC trên đĩa (đúng lớp lỗi [[decision-anchoring]] đã ghi). Có test giữ.
+- Chứng: hook chặn file hỏng rc=2, im với file hợp lệ rc=0; test 11/11; fire-drill `R19 bad:bat->1 good:im->0`; medic 0 fail.

@@ -5,6 +5,7 @@ status: proposed
 timestamp: 2026-08-03
 task: T-260803-01
 r7_meta: true
+r19_meta: true
 ---
 
 # evidence-terminal-chain — PLAN thi hành

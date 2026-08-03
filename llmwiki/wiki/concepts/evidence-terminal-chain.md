@@ -3,6 +3,7 @@ type: concept
 title: "Evidence-terminal-chain — chuỗi kết luận phải chấm dứt ở chứng cứ xem được"
 tags: [evidence, grounding, anti-fabrication, claim-receipts, R19, parametric]
 timestamp: 2026-08-03
+r19_meta: true
 ---
 
 # Evidence-terminal-chain

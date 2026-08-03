@@ -11,18 +11,22 @@ enabled: true                     # cong tac TANG BEN (theo repo, commit duoc, c
                                   # Tat o BAT KY tang nao van IN mot dong len stderr noi ro tang
                                   # nao da tat — co che im lang luc chet se bi nham la dang song.
 
-strictness: advisory              # ASSUMPTION (not verified) — advisory (canh bao, exit 0) cho toi
-                                  # khi do duoc ti le bao oan tren corpus that; roi moi 'strict'.
-                                  # Mot cong chan nham vai lan se bi hoc cach ne, luc do he mat
-                                  # luon tin hieu that.
+strictness: strict                # VERIFIED 2026-08-03 — da do bao oan tren corpus that truoc khi lat:
+                                  # 217 file .md trong llmwiki/wiki, 2 file co khoi evidence-chain,
+                                  # ca 2 la tai lieu DAY chinh dinh dang nay (ref vi du co y khong
+                                  # ton tai) -> them ngoai le `r19_meta: true` cung khuon `r7_meta`
+                                  # -> bao oan 0/2. Luc do moi lat sang strict.
 
-verified: false                   # ASSUMPTION (not verified) — mot chuoi hong chi CHAN khi ca hai:
-                                  # strictness: strict VA verified: true.
+verified: true                    # VERIFIED 2026-08-03 — chuoi hong CHAN that (exit 2) tu day.
+                                  # Muon go: ha ve advisory, hoac dung 1 trong 3 tang cong tac.
 
-# ADAPT-CHECKLIST (chot khi co so do that):
-#   1. Chay advisory tren corpus llmwiki/wiki/ that, dem so canh bao moi tai lieu.
-#   2. Chot nguong "bao oan du thap" cho SC-004 — con so nay CO Y chua dat o SPEC, vi dat bay gio
-#      la bia dung cai loai so ma chinh luat nay cam.
-#   3. Chay: python3 harness/validators/evidence_terminal.py --self-test   (phai PASS)
-#   4. Chay: bash harness/tests/evidence-terminal-test.sh .                (phai PASS)
-#   5. Lat strictness: strict VA verified: true. Chi luc do mot chuoi hong moi CHAN.
+# ADAPT-CHECKLIST — DA CHAY XONG 2026-08-03, giu lai lam vet:
+#   1. [x] Do tren corpus that: 217 .md, 2 file co khoi, 2/2 bi bat.
+#   2. [x] Ca 2 deu la BAO OAN cung mot lop: tai lieu day chinh dinh dang nay. Khong dat nguong
+#          bang so uoc luong; sua bang ngoai le `r19_meta: true` (cung khuon r7_meta) -> 0/2.
+#   3. [x] python3 harness/validators/evidence_terminal.py --self-test   PASS
+#   4. [x] bash harness/tests/evidence-terminal-test.sh .                10/10 pass
+#   5. [x] Lat strictness: strict VA verified: true.
+#
+# NEU bao oan quay lai (tai lieu that bi chan nham): ha `strictness: advisory` truoc, dieu tra sau.
+# Dung de mot cong chan nham song lau — nguoi ta se hoc cach ne, luc do he mat luon tin hieu that.

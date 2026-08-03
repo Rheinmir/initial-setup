@@ -6,6 +6,7 @@ tags: [rule, evidence, grounding, anti-fabrication, claim-receipts, harness]
 timestamp: 2026-08-03
 task: T-260803-01
 r7_meta: true
+r19_meta: true
 ---
 
 # 030826-evidence-terminal-chain-harness

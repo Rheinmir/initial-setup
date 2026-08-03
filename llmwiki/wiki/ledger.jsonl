@@ -175,3 +175,7 @@
 {"ts": "2026-08-01T18:11:23", "session": "3061dd52", "action": "modify", "target": "sources/draft/010826-wiki-mental-model-taxonomy.md", "tool": "Edit"}
 {"ts": "2026-08-01T18:11:55", "session": "3061dd52", "action": "modify", "target": "sources/draft/010826-wiki-mental-model-taxonomy-PLAN.md", "tool": "Edit"}
 {"ts": "2026-08-01T18:11:55", "session": "3061dd52", "action": "modify", "target": "sources/draft/010826-wiki-mental-model-taxonomy-PLAN.md", "tool": "Edit"}
+{"ts": "2026-08-03T15:30:12", "session": "3061dd52", "action": "add", "target": "sources/draft/030826-wiki-layer-suggest.md", "tool": "Write"}
+{"ts": "2026-08-03T15:30:12", "session": "3061dd52", "action": "add", "target": "sources/draft/030826-wiki-layer-suggest.md", "tool": "Write"}
+{"ts": "2026-08-03T15:32:45", "session": "3061dd52", "action": "modify", "target": "sources/010826-session-provenance.md", "tool": "Edit"}
+{"ts": "2026-08-03T15:32:45", "session": "3061dd52", "action": "modify", "target": "sources/010826-session-provenance.md", "tool": "Edit"}

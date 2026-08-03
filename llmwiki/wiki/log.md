@@ -654,55 +654,6 @@ Trang HTML giải thích PR #92 (graph-engineering → orca): 3 gốc thiếu, l
 ## 2026-07-30 — cursor-animated-sites — hook-skill-layers
 Walkthrough tương tác giải thích lifecycle thật của Claude Code + overstack khi user gõ 1 câu: SessionStart(1 lần/phiên) → UserPromptSubmit(mỗi câu) → Claude quyết định → nạp Skill(văn bản, không tự chạy) → PreToolUse(validators, CÓ THỂ CHẶN) → code thật(harness/scripts, tất định) → PostToolUse → lặp lại → Stop(medic --ci, CÓ THỂ CHẶN dừng) → SessionEnd. Cursor lề-trái đi qua cây file đúng thứ tự, màu theo vai trò (đọc/ghi/chặn/qua), kèm 2 ví dụ THẬT đã xảy ra ngay trong hội thoại (R16 report-show-path chặn 1 lần Write; medic --ci FAIL vì overstack.html cũ).
 
-<!-- log:auto:start -->
-
-### 🤖 Log tự-động (code-logger, không do agent ghi)
-
-| Thời điểm | Event | Chi tiết |
-|---|---|---|
-| 2026-08-01 14:41:41 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=4e0e09443e8632ba5682a1a6e9c24216ff8d1 |
-| 2026-08-01 14:41:41 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=796907f7c61afa45e4f669a49ce9f8935d3d3 |
-| 2026-08-01 14:42:59 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=ff0e6b9fd1cdd39a4885b4ab6c6ff2428cb99 |
-| 2026-08-01 14:42:59 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=017c629ca0b66ca546cbc89eaa5bd5d5ea9ef |
-| 2026-08-01 14:43:18 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=ae8838b414f8de49eaa953aa713a73ec61a88 |
-| 2026-08-01 14:43:18 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=113e2fee8e2fa696b7cd532105fdff9294246 |
-| 2026-08-01 14:43:31 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=e396bef79e84de958f8a6f3d33e80e7bb9f7e |
-| 2026-08-01 14:43:31 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=8992847cf641d28f51c427485e0ff07443d8b |
-| 2026-08-01 14:43:38 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=2d2d388378e91eaa4fed9b17e378f700a4bea |
-| 2026-08-01 14:43:38 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=10645b48129961b2fa76f2e4b4b4fcd4e7c70 |
-| 2026-08-01 14:43:58 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=f9bd743b1136e70b0bc7e52d338fca451dc22 |
-| 2026-08-01 14:43:58 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=bd2884d1b0d8d7cdd1785310b8b4dfe1d2988 |
-| 2026-08-01 14:44:22 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=f8d3a1e65545bc63af9df6692e066ec6d65b4 |
-| 2026-08-01 14:44:22 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=ecc02020b47e4cf824bb806756d8a27969b59 |
-| 2026-08-01 14:44:35 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=0ca60e8d79a9df3c04292191a9ac2e06bad31 |
-| 2026-08-01 14:44:35 | `file.write` | harness/scripts/loop-runner.py · tool=Edit · session=350f10dd · actor=agent · prev=28250e88bcc37f5fdb3fb9be6d8718a8e3e2e |
-| 2026-08-01 14:45:00 | `file.write` | harness/scripts/hub.py · tool=Edit · session=350f10dd · actor=agent · prev=4ca6adbd3ffb62be8a28cc9cd5821e0a6b8b3161fec11 |
-| 2026-08-01 14:45:00 | `file.write` | harness/scripts/hub.py · tool=Edit · session=350f10dd · actor=agent · prev=22d1854e9393e1254b4acd1c5c77193ce0e468cbc7fb7 |
-| 2026-08-01 14:45:48 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=e70681109c224898ed8e07fb50297ba6ca8eda |
-| 2026-08-01 14:45:48 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=9ef46a1722f193045b7b39411a73bf8cf1dd55 |
-| 2026-08-01 14:45:56 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=2ef82012d61bc3575176da88ad862cde33e360 |
-| 2026-08-01 14:45:56 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=570a9696e30f2c9dd2d82e981e9e69a5b0f125 |
-| 2026-08-01 14:46:02 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=b772ec48696486fab776c35576d140085b0206 |
-| 2026-08-01 14:46:02 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=ccca95be66cf4924cfc5a1ee02b1604a1e14c5 |
-| 2026-08-01 14:46:29 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=9d7b0a98c28efafd2ddc0dbe52d51c66d4d07f |
-| 2026-08-01 14:46:29 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=350f10dd · actor=agent · prev=17db91906b946d0a0131c56fb913895040aa27 |
-| 2026-08-01 14:46:56 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=350f10dd · actor=agent · prev=bb1d173b9512be95d64df8ca5cd61bdc6 |
-| 2026-08-01 14:46:56 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=350f10dd · actor=agent · prev=ffd5a9b8eb911fa9366540fdd08529674 |
-| 2026-08-01 14:47:03 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=350f10dd · actor=agent · prev=bdd5bcabf2a9b79912f2ada21e01f2539 |
-| 2026-08-01 14:47:03 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=350f10dd · actor=agent · prev=6d51a5c611154e51220cb98c9003c342d |
-| 2026-08-01 14:47:11 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=350f10dd · actor=agent · prev=0d36a245006ac6114a8d2c0ee24cd341d |
-| 2026-08-01 14:47:11 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=350f10dd · actor=agent · prev=ab8e726431f7fdc256c42f033933b9ed9 |
-| 2026-08-01 14:52:47 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=9f141dcd3582b4c0067dcbeea35d85907cd693634a3fbc |
-| 2026-08-01 14:52:47 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=350f10dd · actor=agent · prev=de79e1549f608128541e5148ca17bfc48e0558a4a1f5b0 |
-| 2026-08-01 14:54:31 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/sources/draft/300726-hook-skill-layers.md', 'llmwiki/wiki |
-| 2026-08-01 14:54:31 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=0 · prev=cc221a9e530a3cb939e3a587088f6f83cda8641bc9a5d73ea75b82b107630647 · h=eb43 |
-| 2026-08-01 14:54:31 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=2 · human=['llmwiki/wiki/sources/draft/300726-pr92-flow.md', 'llmwiki/wiki/sources |
-| 2026-08-01 14:57:30 | `file.write` | harness/tests/ge-killswitch-test.sh · tool=Edit · session=350f10dd · actor=agent · prev=09917a0654647b15ed40df17b1ef7e67 |
-| 2026-08-01 14:57:30 | `file.write` | harness/tests/ge-killswitch-test.sh · tool=Edit · session=350f10dd · actor=agent · prev=af90033059d545da06ad5adc25e02d50 |
-| 2026-08-01 14:59:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=90cf2484f67dd8c8ce2ee0556c5d1462035bffbf4294525175edd238fc4e1131 · h=8a36 |
-
-<!-- log:auto:end -->
-
 ## 2026-08-01 — fdk — teach-me: khung bảy bước
 Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Nguồn gốc→Lý do tồn tại→Cơ chế hoạt động→Trade-off→Giới hạn→Vị trí trong hệ thống] để hiểu sâu". Đổi skill teach-me từ khung "bốn phần" (2 cấp + bộ ba + tóm tắt) sang khung bảy bước cố định, đúng thứ tự — dồn nội dung runtime-driven (2 sơ đồ hệ thống/code) vào bước 4, sơ đồ tóm tắt luồng vào bước 7, thêm mới Trade-off (bước 5) và Giới hạn (bước 6) — hai góc trước đây không có chỗ đứng riêng. Sync canonical→mirror→global install (parity 3 bản byte-identical), regen skill-search index, bump capability-stamp 1.3.60→1.3.61, cập nhật fdk-problem-tree.html (node p-45, solved, scope=[skills]). fdk-gate 21/21 PASS.
 
@@ -713,3 +664,55 @@ Draft SPEC cho issue [Rheinmir/setup#93](https://github.com/Rheinmir/setup/issue
 User duyệt SPEC, chuyển `/plan`: 4 task tracer-bullet TDD — T1 hàm suy `operationalizes_targets()`/`_policy_rule_ids()` trong `harness/scripts/wiki-graph.py` (mirror `touches_targets`), T2 wire vào `fdk/tools/build-wiki-graph.py::scan()` + `REL_COLORS`/`REL_VI` + `_mk_protocol_node()` + badge `layer:` (tái dùng `add_code_nodes()` sẵn có, chỉ thêm 1 nhánh rẽ theo `e["rel"]`), T3 gắn `layer:` mẫu cho node wiki đã có tham chiếu skill/rule thật (grep xác nhận trước, không bịa), T4 self-test + medic gate.
 
 **Sự cố phụ phát hiện trong phiên:** `harness/scripts/code-logger.py::render_md()` ghi đè `wiki/log.md` không lock/không atomic — 2 Stop hook (`llmwiki/.claude/hooks/stop.py` + `~/.claude/harness/hooks/stop.py`) cùng gọi hàm này sau mỗi lượt có khả năng race, một lần đã xoá sạch 697/707 dòng lịch sử thủ công (chỉ còn auto-block). Đã khôi phục từ `git show HEAD:llmwiki/wiki/log.md`. Chưa sửa root cause — ngoài phạm vi GH#93, cần `/raise-issue` riêng.
+
+<!-- log:auto:start -->
+
+### 🤖 Log tự-động (code-logger, không do agent ghi)
+
+| Thời điểm | Event | Chi tiết |
+|---|---|---|
+| 2026-08-01 18:04:42 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=c905dd8f38a9cf80213b15959c436d89a324ff |
+| 2026-08-01 18:04:52 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=37fc30b600ef662bd4b671e3f703346f9c5104 |
+| 2026-08-01 18:04:52 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=43f1a6ba82f69c1a0308d9ad8bf126ddbde1cb |
+| 2026-08-01 18:05:05 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=bdd70325b199856480ec763684592477d47c41 |
+| 2026-08-01 18:05:05 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=3ca3c7269a31380c473ce37c01eb7a6a4811f3 |
+| 2026-08-01 18:05:26 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=2754759ffcbb01b44ad8edbb046c75cd87afde |
+| 2026-08-01 18:05:26 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=150a3f0fb5442279007b3d4fec6cbecc843fcc |
+| 2026-08-01 18:05:32 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=7949339505e909d1495b961cb4cd905d1902d6004514b6ce27cdabf4aa029d9f · h=0969 |
+| 2026-08-01 18:05:44 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=096938041c56563479a699b4570e1e825d4cb9 |
+| 2026-08-01 18:05:44 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=66e6ba9559fc56cf94331c02a71d821eace94d |
+| 2026-08-01 18:05:52 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=0f80aed0368337bfff0a96e2f45bcb9c5a6b44 |
+| 2026-08-01 18:05:52 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=a5dcfab2525d2fa4d97851497a2222bcc536c5 |
+| 2026-08-01 18:06:01 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=2184e51e7fb78a4f194ba34f2753daa0f2b67c |
+| 2026-08-01 18:06:01 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=264344ac50778149a11fd86d8ef2c832f1d41e |
+| 2026-08-01 18:06:08 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=a0137930ad8d59d6e602b20bcfa10bba0dc36e |
+| 2026-08-01 18:06:08 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=c6b3a3d2401c9cb19b0a8372aea9cdeb338fbc |
+| 2026-08-01 18:06:21 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=facfe4bd0ec9c8f83de4952b43b2a35d0252ae |
+| 2026-08-01 18:06:21 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=d42e47361eeaf7a7d5ad0ab0e341527997d277 |
+| 2026-08-01 18:07:07 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=da65e53aae8c48a90485f475bde0165fd675ee |
+| 2026-08-01 18:07:07 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=b83f9ad2f7fb4e8342d4fbd806d848deff13ee |
+| 2026-08-01 18:07:15 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=374376d247fc1f6884ad65fe1165742ea1a6e8 |
+| 2026-08-01 18:07:15 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=c31d0630cb07ed6e9d3850cbeb82dee89eb2fa |
+| 2026-08-01 18:07:29 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=90997cbed8e1a7c565817cc49621f937b05c43 |
+| 2026-08-01 18:07:29 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=ce721583f7480dfb087edf5fbd0ac427e7a509 |
+| 2026-08-01 18:08:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=cbbfb7f3294320d693e6a5d4d42787c0f5e07c00f5355a4c02a497fccce8aaf6 · h=027b |
+| 2026-08-01 18:09:33 | `file.write` | llmwiki/wiki/concepts/wiki-core-relations.md · tool=Edit · session=3061dd52 · actor=agent · prev=027b4422c29c5f602553273 |
+| 2026-08-01 18:09:33 | `file.write` | llmwiki/wiki/concepts/wiki-core-relations.md · tool=Edit · session=3061dd52 · actor=agent · prev=79f0722fff5016703b78f0f |
+| 2026-08-01 18:09:50 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=521cbce2e6ffa40a4bc362466be1b44775fbb5cb3813ca878c3659fffdec8434 · h=08f9 |
+| 2026-08-01 18:11:13 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=3061dd52 · actor=agent · prev=08f9 |
+| 2026-08-01 18:11:13 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=3061dd52 · actor=agent · prev=80e1 |
+| 2026-08-01 18:11:23 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=3061dd52 · actor=agent · prev=974d |
+| 2026-08-01 18:11:23 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=3061dd52 · actor=agent · prev=d1e3 |
+| 2026-08-01 18:11:39 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/stale.json', 'llmwiki/wiki/log.md', 'llmwiki/wiki/sources |
+| 2026-08-01 18:11:39 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/wiki/sources/010826-session-provenance.md', 'llmwiki/wiki/inde |
+| 2026-08-01 18:11:39 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/metrics/.stop-debounce.json'] · prev=2324f7958d72d90c88a32f361 |
+| 2026-08-01 18:11:55 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy-PLAN.md · tool=Edit · session=3061dd52 · actor=agent · prev |
+| 2026-08-01 18:11:55 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy-PLAN.md · tool=Edit · session=3061dd52 · actor=agent · prev |
+| 2026-08-01 18:11:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/sources/010826-session-provenance.md', 'llmwiki/wiki/sour |
+| 2026-08-01 18:11:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/stale.json', 'llmwiki/wiki/log.md', 'llmwiki/wiki/sources |
+| 2026-08-01 18:11:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/metrics/.stop-debounce.json'] · prev=110bc167f20b578f9aeef068d |
+
+<!-- log:auto:end -->
+
+## 2026-08-03 — propose — wiki-layer-suggest
+Nối tiếp GH#93: user hỏi trực tiếp có script nào tự cào wiki dự án cũ và gợi ý migrate sang `layer:` không — chưa có, viết SPEC cho công cụ report-only (không tự ghi frontmatter), vì phân loại fact/mental-model là phán đoán ngữ nghĩa chứ không phải suy chắc chắn như `touches`. Ràng buộc chính thêm giữa phiên: mọi gợi ý do heuristic điền (không phải người gõ tay) phải kèm `layer_source: heuristic` + `layer_date: <ngày thật>` để sau này review/ghi-đè lại được, không lẫn với giá trị người đã xác nhận.

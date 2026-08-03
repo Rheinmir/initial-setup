@@ -5,6 +5,9 @@ status: shipped
 tags: [session-provenance, secondary-memory, auto-distill]
 timestamp: 2026-08-01
 session: 3061dd52-42cf-4549-87d7-ebcd6d995be1
+layer: fact
+layer_source: heuristic
+layer_date: 2026-08-03
 ---
 
 # session-provenance 3061dd52 — auto-distill
@@ -17,7 +20,9 @@ session: 3061dd52-42cf-4549-87d7-ebcd6d995be1
 
 ## File chạm trong phiên
 
+- `concepts/wiki-core-relations.md`
 - `lmwiki/html/fdk-problem-tree.html`
+- `sources/draft/010826-wiki-mental-model-taxonomy-PLAN.md`
 - `sources/draft/010826-wiki-mental-model-taxonomy.md`
 
 ## Origin

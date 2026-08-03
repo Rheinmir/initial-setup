@@ -496,6 +496,37 @@ def build_r17(base):
 
 
 # ── Tier 5: aggregate / documentary gate (wiring present + referenced) ──────
+def build_r19(base):
+    # R19: chuoi ket luan phai cham dut o nut CHUNG CU. BAD = la la mot suy luan nua (phai BAT);
+    # GOOD = la la nut observed co ref resolve duoc (phai IM). Advisory nen rc luon 0 —
+    # tin hieu that nam o stderr, giong cach ban than luat bao cho nguoi doc.
+    v = REPO / "harness" / "validators" / "evidence_terminal.py"
+    if not v.is_file():
+        return _dark("content", "evidence_terminal.py not found")
+
+    def mk(name, body):
+        f = base / name
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text("# fixture\n\n```evidence-chain\n" + body + "```\n", encoding="utf-8")
+        return f
+
+    bad = mk("r19-bad.md",
+             "- id: C1\n  claim: \"a\"\n  kind: inference\n  because: [C2]\n"
+             "- id: C2\n  claim: \"b\"\n  kind: inference\n  because: []\n")
+    good = mk("r19-good.md",
+              "- id: C1\n  claim: \"a\"\n  kind: inference\n  because: [E1]\n"
+              "- id: E1\n  claim: \"b\"\n  kind: observed\n"
+              "  evidence:\n    ref: \"harness/policy.yaml\"\n")
+
+    def fired(f):
+        r = subprocess.run([PY, str(v), "--check", str(f), "--root", str(REPO)],
+                           capture_output=True, text=True, timeout=30)
+        return "1" if "[R19 evidence-terminal]" in r.stderr else "0"
+
+    return _result("content", "validators",
+                   [("bad:bat", fired(bad), "1"), ("good:im", fired(good), "0")])
+
+
 def build_r6(base):
     # R6 = verify-before-commit is the COMPOSITE commit gate (pre-commit + CI). It has no
     # single BAD fixture to block; its dark-rail is "the gate is not wired". Prove presence.
@@ -531,6 +562,7 @@ RULES = [
     ("R16", "report-show-path", build_r16),
     ("R17", "problem-tree-flush", build_r17),
     ("R18", "plan-executable", build_r18),
+    ("R19", "evidence-terminal", build_r19),
 ]
 
 

@@ -30,7 +30,7 @@ global_shared:
     # global → fresh-install-smoke đỏ với "engine global THIẾU: fdk/tools/medic.py".
     # Hai hợp đồng nói ngược nhau và installer nghe theo cái sai. Cùng lớp lỗi p-41.
     - "fdk/tools/medic.py — cổng sức khoẻ tổng (stop.py gọi ở downstream, guard fail-open)"
-    - "harness/validators/*.py — 14 validator ép R1-R17"
+    - "harness/validators/*.py — 17 validator ép R1-R19"
     - "harness/scripts/bnal_config.py + bnal_guard.py + bnal_metrics.py — dep chung"
     - "harness/poc-vendor-neutral/** — rào chắn R1-R17 (llmwiki-validate + policy.yaml + gen-converters); CI downstream validate từ đây (Phase 1+3 v4)"
   memory_query:

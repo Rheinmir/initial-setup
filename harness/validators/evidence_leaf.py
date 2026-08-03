@@ -45,9 +45,45 @@ def check_leaf(node, root: Path, cfg: dict):
             if not _claim_receipts_resolve()(path_only, root):
                 return False, f"observed ref khong resolve tren dia: {ev['ref']}"
         return True, ""
+    if kind == "web":
+        # Link phai tro DUNG CHO da doc, khong phai trang chu. Doan trich la thu dong bang
+        # noi dung ma ket luan that su dua vao — trang web doi, doan trich thi khong.
+        url = str(ev.get("url") or "")
+        if not (url.startswith("http://") or url.startswith("https://")):
+            return False, "web phai co 'url' tuyet doi (http:// hoac https://)"
+        if not ev.get("accessed"):
+            return False, "web phai co 'accessed' — ngay truy cap"
+        if not str(ev.get("quote") or "").strip():
+            return False, "web phai co 'quote' — trich nguyen van doan duoc dua vao"
+        return True, ""
+    if kind == "parametric":
+        # Loai DUY NHAT khong xem duoc. Khong cam, nhung bat no LO DIEN.
+        if not str(ev.get("origin") or "").strip():
+            return False, ("parametric phai co 'origin' — kien thuc tu training den tu dau "
+                           "(ten chuan/tai lieu/tac gia) de nguoi khac di kiem duoc")
+        if ev.get("unverified") is not True:
+            return False, "parametric phai mang co 'unverified: true' — no la loai KHONG xem duoc"
+        return True, ""
+    if kind == "absence":
+        if not str(ev.get("cmd") or "").strip():
+            return False, "absence phai co 'cmd' — chinh lenh/truy van da chay de tim"
+        return True, ""
+    if kind in ("tool-record", "graph-edge"):
+        if not str(ev.get("id") or "").strip():
+            return False, f"{kind} phai co 'id' tro toi mot muc trong so tuong ung"
+        return True, ""
     return True, ""
 
 
 def chain_level_check(leaves):
-    """Luat o TANG CHUOI, khong phai tang nut. Task 3 cai luat parametric o day."""
+    """Luat o TANG CHUOI, khong phai tang nut.
+
+    parametric la loai DUY NHAT khong xem duoc — no khong duoc lam diem cuoi duy nhat cua mot
+    chuoi dan toi quyet dinh. Cho phep no dung mot minh la mo cua hau hop thuc hoa phong doan:
+    ket luan luc do tua hoan toan vao tri nho cua model, khong co mot mo neo nao ngoai doi thuc."""
+    if not leaves:
+        return False, "chuoi khong co la nao — khong cham duoc chung cu"
+    if all(n.get("kind") == "parametric" for n in leaves):
+        return False, ("moi la deu la 'parametric' — ket luan dang tua hoan toan vao tri nho cua "
+                       "model. Nang mot la len 'web' (co link) hoac 'observed' (co file/lenh).")
     return True, ""

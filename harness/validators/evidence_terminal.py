@@ -142,6 +142,41 @@ def self_test() -> int:
     if ok:
         fails.append("chuoi vong tron ma van pass")
 
+    ok, why = validate_chain([
+        {"id": "C1", "claim": "a", "kind": "inference", "because": ["W1"]},
+        {"id": "W1", "claim": "b", "kind": "web",
+         "evidence": {"url": "https://example.org/a/b#s3", "accessed": "2026-08-03",
+                      "quote": "doan trich nguyen van"}},
+    ], ROOT_DEFAULT, {})
+    if not ok:
+        fails.append(f"web du 3 truong bi tu choi: {why}")
+
+    ok, why = validate_chain([
+        {"id": "C1", "claim": "a", "kind": "inference", "because": ["W1"]},
+        {"id": "W1", "claim": "b", "kind": "web",
+         "evidence": {"url": "https://example.org/a/b#s3", "accessed": "2026-08-03"}},
+    ], ROOT_DEFAULT, {})
+    if ok:
+        fails.append("web thieu 'quote' ma van pass")
+
+    ok, why = validate_chain([
+        {"id": "C1", "claim": "a", "kind": "inference", "because": ["P1"]},
+        {"id": "P1", "claim": "b", "kind": "parametric",
+         "evidence": {"origin": "RFC 6749 muc 4.1", "unverified": True}},
+    ], ROOT_DEFAULT, {})
+    if ok:
+        fails.append("chuoi chi co la parametric ma van pass")
+
+    ok, why = validate_chain([
+        {"id": "C1", "claim": "a", "kind": "inference", "because": ["P1", "E1"]},
+        {"id": "P1", "claim": "b", "kind": "parametric",
+         "evidence": {"origin": "RFC 6749 muc 4.1", "unverified": True}},
+        {"id": "E1", "claim": "c", "kind": "observed",
+         "evidence": {"ref": "harness/policy.yaml"}},
+    ], ROOT_DEFAULT, {})
+    if not ok:
+        fails.append(f"parametric di kem observed bi tu choi: {why}")
+
     for f in fails:
         print("FAIL:", f)
     print("self-test:", "PASS" if not fails else f"{len(fails)} FAIL")

@@ -68,7 +68,7 @@ BLOCK_RE = re.compile(r"```evidence-chain\s*\n(.*?)```", re.DOTALL)
 # YAML cho phep comment cuoi dong — cung khuon voi META_DOC_RE cua proposal_complete.py (r7_meta).
 META_DOC_RE = re.compile(r"^r19_meta:\s*true\s*(?:#.*)?$", re.MULTILINE | re.IGNORECASE)
 
-_FALLBACK = {"enabled": True, "strictness": "advisory", "verified": False}
+_FALLBACK = {"enabled": True, "mode": "advisory"}
 
 
 def load_cfg(root: Path) -> dict:
@@ -327,7 +327,7 @@ def main() -> None:
     ok, why = validate_chain(nodes, root, cfg)
     if ok:
         sys.exit(0)
-    strict = cfg.get("strictness") == "strict" and cfg.get("verified") is True
+    strict = cfg.get("mode") == "strict"
     print(f"[R19 evidence-terminal] {why}", file=sys.stderr)
     sys.exit(2 if strict else 0)
 

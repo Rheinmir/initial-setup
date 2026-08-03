@@ -31,7 +31,7 @@ Chép nguyên văn từ SPEC. Mỗi task ngầm mang theo toàn bộ mục này;
 
 - **Tất định, 0 token, KHÔNG gọi LLM, chạy được offline.** Tiền lệ chép từ docstring `harness/scripts/grounding-check.py`: *"validator schema cho verdict của evaluator (tất định, 0-token, KHÔNG LLM)"*.
 - **Ba mã thoát phân biệt.** `0` = hợp lệ. `2` = đọc được nhưng schema hoặc chuỗi sai. `3` = hạ tầng lỗi, KHÔNG đọc được đầu vào. Tuyệt đối không trả `0` khi không đọc được đầu vào — lý do ghi sẵn trong docstring `grounding-check.py`: *"một cổng chỉ check rc==0 không phân biệt được 'chưa ai chấm' với 'đã chấm PASS' — gate coi như bị bypass bằng cách không sinh output."*
-- **Advisory trước, blocking chỉ khi `verified: true`.** Tiền lệ `harness/claim-receipts.config.yaml`: *"strictness: advisory — advisory (warn, exit 0) until resolver is symbol-aware; then 'strict'"*.
+- **Advisory trước, blocking sau.** Cùng nguyên tắc ratchet mà `harness/claim-receipts.config.yaml` đang dùng: chỉ chặn sau khi đo được tỉ lệ báo oan trên corpus thật.
 - **`medic` probe `coverage` đang đọc `18/18 rule có bite-test`.** Nó regex `def build_(r\d+)` trong `harness/scripts/harness-doctor.py` và so với `id:\s*(R\d+)` trong `policy.yaml`. Thêm `R19` mà thiếu `def build_r19` sẽ tụt xuống `18/19` và medic chuyển sang warn.
 - **Cổng `tests-wired` trong `.github/workflows/harness.yml`** duyệt từng `harness/tests/*-test.sh` và `exit 1` nếu tên file không xuất hiện trong workflow.
 - **`medic` probe `capproof` đang đọc `212/212 có NEO khai báo`** — năng lực mới phải khai neo, nếu không bị bêu `UNPROVEN`.
@@ -44,7 +44,7 @@ Chép nguyên văn từ SPEC. Mỗi task ngầm mang theo toàn bộ mục này;
 
 - Tạo `harness/validators/evidence_leaf.py` — trách nhiệm duy nhất: trả lời "một nút có phải điểm cuối hợp lệ không" theo từng `kind`, cộng luật ở tầng chuỗi cấm toàn-bộ-lá-là-`parametric`. Không có CLI, không đọc file, để `grounding-check.py` nhập lại được mà không kéo theo tác dụng phụ.
 - Tạo `harness/validators/evidence_terminal.py` — trách nhiệm duy nhất: công tắc ba tầng, đọc khối `evidence-chain`, dựng đồ thị, bắt chu trình, duyệt mọi đường gốc-tới-lá, ánh xạ kết quả sang ba mã thoát.
-- Tạo `harness/evidence-terminal.config.yaml` — `enabled`, `strictness`, `verified`, cùng ADAPT-CHECKLIST nâng lên strict.
+- Tạo `harness/evidence-terminal.config.yaml` — `enabled` và `mode`, cùng ADAPT-CHECKLIST nâng lên strict.
 - Tạo `harness/tests/evidence-terminal-test.sh` — fixture xanh, bốn fixture đỏ, và ba ca công tắc.
 - Tạo `llmwiki/wiki/concepts/evidence-terminal-chain.md` — trang concept chốt schema, sáu loại điểm cuối, và giới hạn của cơ chế.
 - Sửa `harness/scripts/grounding-check.py` — gọi `evidence_leaf.check_leaf` cho từng mục `required_evidence[]`.
@@ -221,7 +221,7 @@ import evidence_leaf  # noqa: E402
 ROOT_DEFAULT = Path(__file__).resolve().parents[2]
 BLOCK_RE = re.compile(r"```evidence-chain\s*\n(.*?)```", re.DOTALL)
 
-_FALLBACK = {"enabled": True, "strictness": "advisory", "verified": False}
+_FALLBACK = {"enabled": True, "mode": "advisory"}
 
 
 def load_cfg(root: Path) -> dict:
@@ -340,7 +340,7 @@ def main() -> None:
     ok, why = validate_chain(nodes, root, cfg)
     if ok:
         sys.exit(0)
-    strict = cfg.get("strictness") == "strict" and cfg.get("verified") is True
+    strict = cfg.get("mode") == "strict"
     print(f"[R19 evidence-terminal] {why}", file=sys.stderr)
     sys.exit(2 if strict else 0)
 
@@ -549,7 +549,7 @@ git commit -m "feat(R19): 6 loại điểm cuối — web đòi link+ngày+tríc
 
 **Interfaces:**
 - Consumes: `bnal_config.load(root, "evidence-terminal", _FALLBACK)` do Task 2 gọi — tên file phải khớp đúng `harness/evidence-terminal.config.yaml`.
-- Produces: ba khoá `enabled`, `strictness`, `verified` mà Task 2 và Task 9 đọc.
+- Produces: hai khoá `enabled` và `mode` mà Task 2 và Task 9 đọc.
 
 - [ ] **Step 1: viết file cấu hình**
 
@@ -560,16 +560,14 @@ git commit -m "feat(R19): 6 loại điểm cuối — web đòi link+ngày+tríc
 enabled: true                     # cong tac TANG BEN (theo repo). false = tat han luat nay.
                                   # Uu tien: co --no-evidence-chain > env OVERSTACK_EVIDENCE_TERMINAL
                                   # > khoa nay. Tat o bat ky tang nao van IN mot dong len stderr.
-strictness: advisory              # ASSUMPTION (not verified) — advisory (canh bao, exit 0) cho toi
-                                  # khi do duoc ti le bao oan tren corpus that; roi moi 'strict'.
-verified: false                   # ASSUMPTION (not verified) — chuoi chi CHAN khi ca hai:
-                                  # strictness: strict VA verified: true.
+mode: advisory                    # advisory = chi canh bao (exit 0) · strict = CHAN that (exit 2)
+                                  # MOT knob cho MOT quyet dinh.
 
 # ADAPT-CHECKLIST (chot khi co so do that):
 #   1. Chay advisory tren corpus llmwiki/wiki/ that, dem so canh bao moi tai lieu.
 #   2. Chot nguong "bao oan du thap" cho SC-004 — con so nay CO Y chua dat o SPEC.
 #   3. Chay: python3 harness/validators/evidence_terminal.py --self-test  (phai PASS).
-#   4. Lat strictness: strict VA verified: true. Chi luc do mot chuoi hong moi CHAN.
+#   4. Lat mode: strict. Chi luc do mot chuoi hong moi CHAN.
 ```
 
 - [ ] **Step 2: chạy cho THẤY validator đọc được config**
@@ -1106,3 +1104,13 @@ git commit -m "feat(R19): công tắc 3 tầng có thứ tự ưu tiên + tắt 
 - **Quét placeholder.** Đã rà toàn bộ; mọi bước đổi code đều có code đầy đủ, mọi lệnh đều có output mong đợi. Không có bước nào nói "tương tự task khác" — Task 3 và Task 9 đều chép lại code thật thay vì trỏ ngược.
 - **Nhất quán kiểu và tên.** `check_leaf(node, root, cfg)` trả `(bool, str)` dùng y hệt ở Task 2, 3, 6. `chain_level_check(leaves)` trả `(bool, str)` dùng ở Task 2 và 3. `switch_state(argv, env, cfg)` trả `(bool, str)` dùng ở Task 2, 8, 9. `EVIDENCE_KINDS` là `frozenset` dùng ở Task 2 và 3. Tên file `harness/evidence-terminal.config.yaml` khớp đúng tham số `"evidence-terminal"` truyền cho `bnal_config.load`.
 - **Một cạm bẫy đã gài sẵn lời giải.** `claim-receipts.py` có dấu gạch ngang trong tên nên `import claim_receipts` sẽ hỏng; Task 2 chỉ rõ phải nạp qua `importlib.util.spec_from_file_location`. Không nói ra thì agent headless chắc chắn vấp.
+
+## Độ lệch giữa PLAN và bản thi hành (ghi lại, không giấu)
+
+Ba chỗ PLAN nói sai và đã sửa lúc code, giữ vết ở đây để lần sau không lặp:
+
+1. **Task 6 suýt phá tương thích ngược.** PLAN bảo mục `required_evidence[]` dạng chuỗi trần thì trả `rc=2`. Nhưng hợp đồng đang chạy dùng chuỗi trần, và `harness/tests/ge-integration-test.sh` dựa vào đó. Bản thi hành: mục dạng dict chịu luật thật, chuỗi trần là legacy chỉ cảnh báo.
+2. **Sai đường dẫn luật chữ.** PLAN ghi `./CLAUDE.md` và `./AGENT.md`; file thật là `llmwiki/CLAUDE.md` và `llmwiki/AGENT.md`.
+3. **Sai contract bite-test.** PLAN ghi `build_r19` trả dict; khuôn thật là `_result(kind, source, [(tên, got, want)])` và phải đăng ký vào bảng cuối `harness-doctor.py`.
+
+Ngoài ra, hai knob `strictness` + `verified` gộp thành một knob `mode`: chúng luôn được đọc cùng nhau cho một quyết định duy nhất, và tên `strictness` va chạm với adapter `claim-receipts` khiến leak-gate của `adapt-registry` đỏ đúng theo luật "một hằng số, một nhà".

@@ -11,14 +11,16 @@ enabled: true                     # cong tac TANG BEN (theo repo, commit duoc, c
                                   # Tat o BAT KY tang nao van IN mot dong len stderr noi ro tang
                                   # nao da tat — co che im lang luc chet se bi nham la dang song.
 
-strictness: strict                # VERIFIED 2026-08-03 — da do bao oan tren corpus that truoc khi lat:
-                                  # 217 file .md trong llmwiki/wiki, 2 file co khoi evidence-chain,
-                                  # ca 2 la tai lieu DAY chinh dinh dang nay (ref vi du co y khong
-                                  # ton tai) -> them ngoai le `r19_meta: true` cung khuon `r7_meta`
-                                  # -> bao oan 0/2. Luc do moi lat sang strict.
-
-verified: true                    # VERIFIED 2026-08-03 — chuoi hong CHAN that (exit 2) tu day.
-                                  # Muon go: ha ve advisory, hoac dung 1 trong 3 tang cong tac.
+mode: strict                      # strict = chuoi hong CHAN that (exit 2). advisory = chi canh bao.
+                                  # MOT knob cho MOT quyet dinh — ban dau tach doi (strictness +
+                                  # verified) la thua, va ten `strictness` va cham voi adapter
+                                  # claim-receipts (leak-gate bat dung: mot hang so, mot nha).
+                                  #
+                                  # DO TRUOC KHI LAT sang strict (2026-08-03), khong lat mu:
+                                  #   217 file .md trong llmwiki/wiki, 2 file co khoi evidence-chain,
+                                  #   2/2 bi bat — ca hai la tai lieu DAY chinh dinh dang nay, ref vi du
+                                  #   co y khong ton tai. Mot LOP bao oan, khong phai hai ca le, nen sua
+                                  #   bang ngoai le `r19_meta: true` (cung khuon r7_meta) -> bao oan 0/2.
 
 # ADAPT-CHECKLIST — DA CHAY XONG 2026-08-03, giu lai lam vet:
 #   1. [x] Do tren corpus that: 217 .md, 2 file co khoi, 2/2 bi bat.

@@ -159,3 +159,12 @@ rules:
     event: SessionEnd
     event_action: session-end
     note: "llmwiki/.claude/hooks/session_end.py::flush_problem_tree. Đích: tắt app bình thường thì cây truy vết vẫn nằm đúng chỗ (feedback 020726)."
+
+  - id: R19
+    name: evidence-terminal
+    validator: evidence_terminal.py
+    statement: "Tài liệu mang kết luận có khối ```evidence-chain phải để MỌI đường đi từ gốc tới lá kết thúc ở nút CHỨNG CỨ (observed/tool-record/graph-edge/web/parametric/absence), không được kết thúc ở nút suy luận. `web` đòi url tuyệt đối trỏ đúng chỗ đã đọc + ngày truy cập + trích nguyên văn; `parametric` (kiến thức từ training của model) đòi origin + cờ unverified và KHÔNG được làm điểm cuối duy nhất. Chuỗi vòng tròn = không hợp lệ."
+    enforce_at: [session, repo]
+    applies_to: [write]
+    scope: "wiki/**/*.md có chứa khối ```evidence-chain; tài liệu DẠY chính định dạng này khai `r19_meta: true` để miễn"
+    note: "Công tắc 3 tầng ưu tiên từ hẹp tới rộng: cờ --no-evidence-chain > env OVERSTACK_EVIDENCE_TERMINAL > `enabled` trong harness/evidence-terminal.config.yaml. Tắt ở tầng nào cũng in một dòng lên stderr — cổng câm nguy hiểm hơn cổng đỏ."

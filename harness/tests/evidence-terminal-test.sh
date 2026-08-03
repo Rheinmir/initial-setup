@@ -133,11 +133,11 @@ if [ -f "$DEPLOY" ]; then
   got=$(python3 -c "
 import sys; sys.path.insert(0, '$SRC/llmwiki/.claude/hooks/validators')
 import evidence_terminal as e
-print(e.load_cfg(e.ROOT_DEFAULT).get('strictness'), e.ROOT_DEFAULT)" 2>/dev/null)
+print(e.load_cfg(e.ROOT_DEFAULT).get('mode'), e.ROOT_DEFAULT)" 2>/dev/null)
   want=$(python3 -c "
 import sys; sys.path.insert(0, '$SRC/harness/validators')
 import evidence_terminal as e
-print(e.load_cfg(e.ROOT_DEFAULT).get('strictness'), e.ROOT_DEFAULT)" 2>/dev/null)
+print(e.load_cfg(e.ROOT_DEFAULT).get('mode'), e.ROOT_DEFAULT)" 2>/dev/null)
   [ -n "$got" ] && [ "$got" = "$want" ] \
     && ok "ban deploy tier-2 suy dung goc repo + doc dung config nhu ban canonical" \
     || bad "ban deploy tier-2" "deploy='$got' vs canonical='$want' — luat co the tu tat o ban deploy"

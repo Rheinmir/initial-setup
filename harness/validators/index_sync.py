@@ -22,11 +22,21 @@ def gitignored(rel: str, wiki: Path) -> bool:
     nên index_sync nhất quán giữa máy tác giả và clone sạch: file gitignored được BỎ QUA cả
     hai chiều (không bắt buộc có row, mà row trỏ tới nó cũng không bị coi là 'thừa').
     Fail-open: git lỗi/không có → coi như KHÔNG ignore.
+
+    `git check-ignore` cần chạy VỚI CWD nằm trong working tree để tìm .gitignore — nếu tiến
+    trình gọi (hook/agent) có cwd trôi ra ngoài repo, lệnh fail-open sai thành "không ignore"
+    dù path đúng, gây báo THUA giả cho draft/archive local-only. Ép cwd=wiki_abs (luôn nằm
+    trong repo, không phụ thuộc cwd kế thừa từ caller) — VÀ resolve `full` thành absolute
+    trước khi truyền cho git, vì nếu `wiki` tới dưới dạng relative (--wiki-dir fdk/wiki) thì
+    `full` cũng relative; đổi cwd mà không resolve full sẽ khiến full bị nối đôi theo cwd mới
+    (fdk/wiki/fdk/wiki/...) và check sai theo hướng ngược lại.
     """
-    full = (wiki / rel).as_posix()
+    wiki_abs = wiki.resolve()
+    full = (wiki_abs / rel).as_posix()
     if full not in _IGN_CACHE:
         try:
-            r = subprocess.run(["git", "check-ignore", "-q", full], capture_output=True, timeout=5)
+            r = subprocess.run(["git", "check-ignore", "-q", full], cwd=str(wiki_abs),
+                                capture_output=True, timeout=5)
             _IGN_CACHE[full] = (r.returncode == 0)
         except Exception:
             _IGN_CACHE[full] = False

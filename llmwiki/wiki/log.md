@@ -668,5 +668,10 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-03 15:27:36 | `file.write` | llmwiki/skills/utils/docs-site-macos.md · tool=Edit · session=3b20b398 · actor=agent · prev=54cfbbad2d6bf3b196e3d0ec98f4 |
 | 2026-08-03 15:27:36 | `file.write` | llmwiki/skills/utils/docs-site-macos.md · tool=Edit · session=3b20b398 · actor=agent · prev=c54deb946d526ff9501ecebdb093 |
 | 2026-08-03 15:28:19 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=8ee01a899dc3359d1093c440840cd389963793d9eb5ed00404cf6100f3823cd0 · h=3910 |
+| 2026-08-03 15:30:46 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/metrics/.stop-debounce.json', 'llmwiki/wiki/log.md'] · prev=39 |
+| 2026-08-03 15:30:46 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/sources/030826-session-provenance.md'] · prev=f50f48ed568 |
+| 2026-08-03 15:34:08 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=3b20b398 · actor=agent · prev=1e81b26513467829b547ae6eed360c72dbf1795866c217 |
+| 2026-08-03 15:34:08 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=3b20b398 · actor=agent · prev=fe33e32a8b13cdd6de9d8cedb4529554c3dd2dd98bec94 |
+| 2026-08-03 15:35:32 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['fdk/skills.provenance.json'] · prev=a94bae66b9ceaf32117a8a0c9635912825 |
 
 <!-- log:auto:end -->

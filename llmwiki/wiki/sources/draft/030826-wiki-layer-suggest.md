@@ -1,7 +1,7 @@
 ---
 type: draft
 title: "wiki-layer-suggest — heuristic report gợi ý layer: cho dự án cũ, không tự ghi"
-status: proposed
+status: implemented
 tags: [wiki-core, taxonomy, layer, migration, operationalizes, heuristic]
 timestamp: 2026-08-03
 task: T-260803-01
@@ -9,7 +9,7 @@ task: T-260803-01
 
 # 030826-wiki-layer-suggest — heuristic report gợi ý `layer:`, không tự ghi
 
-**Status:** proposed
+**Status:** implemented (T1-T3 committed 2026-08-03)
 
 **Sequence diagram:** [030826-wiki-layer-suggest-seq.html](../../../html/030826-wiki-layer-suggest-seq.html)
 
@@ -70,9 +70,9 @@ Nối tiếp GH#93 (`[[010826-wiki-mental-model-taxonomy]]`): field `layer: fact
 
 ## Plan
 
-- [ ] **T1 — Viết `harness/scripts/wiki-layer-suggest.py`: đọc frontmatter (mirror regex của `wiki-graph.py`), áp 2 luật heuristic, in report kèm 3-dòng snippet copy-paste + `layer_source`/`layer_date` thật.** Verify: SC-001, FR-001-003.
-- [ ] **T2 — Self-test tất định (`--self-test`, mirror style `wiki-graph.py`): wiki tạm có 1 node `type: source`, 1 node `type: concept` có `## Approaches`, 1 node mơ hồ (không heuristic nào khớp) — xác nhận đúng 2 gợi ý ra, 1 node bị bỏ qua.** Verify: FR-001, FR-002 (không file nào bị ghi trong quá trình test).
-- [ ] **T3 — Chạy thật trên `llmwiki/wiki` của repo này, đọc report, chấp nhận 1-2 gợi ý bằng tay (dán 3 dòng), build lại `wiki-graph.html` xác nhận badge hiện.** Verify: SC-002, SC-003.
+- [x] **T1 — Viết `harness/scripts/wiki-layer-suggest.py`: đọc frontmatter (mirror regex của `wiki-graph.py`), áp 2 luật heuristic, in report kèm 3-dòng snippet copy-paste + `layer_source`/`layer_date` thật.** Verify: SC-001, FR-001-003.
+- [x] **T2 — Self-test tất định (`--self-test`, mirror style `wiki-graph.py`): wiki tạm có 1 node `type: source`, 1 node `type: concept` có `## Approaches`, 1 node mơ hồ (không heuristic nào khớp) — xác nhận đúng 2 gợi ý ra, 1 node bị bỏ qua.** Verify: FR-001, FR-002 (không file nào bị ghi trong quá trình test).
+- [x] **T3 — Chạy thật trên `llmwiki/wiki` của repo này, đọc report, chấp nhận 1-2 gợi ý bằng tay (dán 3 dòng), build lại `wiki-graph.html` xác nhận badge hiện.** Verify: SC-002, SC-003.
 
 ## Agent Task Assignment
 

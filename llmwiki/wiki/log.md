@@ -657,51 +657,61 @@ Walkthrough tương tác giải thích lifecycle thật của Claude Code + over
 ## 2026-08-01 — fdk — teach-me: khung bảy bước
 Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Nguồn gốc→Lý do tồn tại→Cơ chế hoạt động→Trade-off→Giới hạn→Vị trí trong hệ thống] để hiểu sâu". Đổi skill teach-me từ khung "bốn phần" (2 cấp + bộ ba + tóm tắt) sang khung bảy bước cố định, đúng thứ tự — dồn nội dung runtime-driven (2 sơ đồ hệ thống/code) vào bước 4, sơ đồ tóm tắt luồng vào bước 7, thêm mới Trade-off (bước 5) và Giới hạn (bước 6) — hai góc trước đây không có chỗ đứng riêng. Sync canonical→mirror→global install (parity 3 bản byte-identical), regen skill-search index, bump capability-stamp 1.3.60→1.3.61, cập nhật fdk-problem-tree.html (node p-45, solved, scope=[skills]). fdk-gate 21/21 PASS.
 
+## 2026-08-03 — propose — evidence-terminal-chain
+- SPEC `030826-evidence-terminal-chain-harness.md` + trang seq `030826-evidence-terminal-chain-seq.html` (8 diagram / 8 task), task `T-260803-01`, trạng thái **proposed** — chờ duyệt, chưa viết code.
+- Luật đề xuất R19 `evidence-terminal`: mọi đường đi từ kết luận xuống lá phải kết thúc ở nút chứng cứ. Taxonomy 6 loại điểm cuối; `web` đòi link tới đúng chỗ tìm + ngày truy cập + trích nguyên văn; `parametric` (kiến thức từ training model) phải khai `origin` + cờ chưa kiểm chứng và bị cấm làm điểm cuối duy nhất.
+- Prior art đã grep, không dẫm: `claim-receipts.py` (gán nhãn + resolve reference), `grounding-check.py` (schema verdict), issue `110726-anti-fabrication-observed-metrics` (trục số đo).
+
+## 2026-08-03 — plan — evidence-terminal-chain
+- SPEC được duyệt, bổ sung giữa chừng yêu cầu bật/tắt → SPEC vá thêm FR-011, FR-012, SC-005, Task 9 và mục "Công tắc bật/tắt ba tầng" (9 task / 9 diagram).
+- `030826-evidence-terminal-chain-PLAN.md`: 9 task thi hành, 12/12 FR có task nhận, R18 rc=0.
+- Công tắc theo khuôn kill-switch sẵn có của repo: cờ `--no-evidence-chain` > env `OVERSTACK_EVIDENCE_TERMINAL` > `enabled` trong config; tắt ở bất kỳ tầng nào vẫn in dòng báo lên stderr (chống cổng câm).
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-31 14:06:53 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=2af546a7e283a58197855e80ffd1a6421bc5 |
-| 2026-07-31 14:06:53 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=0294603d1fdf028c26f6a9af33163e297113 |
-| 2026-07-31 14:07:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=872254341437d7bdb5e24198335b72e9e308 |
-| 2026-07-31 14:07:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4a028010b093f4167e4e786aa4eb89aa09f9 |
-| 2026-07-31 14:07:26 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=adbe374df9612144b586016ad6a4e8585400 |
-| 2026-07-31 14:07:26 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c253a4a672a6f5ddefd469ba598360dd9840 |
-| 2026-07-31 14:08:00 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=120a26031bd792d034e3273dd4e29d7c9 |
-| 2026-07-31 14:08:00 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=e8452613698b3022cd29351e65ec6c00d |
-| 2026-07-31 14:08:45 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=802246725d06d02eafe92cebaa01a3ba2 |
-| 2026-07-31 14:08:45 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=1319b8e1 · actor=agent · prev=7ba495cdccace5f28e91724db8c0e6ec2 |
-| 2026-08-02 13:03:05 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=cbb217c7cbb175aba150a5b38413fc66bdb0 |
-| 2026-08-02 13:03:05 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=38ee71c7625ebd6e537300c58c969c28a005 |
-| 2026-08-02 13:03:24 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=8b1449848fad09e58cdbef9829403e8c49ac |
-| 2026-08-02 13:03:24 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4de4116204da85f6b68306cee6cf9cea9002 |
-| 2026-08-02 13:03:50 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=80c055df166d41702937abcb56f15fc89d4a |
-| 2026-08-02 13:03:50 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=01a82e2a4b34d6387408da71db13c861069e |
-| 2026-08-02 13:06:11 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=d73c8db2a8e9dd8a342804008954038ae9b4 |
-| 2026-08-02 13:06:11 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=c2c09e3bb7b45e6bb0d93aafcdd3feb85baf |
-| 2026-08-02 13:06:28 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a2378db87364acf7ae4645bc5825927b99df |
-| 2026-08-02 13:06:28 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=3c209ceda31faff26797ce83c4050f919b7f |
-| 2026-08-02 13:06:39 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4a4d0968c891f743a4f60b971bf9da741bf8 |
-| 2026-08-02 13:06:39 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f92693694b8f9d5fd920f970ba465a0ba5cd |
-| 2026-08-03 00:04:23 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=dac8754a70c07831acb8eea4b80463453 |
-| 2026-08-03 00:04:23 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=c144de75f6dfcab3c303d5527af96dddd |
-| 2026-08-03 00:04:34 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=105ea2378da6b641a9a6f31a93b49b976 |
-| 2026-08-03 00:04:34 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=25463f2254281a2c07a69e231f917b892 |
-| 2026-08-03 00:04:42 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=50715eccdfd5a4c7a55d5975fcdb551dd |
-| 2026-08-03 00:04:42 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=65704a129b8e737f867fc244022a7eee4 |
-| 2026-08-03 00:05:00 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=8a9ee82073b8adf5840b5c2b7939eb95a |
-| 2026-08-03 00:05:00 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=351ac27ce1d870efb17ce07aba97a03be |
-| 2026-08-03 00:05:20 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=c63b15c0ccb8d5a3c73f5c6d57f |
-| 2026-08-03 00:05:20 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=461510743bb8111c913eac28470 |
-| 2026-08-03 00:05:37 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=6b1420637061213bde2b2a215fe |
-| 2026-08-03 00:05:37 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=4e9c035bebcec93f9c880a4bbb1 |
-| 2026-08-03 00:08:59 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=471ccfa59ed534ca266e6145ed19adf9b |
-| 2026-08-03 00:08:59 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=8bcbbd8633b9d31d0025b15cbba0a622f |
-| 2026-08-03 00:09:14 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=46c9f4a1ab0c44039297917c671 |
-| 2026-08-03 00:09:14 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=dea106cbcf68cb1b8e932b56d75 |
 | 2026-08-03 06:40:04 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=be6620d90361d49866fca121a029e7c5b439a5a5530374 |
 | 2026-08-03 06:40:04 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=180165ce379567d2ac973f0595eb10eda47c369f414b09 |
+| 2026-08-03 13:07:31 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=92dfbe3aa34dd47d8ef7ac1f49d4809971fa54bb90229020f60f45b21d86b8d3 · h=a0d6 |
+| 2026-08-03 13:07:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/sources/030826-session-provenance.md', 'llmwiki/wiki/inde |
+| 2026-08-03 13:07:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=fa4b97ee5c3958cc0c038679c8ee5cc32116c0278 |
+| 2026-08-03 16:11:37 | `task.new` |  · task=T-260803-01 · title=evidence-terminal-chain · state=proposed · actor=agent · prev=784dba4bd0eb571944bd3d37a83bd0 |
+| 2026-08-03 16:14:55 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Write · session=b8afb386 · actor=agent · pre |
+| 2026-08-03 16:14:55 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Write · session=b8afb386 · actor=agent · pre |
+| 2026-08-03 16:18:45 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Write · session=b8afb386 · actor=agent · prev=57029686163895 |
+| 2026-08-03 16:18:45 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Write · session=b8afb386 · actor=agent · prev=310421dd303d42 |
+| 2026-08-03 16:19:15 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:19:15 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:19:24 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=871a82fc2a8e8e0 |
+| 2026-08-03 16:19:24 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=ec6a387a2c362ff |
+| 2026-08-03 16:19:29 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=2f9bad82f311ada |
+| 2026-08-03 16:19:29 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=e6a024e1c70e138 |
+| 2026-08-03 16:19:59 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=965e98a687935309febdaf66805685c5f1a86d4038775e |
+| 2026-08-03 16:19:59 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=d7e8f43e4e44544d281a42b30bb569b71a61e48678c2d6 |
+| 2026-08-03 16:23:59 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:23:59 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:24:08 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:24:08 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:24:20 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:24:20 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:24:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:24:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:24:51 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=32c19c4cc7dad6e |
+| 2026-08-03 16:24:51 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=341cfd861988170 |
+| 2026-08-03 16:24:59 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=b1c6d6c5d2a5fff |
+| 2026-08-03 16:24:59 | `file.write` | llmwiki/html/030826-evidence-terminal-chain-seq.html · tool=Edit · session=b8afb386 · actor=agent · prev=f4478b0f46f3be0 |
+| 2026-08-03 16:25:07 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:25:07 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:25:19 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:25:19 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:25:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:25:27 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md · tool=Edit · session=b8afb386 · actor=agent · prev |
+| 2026-08-03 16:31:22 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Write · session=b8afb386 · actor=agent · prev=7 |
+| 2026-08-03 16:31:22 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Write · session=b8afb386 · actor=agent · prev=9 |
+| 2026-08-03 16:31:53 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Edit · session=b8afb386 · actor=agent · prev=c1 |
+| 2026-08-03 16:31:53 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Edit · session=b8afb386 · actor=agent · prev=ea |
 
 <!-- log:auto:end -->

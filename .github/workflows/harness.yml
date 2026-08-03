@@ -135,6 +135,26 @@ jobs:
         run: bash harness/tests/orca-guard-failopen-test.sh .
       - name: r12-v3-workspace — sweep subrepo behind (T5)
         run: bash harness/tests/r12-v3-workspace-test.sh .
+      - name: dep-health-gate — TỒN TẠI ≠ DÙNG ĐƯỢC (chặn hồi quy code-graph 0-byte/thiếu schema)
+        run: bash harness/tests/dep-health-gate-test.sh .
+      - name: ge-acceptance — TT_X nghiệm thu 7 mắt xích PDF Graph Engineering bằng lệnh thật
+        run: bash harness/tests/ge-acceptance-test.sh .
+      - name: ge-backcompat — dữ liệu/lệnh CŨ vẫn chạy sau T1–T7 (đọc JSONL/provenance/mermaid cũ)
+        run: bash harness/tests/ge-backcompat-test.sh .
+      - name: ge-integration — T1/T2/T4/T7 nói chuyện được với nhau trên một dòng công việc thật
+        run: bash harness/tests/ge-integration-test.sh .
+      - name: ge-killswitch — commit-DAG hub (T7) tắt được · xoá được · gỡ được
+        run: bash harness/tests/ge-killswitch-test.sh .
+      - name: ge-purpose — TT8 từng thay đổi T1–T7 có làm ĐÚNG VIỆC nó sinh ra để làm không
+        run: bash harness/tests/ge-purpose-test.sh .
+      - name: ge-reachability — TT5 năng lực mới tới tay agent + không tụt baseline
+        run: bash harness/tests/ge-reachability-test.sh .
+      - name: ge-travel — thay đổi mới có tới tay người dùng mới qua đường cài thật không
+        run: bash harness/tests/ge-travel-test.sh .
+      - name: wiki-sync-flags-failopen — cờ code-drift tới /query, mọi trạng thái hỏng fail-open
+        run: bash harness/tests/wiki-sync-flags-failopen-test.sh .
+      - name: wikigraph-single-source — wiki-graph.py và build-wiki-graph.py không được lệch cạnh
+        run: bash harness/tests/wikigraph-single-source-test.sh .
       - name: tests-wired — MỌI harness/tests/*-test.sh phải có step trong workflow này
         run: |
           for t in harness/tests/*-test.sh; do

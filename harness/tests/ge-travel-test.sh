@@ -146,7 +146,13 @@ for f in grounding-check.py hub.py; do
 done
 
 hdr "(e) cổng sẵn có không đỏ vì engine mới (fresh-install-smoke --local)"
-if env HOME="$TMP/home2" \
+# Check này cố ý đọc GLOBAL SKILLS THẬT của máy đang chạy (CLAUDE_SKILLS_DIR trỏ REAL_HOME) —
+# đúng cho máy dev đã cài skill qua /fdk-uat, nhưng CI runner sạch (vd GitHub Actions) không có
+# global install nào để "không đỏ vì engine mới" — tiền đề của check không áp dụng, không phải
+# hồi quy thật. Skip rõ ràng thay vì fail khi máy chưa có global skill nào.
+if [ ! -d "$REAL_HOME/.claude/skills" ] || [ -z "$(ls -A "$REAL_HOME/.claude/skills" 2>/dev/null)" ]; then
+  ok "fresh-install-smoke --local SKIP (máy chưa có global skill install để bảo vệ — vd CI runner sạch)"
+elif env HOME="$TMP/home2" \
        CLAUDE_SKILLS_DIR="$REAL_HOME/.claude/skills" \
        AGENTS_SKILLS_DIR="$REAL_HOME/.agents/skills" \
        bash "$SRC/harness/scripts/fresh-install-smoke.sh" --local >"$TMP/smoke.log" 2>&1; then

@@ -95,6 +95,24 @@ Nói cách khác, luật này chặn được loại thất bại "chuỗi khôn
 
 Tương tự, phần văn xuôi tự do trong hội thoại nằm ngoài tầm với của validator. Không có cách tất định và không tốn token nào để dựng cây suy luận từ một đoạn văn tiếng Việt lẫn tiếng Anh. Phần đó được gác bằng luật chữ trong `CLAUDE.md` và `AGENT.md`, và đo bằng cách chấm mẫu, không bằng cổng xanh đỏ.
 
+## Tắt luật này thế nào
+
+Luật tắt được ở ba tầng, ưu tiên đi từ hẹp tới rộng.
+
+Tắt cho đúng một lần chạy, dùng khi gỡ rối chính validator:
+
+    python3 harness/validators/evidence_terminal.py --check FILE --no-evidence-chain
+
+Tắt cho một phiên hoặc một máy, không đụng file trong repo (nhận `0`, `false`, `off`):
+
+    export OVERSTACK_EVIDENCE_TERMINAL=0
+
+Tắt bền theo repo, cả team dùng chung — đặt `enabled: false` trong `harness/evidence-terminal.config.yaml`.
+
+Ở cả ba tầng, validator vẫn in một dòng lên `stderr` nói rõ luật đang tắt và tầng nào đã tắt nó. Đây là chủ ý chứ không phải tiện tay: một cơ chế im lặng lúc không hoạt động sẽ bị nhầm là đang hoạt động, và người ta yên tâm về một thứ đã chết từ lâu. Cổng câm nguy hiểm hơn cổng đỏ, vì cổng đỏ ít nhất còn nói.
+
+Có công tắc công khai cũng là cách giữ cho việc tắt là một quyết định nhìn thấy được. Một cơ chế ép kỷ luật mà không có đường tắt hợp pháp sẽ bị né bằng cách tệ hơn nhiều — người ta viết khối chuỗi cho có, cổng vẫn xanh, còn chất lượng thì đã mục mà không ai biết.
+
 ## Origin
 
 - **SPEC:** `llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-harness.md` (duyệt 2026-08-03)

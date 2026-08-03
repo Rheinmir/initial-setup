@@ -177,6 +177,29 @@ def self_test() -> int:
     if not ok:
         fails.append(f"parametric di kem observed bi tu choi: {why}")
 
+    # --- cong tac ba tang: uu tien tu HEP toi RONG, va tat phai NOI RO tang nao ---
+    en, layer = switch_state(["--no-evidence-chain"], {"OVERSTACK_EVIDENCE_TERMINAL": "1"},
+                             {"enabled": True})
+    if en or "no-evidence-chain" not in layer:
+        fails.append("co CLI phai THANG env dang bat")
+
+    en, layer = switch_state([], {"OVERSTACK_EVIDENCE_TERMINAL": "0"}, {"enabled": True})
+    if en or "OVERSTACK_EVIDENCE_TERMINAL" not in layer:
+        fails.append("env=0 phai THANG config enabled: true")
+
+    en, layer = switch_state([], {}, {"enabled": False})
+    if en or "config" not in layer:
+        fails.append("config enabled: false phai tat duoc")
+
+    en, _ = switch_state([], {}, {"enabled": True})
+    if not en:
+        fails.append("mac dinh phai la BAT")
+
+    for raw in ("0", "false", "off", "OFF", " False "):
+        en, _ = switch_state([], {"OVERSTACK_EVIDENCE_TERMINAL": raw}, {"enabled": True})
+        if en:
+            fails.append(f"env gia tri tat khong nhan dang: {raw!r}")
+
     for f in fails:
         print("FAIL:", f)
     print("self-test:", "PASS" if not fails else f"{len(fails)} FAIL")

@@ -718,3 +718,9 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 
 ## 2026-08-03 — R19 Task 1 — trang concept evidence-terminal-chain
 - `llmwiki/wiki/concepts/evidence-terminal-chain.md`: schema khối `evidence-chain`, bảng 6 loại điểm cuối, ví dụ xanh/đỏ phiên 03/08, và mục GIỚI HẠN nói rõ validator kiểm path resolve chứ không kiểm nội dung có chống lưng.
+
+## 2026-08-03 — R19 Task 2-9 — thi hành evidence-terminal
+- Validator `harness/validators/evidence_terminal.py` + `evidence_leaf.py`; config advisory; R19 vào policy.yaml; grounding-check dùng chung luật điểm cuối; luật chữ vào CLAUDE.md/AGENT.md; test 8/8 + bite-test `build_r19` + wire CI.
+- Công tắc 3 tầng: `--no-evidence-chain` > `OVERSTACK_EVIDENCE_TERMINAL` > `enabled`; tắt tầng nào cũng in dòng báo lên stderr.
+- Đối chứng chống test-giả: vô hiệu luật tầng chuỗi → 7/8 (ca `parametric đơn độc` đỏ); khôi phục → 8/8.
+- capability-stamp 1.3.61 → 1.3.62; capproof 212 → 213 neo.

@@ -9,6 +9,7 @@
 | [decision-anchoring](concepts/decision-anchoring.md) | concept | Neo quyết định vào symbol code, 4 trạng thái LIVE/STALE/ORPHAN/UNAVAILABLE suy từ code-graph, không cất tay |
 | [log-model](concepts/log-model.md) | concept | Bản đồ 5 cơ chế "ghi lại chuyện đã xảy ra" (events/scratch-log/mem-rank/touches/provenance-log) — mỗi cái độc lập, đừng ép hợp nhất |
 | [provenance-log](concepts/provenance-log.md) | concept | Sổ sự kiện artifact-level git-native, hash-chain theo writer, merge=union, CAP=AP — pattern Kafka rẻ dựng từ mảnh đã có sẵn |
+| [evidence-terminal-chain](concepts/evidence-terminal-chain.md) | concept | Schema chuỗi chứng cứ và sáu loại điểm cuối của luật R19 — chuỗi kết luận phải chấm dứt ở thứ xem được, `web` đòi link đúng chỗ + ngày + trích nguyên văn, `parametric` (kiến thức từ training) đòi origin và cấm đứng một mình; kèm giới hạn "resolve path không đồng nghĩa chống lưng nội dung" |
 | [commit-dag-hub](concepts/commit-dag-hub.md) | concept | Mỗi thí nghiệm ratchet thành một node commit trong `refs/hub/*` + `git notes`, hỏi được children/leaves/lineage/diff — opt-in, mặc định tắt, gỡ được sạch bằng ba tầng |
 | [040726-issue4-trace-grader-plan](draft/040726-issue4-trace-grader-plan.md) | plan | Plan step-by-step GH#4: sửa run.ok transcript, lọc sidechain, check grounding edited_without_read — cho dev khác làm tiếp |
 | [300626-audit-fix-docs-site-macos](draft/uiux/300626-audit-fix-docs-site-macos.md) | draft | Audit + 8 fix (a11y/head/glass) cho skill docs-site-macos, đồng bộ cả 2 bản mirror |

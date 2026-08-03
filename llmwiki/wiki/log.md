@@ -715,3 +715,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-03 16:31:53 | `file.write` | llmwiki/wiki/sources/draft/030826-evidence-terminal-chain-PLAN.md · tool=Edit · session=b8afb386 · actor=agent · prev=ea |
 
 <!-- log:auto:end -->
+
+## 2026-08-03 — R19 Task 1 — trang concept evidence-terminal-chain
+- `llmwiki/wiki/concepts/evidence-terminal-chain.md`: schema khối `evidence-chain`, bảng 6 loại điểm cuối, ví dụ xanh/đỏ phiên 03/08, và mục GIỚI HẠN nói rõ validator kiểm path resolve chứ không kiểm nội dung có chống lưng.

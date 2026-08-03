@@ -1,0 +1,28 @@
+# evidence-terminal (R19) — moi duong di tu ket luan xuong la phai ket thuc o nut CHUNG CU.
+# Engine: harness/validators/evidence_terminal.py + harness/validators/evidence_leaf.py
+# Concept: llmwiki/wiki/concepts/evidence-terminal-chain.md
+
+enabled: true                     # cong tac TANG BEN (theo repo, commit duoc, ca team dung chung).
+                                  # false = tat han luat nay.
+                                  # Uu tien tu HEP toi RONG:
+                                  #   co --no-evidence-chain
+                                  #   > env OVERSTACK_EVIDENCE_TERMINAL (0/false/off)
+                                  #   > khoa `enabled` nay
+                                  # Tat o BAT KY tang nao van IN mot dong len stderr noi ro tang
+                                  # nao da tat — co che im lang luc chet se bi nham la dang song.
+
+strictness: advisory              # ASSUMPTION (not verified) — advisory (canh bao, exit 0) cho toi
+                                  # khi do duoc ti le bao oan tren corpus that; roi moi 'strict'.
+                                  # Mot cong chan nham vai lan se bi hoc cach ne, luc do he mat
+                                  # luon tin hieu that.
+
+verified: false                   # ASSUMPTION (not verified) — mot chuoi hong chi CHAN khi ca hai:
+                                  # strictness: strict VA verified: true.
+
+# ADAPT-CHECKLIST (chot khi co so do that):
+#   1. Chay advisory tren corpus llmwiki/wiki/ that, dem so canh bao moi tai lieu.
+#   2. Chot nguong "bao oan du thap" cho SC-004 — con so nay CO Y chua dat o SPEC, vi dat bay gio
+#      la bia dung cai loai so ma chinh luat nay cam.
+#   3. Chay: python3 harness/validators/evidence_terminal.py --self-test   (phai PASS)
+#   4. Chay: bash harness/tests/evidence-terminal-test.sh .                (phai PASS)
+#   5. Lat strictness: strict VA verified: true. Chi luc do mot chuoi hong moi CHAN.

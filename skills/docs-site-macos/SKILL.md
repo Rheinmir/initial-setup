@@ -806,7 +806,7 @@ if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)
 ```css
 .theme-row{position:sticky;bottom:-<pad-nav>;margin-top:auto;display:flex;align-items:center;justify-content:space-between;
   padding:11px 16px;border-top:1px solid rgba(30,90,170,.14);background:…glass…;backdrop-filter:blur(14px)}
-.theme-switch .track{position:relative;width:50px;height:26px;border-radius:999px;…}
+.theme-switch .track{display:inline-block;position:relative;width:50px;height:26px;border-radius:999px;…}
 .theme-switch .track::before{content:'☀️';left:6px;…} .theme-switch .track::after{content:'🌙';right:6px;…}
 .theme-switch .knob{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .18s}
 .theme-switch.on .knob{left:26px} .theme-switch.on .track{background:…dark…}

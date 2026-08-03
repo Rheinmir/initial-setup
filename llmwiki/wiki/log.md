@@ -663,24 +663,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=b881188020e259c44deac859726d2097dcdeee64a03f702 |
-| 2026-07-30 12:53:51 | `file.write` | harness/out/qc-verdict.json · tool=Write · session= · actor=agent · prev=2ddd8c9f30df1cab65a944ec3bd0ec8fe0507b10ff899de |
-| 2026-07-31 08:44:01 | `file.write` | harness/scripts/agent-trace.py · tool=Write · session=1319b8e1 · actor=agent · prev=7e6148c7c8e74461d04304fbf119ae813aa7 |
-| 2026-07-31 08:44:01 | `file.write` | harness/scripts/agent-trace.py · tool=Write · session=1319b8e1 · actor=agent · prev=9d5d8a0cef2bf046fd6da7a7edddf3013f21 |
-| 2026-07-31 08:45:27 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=22ce5bb631cb7e0463dbe1e7708284249a0ff0 |
-| 2026-07-31 08:45:27 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f504b5574bb3ccbd03b9209a61e769a00cfd6e |
-| 2026-07-31 08:45:48 | `file.write` | llmwiki/wiki/concepts/log-model.md · tool=Edit · session=1319b8e1 · actor=agent · prev=31a7ffab923ed1aabcb74742a046619e2 |
-| 2026-07-31 08:45:48 | `file.write` | llmwiki/wiki/concepts/log-model.md · tool=Edit · session=1319b8e1 · actor=agent · prev=a9847de6119f71cf9d8cf7ab0d2af87d9 |
-| 2026-07-31 11:21:49 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=0515dbb8b8c7d5bc53284ce75d1c946fba3d |
-| 2026-07-31 11:21:49 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=fe3d4e5e6512fa17dbf4863e6736223445d4 |
-| 2026-07-31 11:21:57 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=ecea7b481fc60c6bdfc6a3b7d68641de8858 |
-| 2026-07-31 11:21:57 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=dbcd1b36d6a61b7f727211af22d9ed2431e5 |
-| 2026-07-31 11:24:36 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=9a6aa60bb214da25ac43e0d2598ebd9f84cf |
-| 2026-07-31 11:24:36 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=bd95a942ca6b8b0e69f19b05f2dbadf3cbd5 |
-| 2026-07-31 11:24:50 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=59b88f0a3b7b1f9d5f35552da5fdababe872 |
-| 2026-07-31 11:24:50 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=a2a0b6ed43eb46667cd351e57d8647a11dd8 |
-| 2026-07-31 11:25:25 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=764496d6e09f255b30bacf2d8633de1c2adb |
-| 2026-07-31 11:25:25 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=260579d6e2a6fe9c3a4b16cddfdb46e0bae9 |
 | 2026-07-31 14:06:53 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=2af546a7e283a58197855e80ffd1a6421bc5 |
 | 2026-07-31 14:06:53 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=0294603d1fdf028c26f6a9af33163e297113 |
 | 2026-07-31 14:07:05 | `file.write` | harness/scripts/token-budget.py · tool=Edit · session=1319b8e1 · actor=agent · prev=872254341437d7bdb5e24198335b72e9e308 |
@@ -703,5 +685,23 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-02 13:06:28 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=3c209ceda31faff26797ce83c4050f919b7f |
 | 2026-08-02 13:06:39 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=4a4d0968c891f743a4f60b971bf9da741bf8 |
 | 2026-08-02 13:06:39 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=1319b8e1 · actor=agent · prev=f92693694b8f9d5fd920f970ba465a0ba5cd |
+| 2026-08-03 00:04:23 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=dac8754a70c07831acb8eea4b80463453 |
+| 2026-08-03 00:04:23 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=c144de75f6dfcab3c303d5527af96dddd |
+| 2026-08-03 00:04:34 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=105ea2378da6b641a9a6f31a93b49b976 |
+| 2026-08-03 00:04:34 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=25463f2254281a2c07a69e231f917b892 |
+| 2026-08-03 00:04:42 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=50715eccdfd5a4c7a55d5975fcdb551dd |
+| 2026-08-03 00:04:42 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=65704a129b8e737f867fc244022a7eee4 |
+| 2026-08-03 00:05:00 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=8a9ee82073b8adf5840b5c2b7939eb95a |
+| 2026-08-03 00:05:00 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=351ac27ce1d870efb17ce07aba97a03be |
+| 2026-08-03 00:05:20 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=c63b15c0ccb8d5a3c73f5c6d57f |
+| 2026-08-03 00:05:20 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=461510743bb8111c913eac28470 |
+| 2026-08-03 00:05:37 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=6b1420637061213bde2b2a215fe |
+| 2026-08-03 00:05:37 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=4e9c035bebcec93f9c880a4bbb1 |
+| 2026-08-03 00:08:59 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=471ccfa59ed534ca266e6145ed19adf9b |
+| 2026-08-03 00:08:59 | `file.write` | harness/scripts/install-harness.sh · tool=Edit · session=b8afb386 · actor=agent · prev=8bcbbd8633b9d31d0025b15cbba0a622f |
+| 2026-08-03 00:09:14 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=46c9f4a1ab0c44039297917c671 |
+| 2026-08-03 00:09:14 | `file.write` | harness/tests/openclaude-install-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=dea106cbcf68cb1b8e932b56d75 |
+| 2026-08-03 06:40:04 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=be6620d90361d49866fca121a029e7c5b439a5a5530374 |
+| 2026-08-03 06:40:04 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=b8afb386 · actor=agent · prev=180165ce379567d2ac973f0595eb10eda47c369f414b09 |
 
 <!-- log:auto:end -->

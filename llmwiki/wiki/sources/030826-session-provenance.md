@@ -17,6 +17,7 @@ session: b8afb386-a779-4be2-b734-01a1b5e4e8db
 
 ## File chạm trong phiên
 
+- `concepts/evidence-terminal-chain.md`
 - `github/workflows/harness.yml`
 - `sources/draft/030826-evidence-terminal-chain-PLAN.md`
 - `sources/draft/030826-evidence-terminal-chain-harness.md`

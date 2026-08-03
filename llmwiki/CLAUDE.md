@@ -20,6 +20,28 @@ Trước khi sửa hay xây bất cứ thứ gì, hỏi **"vì sao"** cho tới 
 - **Nghi ngờ chẩn đoán đầu tiên của chính mình.** Nó thường là suy luận từ triệu chứng chứ chưa đọc code. Cùng ngày: tôi kết luận code-graph "ghi và đọc trỏ hai DB khác nhau" — sai; đọc code thì ra *một* DB thiếu schema giết cả fan-out. Chẩn đoán chỉ được tin sau khi **tái hiện** được.
 - **Ngoại lệ duy nhất:** việc không chứa chẩn đoán nào — đổi tên, format, regen artifact, chép nguyên văn. Việc nào có chữ "sửa", "hỏng", "vì sao", "sao lại thế" thì luôn chạy.
 
+## Chứng cứ — chuỗi lập luận phải chấm dứt ở thứ XEM ĐƯỢC
+
+Được phép lập luận, nhưng cuối mỗi chuỗi phải là chứng cứ mở ra xem được, không phải một lập luận
+nữa. Chuỗi `A vì B vì chứng cứ C` là xong; chuỗi `A vì B vì C` mà C lại là suy luận thì CHƯA xong —
+phải khai tiếp C dựa trên cái gì, cho tới khi chạm đáy.
+
+Sáu loại được tính là điểm cuối:
+- `observed` — đường dẫn `file:line` mở ra được, hoặc lệnh chạy lại được kèm output.
+- `tool-record` — id một mục trong provenance-log / events.jsonl / ledger.
+- `graph-edge` — eid một cạnh trong wiki graph.
+- `web` — dữ liệu tìm trên mạng: phải kèm **link tới ĐÚNG CHỖ tìm được** (không phải trang chủ),
+  ngày truy cập, và trích nguyên văn đoạn đã dựa vào.
+- `parametric` — kiến thức từ **training của model**: phải tự khai đúng là loại này, **chỉ rõ nó ở
+  đâu ra** (tên chuẩn, tài liệu, tác giả), và nói rõ là chưa kiểm chứng. KHÔNG được là điểm cuối duy
+  nhất của một kết luận dùng để quyết định — phải nâng lên `web`/`observed` hoặc đi kèm loại khác.
+- `absence` — chính lệnh/truy vấn đã chạy để tìm, kèm output rỗng của nó.
+
+Không kết luận bằng "rõ ràng là", "ai cũng biết", hay bằng cách trỏ ngược về một mục lập luận khác
+trong cùng câu trả lời. Tài liệu có khối ```evidence-chain thì bị R19 kiểm bằng máy
+(`harness/validators/evidence_terminal.py`); phần CHAT không validator nào với tới, nên đó là kỷ
+luật bắt buộc chứ không phải gợi ý. Chi tiết: [[evidence-terminal-chain]].
+
 ## Cái thang chống over-engineering — chạy khi VIẾT/SỬA code
 Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponytail, MIT — nguồn `060726-ponytail-distill`.)
 

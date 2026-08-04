@@ -665,29 +665,15 @@ User duyệt SPEC, chuyển `/plan`: 4 task tracer-bullet TDD — T1 hàm suy `o
 
 **Sự cố phụ phát hiện trong phiên:** `harness/scripts/code-logger.py::render_md()` ghi đè `wiki/log.md` không lock/không atomic — 2 Stop hook (`llmwiki/.claude/hooks/stop.py` + `~/.claude/harness/hooks/stop.py`) cùng gọi hàm này sau mỗi lượt có khả năng race, một lần đã xoá sạch 697/707 dòng lịch sử thủ công (chỉ còn auto-block). Đã khôi phục từ `git show HEAD:llmwiki/wiki/log.md`. Chưa sửa root cause — ngoài phạm vi GH#93, cần `/raise-issue` riêng.
 
+## 2026-08-03 — propose — wiki-layer-suggest
+Nối tiếp GH#93: user hỏi trực tiếp có script nào tự cào wiki dự án cũ và gợi ý migrate sang `layer:` không — chưa có, viết SPEC cho công cụ report-only (không tự ghi frontmatter), vì phân loại fact/mental-model là phán đoán ngữ nghĩa chứ không phải suy chắc chắn như `touches`. Ràng buộc chính thêm giữa phiên: mọi gợi ý do heuristic điền (không phải người gõ tay) phải kèm `layer_source: heuristic` + `layer_date: <ngày thật>` để sau này review/ghi-đè lại được, không lẫn với giá trị người đã xác nhận.
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-01 18:04:42 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=c905dd8f38a9cf80213b15959c436d89a324ff |
-| 2026-08-01 18:04:52 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=37fc30b600ef662bd4b671e3f703346f9c5104 |
-| 2026-08-01 18:04:52 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=43f1a6ba82f69c1a0308d9ad8bf126ddbde1cb |
-| 2026-08-01 18:05:05 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=bdd70325b199856480ec763684592477d47c41 |
-| 2026-08-01 18:05:05 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=3ca3c7269a31380c473ce37c01eb7a6a4811f3 |
-| 2026-08-01 18:05:26 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=2754759ffcbb01b44ad8edbb046c75cd87afde |
-| 2026-08-01 18:05:26 | `file.write` | harness/scripts/wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=150a3f0fb5442279007b3d4fec6cbecc843fcc |
-| 2026-08-01 18:05:32 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=7949339505e909d1495b961cb4cd905d1902d6004514b6ce27cdabf4aa029d9f · h=0969 |
-| 2026-08-01 18:05:44 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=096938041c56563479a699b4570e1e825d4cb9 |
-| 2026-08-01 18:05:44 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=66e6ba9559fc56cf94331c02a71d821eace94d |
-| 2026-08-01 18:05:52 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=0f80aed0368337bfff0a96e2f45bcb9c5a6b44 |
-| 2026-08-01 18:05:52 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=a5dcfab2525d2fa4d97851497a2222bcc536c5 |
-| 2026-08-01 18:06:01 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=2184e51e7fb78a4f194ba34f2753daa0f2b67c |
-| 2026-08-01 18:06:01 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=264344ac50778149a11fd86d8ef2c832f1d41e |
-| 2026-08-01 18:06:08 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=a0137930ad8d59d6e602b20bcfa10bba0dc36e |
-| 2026-08-01 18:06:08 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=c6b3a3d2401c9cb19b0a8372aea9cdeb338fbc |
-| 2026-08-01 18:06:21 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=facfe4bd0ec9c8f83de4952b43b2a35d0252ae |
 | 2026-08-01 18:06:21 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=d42e47361eeaf7a7d5ad0ab0e341527997d277 |
 | 2026-08-01 18:07:07 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=da65e53aae8c48a90485f475bde0165fd675ee |
 | 2026-08-01 18:07:07 | `file.write` | fdk/tools/build-wiki-graph.py · tool=Edit · session=3061dd52 · actor=agent · prev=b83f9ad2f7fb4e8342d4fbd806d848deff13ee |
@@ -711,8 +697,22 @@ User duyệt SPEC, chuyển `/plan`: 4 task tracer-bullet TDD — T1 hàm suy `o
 | 2026-08-01 18:11:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/sources/010826-session-provenance.md', 'llmwiki/wiki/sour |
 | 2026-08-01 18:11:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/stale.json', 'llmwiki/wiki/log.md', 'llmwiki/wiki/sources |
 | 2026-08-01 18:11:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/metrics/.stop-debounce.json'] · prev=110bc167f20b578f9aeef068d |
+| 2026-08-03 15:28:51 | `task.new` |  · task=T-260803-01 · title=wiki-layer-suggest: heuristic report tool cho dự án cũ migrate layer: · state=proposed · act |
+| 2026-08-03 15:30:12 | `file.write` | llmwiki/wiki/sources/draft/030826-wiki-layer-suggest.md · tool=Write · session=3061dd52 · actor=agent · prev=7297d3b765c |
+| 2026-08-03 15:30:12 | `file.write` | llmwiki/wiki/sources/draft/030826-wiki-layer-suggest.md · tool=Write · session=3061dd52 · actor=agent · prev=9a5df912822 |
+| 2026-08-03 15:31:09 | `file.write` | llmwiki/html/030826-wiki-layer-suggest-seq.html · tool=Write · session=3061dd52 · actor=agent · prev=1e7bd41cd7937dbbe2f |
+| 2026-08-03 15:31:09 | `file.write` | llmwiki/html/030826-wiki-layer-suggest-seq.html · tool=Write · session=3061dd52 · actor=agent · prev=a963bd4296500e0f2c9 |
+| 2026-08-03 15:31:24 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=3061dd52 · actor=agent · prev=b0c25537175bb54629ab14e7b63530a8d65537c0286e5a |
+| 2026-08-03 15:31:24 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=3061dd52 · actor=agent · prev=423b41aaaae098dec7bacd4e7a02277a739181ef6c15b6 |
+| 2026-08-03 15:31:39 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=3061dd52 · actor=agent · prev=23abdc4e1c67e719c96e40064723b9e5b662db2eb46eb6d7 |
+| 2026-08-03 15:31:39 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=3061dd52 · actor=agent · prev=f6e68626663bd16248fdf29015a82017e2cdd3dc72bd2e13 |
+| 2026-08-03 15:32:29 | `file.write` | harness/scripts/wiki-layer-suggest.py · tool=Write · session=3061dd52 · actor=agent · prev=cf2f8165f9507bf61c4cf6075eb8f |
+| 2026-08-03 15:32:29 | `file.write` | harness/scripts/wiki-layer-suggest.py · tool=Write · session=3061dd52 · actor=agent · prev=ca9af1d0db131dd06a1f35dab5cac |
+| 2026-08-03 15:32:45 | `file.write` | llmwiki/wiki/sources/010826-session-provenance.md · tool=Edit · session=3061dd52 · actor=agent · prev=f34f7bd027fa0f7961 |
+| 2026-08-03 15:32:45 | `file.write` | llmwiki/wiki/sources/010826-session-provenance.md · tool=Edit · session=3061dd52 · actor=agent · prev=3427fc981a3a36ed77 |
+| 2026-08-03 15:34:56 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=752f7370e55f1c85b20b52fa9db3c9a7784244cb724ac7695227656c6f28587d · h=bad0 |
+| 2026-08-03 15:34:56 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/scripts/wiki-layer-suggest.py', 'llmwiki/wiki/sources/draft/03 |
+| 2026-08-03 15:34:56 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/version.json', 'fdk/CAPABILITIES.md', 'harness/metrics/.stop-d |
+| 2026-08-03 15:35:42 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/sources/draft/030826-wiki-layer-suggest.md'] · prev=ad1fd |
 
 <!-- log:auto:end -->
-
-## 2026-08-03 — propose — wiki-layer-suggest
-Nối tiếp GH#93: user hỏi trực tiếp có script nào tự cào wiki dự án cũ và gợi ý migrate sang `layer:` không — chưa có, viết SPEC cho công cụ report-only (không tự ghi frontmatter), vì phân loại fact/mental-model là phán đoán ngữ nghĩa chứ không phải suy chắc chắn như `touches`. Ràng buộc chính thêm giữa phiên: mọi gợi ý do heuristic điền (không phải người gõ tay) phải kèm `layer_source: heuristic` + `layer_date: <ngày thật>` để sau này review/ghi-đè lại được, không lẫn với giá trị người đã xác nhận.

@@ -13,6 +13,11 @@ set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # nguồn = poc-vendor-neutral/
 ROOT="."; VENDORS=""; VERIFY=1; CLEAN=0; WITH_SKILLS=0; WITH_WIKI=0
+# GH_HOME phải định nghĩa ở TOP LEVEL: trước đây nó chỉ được gán trong nhánh
+# `if [ "$WITH_WIKI" = 1 ]`, nhưng dòng BC="$GH_HOME/hooks/build-capabilities.py" ở dưới lại
+# nằm NGOÀI nhánh đó — nên cài KHÔNG kèm --with-wiki là `set -u` giết script ngay
+# ("GH_HOME: unbound variable"). Đo 2026-08-06 khi cài vào CoopCons: crash sau bước B4.
+GH_HOME="${OVERSTACK_HARNESS_HOME:-$HOME/.claude/harness}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --vendor) VENDORS="${2:-}"; shift 2;;
@@ -193,7 +198,6 @@ if [ "$WITH_WIKI" = 1 ]; then
     # v4 ĐẢO GH#51 (council-038, GH#63 Phase 2): engine KHÔNG travel vào repo nữa — GLOBAL-SHARED
     # ~/.claude/harness là source-of-truth (U10). Repo chỉ giữ llmwiki (data) + .harness-stamp.
     # Hooks fire từ GLOBAL ~/.claude/settings.json (install-harness --global wire, guard theo stamp).
-    GH_HOME="${OVERSTACK_HARNESS_HOME:-$HOME/.claude/harness}"
     # 1) đảm bảo global harness có mặt VÀ KHÔNG CŨ.
     #    Trước đây chỉ cài khi VẮNG → re-curl bootstrap không bao giờ refresh global → global kẹt
     #    ở bản cũ mãi mãi. Hệ quả dây chuyền: stamp dự án == global (cùng bản cũ) → hook

@@ -260,6 +260,26 @@ if [ "$WITH_SKILLS" = 1 ]; then
   else
     warn "  không có npx — cài skill tay: npx skills add $SKILLS_REF --global --all"
   fi
+
+  # OpenClaude quét THƯ MỤC SKILL RIÊNG: ~/.openclaude/skills. `npx skills add --global` chỉ
+  # ghi vào ~/.claude/skills, nên máy có cả hai CLI thì openclaude thấy 0 skill — gõ
+  # /orca-onboard không resolve, agent tự chế lại việc đã có sẵn. Đo 2026-08-06: 87 skill ở
+  # ~/.claude/skills, thư mục ~/.openclaude/skills KHÔNG tồn tại; bundle openclaude grep ra
+  # 10 hit ".openclaude/skills" và 0 hit ".claude/skills".
+  # Symlink thay vì copy: MỘT nguồn chân lý, cài/gỡ skill một lần là cả hai CLI thấy ngay.
+  if command -v openclaude >/dev/null 2>&1; then
+    OC_SKILLS="$HOME/.openclaude/skills"
+    if [ -L "$OC_SKILLS" ]; then
+      log "  ✓ OpenClaude skills → đã trỏ sẵn ($(readlink "$OC_SKILLS"))"
+    elif [ -e "$OC_SKILLS" ]; then
+      warn "  OpenClaude đã có thư mục skill RIÊNG (không phải symlink) — giữ nguyên, không đè"
+    elif [ -d "$HOME/.claude/skills" ]; then
+      mkdir -p "$HOME/.openclaude"
+      ln -s "$HOME/.claude/skills" "$OC_SKILLS" \
+        && log "  ✓ OpenClaude skills → symlink ~/.claude/skills (cả hai CLI dùng chung)" \
+        || warn "  không tạo được symlink ~/.openclaude/skills — openclaude sẽ thấy 0 skill"
+    fi
+  fi
 fi
 
 # ── BẢN ĐỒ NĂNG LỰC CHO MODEL (ADR-005) — mắt xích cuối, đừng bỏ ──────────────────────

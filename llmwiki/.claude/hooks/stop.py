@@ -337,9 +337,17 @@ def main() -> None:
     # ANTI-IDLE: provider cắt lượt bằng refusal rỗng → chặn dừng, bảo agent làm tiếp.
     # `stop_hook_active` đã được guard ở đầu main() nên không lặp vô hạn.
     if provider_stall(tp):
-        print("[anti-idle] Lượt trước bị cắt bởi một refusal RỖNG từ provider "
-              "(usage=0 token) — đó là nhiễu hạ tầng, KHÔNG phải kết luận của bạn. "
-              "Hãy tiếp tục đúng việc đang dở, đừng hỏi lại người dùng.", file=sys.stderr)
+        reason = ("Lượt trước bị cắt bởi một refusal RỖNG từ provider (usage=0 token) — "
+                  "đó là nhiễu hạ tầng, KHÔNG phải kết luận của bạn. Hãy tiếp tục đúng "
+                  "việc đang dở, đừng hỏi lại người dùng.")
+        # HAI RUNTIME, HAI GIAO THỨC — phải nói cả hai thứ tiếng:
+        #   Claude Code : exit 2 + stderr  → chặn dừng.
+        #   OpenClaude  : JSON stdout {"decision":"block"} → chặn dừng; nó KHÔNG hiểu exit 2.
+        # Đo 2026-08-06 (phiên CoopCons c4b5069a): bản chỉ-exit-2 khiến openclaude xếp thông
+        # điệp vào `hookErrors` và preventedContinuation VẪN false — hook nói mà runtime không
+        # nghe. Bằng chứng trong bundle: blocked = isSyncHookJSONOutput(j) && j.decision==="block".
+        print(json.dumps({"decision": "block", "reason": reason}, ensure_ascii=False))
+        print("[anti-idle] " + reason, file=sys.stderr)
         sys.exit(2)
     # THỨ TỰ CÓ CHỦ ĐÍCH: thứ SINH nội dung chạy trước thứ RENDER nội dung.
     # secondary_memory ghi session-provenance vào wiki và sinh lại memory-map; regen_docs

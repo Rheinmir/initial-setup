@@ -76,5 +76,40 @@ grep -q 'payload.get("stop_hook_active")' "$HOOK" \
   && ok "guard stop_hook_active con nguyen (khong lap vo han)" \
   || bad "guard stop_hook_active" "MAT guard → block lap vo han"
 
+# ── Giao thuc CHAN: hai runtime nghe hai kieu KHAC NHAU ──
+# Claude Code : exit 2 + stderr.
+# OpenClaude  : JSON stdout {"decision":"block"} — KHONG hieu exit 2.
+# Do 2026-08-06 (phien CoopCons c4b5069a): ban chi-exit-2 khien openclaude xep thong diep vao
+# `hookErrors` va preventedContinuation VAN false → hook noi ma runtime khong nghe. Bang chung
+# trong bundle: blocked = isSyncHookJSONOutput(j) && j.decision==="block".
+STALL="$TMP/proto.jsonl"
+mk "$STALL" "$REF" '{"input_tokens":0,"output_tokens":0}'
+cat > "$TMP/probe.py" <<'PROBE'
+import json, subprocess, sys, pathlib
+root, tp = sys.argv[1], sys.argv[2]
+hook = pathlib.Path(root) / "llmwiki/.claude/hooks/stop.py"
+p = subprocess.run([sys.executable, str(hook)],
+    input=json.dumps({"cwd": root, "transcript_path": tp, "session_id": "t",
+                      "stop_hook_active": False}),
+    capture_output=True, text=True, timeout=120, cwd=root)
+line = [l for l in p.stdout.splitlines() if l.strip().startswith("{")]
+d = json.loads(line[0]) if line else {}
+print("%s|%s|%s" % (p.returncode, d.get("decision", ""), bool(d.get("reason"))))
+PROBE
+out=$(python3 "$TMP/probe.py" "$SRC" "$STALL" 2>/dev/null)
+rc="${out%%|*}"; rest="${out#*|}"; dec="${rest%%|*}"; has_reason="${rest##*|}"
+
+[ "$dec" = "block" ] \
+  && ok "phat JSON stdout decision=block (OpenClaude moi chan duoc)" \
+  || bad "JSON block" "stdout thieu decision=block → openclaude se KHONG chan"
+
+[ "$has_reason" = "True" ] \
+  && ok "JSON co 'reason' (agent biet vi sao phai chay tiep)" \
+  || bad "JSON reason" "thieu reason"
+
+[ "$rc" = "2" ] \
+  && ok "van exit 2 (Claude Code chan bang ma thoat)" \
+  || bad "exit code" "rc=$rc — Claude Code se khong chan"
+
 printf '\n%d/%d pass\n' "$PASS" "$N"
 [ "$FAIL" -eq 0 ] || exit 2

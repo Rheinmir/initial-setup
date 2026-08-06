@@ -689,16 +689,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-03 17:47:22 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=e7d703d74172f7324c4fb9506139 |
-| 2026-08-03 17:47:22 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=e44717bb9938f13e9279cd29d3d7 |
-| 2026-08-03 17:47:31 | `file.write` | harness/validators/evidence_leaf.py · tool=Edit · session=b8afb386 · actor=agent · prev=a60f9b54da68bb28801860aefffc4489 |
-| 2026-08-03 17:47:31 | `file.write` | harness/validators/evidence_leaf.py · tool=Edit · session=b8afb386 · actor=agent · prev=492889c6bde8d9b9ebc83da39ad580a3 |
-| 2026-08-03 17:47:53 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=dfad222b45db0e09555bacb0b61d |
-| 2026-08-03 17:47:53 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=2c9ab15474f0e8e16c2aad843ad6 |
-| 2026-08-03 17:48:02 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=516fe34b58eae16d0744bde47375 |
-| 2026-08-03 17:48:02 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=b4b4b8952c2e2e9e487b01d79e7d |
-| 2026-08-03 17:48:34 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=58fe5aaa25bfb3c0a0a4e398ae8d |
-| 2026-08-03 17:48:34 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=d7352b7d1138095aa1118f42512c |
 | 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=2 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/sources/draft/030826-evidence-term |
 | 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/.claude/hooks/validators/evidence_terminal.py'] · prev=f3cff78 |
 | 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/.claude/hooks/validators/evidence_leaf.py', 'llmwiki/wiki/sour |
@@ -729,5 +719,15 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-05 16:07:28 | `file.write` | llmwiki/wiki/sources/050826-setup-openclaude-opencode.md · tool=Write · session=b8afb386 · actor=agent · prev=46e106b890 |
 | 2026-08-06 14:39:38 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=e3b705f2691d661c703aa8e2600297 |
 | 2026-08-06 14:39:38 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=d776a95abbff31fcb4997902b84789 |
+| 2026-08-06 14:45:13 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/wiki/sources/050826-session-provenance.md', 'llmwiki/wiki/sour |
+| 2026-08-06 14:45:13 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/index.md', 'llmwiki/wiki/log.md'] · prev=5f3532b0679b8750 |
+| 2026-08-06 14:45:13 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/.claude/hooks/stop.py', 'llmwiki/wiki/sources/050826-setup-ope |
+| 2026-08-06 14:53:31 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/poc-vendor-neutral/install.sh'] · prev=305cfde0f5a58a415f6851d |
+| 2026-08-06 14:53:38 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/sources/050826-session-provenance.md'] · prev=cec57a0bcc6 |
+| 2026-08-06 14:53:38 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/tests/anti-idle-stop-test.sh', 'llmwiki/wiki/log.md'] · prev=5 |
+| 2026-08-06 14:53:38 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/sources/060826-session-provenance.md', 'llmwiki/wiki/inde |
+| 2026-08-06 14:53:38 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/sources/050826-setup-openclaude-opencode.md', 'llmwiki/.c |
+| 2026-08-06 21:27:52 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=187dbec7b812c17d556ef44a8e48087 |
+| 2026-08-06 21:27:52 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=d1d3cd48ce9b4bce110a796ecb731fe |
 
 <!-- log:auto:end -->

@@ -689,10 +689,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=2 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/sources/draft/030826-evidence-term |
-| 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/.claude/hooks/validators/evidence_terminal.py'] · prev=f3cff78 |
-| 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/.claude/hooks/validators/evidence_leaf.py', 'llmwiki/wiki/sour |
-| 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['harness/evidence-terminal.config.yaml', 'llmwiki/wiki/concepts/evidenc |
 | 2026-08-03 18:10:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/sources/030826-session-provenance. |
 | 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/evidence-terminal.config.yaml', 'harness/validators/evidence_t |
 | 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/validators/evidence_leaf.py', 'harness/poc-vendor-neutral/poli |
@@ -729,5 +725,9 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-06 14:53:38 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/sources/050826-setup-openclaude-opencode.md', 'llmwiki/.c |
 | 2026-08-06 21:27:52 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=187dbec7b812c17d556ef44a8e48087 |
 | 2026-08-06 21:27:52 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=d1d3cd48ce9b4bce110a796ecb731fe |
+| 2026-08-06 21:30:59 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/.claude/hooks/stop.py'] · prev=7fd509169ad2d44812fa78d7e24caaa |
+| 2026-08-06 21:30:59 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/wiki/log.md', 'harness/poc-vendor-neutral/install.sh'] · prev= |
+| 2026-08-06 21:31:00 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/.claude/hooks/stop.py'] · prev=e91712c74f4577298c817488aee925f |
+| 2026-08-06 21:31:00 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/tests/anti-idle-stop-test.sh', 'llmwiki/wiki/log.md', 'harness |
 
 <!-- log:auto:end -->

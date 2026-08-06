@@ -276,6 +276,51 @@ def wiki_changed(root: str) -> bool:
         return False
 
 
+# Câu refusal mà PROVIDER chèn khi lượt bị cắt — KHÔNG phải model sinh ra sau khi suy luận.
+# Dấu hiệu phân biệt (đo 2026-08-06, phiên CoopCons 59f19d72): usage TỔNG = 0 ở mọi trường,
+# trong khi 42 lượt bình thường cùng phiên có trung vị 40.773 token. Refusal THẬT của model
+# luôn tốn output token, nên `usage == 0` là ranh giới an toàn: chỉ ép chạy tiếp khi chắc chắn
+# đây là nhiễu hạ tầng, tuyệt đối không đè lên một lời từ chối có lý do.
+PROVIDER_NULL_REFUSAL = "I'm sorry, but I cannot assist with that request."
+
+
+def provider_stall(transcript_path: str) -> bool:
+    """Lượt cuối có phải refusal RỖNG do provider chèn không (usage=0)?
+
+    Trước bản này: refusal kết thúc lượt → agent đứng im chờ người gõ 'continue'. Đo được
+    9 lần gõ tay trong một phiên, cách nhau 25-115 phút. Fail-open tuyệt đối: không đọc được
+    transcript thì trả False, không bao giờ tự ý chặn dừng."""
+    if not transcript_path:
+        return False
+    try:
+        last = None
+        with open(transcript_path, encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    r = json.loads(line)
+                except Exception:
+                    continue
+                if r.get("type") == "assistant":
+                    last = r
+        if not last:
+            return False
+        msg = last.get("message") or {}
+        blocks = msg.get("content")
+        if not isinstance(blocks, list):
+            return False
+        text = " ".join(b.get("text", "") for b in blocks
+                        if isinstance(b, dict) and b.get("type") == "text")
+        if PROVIDER_NULL_REFUSAL not in text:
+            return False
+        usage = msg.get("usage") or {}
+        return sum(v for v in usage.values() if isinstance(v, int)) == 0
+    except Exception:
+        return False  # fail-open: hạ tầng lỗi không được phá phiên
+
+
 def main() -> None:
     payload = read_payload()
     audit(payload, "Stop")
@@ -288,6 +333,14 @@ def main() -> None:
     tp = payload.get("transcript_path")  # Trụ 1 Cost Attribution: 1 cost record / run, upsert theo session (cumulative, idempotent)
     if tp:
         code_log(root, "--run-cost", f"--transcript={tp}", f"--session={payload.get('session_id') or ''}")
+
+    # ANTI-IDLE: provider cắt lượt bằng refusal rỗng → chặn dừng, bảo agent làm tiếp.
+    # `stop_hook_active` đã được guard ở đầu main() nên không lặp vô hạn.
+    if provider_stall(tp):
+        print("[anti-idle] Lượt trước bị cắt bởi một refusal RỖNG từ provider "
+              "(usage=0 token) — đó là nhiễu hạ tầng, KHÔNG phải kết luận của bạn. "
+              "Hãy tiếp tục đúng việc đang dở, đừng hỏi lại người dùng.", file=sys.stderr)
+        sys.exit(2)
     # THỨ TỰ CÓ CHỦ ĐÍCH: thứ SINH nội dung chạy trước thứ RENDER nội dung.
     # secondary_memory ghi session-provenance vào wiki và sinh lại memory-map; regen_docs
     # dựng wiki-graph + overstack (overstack NHÚNG memory-map). Thứ tự cũ ngược lại nên

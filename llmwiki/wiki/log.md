@@ -689,32 +689,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-03 17:08:10 | `file.write` | harness/scripts/grounding-check.py · tool=Edit · session=b8afb386 · actor=agent · prev=23fda55613639350a93ad61b5b18cc9c1 |
-| 2026-08-03 17:08:27 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=a5ff2aa5c23038825b4008cce8d402a14c0e481864adc2390320883385a28444 · h=d4e9 |
-| 2026-08-03 17:09:15 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/AGENT.md', 'llmwiki/CLAUDE.md'] · prev=d4e9f551dbe0383ab0e8d45 |
-| 2026-08-03 17:09:43 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=6b524ea06235aa9b502017d30a4 |
-| 2026-08-03 17:09:43 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=b9169029b98b18306cb07d4a607 |
-| 2026-08-03 17:11:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['harness/scripts/harness-doctor.py', 'harness/travel-policy.yaml'] · pr |
-| 2026-08-03 17:11:21 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=682e69ce5c6b4b87f7b46da1096f |
-| 2026-08-03 17:11:21 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=39187145370dcb8e9b6dac961e07 |
-| 2026-08-03 17:11:41 | `file.write` | llmwiki/wiki/concepts/evidence-terminal-chain.md · tool=Edit · session=b8afb386 · actor=agent · prev=3da967576bc665b1526 |
-| 2026-08-03 17:11:41 | `file.write` | llmwiki/wiki/concepts/evidence-terminal-chain.md · tool=Edit · session=b8afb386 · actor=agent · prev=f6e10ea4783be8c12e0 |
-| 2026-08-03 17:12:51 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['fdk/CAPABILITIES.md', 'harness/version.json'] · prev=a8a6ddb383a4e107c |
-| 2026-08-03 17:12:51 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=752a596cd8c6ee131b0becb18a4c8f571d75b5ff1 |
-| 2026-08-03 17:43:46 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=2f6de42619949f186c4bdbeb4693 |
-| 2026-08-03 17:43:46 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=ab5dae2732fb0316b7fa1d4cdb3a |
-| 2026-08-03 17:43:57 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=69ccd774b83c202f62782a6ea9f5 |
-| 2026-08-03 17:43:57 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=53ddeea0d424eedc782d144e18e6 |
-| 2026-08-03 17:44:03 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=66e2058afe1bc01d523750c219ce |
-| 2026-08-03 17:44:03 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=a76e3d70366080a9d171d81c594c |
-| 2026-08-03 17:44:13 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=c43068fb1b13de96aabf5654eabd |
-| 2026-08-03 17:44:13 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=fb41774fc1c33c190b5b0343fa22 |
-| 2026-08-03 17:44:43 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=333f600f3c2340a0797f5f45bb88 |
-| 2026-08-03 17:44:43 | `file.write` | harness/tests/evidence-terminal-test.sh · tool=Edit · session=b8afb386 · actor=agent · prev=67b44376a14e60537d76b370d346 |
-| 2026-08-03 17:46:05 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=74ebe7863bd71d682a0457ffb511 |
-| 2026-08-03 17:46:05 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=7e6ab9cb1724da70e018c3256568 |
-| 2026-08-03 17:46:12 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=b8afb386 · actor=agent · prev=f4a153b7d7a1c9b4480315a314d30 |
-| 2026-08-03 17:46:12 | `file.write` | llmwiki/.claude/hooks/post_tool_use.py · tool=Edit · session=b8afb386 · actor=agent · prev=47ff483e7ae882428b82aacf2ed50 |
 | 2026-08-03 17:47:22 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=e7d703d74172f7324c4fb9506139 |
 | 2026-08-03 17:47:22 | `file.write` | harness/validators/evidence_terminal.py · tool=Edit · session=b8afb386 · actor=agent · prev=e44717bb9938f13e9279cd29d3d7 |
 | 2026-08-03 17:47:31 | `file.write` | harness/validators/evidence_leaf.py · tool=Edit · session=b8afb386 · actor=agent · prev=a60f9b54da68bb28801860aefffc4489 |
@@ -729,5 +703,31 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/.claude/hooks/validators/evidence_terminal.py'] · prev=f3cff78 |
 | 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/.claude/hooks/validators/evidence_leaf.py', 'llmwiki/wiki/sour |
 | 2026-08-03 17:50:02 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['harness/evidence-terminal.config.yaml', 'llmwiki/wiki/concepts/evidenc |
+| 2026-08-03 18:10:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/sources/030826-session-provenance. |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/evidence-terminal.config.yaml', 'harness/validators/evidence_t |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/validators/evidence_leaf.py', 'harness/poc-vendor-neutral/poli |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/scripts/install-harness.sh', 'llmwiki/wiki/index.md', 'llmwiki |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['fdk/CAPABILITIES.md', 'llmwiki/wiki/log.md', 'llmwiki/.claude/hooks/va |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/scripts/harness-doctor.py', 'llmwiki/wiki/sources/draft/030826 |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/sources/030826-session-provenance.md', 'harness/tests/evi |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/tests/openclaude-install-test.sh', 'harness/scripts/grounding- |
+| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/AGENT.md'] · prev=3a6b1f7daa816073293805ee5d6689a2e68ffb317173 |
+| 2026-08-03 18:18:04 | `task.set` |  · task=T-260803-01 · state=approved · note=R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail · actor=agent · pr |
+| 2026-08-03 18:18:04 | `task.set` |  · task=T-260803-01 · state=dispatched · note=R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail · actor=agent ·  |
+| 2026-08-03 18:18:04 | `task.set` |  · task=T-260803-01 · state=done · note=R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail · actor=agent · prev=8 |
+| 2026-08-03 18:25:34 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/policy.yaml', 'harness/metrics/tasks.json', 'harness/validator |
+| 2026-08-03 18:25:34 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/evidence-terminal.config.yaml', 'llmwiki/.claude/hooks/validat |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/scripts/grounding-check.py', 'llmwiki/CLAUDE.md', 'harness/scr |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/tests/evidence-terminal-test.sh', 'harness/tests/openclaude-in |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/index.md', 'harness/validators/evidence_leaf.py', 'harnes |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['llmwiki/wiki/concepts/evidence-terminal-chain.md', 'harness/version.js |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['llmwiki/wiki/sources/030826-session-provenance.md', 'llmwiki/wiki/sour |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/AGENT.md', 'harness/scripts/install-harness.sh', 'harness/poc- |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/.claude/hooks/post_tool_use.py', 'harness/policy.yaml', 'llmwi |
+| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/.claude/hooks/validators/evidence_terminal.py', 'harness/valid |
+| 2026-08-05 16:07:28 | `file.write` | llmwiki/wiki/sources/050826-setup-openclaude-opencode.md · tool=Write · session=b8afb386 · actor=agent · prev=957be6c4a4 |
+| 2026-08-05 16:07:28 | `file.write` | llmwiki/wiki/sources/050826-setup-openclaude-opencode.md · tool=Write · session=b8afb386 · actor=agent · prev=46e106b890 |
+| 2026-08-06 14:39:38 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=e3b705f2691d661c703aa8e2600297 |
+| 2026-08-06 14:39:38 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=d776a95abbff31fcb4997902b84789 |
 
 <!-- log:auto:end -->

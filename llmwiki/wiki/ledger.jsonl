@@ -184,3 +184,5 @@
 {"ts": "2026-08-03T17:03:06", "session": "b8afb386", "action": "add", "target": "concepts/evidence-terminal-chain.md", "tool": "Write"}
 {"ts": "2026-08-03T17:11:41", "session": "b8afb386", "action": "modify", "target": "concepts/evidence-terminal-chain.md", "tool": "Edit"}
 {"ts": "2026-08-03T17:11:41", "session": "b8afb386", "action": "modify", "target": "concepts/evidence-terminal-chain.md", "tool": "Edit"}
+{"ts": "2026-08-05T16:07:28", "session": "b8afb386", "action": "add", "target": "sources/050826-setup-openclaude-opencode.md", "tool": "Write"}
+{"ts": "2026-08-05T16:07:28", "session": "b8afb386", "action": "add", "target": "sources/050826-setup-openclaude-opencode.md", "tool": "Write"}

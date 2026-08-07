@@ -316,5 +316,23 @@
         "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md"
       }
     ]
+  },
+  "T-260807-01": {
+    "id": "T-260807-01",
+    "title": "Windows PowerShell harness installer",
+    "state": "superseded",
+    "created": "2026-08-07T23:22:45",
+    "updated": "2026-08-07T23:40:22",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-08-07T23:22:45"
+      },
+      {
+        "state": "superseded",
+        "ts": "2026-08-07T23:40:22",
+        "note": "file SPEC/HTML/unknown đã xoá theo yêu cầu user 2026-08-07; backup ở scratchpad"
+      }
+    ]
   }
 }

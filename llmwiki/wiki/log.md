@@ -683,25 +683,17 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
   - **Luật tự tắt ở bản deploy**: `ROOT = parents[2]` suy root theo vị trí bản đang chạy; bản tier-2 `llmwiki/.claude/hooks/validators/` tính ra `llmwiki/.claude` → không thấy config → rơi fallback advisory. Đổi sang suy root theo MỐC trên đĩa (đúng lớp lỗi [[decision-anchoring]] đã ghi). Có test giữ.
 - Chứng: hook chặn file hỏng rc=2, im với file hợp lệ rc=0; test 11/11; fire-drill `R19 bad:bat->1 good:im->0`; medic 0 fail.
 
+## 2026-08-07 — propose — windows-powershell-installer
+
+- Proposed `bootstrap.ps1`: a PowerShell launcher that validates Git Bash and runs the existing authoritative Bash bootstrap; native PowerShell installer and WSL fallback are explicitly out of scope.
+- Added the companion sequence page and a Windows CI acceptance requirement. The proposal stays pending approval; no production installer code has changed.
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-03 18:10:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/sources/030826-session-provenance. |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/evidence-terminal.config.yaml', 'harness/validators/evidence_t |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/validators/evidence_leaf.py', 'harness/poc-vendor-neutral/poli |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/scripts/install-harness.sh', 'llmwiki/wiki/index.md', 'llmwiki |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['fdk/CAPABILITIES.md', 'llmwiki/wiki/log.md', 'llmwiki/.claude/hooks/va |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/scripts/harness-doctor.py', 'llmwiki/wiki/sources/draft/030826 |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/sources/030826-session-provenance.md', 'harness/tests/evi |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/tests/openclaude-install-test.sh', 'harness/scripts/grounding- |
-| 2026-08-03 18:10:35 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/AGENT.md'] · prev=3a6b1f7daa816073293805ee5d6689a2e68ffb317173 |
-| 2026-08-03 18:18:04 | `task.set` |  · task=T-260803-01 · state=approved · note=R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail · actor=agent · pr |
-| 2026-08-03 18:18:04 | `task.set` |  · task=T-260803-01 · state=dispatched · note=R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail · actor=agent ·  |
-| 2026-08-03 18:18:04 | `task.set` |  · task=T-260803-01 · state=done · note=R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail · actor=agent · prev=8 |
-| 2026-08-03 18:25:34 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/policy.yaml', 'harness/metrics/tasks.json', 'harness/validator |
 | 2026-08-03 18:25:34 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/evidence-terminal.config.yaml', 'llmwiki/.claude/hooks/validat |
 | 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/scripts/grounding-check.py', 'llmwiki/CLAUDE.md', 'harness/scr |
 | 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/tests/evidence-terminal-test.sh', 'harness/tests/openclaude-in |
@@ -729,5 +721,22 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-06 21:30:59 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/wiki/log.md', 'harness/poc-vendor-neutral/install.sh'] · prev= |
 | 2026-08-06 21:31:00 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/.claude/hooks/stop.py'] · prev=e91712c74f4577298c817488aee925f |
 | 2026-08-06 21:31:00 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/tests/anti-idle-stop-test.sh', 'llmwiki/wiki/log.md', 'harness |
+| 2026-08-06 21:38:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=0e9ae81bfa7e43e932087e33bb49c4fff4d58dab4 |
+| 2026-08-06 21:38:43 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=b0745ed920eb86253bb3f1441bb053116794b587b |
+| 2026-08-07 23:22:45 | `task.new` |  · task=T-260807-01 · title=Windows PowerShell harness installer · state=proposed · actor=agent · prev=583dd4aadc6b64444 |
+| 2026-08-07 23:24:31 | `file.write` | llmwiki/wiki/sources/draft/070826-windows-powershell-installer.md · tool=Write · session=63352240 · actor=agent · prev=8 |
+| 2026-08-07 23:24:56 | `file.write` | llmwiki/html/070826-windows-powershell-installer-seq.html · tool=Write · session=63352240 · actor=agent · prev=751849ea4 |
+| 2026-08-07 23:25:04 | `file.write` | llmwiki/html/070826-windows-powershell-installer-seq.html · tool=Edit · session=63352240 · actor=agent · prev=8ee679b427 |
+| 2026-08-07 23:25:09 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=63352240 · actor=agent · prev=a05dab819e8adf92e3fbdc21d84f193a261f6c8adfcf3b |
+| 2026-08-07 23:25:18 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=63352240 · actor=agent · prev=263b32fe60e84b52bd0b807f460aa64993358d7b28bb25c1 |
+| 2026-08-07 23:25:57 | `file.write` | llmwiki/wiki/sources/draft/070826-windows-powershell-installer.md · tool=Edit · session=63352240 · actor=agent · prev=b1 |
+| 2026-08-07 23:25:57 | `file.write` | llmwiki/wiki/sources/draft/070826-windows-powershell-installer.md · tool=Edit · session=63352240 · actor=agent · prev=87 |
+| 2026-08-07 23:25:57 | `file.write` | llmwiki/html/070826-windows-powershell-installer-seq.html · tool=Edit · session=63352240 · actor=agent · prev=9cb7cc0742 |
+| 2026-08-07 23:25:57 | `file.write` | llmwiki/html/070826-windows-powershell-installer-seq.html · tool=Edit · session=63352240 · actor=agent · prev=c71dcd66a6 |
+| 2026-08-07 23:26:20 | `file.write` | llmwiki/wiki/draft/unknown/unknown-windows-hook-runtime.md · tool=Write · session=63352240 · actor=agent · prev=bcc2323f |
 
 <!-- log:auto:end -->
+
+## 2026-08-07 — dọn phiên song song + sổ hook
+- Xoá 3 file do một phiên song song sinh qua `/propose` (SPEC `070826-windows-powershell-installer.md` 16 KB, trang seq 9,8 KB, sổ nợ `unknown-windows-hook-runtime.md`), gỡ 2 dòng index, chuyển task `T-260807-01` → `superseded`. Backup ở scratchpad, không xoá vĩnh viễn.
+- Hướng dẫn Windows PowerShell viết vào file NGOÀI repo (`~/.config/overstack/SETUP-openclaude-opencode-MACHINE.md`) vì có token thật; mục 3b khai rõ CHƯA kiểm chứng trên Windows.

@@ -186,3 +186,7 @@
 {"ts": "2026-08-03T17:11:41", "session": "b8afb386", "action": "modify", "target": "concepts/evidence-terminal-chain.md", "tool": "Edit"}
 {"ts": "2026-08-05T16:07:28", "session": "b8afb386", "action": "add", "target": "sources/050826-setup-openclaude-opencode.md", "tool": "Write"}
 {"ts": "2026-08-05T16:07:28", "session": "b8afb386", "action": "add", "target": "sources/050826-setup-openclaude-opencode.md", "tool": "Write"}
+{"ts": "2026-08-07T23:24:31", "session": "63352240", "action": "add", "target": "sources/draft/070826-windows-powershell-installer.md", "tool": "Write"}
+{"ts": "2026-08-07T23:25:57", "session": "63352240", "action": "modify", "target": "sources/draft/070826-windows-powershell-installer.md", "tool": "Edit"}
+{"ts": "2026-08-07T23:25:57", "session": "63352240", "action": "modify", "target": "sources/draft/070826-windows-powershell-installer.md", "tool": "Edit"}
+{"ts": "2026-08-07T23:26:20", "session": "63352240", "action": "add", "target": "draft/unknown/unknown-windows-hook-runtime.md", "tool": "Write"}

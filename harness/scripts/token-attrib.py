@@ -14,6 +14,7 @@ của một file auto-load bơm 4 lần thành 7,2 TRIỆU token·lượt — tr
   --top N             chỉ in N nguồn nặng nhất (mặc định 12)
   --json              xuất máy đọc
   --all-sessions      gộp mọi transcript của dự án thay vì phiên mới nhất
+  --agents            tách chi phí LUỒNG CHÍNH vs AGENT CON của dự án (spawn agent tốn bao nhiêu)
   --self-test         kiểm tất định, không đọc gì ngoài fixture trong bộ nhớ
 
 Exit: 0 = đo được · 3 = không tìm/không đọc được transcript (KHÔNG trả 0 để cổng không hiểu
@@ -135,6 +136,83 @@ def analyse(rows):
             "sources": dict(sorted(agg.items(), key=lambda kv: -kv[1]["amp"]))}
 
 
+# Trọng số CHI PHÍ TƯƠNG ĐỐI giữa các loại token. KHÔNG phải tiền — chỉ để so bó đũa: một token
+# output đắt hơn nhiều một token đọc-từ-cache, nên cộng thô 4 con số lại là so sai. Con số dưới
+# theo bậc giá phổ biến của các nhà cung cấp; đổi ở đây nếu bảng giá của bạn khác.
+COST_W = {"input_tokens": 1.0, "cache_read_input_tokens": 0.1,
+          "cache_creation_input_tokens": 1.25, "output_tokens": 5.0}
+
+
+def _usage_of(path):
+    u, turns = {}, 0
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return u, 0
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            r = json.loads(line)
+        except Exception:
+            continue
+        if r.get("type") != "assistant":
+            continue
+        turns += 1
+        for k, v in ((r.get("message") or {}).get("usage") or {}).items():
+            if isinstance(v, int):
+                u[k] = u.get(k, 0) + v
+    return u, turns
+
+
+def weighted(u):
+    return sum(u.get(k, 0) * w for k, w in COST_W.items())
+
+
+def agents_report(cwd: str) -> int:
+    """AGENT CON có thể là khoản lớn nhất mà không ai nhìn: nó chạy ở transcript RIÊNG nên mọi
+    bảng đo phiên-chính đều bỏ sót. Đo thật 15 dự án: trên Claude Code agent con chiếm 0,7-31%,
+    nhưng trên OpenClaude đều đặn 47-69% — tức spawn agent ở đó đắt gấp hơn chục lần."""
+    slug = project_slug(cwd)
+    found = False
+    for home in (".claude", ".openclaude"):
+        proj = Path.home() / home / "projects" / slug
+        if not proj.is_dir():
+            continue
+        main = list(proj.glob("*.jsonl"))
+        subs = list(proj.rglob("subagents/*.jsonl"))
+        if not main and not subs:
+            continue
+        found = True
+        agg = {}
+        for name, files in (("LUỒNG CHÍNH", main), ("AGENT CON", subs)):
+            U, T = {}, 0
+            for f in files:
+                u, t = _usage_of(f)
+                for k, v in u.items():
+                    U[k] = U.get(k, 0) + v
+                T += t
+            agg[name] = (U, T, len(files))
+        total = sum(weighted(v[0]) for v in agg.values()) or 1
+        print(f"\n### {home} · {Path(cwd).name}")
+        print(f"  {'':<13}{'file':>5}{'lượt':>8}{'output':>12}{'cache_read':>15}"
+              f"{'uncached':>12}{'chi phí tđ':>14}{'%':>7}")
+        for name, (U, T, N) in agg.items():
+            w = weighted(U)
+            print(f"  {name:<13}{N:>5}{T:>8,}{U.get('output_tokens',0):>12,}"
+                  f"{U.get('cache_read_input_tokens',0):>15,}{U.get('input_tokens',0):>12,}"
+                  f"{int(w):>14,}{w/total*100:>6.1f}%")
+        sub_pct = weighted(agg["AGENT CON"][0]) / total * 100
+        if sub_pct > 40:
+            print(f"  ⚠ agent con nuốt {sub_pct:.0f}% chi phí — xem lại có spawn thừa không.")
+    if not found:
+        print("[token-attrib] không thấy transcript nào cho dự án này", file=sys.stderr)
+        return 3
+    print("\nchi phí tđ = token có trọng số (uncached 1.0 · cache_read 0.1 · cache_write 1.25 · "
+          "output 5.0).\nKhông phải tiền — chỉ để so tương quan; sửa COST_W nếu bảng giá khác.")
+    return 0
+
+
 def report(res, top, path):
     u = res["usage"]
     cr = u.get("cache_read_input_tokens", 0)
@@ -197,6 +275,8 @@ def main() -> None:
     a = sys.argv[1:]
     if "--self-test" in a:
         sys.exit(self_test())
+    if "--agents" in a:
+        sys.exit(agents_report(os.getcwd()))
     top = int(a[a.index("--top") + 1]) if "--top" in a else 12
 
     if "--transcript" in a:

@@ -73,5 +73,39 @@ b=$(python3 "$T" --transcript "$TMP/t.jsonl" --json 2>/dev/null | shasum -a1 | c
   && ok "tat dinh: hai lan chay cho ket qua giong het" \
   || bad "tat dinh" "$a vs $b"
 
+# --agents: tach chi phi LUONG CHINH vs AGENT CON. Agent con chay o transcript RIENG nen moi
+# bang do phien-chinh deu bo sot. Do that 15 du an: Claude Code 0,7-31%, OpenClaude 47-69%.
+# Dung HOME GIA: --agents tra ~/.claude/projects/<slug-cua-cwd>, khong phai thu muc cwd.
+FAKE="$TMP/home"; WORK="$TMP/work"; mkdir -p "$WORK"
+# pwd -P: macOS resolve /var -> /private/var, ma script dung Path.resolve(). Tinh slug tu duong
+# dan DA RESOLVE, neu khong test se tro nham thu muc va bao "khong ra bang" mot cach oan uong.
+WORKP="$(cd "$WORK" && pwd -P)"
+SLUG="-$(printf '%s' "${WORKP#/}" | tr '/' '-')"
+SUBD="$FAKE/.claude/projects/$SLUG/subagents"; mkdir -p "$SUBD"
+python3 - "$FAKE/.claude/projects/$SLUG" <<'PY2'
+import json, sys, pathlib
+d = pathlib.Path(sys.argv[1])
+def w(p, out, cr):
+    p.write_text(json.dumps({"type": "assistant", "message": {"usage":
+        {"output_tokens": out, "cache_read_input_tokens": cr}}}) + "\n")
+w(d / "main.jsonl", 100, 1000)
+w(d / "subagents" / "a1.jsonl", 200, 2000)
+PY2
+out=$(cd "$WORK" && HOME="$FAKE" python3 "$T" --agents 2>&1)
+
+printf '%s' "$out" | grep -q "LUỒNG CHÍNH" \
+  && ok "--agents in duoc bang main vs subagent" \
+  || bad "--agents" "khong ra bang"
+
+# trong so: main out=100,cr=1000 -> 100*5 + 1000*0.1 = 600. Cong tho 4 so se ra 1100 -> sai.
+printf '%s' "$out" | grep -q "600" \
+  && ok "trong so chi phi dung (output x5, cache_read x0.1)" \
+  || bad "trong so" "khong thay 600 — cong tho 4 con so la so sai"
+
+# agent con o day dat hon main (200*5+2000*0.1=1200 vs 600) -> phai canh bao >40%
+printf '%s' "$out" | grep -q "agent con nuot\|agent con nuốt" \
+  && ok "canh bao khi agent con nuot >40% chi phi" \
+  || bad "canh bao agent con" "khong canh bao du chiem 67%"
+
 printf '\n%d/%d pass\n' "$PASS" "$N"
 [ "$FAIL" -eq 0 ] || exit 2

@@ -85,6 +85,7 @@ STEPS = [
         "python3 harness/scripts/wiki-graph.py --self-test >/dev/null && "
         "python3 harness/scripts/provenance-log.py --self-test >/dev/null && "
         "python3 harness/scripts/claim-receipts.py --self-test >/dev/null && "
+        "python3 harness/scripts/token-attrib.py --self-test >/dev/null && "
         "python3 harness/scripts/prospect-critic.py --self-test >/dev/null && "
         "python3 harness/scripts/web-crawl.py --self-test >/dev/null && "
         "python3 harness/scripts/web-clone.py --self-test >/dev/null && "

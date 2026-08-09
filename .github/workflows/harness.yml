@@ -141,6 +141,8 @@ jobs:
         run: bash harness/tests/evidence-terminal-test.sh .
       - name: anti-idle — provider cắt lượt bằng refusal rỗng thì Stop hook chặn dừng
         run: bash harness/tests/anti-idle-stop-test.sh .
+      - name: token-attrib — quy trách nhiệm token theo nguồn bơm (khuếch đại token·lượt)
+        run: bash harness/tests/token-attrib-test.sh .
       - name: tests-wired — MỌI harness/tests/*-test.sh phải có step trong workflow này
         run: |
           for t in harness/tests/*-test.sh; do

@@ -698,8 +698,6 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/.claude/hooks/post_tool_use.py', 'harness/policy.yaml', 'llmwi |
-| 2026-08-03 18:25:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/.claude/hooks/validators/evidence_terminal.py', 'harness/valid |
 | 2026-08-05 16:07:28 | `file.write` | llmwiki/wiki/sources/050826-setup-openclaude-opencode.md · tool=Write · session=b8afb386 · actor=agent · prev=957be6c4a4 |
 | 2026-08-05 16:07:28 | `file.write` | llmwiki/wiki/sources/050826-setup-openclaude-opencode.md · tool=Write · session=b8afb386 · actor=agent · prev=46e106b890 |
 | 2026-08-06 14:39:38 | `file.write` | harness/tests/anti-idle-stop-test.sh · tool=Write · session=b8afb386 · actor=agent · prev=e3b705f2691d661c703aa8e2600297 |
@@ -738,5 +736,12 @@ Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Ngu�
 | 2026-08-07 23:42:08 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/sources/070826-session-provenance.md', 'harness/metrics/t |
 | 2026-08-07 23:42:08 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=dc556359918eb1637a3b8bf4b723eb4c7ffa0a6fe |
 | 2026-08-07 23:42:08 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/index.md'] · prev=7e9024cee23d37070ab9e0594a92d8a22fca562 |
+| 2026-08-07 23:44:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=0b099ec3c34c33e0ba6bd223ca9f918c56c5a0355 |
+| 2026-08-07 23:44:43 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=a298d8c0621dedddb47b9e395179ec062e9470889 |
 
 <!-- log:auto:end -->
+
+## 2026-08-09 — chuyển endpoint ctd-opus + chốt giới hạn cấu hình openclaude
+- opencode `ctd` → `https://ctd-opus-resource.services.ai.azure.com/openai/v1`; cả key1 lẫn key2 chạy thật (`build · gpt-5.6-terra`). key2 lưu thành `CTD_OPUS_KEY2` trong file secrets ngoài repo.
+- egress-guard: thêm 2 host `ctd-opus-resource.*` theo lệ "mỗi host một dòng, không wildcard". Self-test PASS; host mới 200, `example.com` vẫn bị chặn.
+- **openclaude KHÔNG đổi provider được bằng env** — thử 6 tổ hợp (kể cả `CLAUDE_CODE_USE_OPENAI=1`, `OPENAI_MODEL`, pattern Azure + `OPENAI_AZURE_STYLE=1`): đều 401. Listener nội bộ chứng minh **0 request ra mạng** → 401 là cổng xác thực nội bộ, không phải Azure. Key tốt: curl cùng key ra 200 và `chat/completions` trả "PONG". Đường chính thức là `/provider` trong TUI (ghi `.openclaude-profile.json`); không có subcommand phi-tương-tác nào tương đương.

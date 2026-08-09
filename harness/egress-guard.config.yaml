@@ -22,9 +22,13 @@ egress:
   # +2026-08-02: thêm host Azure AI Foundry khi tích hợp provider askctd. Đây là mở
   # đường egress có chủ đích cho một endpoint LLM cụ thể, KHÔNG phải wildcard *.azure.com
   # — thêm resource khác thì thêm dòng khác, để mỗi lần mở đều là một quyết định.
+  # +2026-08-09: thêm resource ctd-opus khi chuyển provider mặc định sang nó. Vẫn theo lệ
+  # trên — liệt kê từng host, không wildcard.
   allow_domains: [github.com, raw.githubusercontent.com,
                   askctd-resource.services.ai.azure.com,
-                  askctd-resource.openai.azure.com]
+                  askctd-resource.openai.azure.com,
+                  ctd-opus-resource.services.ai.azure.com,
+                  ctd-opus-resource.openai.azure.com]
   # Commands that can move data off-box -> any of these reaching a non-allow-listed domain is flagged.
   net_commands: [curl, wget, nc, ncat, telnet, scp, sftp, rsync]   # ASSUMPTION (not verified) — starter set; widen per stack
 

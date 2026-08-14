@@ -38,7 +38,25 @@ from datetime import date
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-SKILLS = REPO / "skills"
+
+
+def _resolve_skills_dir(repo: Path) -> Path:
+    """Repo gốc: skills/ nằm cạnh fdk/. Global harness home (~/.claude/harness/,
+    cài bởi install-harness.sh --global) mirror fdk/tools nhưng KHÔNG có skills/
+    riêng — skill thật nằm ở ~/.claude/skills/ (cài qua `npx skills add --global`),
+    tức REPO.parent/skills. Fallback này chỉ kích khi candidate trong-repo rỗng,
+    nên không đổi hành vi khi chạy trong repo gốc (GH#87)."""
+    candidate = repo / "skills"
+    if any(candidate.glob("*/SKILL.md")):
+        return candidate
+    if repo.name == "harness":
+        alt = repo.parent / "skills"
+        if alt.is_dir():
+            return alt
+    return candidate
+
+
+SKILLS = _resolve_skills_dir(REPO)
 STORE = REPO / "fdk" / "skills.provenance.json"
 SCHEMA = "skill-provenance/v1"
 
@@ -168,6 +186,19 @@ def cmd_list(a) -> int:
 
 
 def self_test() -> int:
+    # GH#87: fallback global-harness-home phải trúng khi repo-candidate rỗng, và
+    # KHÔNG kích khi repo-candidate đã có skill (tránh phá hành vi trong repo gốc).
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+        claude_home = td / ".claude"
+        harness = claude_home / "harness"
+        (harness / "skills").mkdir(parents=True)  # rỗng — mô phỏng global home
+        real_skills = claude_home / "skills" / "demo-skill"
+        real_skills.mkdir(parents=True)
+        (real_skills / "SKILL.md").write_text("---\nname: demo-skill\n---\n")
+        assert _resolve_skills_dir(harness) == claude_home / "skills"
+        assert _resolve_skills_dir(td / "some-repo") == td / "some-repo" / "skills"
     # sha256 ổn định + evaluate phân loại đúng trên store giả.
     assert _sha256(Path(__file__)) == _sha256(Path(__file__))
     disk = set(on_disk_skills())

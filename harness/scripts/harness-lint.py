@@ -95,6 +95,34 @@ SYNCED_COPIES = [
     ("harness/validators/index_sync.py", "llmwiki/.claude/hooks/validators/index_sync.py"),
 ]
 
+# --gate-wiring: a script can define a --fail-on group that nothing ever passes, so it never
+# gates anything (it happened: wiki-health.py grew a `summary` group but fdk-gate.py's L4 step
+# still only passed `--fail-on broken` — the check was live in the file, dead in CI, and an
+# agent reported it as "chặn tái diễn" before verifying). Each (script, groups-source, gate-file)
+# entry is checked: every group the script's argparse --fail-on accepts must either appear in
+# gate_file's invocation of it, or be explicitly listed in ADVISORY_ONLY with a reason — so
+# leaving a group ungated requires a deliberate, commented decision, not silence.
+GATE_WIRED_SCRIPTS = [
+    ("harness/scripts/wiki-health.py", "harness/scripts/fdk-gate.py"),
+]
+# group -> why it's intentionally NOT required to be in fdk-gate.py's --fail-on. Mỗi lý do
+# PHẢI trả lời được 2 câu (cùng khuôn với marker "shortcut:" ở llmwiki/CLAUDE.md): vì sao
+# im lặng bây giờ vẫn AN TOÀN, và ĐIỀU KIỆN nào thì phải bật gate lên. Một câu chung chung
+# kiểu "để sau"/"chưa rõ" không trả lời được câu 2 — sẽ bị check_gate_wiring() tự bắt.
+ADVISORY_ONLY = {
+    "orphans": "trend signal (trang không ai trỏ tới) — không phải lỗi đúng/sai, thiết kế "
+               "wiki-health.py vốn coi group này report-only theo mặc định.",
+    "stale": "trend signal (ngày sửa cuối) theo --stale-days — cùng lý do, không gate cứng.",
+    "index": "có nợ cũ pre-existing (missing/extra_in_index) chưa được dọn; bật gate sẽ đỏ vì "
+             "lý do không liên quan tới thay đổi đang xét — cần dọn nợ trước rồi mới bật.",
+}
+_FAIL_GROUP_RE = re.compile(r'"(\w+)"\s+in\s+fail_groups')
+_MIN_REASON_LEN = 40  # ký tự — chặn kiểu bỏ qua 1 chữ ("ok", "an toàn") không giải thích gì
+_VAGUE_REASONS = {
+    "todo", "tbd", "n/a", "để sau", "chưa rõ", "later", "sau", "chưa biết",
+    "update sau", "tạm thời", "ok", "an toàn", "không cần", "không sao",
+}
+
 
 def _canonical_dirs():
     """Read CONTENT_DIRS from harness/wikidirs.py (the single source of truth).
@@ -275,6 +303,75 @@ def check_wiring():
     return drift, lines
 
 
+def check_gate_wiring():
+    """Assert every --fail-on group a script defines is actually passed by its gate caller.
+
+    A group is fine either wired (present in the gate's invocation args) or explicitly
+    ADVISORY_ONLY with a reason. Anything else is an orphaned check: it exists in the
+    script, gates nothing in CI. Fail-open on missing/unparseable files.
+    """
+    lines = ["== --gate-wiring : every --fail-on group is either wired or explicitly advisory =="]
+    drift = 0
+    for script_rel, gate_rel in GATE_WIRED_SCRIPTS:
+        script_file = REPO_ROOT / script_rel
+        gate_file = REPO_ROOT / gate_rel
+        if not script_file.is_file() or not gate_file.is_file():
+            lines.append("  fail-open: %s or %s missing — skipping." % (script_rel, gate_rel))
+            continue
+        script_text = script_file.read_text(encoding="utf-8")
+        gate_text = gate_file.read_text(encoding="utf-8")
+
+        groups = sorted(set(_FAIL_GROUP_RE.findall(script_text)))
+        if not groups:
+            lines.append("  fail-open: no `\"X\" in fail_groups` pattern found in %s — skipping."
+                         % script_rel)
+            continue
+
+        # Find every --fail-on value actually passed anywhere in the gate file's source
+        # (covers argv lists like ["--fail-on", "broken,summary"] and "--fail-on X" strings).
+        wired = set()
+        for m in re.finditer(r'"--fail-on"\s*,\s*"([^"]*)"', gate_text):
+            wired |= set(m.group(1).split(","))
+        for m in re.finditer(r"--fail-on[= ]([A-Za-z,_]+)", gate_text):
+            wired |= set(m.group(1).split(","))
+
+        lines.append("  %s groups : %s" % (script_rel, ", ".join(groups)))
+        lines.append("  wired in %s : %s" % (gate_rel, ", ".join(sorted(wired)) or "(none)"))
+
+        clean = True
+        for g in groups:
+            if g in wired:
+                continue
+            if g in ADVISORY_ONLY:
+                reason = ADVISORY_ONLY[g].strip()
+                if len(reason) < _MIN_REASON_LEN or reason.rstrip(".!").lower() in _VAGUE_REASONS:
+                    lines.append(
+                        "  DRIFT lý do ADVISORY_ONLY['%s'] quá ngắn/chung chung ('%s') — không "
+                        "đủ để biết VÌ SAO im lặng vẫn an toàn và KHI NÀO phải bật lại; viết "
+                        "theo đúng khuôn 'shortcut:' của CLAUDE.md, không chỉ 1-2 chữ."
+                        % (g, reason)
+                    )
+                    drift += 1
+                    clean = False
+                else:
+                    lines.append("  note  '%s' cố ý không tự-chặn — %s" % (g, reason))
+                continue
+            lines.append(
+                "  DRIFT '%s' là một kiểm tra lỗi có trong %s, nhưng KHÔNG được %s thật sự bật "
+                "lên. Hậu quả: kiểm tra này chỉ NẰM ĐÓ cho có, không ai bị chặn nếu phạm đúng "
+                "lỗi nó dò — lỗi cứ lặp lại, tự cộng dồn, tới khi tình cờ có người phát hiện thì "
+                "có thể đã xảy ra rất nhiều lần rồi phải dọn hàng loạt, thay vì bị chặn ngay lần "
+                "đầu. Sửa 1 trong 2: thêm '%s' vào --fail-on trong %s, hoặc nếu CỐ Ý không chặn "
+                "thì ghi rõ lý do vào ADVISORY_ONLY['%s']."
+                % (g, script_rel, gate_rel, g, gate_rel, g)
+            )
+            drift += 1
+            clean = False
+        if clean:
+            lines.append("  ok    every group is wired or explicitly advisory với lý do đủ rõ")
+    return drift, lines
+
+
 def main():
     ap = argparse.ArgumentParser(
         description="harness-lint — the harness guarding itself against guardrail drift")
@@ -286,6 +383,8 @@ def main():
                     help="check every wiki-tree scanner skips gitignored")
     ap.add_argument("--copies", action="store_true",
                     help="check hand-synced validator copies are byte-identical")
+    ap.add_argument("--gate-wiring", action="store_true",
+                    help="check every --fail-on group is wired in its gate caller or declared advisory")
     ap.add_argument("--check", action="store_true",
                     help="run both; exit 2 on any drift (use in pre-commit / CI)")
     args = ap.parse_args()
@@ -294,9 +393,12 @@ def main():
     do_wiring = args.wiring or args.check
     do_scanners = args.scanners or args.check
     do_copies = args.copies or args.check
-    gating = args.constants or args.wiring or args.scanners or args.copies or args.check
-    if not (do_constants or do_wiring or do_scanners or do_copies):  # no flags -> default report, non-gating
-        do_constants = do_wiring = do_scanners = do_copies = True
+    do_gate_wiring = args.gate_wiring or args.check
+    gating = (args.constants or args.wiring or args.scanners or args.copies
+              or args.gate_wiring or args.check)
+    if not (do_constants or do_wiring or do_scanners or do_copies or do_gate_wiring):
+        # no flags -> default report, non-gating
+        do_constants = do_wiring = do_scanners = do_copies = do_gate_wiring = True
         gating = False
 
     total_drift = 0
@@ -315,6 +417,10 @@ def main():
         out += ls + [""]
     if do_wiring:
         d, ls = check_wiring()
+        total_drift += d
+        out += ls + [""]
+    if do_gate_wiring:
+        d, ls = check_gate_wiring()
         total_drift += d
         out += ls + [""]
 

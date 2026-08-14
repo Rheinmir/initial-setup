@@ -17,6 +17,7 @@ session: 765fc26c-8361-48e4-98bd-68c8af0cb155
 ## File chạm trong phiên
 
 - `arness/scripts/install-harness.sh`
+- `sources/draft/200726-context-hygiene-budget.md`
 
 ## Origin
 - **Session:** `765fc26c-8361-48e4-98bd-68c8af0cb155`

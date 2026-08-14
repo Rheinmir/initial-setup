@@ -32,7 +32,25 @@ import re
 import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-SKILLS_DIR = os.path.join(ROOT, "skills")
+
+
+def _resolve_skills_dir(root):
+    """Repo gốc: skills/ nằm cạnh fdk/. Global harness home (~/.claude/harness/,
+    cài bởi install-harness.sh --global) mirror fdk/tools nhưng KHÔNG có skills/
+    riêng — skill thật nằm ở ~/.claude/skills/ (cài qua `npx skills add --global`),
+    tức dirname(root)/skills. Fallback chỉ kích khi candidate trong-repo rỗng, nên
+    không đổi hành vi khi chạy trong repo gốc (GH#87)."""
+    candidate = os.path.join(root, "skills")
+    if glob.glob(os.path.join(candidate, "*", "SKILL.md")):
+        return candidate
+    if os.path.basename(root) == "harness":
+        alt = os.path.join(os.path.dirname(root), "skills")
+        if os.path.isdir(alt):
+            return alt
+    return candidate
+
+
+SKILLS_DIR = _resolve_skills_dir(ROOT)
 OUT_JSON = os.path.join(ROOT, "fdk", "skills.search.json")
 
 K1, B = 1.5, 0.3  # BM25 knobs. b is below the 0.75 default on purpose: skill
@@ -269,6 +287,24 @@ def cmd_find(a):
     print()
 
 
+def self_test():
+    # GH#87: fallback global-harness-home phải trúng khi repo-candidate rỗng, và
+    # KHÔNG kích khi repo-candidate đã có skill (tránh phá hành vi trong repo gốc).
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        claude_home = os.path.join(td, ".claude")
+        harness = os.path.join(claude_home, "harness")
+        os.makedirs(os.path.join(harness, "skills"))  # rỗng — mô phỏng global home
+        real_skill = os.path.join(claude_home, "skills", "demo-skill")
+        os.makedirs(real_skill)
+        with open(os.path.join(real_skill, "SKILL.md"), "w") as f:
+            f.write("---\nname: demo-skill\n---\n")
+        assert _resolve_skills_dir(harness) == os.path.join(claude_home, "skills")
+        repo = os.path.join(td, "some-repo")
+        assert _resolve_skills_dir(repo) == os.path.join(repo, "skills")
+    print("✓ self-test passed")
+
+
 def main():
     p = argparse.ArgumentParser(description="BM25 skill search: build index + find-skill CLI.")
     p.add_argument("cmd", nargs="?", default="build", choices=["build", "find-skill"],
@@ -279,7 +315,10 @@ def main():
     p.add_argument("--html", help="cheatsheet path (default: auto-detect)")
     p.add_argument("--skills", default=SKILLS_DIR, help="skills dir")
     p.add_argument("--out", default=OUT_JSON, help="output JSON path")
+    p.add_argument("--self-test", action="store_true", help="kiểm bất biến nội bộ")
     a = p.parse_args()
+    if a.self_test:
+        return self_test()
     (cmd_find if a.cmd == "find-skill" else cmd_build)(a)
 
 

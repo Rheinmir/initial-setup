@@ -612,57 +612,71 @@ Thêm bước 8f vào `skills/lint/SKILL.md` (canonical — nhớ đúng bài h�
 
 Tạo `llmwiki/wiki/concepts/provenance-log.md` — concept đầy đủ (CAP/AP, ranh giới với `touches`/`correlate()`, bài học `/fable5` writer_id, bằng chứng thật 98 event/53 code.change/44 docs.change/1 decision.confirm đo lúc viết). `medic --ci` 0 fail sau khi regen `build-overstack-docs.py` (docs drift từ skill-listing đổi, không liên quan trực tiếp).
 
+## 2026-07-24 — fdk-uat/fdk-poc — gate cứng bắt buộc tạo workspace Orca thật
+
+User nhắc lần thứ 2 (2026-07-21 → 2026-07-24, cùng lỗi tái diễn ở cả /fdk-uat lẫn /fdk-poc): agent tự ý chạy filesystem-only (curl vào thư mục tạm, test CLI thuần) rồi báo hoàn tất, bỏ qua việc dựng workspace Orca thật — "không visual = không dùng được". Root cause: bước dựng workspace trong `skills/fdk-uat/SKILL.md` được đánh dấu "(tuỳ chọn)" — nhớ tay đã fail 2 lần liền, đúng dấu hiệu cần đổi cấu trúc thay vì nhắc thêm.
+
+Vá `skills/fdk-uat/SKILL.md` (canonical, sync mirror+installed, parity xác nhận `diff`): bỏ chữ "tuỳ chọn", thêm block assert chạy `orca worktree list` verify đúng tên worktree vừa tạo có mặt — fail thì DỪNG, không được báo PASS. Vá tương tự bản CÀI của `fdk-poc` (`~/.claude/skills/fdk-poc/SKILL.md`) — nhưng canonical thật của skill này nằm trên nhánh `Rheinmir/issue-15-br-k`, không sửa được sạch từ `orca`; ghi rõ giới hạn này để không tưởng nhầm đã vá triệt để (bản cài sẽ mất vá nếu `npx skills add` cài lại từ nguồn gốc).
+
+## 2026-08-11 — distill (bypass ingest) — repowise-dev/repowise
+
+Yêu cầu trực tiếp "repowise-dev/repowise distill nó đi". `llmwiki/raw/` khoá ghi cho agent (deny rule + luật "chỉ người ghi") — hỏi user, chọn bỏ qua `raw/`, ghi thẳng vào wiki theo mạch [[frontier-gap-scan]] (quét đối thủ) thay vì `/ingest` chuẩn 7 bước.
+
+Tạo `llmwiki/wiki/entities/repowise.md` (entity, so sánh điểm chạm thật với `code-graph`/`/ingest`/`harness/validators/code_health.py`) + `llmwiki/innovation/110826-innovation.md` (bảng đối chiếu, kết luận: 1 gap mới đủ chín — code-health tất định/defect-validated + dead-code + PR-bot 0-LLM, KHÔNG trùng GH#9-13/#101/#102 — chưa raise, chờ user xác nhận vì tạo issue là hành động công khai).
+
+## 2026-08-11 — distill cơ chế (clean-room) — code_complexity.py
+
+User yêu cầu tiếp: không chỉ doc, distill CƠ CHẾ nguyên code sang Python. repowise là AGPL-3.0, overstack MIT — hỏi user cách port, chọn **clean-room** (đọc README thuật toán qua `gh api`, không tải/copy code gốc, tự viết lại bằng stdlib).
+
+Ship `harness/validators/code_complexity.py`: McCabe CCN + NLOC per-function (`ast`), LCOM4-lite cohesion + god-class per-class (connected-components qua `self.attr`/gọi-lẫn-nhau, safety-valve khi 0 tín hiệu), duplicate-code (token-chunk hash, đơn giản hơn sliding Rabin-Karp thật), điểm 1-10/file, advisory-only. Selftest assert-based (`--selftest`) xanh; chạy thật trên 124 file .py trong repo, bắt đúng finding thật (kể cả cặp mirror `proposal_complete.py` trùng gần 100% — xác nhận detector không phải false-positive ngẫu nhiên).
+
+Ghi rõ ceiling KHÔNG làm ở lượt này (cập nhật `llmwiki/innovation/110826-innovation.md`): không "defect-validated" (trọng số tự chọn, không calibrated), chỉ Python (không tree-sitter đa ngôn ngữ), chưa có dead-code/PR-bot/refactor-plan-sinh-cụ-thể, chưa wire vào gate/medic (đứng standalone advisory, cần hỏi trước khi nâng hard-gate).
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-07-23 16:51:24 | `file.write` | llmwiki/wiki/sources/draft/190726-graph-lessons-grapuco.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=bc6daf67f |
-| 2026-07-23 16:51:29 | `file.write` | llmwiki/wiki/sources/draft/190726-graph-lessons-grapuco.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=85cb37509 |
-| 2026-07-23 16:51:34 | `file.write` | llmwiki/wiki/sources/draft/200726-orchestration-loop-closure.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=f6db |
-| 2026-07-23 16:51:38 | `file.write` | llmwiki/wiki/sources/draft/200726-orchestration-loop-closure.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=9ba9 |
-| 2026-07-23 16:51:47 | `file.write` | llmwiki/wiki/sources/draft/190726-travel-gap-forcing-functions.md · tool=Edit · session=3c7d0f9c · actor=agent · prev=3a |
-| 2026-07-23 16:55:18 | `file.write` | harness/scripts/fdk-gate.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=b64437e5205ddfc9c58a5dcd81c1f08fc928575a |
-| 2026-07-23 16:58:07 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=84271e8cd486d2fdaa251f4d86b5bd6040 |
-| 2026-07-23 16:58:18 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3c7d0f9c · actor=agent · prev=7d1fd67db3325b8bc3ebcdd015216cbad1 |
-| 2026-07-24 08:46:53 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog.md · tool=Edit · session=765fc26c · actor=agent · prev=5c |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=3 · human=['llmwiki/wiki/sources/210726-session-provenance.md', 'fdk/CAPABILITIES. |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=0 · prev=06f0468baf94455dcfd1886b3db26f2efbf8d760347b6bb3cd71d14f70163d66 · h=de87 |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/skills/utils/extract-site.md'] · prev=de875b1fd0ec34d68a8bff0f |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/innovation/230726-innovation.md', 'llmwiki/wiki/sources/230726 |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/sources/draft/210721-decision-anchoring-adoption-metric.m |
-| 2026-07-24 08:47:10 | `commit.reconcile` |  · actor=system · agent_n=3 · human_n=1 · human=['llmwiki/wiki/draft/unknown/unknown-context-hygiene.md'] · prev=dbc90fc |
-| 2026-07-24 08:55:17 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md · tool=Write · session=765fc26c · actor=agent · p |
-| 2026-07-24 08:55:29 | `file.write` | llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md · tool=Edit · session=765fc26c · actor=agent · pr |
-| 2026-07-24 08:55:47 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=765fc26c · actor=agent · prev=0c6675fe2842ebf235ea01bfe009b6524883d7a0260a5e |
-| 2026-07-24 08:56:00 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=96b25e265daf6c0104aa49c11ea452b7d1e132a33 |
-| 2026-07-24 08:57:20 | `file.write` | harness/scripts/provenance-log.py · tool=Write · session=765fc26c · actor=agent · prev=ed61abaa4cf228bc1aa12b288354873b4 |
-| 2026-07-24 08:57:40 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=63d7c49cf13ceb8dfa9248f93c19843113 |
-| 2026-07-24 08:58:26 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=7a118f76188601aaaab06ba6e885cd0 |
-| 2026-07-24 08:58:38 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=22a974ddb854008c8b6da248c754acf |
-| 2026-07-24 08:59:01 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=ed25b8c81025aee1e43ffd737e0404a |
-| 2026-07-24 08:59:19 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=e0486f7da005b63533194ea0672f947 |
-| 2026-07-24 08:59:32 | `file.write` | harness/scripts/decision-liveness.py · tool=Edit · session=765fc26c · actor=agent · prev=11f2022e8f8289b13e1d82cc6b760a3 |
-| 2026-07-24 08:59:57 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=0 · prev=15edb18d5cc945fd7f2a1f06c38c9a79dc401392b97118b8008954161f2935d8 · h=1a85 |
-| 2026-07-24 08:59:58 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/scripts/decision-liveness.py'] · prev=1a858d16bd7f18b4fe319d8c |
-| 2026-07-24 09:00:15 | `file.write` | llmwiki/.claude/hooks/stop.py · tool=Edit · session=765fc26c · actor=agent · prev=39c48863af5321cb15ee1a506f7a6fa10c43eb |
-| 2026-07-24 09:03:57 | `file.write` | llmwiki/innovation/240726-innovation.md · tool=Write · session=bfce9765 · actor=agent · prev=96e7a747818f92f48d6f599d12c |
-| 2026-07-24 09:04:28 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['fdk/CAPABILITIES.md', 'llmwiki/wiki/log.md', 'harness/version.json', ' |
-| 2026-07-24 09:04:28 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['harness/mechanisms.yaml', 'llmwiki/wiki/sources/draft/220722-artifact- |
-| 2026-07-24 09:24:49 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=10d23019252ac6ab513480492bd611b497 |
-| 2026-07-24 09:25:09 | `file.write` | harness/scripts/provenance-log.py · tool=Edit · session=765fc26c · actor=agent · prev=eaacfef826c3c69569432cec8bf8274b5a |
-| 2026-07-24 09:25:58 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=e6b912c8f260f6f80f40fe142620fde98d6c37286 |
-| 2026-07-24 09:36:10 | `file.write` | skills/lint/SKILL.md · tool=Edit · session=765fc26c · actor=agent · prev=b363dd7a107410d2575c9c3e39bc529d66a5d493b072f92 |
-| 2026-07-24 09:37:25 | `file.write` | llmwiki/wiki/concepts/provenance-log.md · tool=Write · session=765fc26c · actor=agent · prev=a8fa6b46f0effbe95cb6463362e |
-| 2026-07-24 09:37:41 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=765fc26c · actor=agent · prev=a4cbb1a77f96a8f91cc29ccb43cc56e74eeff332224dcf |
-| 2026-07-24 09:39:16 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['llmwiki/wiki/log.md'] · prev=f221708e0d75c533ec4da00960d68b4073dc0385f |
-| 2026-07-24 09:39:16 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/skills/wiki-loop/lint.md'] · prev=9d22c4136892038c8495ed4c0aee |
+| 2026-08-01 16:35:19 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Write · session=8a8ad17d · actor=agent · prev=a61 |
+| 2026-08-01 16:35:25 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=8a8ad17d · actor=agent · prev=0ff68dd9815c83de257d01f0f9bfa966f132c |
+| 2026-08-01 16:35:58 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=8a8ad17d · actor=agent · prev=a04d9321d8f298b9d5030463e40b3b0c9da94 |
+| 2026-08-01 16:39:43 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=918e |
+| 2026-08-01 16:39:59 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=63a8 |
+| 2026-08-01 16:40:11 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=bdfd |
+| 2026-08-01 16:40:29 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=7115 |
+| 2026-08-01 16:40:39 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=1c93 |
+| 2026-08-01 16:40:46 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=1be3 |
+| 2026-08-01 16:40:53 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=8a8ad17d · actor=agent · prev=0b82cf15a00d24237bad15ee4547a2ce796a8 |
+| 2026-08-01 16:43:10 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=b539 |
+| 2026-08-01 16:43:17 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=0ef9 |
+| 2026-08-01 16:43:23 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=2ddd |
+| 2026-08-01 16:43:31 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=57e2 |
+| 2026-08-01 16:43:38 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=2828 |
+| 2026-08-01 16:43:45 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=6d11 |
+| 2026-08-02 22:53:47 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=d2af35c0314085f86aa2dbc1774db08da2c110ed6a8977bfbc3281fe7ff22c0d · h=735a |
+| 2026-08-03 09:09:22 | `file.write` | llmwiki/innovation/030826-innovation.md · tool=Write · session=d1a42e6e · actor=agent · prev=735a51db09cace928d3ff494d88 |
+| 2026-08-04 09:06:19 | `file.write` | llmwiki/innovation/040826-innovation.md · tool=Write · session=4f625e3f · actor=agent · prev=d68f3e502b114125517938360a1 |
+| 2026-08-05 00:05:24 | `file.write` | llmwiki/wiki/sources/draft/050826-raise-issue-skill-missing-commit-step.md · tool=Write · session=8a8ad17d · actor=agent |
+| 2026-08-05 00:05:31 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=8a8ad17d · actor=agent · prev=1e1ff2316a81f673dd08f4819d9fdf07918e2 |
+| 2026-08-05 00:05:49 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=8a8ad17d · actor=agent · prev=9609959b4197aa2d2bd31daa165c933c424f8 |
+| 2026-08-05 00:06:00 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=4336f77a3ce4a97f11ab3ffd6604086c6b11acb2f445c89e96391b6908dbe4bd · h=9434 |
+| 2026-08-05 00:09:17 | `file.write` | llmwiki/wiki/sources/draft/050826-distill-zero-mem-graph-branch.md · tool=Write · session=5a9be8ac · actor=agent · prev= |
+| 2026-08-05 00:09:28 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=5a9be8ac · actor=agent · prev=115ce2f9cecc86e63bfb6569b45af0b58e2ec |
+| 2026-08-05 00:09:48 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=5a9be8ac · actor=agent · prev=f19e26b74b4d10955d8b0f1ed555118a875b9 |
+| 2026-08-05 00:31:22 | `file.write` | llmwiki/wiki/sources/draft/050826-distill-zero-mem-graph-branch.md · tool=Edit · session=5a9be8ac · actor=agent · prev=f |
+| 2026-08-05 09:07:25 | `file.write` | llmwiki/innovation/050826-innovation.md · tool=Write · session=d3d1153e · actor=agent · prev=cacfe103b57ee7dc8165c665c95 |
+| 2026-08-06 09:07:16 | `file.write` | llmwiki/innovation/060826-innovation.md · tool=Write · session=2015d100 · actor=agent · prev=100900cda8e9f542902a6c111a3 |
+| 2026-08-07 09:05:48 | `file.write` | llmwiki/innovation/070826-innovation.md · tool=Write · session=55337220 · actor=agent · prev=391ead7b79edd967e758d9a563a |
+| 2026-08-10 09:09:16 | `file.write` | llmwiki/wiki/sources/draft/100826-skill-behavioral-integrity-verification.md · tool=Write · session=12cffa69 · actor=age |
+| 2026-08-10 09:09:43 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=12cffa69 · actor=agent · prev=482105fc5c78199244cbe5774d59a23236a71 |
+| 2026-08-10 09:11:05 | `file.write` | llmwiki/innovation/100826-innovation.md · tool=Write · session=12cffa69 · actor=agent · prev=a2bbab266bfecae768ee2869cfe |
+| 2026-08-11 10:12:54 | `file.write` | llmwiki/wiki/entities/repowise.md · tool=Write · session=dba79064 · actor=agent · prev=652f0f23ce2a66575fa482784088b5e9f |
+| 2026-08-11 10:13:30 | `file.write` | llmwiki/innovation/110826-innovation.md · tool=Write · session=dba79064 · actor=agent · prev=53d86eac11cf99766dd456c1f6a |
+| 2026-08-11 10:13:36 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=dba79064 · actor=agent · prev=0e1c2cac6e226f975053a2e839d1ecf5dc3145126a8687 |
+| 2026-08-11 10:13:43 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=78846909f59c5c5970efc7998ab2bd51ae56d6cee60679b9 |
+| 2026-08-11 16:44:08 | `file.write` | harness/validators/code_complexity.py · tool=Write · session=dba79064 · actor=agent · prev=0a0f981ad6083af5cc1d542a50b7a |
+| 2026-08-11 16:44:51 | `file.write` | llmwiki/innovation/110826-innovation.md · tool=Edit · session=dba79064 · actor=agent · prev=64fc7c174ddfb071c147c357f2fb |
+| 2026-08-11 16:45:05 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=460d7efdad92bc4ccc1b85f8a9952a9b0b89e1820333ac39 |
 
 <!-- log:auto:end -->
-
-## 2026-07-24 — fdk-uat/fdk-poc — gate cứng bắt buộc tạo workspace Orca thật
-
-User nhắc lần thứ 2 (2026-07-21 → 2026-07-24, cùng lỗi tái diễn ở cả /fdk-uat lẫn /fdk-poc): agent tự ý chạy filesystem-only (curl vào thư mục tạm, test CLI thuần) rồi báo hoàn tất, bỏ qua việc dựng workspace Orca thật — "không visual = không dùng được". Root cause: bước dựng workspace trong `skills/fdk-uat/SKILL.md` được đánh dấu "(tuỳ chọn)" — nhớ tay đã fail 2 lần liền, đúng dấu hiệu cần đổi cấu trúc thay vì nhắc thêm.
-
-Vá `skills/fdk-uat/SKILL.md` (canonical, sync mirror+installed, parity xác nhận `diff`): bỏ chữ "tuỳ chọn", thêm block assert chạy `orca worktree list` verify đúng tên worktree vừa tạo có mặt — fail thì DỪNG, không được báo PASS. Vá tương tự bản CÀI của `fdk-poc` (`~/.claude/skills/fdk-poc/SKILL.md`) — nhưng canonical thật của skill này nằm trên nhánh `Rheinmir/issue-15-br-k`, không sửa được sạch từ `orca`; ghi rõ giới hạn này để không tưởng nhầm đã vá triệt để (bản cài sẽ mất vá nếu `npx skills add` cài lại từ nguồn gốc).

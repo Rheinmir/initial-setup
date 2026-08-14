@@ -43,7 +43,7 @@ Everything above is deterministic and built now. The ONE quarantined unknown is 
 ## Rules
 - Capture is fail-open — recording a failure must never break the session.
 - Never auto-promote. `--draft` seeds `/propose`; a human approves.
-- The draft filename date is fixed (`--date`, default 2026-06-28) for determinism; real use can stamp today.
+- The draft filename date is fixed (`--date`, default 2026-06-29, **ISO `YYYY-MM-DD` only** — not the `DDMMYY` wiki filename convention) for determinism; real use can stamp today. A malformed `--date` now exits 2 with a clear error instead of silently falling back to the default (fixed 2026-07-20 after that exact silent-fallback shipped a wrong-dated draft file).
 - Do not hard-code the threshold or taxonomy anywhere but the config — that is the adapter.
 
 ## Related

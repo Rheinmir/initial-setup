@@ -23,6 +23,8 @@ SKIP_BASENAMES = {"README.md", "_template.md",
 CONTENT_DIRS = ("concepts", "entities", "sources", "draft", "architecture", "tours")
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]")
 MDLINK_RE = re.compile(r"\]\(([^)#\s]+\.md)\)")
+INDEX_ROW_RE = re.compile(r"^\|\s*\[([^\]]+)\]\(([^)]+)\)\s*\|\s*[^|]+\s*\|\s*([^|]+)\|", re.MULTILINE)
+BARE_DATE_RE = re.compile(r"^20\d{2}-\d{2}-\d{2}$")
 
 _LO_CACHE: dict = {}
 
@@ -98,7 +100,7 @@ def main() -> None:
     ap.add_argument("--wiki-dir", required=True)
     ap.add_argument("--stale-days", type=int, default=60)
     ap.add_argument("--csv")
-    ap.add_argument("--fail-on", default="", help="csv: broken,orphans,index,stale")
+    ap.add_argument("--fail-on", default="", help="csv: broken,orphans,index,summary,stale")
     args = ap.parse_args()
 
     wiki = Path(args.wiki_dir)
@@ -144,6 +146,14 @@ def main() -> None:
     missing_index = sorted(set(rel.values()) - indexed)
     extra_index = sorted(r for r in idx_refs if r not in set(rel.values()))
 
+    # 3b. summary chất lượng thấp: cột Summary chỉ là ngày tháng trơ (vô dụng —
+    # ngày đã có sẵn trong tên file), thường do agent lười gõ khi thêm row.
+    bare_date_summary = []
+    for m in INDEX_ROW_RE.finditer(idx_text):
+        name, link, summary = m.group(1), m.group(2), m.group(3).strip()
+        if BARE_DATE_RE.match(summary):
+            bare_date_summary.append(f"{name}({link})")
+
     # 4. stale (theo git)
     now = datetime.datetime.now().timestamp()
     stale = []
@@ -159,6 +169,7 @@ def main() -> None:
         "orphans": orphans,
         "missing_in_index": missing_index,
         "extra_in_index": extra_index,
+        "bare_date_summary": bare_date_summary,
         "stale": stale,
     }
     print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -180,6 +191,7 @@ def main() -> None:
         ("broken" in fail_groups and broken)
         or ("orphans" in fail_groups and orphans)
         or ("index" in fail_groups and (missing_index or extra_index))
+        or ("summary" in fail_groups and bare_date_summary)
         or ("stale" in fail_groups and stale)
     )
     sys.exit(2 if failed else 0)

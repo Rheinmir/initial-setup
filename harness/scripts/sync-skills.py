@@ -59,6 +59,7 @@ LOOP_MAP = {
     "last30days": "utils", "minimalist-ui": "utils", "redesign-existing-projects": "utils",
     "snapshot-push": "utils", "stitch-design-taste": "utils", "tour-guide-supademo": "utils",
     "tour-guide": "utils",
+    "fable5": "utils",
 }
 
 

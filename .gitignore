@@ -53,3 +53,6 @@ llmwiki/wiki/sources/draft/archive/
 
 # mem-rank local memory store
 harness/metrics/memory.jsonl
+
+# Stop hook debounce state (p-45: build-wiki-graph 49s + medic --ci 26s fired ~mọi lượt)
+harness/metrics/.stop-debounce.json

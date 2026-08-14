@@ -109,10 +109,7 @@ def report(root, k):
 
 
 def _ddmmyy(s):
-    try:
-        return date.fromisoformat(s).strftime("%d%m%y")
-    except Exception:
-        return date.fromisoformat(DEFAULT_DATE).strftime("%d%m%y")
+    return date.fromisoformat(s).strftime("%d%m%y")
 
 
 def _slug(s):
@@ -189,6 +186,10 @@ def main():
     k = KINDS[kind]
     root = Path(_opt(args, "--root") or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
     date_str = _opt(args, "--date") or DEFAULT_DATE
+    try:
+        date.fromisoformat(date_str)
+    except ValueError:
+        print(f"--date muốn ISO YYYY-MM-DD, nhận '{date_str}'", file=sys.stderr); sys.exit(2)
     detail = _opt(args, "--detail")
     score = _opt(args, "--score")
 

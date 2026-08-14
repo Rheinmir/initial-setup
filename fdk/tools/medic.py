@@ -109,6 +109,28 @@ def p_docs():
     return "ok", f"{len(checks)} generator khớp đĩa", ""
 
 
+def p_wikisummary():
+    """index.md: cột Summary không được là ngày tháng trơ (vô dụng — ngày đã có sẵn trong tên
+    file). wiki-health.py ĐÃ có check này từ trước (global_shared, ship xuống mọi dự án khách)
+    nhưng chưa từng có gì gọi nó ở downstream — nằm đó không chặn ai. Probe này wire nó vào
+    thật, phạm vi HẸP CỐ Ý: chỉ 'summary', không bật broken/orphans/stale (nợ cũ project khác
+    có thể đỏ vì lý do không liên quan — quyết định bật rộng hơn để riêng, không lặng lẽ ở đây)."""
+    wh = ROOT / "harness/scripts/wiki-health.py"
+    wiki = ROOT / "llmwiki/wiki"
+    if not (wh.exists() and wiki.is_dir()):
+        return "skip", "thiếu wiki-health.py/llmwiki/wiki", ""
+    rc, out = sh([PY, str(wh), "--wiki-dir", "llmwiki/wiki", "--fail-on", "summary"], timeout=30)
+    try:
+        bad = json.loads(out).get("bare_date_summary", [])
+    except Exception:
+        return "skip", "wiki-health.py không trả JSON parse được", ""
+    if rc != 0 or bad:
+        sample = ", ".join(bad[:3])
+        return ("fail", f"{len(bad)} dòng index.md có Summary chỉ là ngày tháng: {sample}",
+                "đọc file liên kết rồi viết lại Summary thật (1 câu mô tả nội dung, không lặp ngày)")
+    return "ok", "mọi Summary trong index.md đều là mô tả thật", ""
+
+
 def p_frontend():
     """Anti-pattern FRONTEND ở HTML sinh (ligature code, prose lọt code block) — p_docs không bắt."""
     chk = ROOT / "fdk/tools/frontend-antipattern.py"
@@ -137,7 +159,7 @@ PROBE_MECH_MAP = {
     "narrative": None, "foundation": None, "code": None, "eval": None, "freshinstall": None,
     "selfstate": "code-state", "capsurface": "capsurface",
     "capproof": "capproof", "provenance": "provenance-scope",
-    "orchestration": None, "deps": None,
+    "orchestration": None, "deps": None, "wikisummary": None,
 }
 
 
@@ -461,6 +483,7 @@ PROBES = [
     ("drift",    ["drift", "rules"],             lambda: p_rules()),  # drift lộ trong p_rules
     ("backstop", ["backstop", "git", "commit"],  p_backstop),
     ("docs",     ["docs", "capabilities"],       p_docs),
+    ("wikisummary", ["wikisummary", "docs", "index"], p_wikisummary),
     ("frontend", ["frontend", "docs", "html"],    p_frontend),
     ("narrative", ["narrative", "docs", "drift"], p_narrative),
     ("foundation", ["foundation", "docs", "drift"], p_foundation),

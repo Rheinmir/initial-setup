@@ -58,6 +58,36 @@ def min_evidence(root=None) -> int:
         return 0                                  # fail-open: không đọc được cấu hình thì không siết
 
 
+def _evidence_items_errs(items) -> list:
+    """R19: mỗi mục required_evidence[] phải là một ĐIỂM CUỐI, không phải một suy luận nữa.
+
+    Dùng CHUNG `evidence_leaf.check_leaf` với validator R19 — không có bộ luật thứ hai, hai bản
+    song song về cùng một khái niệm chắc chắn lệch nhau sau vài tháng.
+
+    TƯƠNG THÍCH NGƯỢC: hợp đồng cũ cho phép mục là CHUỖI TRẦN ("test A đỏ→xanh"), và
+    ge-integration-test.sh cùng verdict đã ghi đang dựa vào đó. Chuỗi trần không mang `kind` nên
+    không kiểm được — nó chỉ được CẢNH BÁO, không thành lỗi, cho tới khi R19 lật sang strict.
+    Mục dạng dict thì chịu luật thật ngay từ bây giờ.
+    """
+    errs = []
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "validators"))
+        import evidence_leaf
+    except Exception:                                  # fail-open: thiếu engine thì không siết
+        return errs
+    root = Path(__file__).resolve().parents[2]
+    for it in items:
+        if not isinstance(it, dict):
+            print(f"[grounding-check] R19 advisory: mục required_evidence là chuỗi trần "
+                  f"({str(it)[:60]!r}) — nên khai {{kind, evidence}} để kiểm được điểm cuối",
+                  file=sys.stderr)
+            continue
+        ok, why = evidence_leaf.check_leaf(it, root, {})
+        if not ok:
+            errs.append(f"required_evidence: mục không phải điểm cuối hợp lệ — {why}")
+    return errs
+
+
 def check_verdict(obj: dict, root=None) -> list:
     """Trả danh sách lỗi schema; [] = hợp lệ."""
     errs = []
@@ -80,6 +110,9 @@ def check_verdict(obj: dict, root=None) -> list:
         ev = obj.get("required_evidence")
         if not (isinstance(ev, list) and ev and all(str(x).strip() for x in ev)):
             errs.append("revise bắt buộc required_evidence[] >= 1 mục non-empty")
+    ev = obj.get("required_evidence")
+    if isinstance(ev, list) and ev:
+        errs += _evidence_items_errs(ev)
     return errs
 
 
@@ -147,6 +180,16 @@ def self_test():
          '"required_evidence":["test qc-off-by-one-pagination chạy ĐỎ"]}', True),
         ("revise thiếu required_evidence",
          '{"decision":"revise","claim":"paginate() bỏ sót phần tử cuối","reason":"off-by-one ở paginate.py:42"}', False),
+        ("R19: required_evidence dạng điểm cuối hợp lệ",
+         '{"decision":"revise","claim":"c","reason":"r","required_evidence":'
+         '[{"kind":"observed","evidence":{"ref":"harness/policy.yaml"}}]}', True),
+        ("R19: required_evidence dạng điểm cuối HỎNG (web thiếu quote)",
+         '{"decision":"revise","claim":"c","reason":"r","required_evidence":'
+         '[{"kind":"web","evidence":{"url":"https://example.org/a","accessed":"2026-08-03"}}]}', False),
+        ("R19: mục 'web' đủ 3 trường thì qua",
+         '{"decision":"revise","claim":"c","reason":"r","required_evidence":'
+         '[{"kind":"web","evidence":{"url":"https://example.org/a#s1","accessed":"2026-08-03",'
+         '"quote":"trích nguyên văn"}}]}', True),
         ("decision lạ",
          '{"decision":"looks-good","claim":"ok","reason":"ok"}', False),
         ("claim rỗng",

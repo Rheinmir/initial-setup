@@ -101,6 +101,17 @@ rules:
       - "linear-gradient(180deg,#f7fbff"
       - "inset 0 1px 0 rgba(255,255,255"
 
+  evidence_terminal:
+    id: R19
+    name: evidence-terminal
+    kind: content_check
+    statement: "Tai lieu mang ket luan co khoi ```evidence-chain PHAI de MOI duong di tu goc toi la ket thuc o nut CHUNG CU (observed/tool-record/graph-edge/web/parametric/absence), khong duoc ket thuc o nut suy luan. web doi url tuyet doi tro DUNG CHO da doc + ngay truy cap + trich nguyen van; parametric (kien thuc tu TRAINING cua model) doi origin + co unverified va KHONG duoc lam diem cuoi duy nhat. Chuoi vong tron = khong hop le."
+    enforce_at: [session, repo]
+    target_globs: ["**/llmwiki/wiki/**/*.md"]
+    when_contains: ["```evidence-chain"]
+    handler: "harness/validators/evidence_terminal.py --check FILE. Cong tac 3 tang uu tien tu hep toi rong: co --no-evidence-chain > env OVERSTACK_EVIDENCE_TERMINAL > harness/evidence-terminal.config.yaml (enabled). Tat o tang nao van in mot dong len stderr."
+    blocking: false
+
   pull_before_change:
     id: R12
     name: pull-before-change

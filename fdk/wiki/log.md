@@ -319,3 +319,4 @@ Viết lại /fdk (canonical + mirror, diff=SAME) thành self-contained: pre-fli
 - 2026-07-20 12:57 — session `eec0806a` — 22 tool calls — files: 200726-code-graph-index-broken.md, 200726-orchestration-loop-closure-seq.html, 200726-orchestration-loop-closure.md, 200726-orchestration-triage.md, SKILL.md, council.personas.yaml, newcomer-adr.md, orca-dispatch.py …
 - 2026-07-23 14:56 — session `6ac5fed4` — 86 tool calls — files: CLAUDE.md, code-logger.py, fdk-gate.py, harness-lint.py, index.md, medic.py, outlines-distill.md, wiki-health.py
 - 2026-07-27 10:33 — session `dff80143` — 6 tool calls — files: 270726-innovation.md, ISSUES.md
+- 2026-08-14 08:13 — session `dba79064` — 12 tool calls — files: .stop-debounce.json, harness.yml, index.md, log.md

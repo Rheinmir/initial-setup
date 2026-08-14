@@ -68,7 +68,11 @@ def main() -> None:
         sys.exit(0)
 
     # không truyền content → validator đọc file đã ghi trên disk (trạng thái cuối)
-    for name in ("origin_required.py", "okf_frontmatter.py", "proposal_complete.py"):
+    # R19 evidence-terminal: chuỗi kết luận phải chạm chứng cứ. Không có dòng này thì policy
+    # khai enforce_at:[session] mà KHÔNG ai gọi — cổng câm (đo 2026-08-03: khai R19 xong, hook
+    # vẫn không fire vì dispatch list là hằng số ở đây, không đọc policy).
+    for name in ("origin_required.py", "okf_frontmatter.py", "proposal_complete.py",
+                 "evidence_terminal.py"):
         rc, err = run_validator(name, {"action": "write", "file_path": fp}, vdir)
         if rc == 2:
             print(err, file=sys.stderr)

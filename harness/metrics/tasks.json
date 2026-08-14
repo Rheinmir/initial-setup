@@ -1,0 +1,338 @@
+{
+  "T-260803-01": {
+    "id": "T-260803-01",
+    "title": "evidence-terminal-chain",
+    "state": "done",
+    "created": "2026-08-03T16:11:37",
+    "updated": "2026-08-03T18:18:04",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-08-03T16:11:37"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-08-03T18:18:04",
+        "note": "R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail"
+      },
+      {
+        "state": "dispatched",
+        "ts": "2026-08-03T18:18:04",
+        "note": "R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail"
+      },
+      {
+        "state": "done",
+        "ts": "2026-08-03T18:18:04",
+        "note": "R19 evidence-terminal: 9/9 task, test 11/11, medic 0 fail"
+      }
+    ]
+  },
+  "T-260701-01": {
+    "id": "T-260701-01",
+    "title": "Query L0→L1: eval truy-hồi + telemetry + tool có-lọc (land chung, cap 30 golden)",
+    "state": "done",
+    "created": "2026-07-02T14:59:22",
+    "updated": "2026-07-02T14:59:22",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-02T14:59:22",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/draft/orca/010726-query-retrieval-eval.md"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-07-02T14:59:22",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/draft/orca/010726-query-retrieval-eval.md"
+      },
+      {
+        "state": "dispatched",
+        "ts": "2026-07-02T14:59:22",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/draft/orca/010726-query-retrieval-eval.md"
+      },
+      {
+        "state": "done",
+        "ts": "2026-07-02T14:59:22",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/draft/orca/010726-query-retrieval-eval.md"
+      }
+    ]
+  },
+  "T-260702-01": {
+    "id": "T-260702-01",
+    "title": "orca-issue loop + problem-tree travel (p-02, p-04)",
+    "state": "done",
+    "created": "2026-07-18T17:08:01",
+    "updated": "2026-07-18T17:08:01",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-18T17:08:01",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/020726-orca-issue-ledger-travel.md"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-07-18T17:08:01",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/020726-orca-issue-ledger-travel.md"
+      },
+      {
+        "state": "dispatched",
+        "ts": "2026-07-18T17:08:01",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/020726-orca-issue-ledger-travel.md"
+      },
+      {
+        "state": "done",
+        "ts": "2026-07-18T17:08:01",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/020726-orca-issue-ledger-travel.md"
+      }
+    ]
+  },
+  "T-260702-02": {
+    "id": "T-260702-02",
+    "title": "020726-council-chọn-đề-thi — dựng app mẫu ngoài mẫu + harass test 8 loại vector, để council tự chọn đề thi (chống ludic fallacy)",
+    "state": "superseded",
+    "created": "2026-07-18T17:13:49",
+    "updated": "2026-07-18T17:13:49",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-18T17:13:49",
+        "note": "backfill 2026-08-03: suy tu status:'superseded' + git log cua llmwiki/wiki/sources/draft/020726-council-chon-de-thi-self-index.md"
+      },
+      {
+        "state": "superseded",
+        "ts": "2026-07-18T17:13:49",
+        "note": "backfill 2026-08-03: suy tu status:'superseded' + git log cua llmwiki/wiki/sources/draft/020726-council-chon-de-thi-self-index.md"
+      }
+    ]
+  },
+  "T-260703-01": {
+    "id": "T-260703-01",
+    "title": "030726-medic — cổng sức khoẻ tổng / tuyến phòng thủ cuối của framework (1 lệnh, tự-mở-coverage)",
+    "state": "proposed",
+    "created": "2026-07-03T14:30:57",
+    "updated": "2026-07-03T14:30:57",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-03T14:30:57",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/030726-medic-cong-suc-khoe-tong.md"
+      }
+    ]
+  },
+  "T-260703-02": {
+    "id": "T-260703-02",
+    "title": "030726-milestone-v106 — hardening (medic 17/17 + framework-touch hook) + query-implement",
+    "state": "proposed",
+    "created": "2026-07-03T19:46:38",
+    "updated": "2026-07-03T19:46:38",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-03T19:46:38",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/030726-milestone-v106-harden.md"
+      }
+    ]
+  },
+  "T-260703-04": {
+    "id": "T-260703-04",
+    "title": "narrative-as-data + medic narrative-drift probe (council-025)",
+    "state": "done",
+    "created": "2026-07-18T17:13:49",
+    "updated": "2026-07-18T17:13:49",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-18T17:13:49",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/030726-narrative-as-data.md"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-07-18T17:13:49",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/030726-narrative-as-data.md"
+      },
+      {
+        "state": "dispatched",
+        "ts": "2026-07-18T17:13:49",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/030726-narrative-as-data.md"
+      },
+      {
+        "state": "done",
+        "ts": "2026-07-18T17:13:49",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/030726-narrative-as-data.md"
+      }
+    ]
+  },
+  "T-260703-03": {
+    "id": "T-260703-03",
+    "title": "030726-secondary-memory — bộ nhớ thứ cấp 3-tầng (auto scratch-log + view session/feature + journal-distill), file-first không RAG",
+    "state": "proposed",
+    "created": "2026-07-03T15:01:57",
+    "updated": "2026-07-03T15:01:57",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-03T15:01:57",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/030726-secondary-memory.md"
+      }
+    ]
+  },
+  "T-260714-01": {
+    "id": "T-260714-01",
+    "title": "propose-plan-split-superpowers",
+    "state": "proposed",
+    "created": "2026-07-18T17:08:01",
+    "updated": "2026-07-18T17:08:01",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-18T17:08:01",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/140726-propose-plan-split-superpowers.md"
+      }
+    ]
+  },
+  "T-260714-02": {
+    "id": "T-260714-02",
+    "title": "spec-kit-traceability",
+    "state": "proposed",
+    "created": "2026-07-14T23:00:38",
+    "updated": "2026-07-14T23:00:38",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-14T23:00:38",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/140726-spec-kit-traceability.md"
+      }
+    ]
+  },
+  "T-260717-01": {
+    "id": "T-260717-01",
+    "title": "Gộp gitignored-check trùng lặp trong okf-check.py về canonical index_sync",
+    "state": "proposed",
+    "created": "2026-07-17T10:36:48",
+    "updated": "2026-07-17T10:36:48",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-17T10:36:48",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/170726-gitignored-dedupe.md"
+      }
+    ]
+  },
+  "T-260719-02": {
+    "id": "T-260719-02",
+    "title": "Graph stack — bài học từ thread Grapuco: sửa 2, đo 3, nháp 1",
+    "state": "proposed",
+    "created": "2026-07-24T08:47:08",
+    "updated": "2026-07-24T08:47:08",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-24T08:47:08",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/190726-graph-lessons-grapuco.md"
+      }
+    ]
+  },
+  "T-260719-01": {
+    "id": "T-260719-01",
+    "title": "Bịt 3 lỗ travel của đường curl update — mỗi fix tự mang forcing function",
+    "state": "proposed",
+    "created": "2026-07-24T08:47:08",
+    "updated": "2026-07-24T08:47:08",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-24T08:47:08",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/190726-travel-gap-forcing-functions.md"
+      }
+    ]
+  },
+  "T-260720-01": {
+    "id": "T-260720-01",
+    "title": "Pha 1 — nguyên thuỷ 'biết khi nào agent xong', gốc của 78% task không bao giờ được giao",
+    "state": "proposed",
+    "created": "2026-07-24T08:47:08",
+    "updated": "2026-07-24T08:47:08",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-24T08:47:08",
+        "note": "backfill 2026-08-03: suy tu status:'proposed' + git log cua llmwiki/wiki/sources/draft/200726-orchestration-loop-closure.md"
+      }
+    ]
+  },
+  "T-260721-03": {
+    "id": "T-260721-03",
+    "title": "Decision-anchoring-PLAN",
+    "state": "done",
+    "created": "2026-07-21T16:02:00",
+    "updated": "2026-07-21T16:02:00",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-21T16:02:00",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/210721-decision-anchoring-PLAN.md"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-07-21T16:02:00",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/210721-decision-anchoring-PLAN.md"
+      },
+      {
+        "state": "dispatched",
+        "ts": "2026-07-21T16:02:00",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/210721-decision-anchoring-PLAN.md"
+      },
+      {
+        "state": "done",
+        "ts": "2026-07-21T16:02:00",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/210721-decision-anchoring-PLAN.md"
+      }
+    ]
+  },
+  "T-260722-01": {
+    "id": "T-260722-01",
+    "title": "Artifact-provenance-eventlog-PLAN",
+    "state": "done",
+    "created": "2026-07-24T09:04:27",
+    "updated": "2026-07-24T09:04:27",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-24T09:04:27",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-07-24T09:04:27",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md"
+      },
+      {
+        "state": "dispatched",
+        "ts": "2026-07-24T09:04:27",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md"
+      },
+      {
+        "state": "done",
+        "ts": "2026-07-24T09:04:27",
+        "note": "backfill 2026-08-03: suy tu status:'done' + git log cua llmwiki/wiki/sources/draft/220722-artifact-provenance-eventlog-PLAN.md"
+      }
+    ]
+  },
+  "T-260807-01": {
+    "id": "T-260807-01",
+    "title": "Windows PowerShell harness installer",
+    "state": "superseded",
+    "created": "2026-08-07T23:22:45",
+    "updated": "2026-08-07T23:40:22",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-08-07T23:22:45"
+      },
+      {
+        "state": "superseded",
+        "ts": "2026-08-07T23:40:22",
+        "note": "file SPEC/HTML/unknown đã xoá theo yêu cầu user 2026-08-07; backup ở scratchpad"
+      }
+    ]
+  }
+}

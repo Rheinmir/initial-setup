@@ -131,6 +131,8 @@ jobs:
         run: bash harness/tests/docs-skill-okf-test.sh .
       - name: harness-update — T1-T4 cài/refresh trong repo tạm cô lập
         run: bash harness/tests/harness-update-test.sh .
+      - name: openclaude-install — detect/merge/idempotency trong HOME cô lập
+        run: bash harness/tests/openclaude-install-test.sh .
       - name: orca-guard fail-open — hook thiếu file không được brick tool (cozyroom)
         run: bash harness/tests/orca-guard-failopen-test.sh .
       - name: r12-v3-workspace — sweep subrepo behind (T5)
@@ -155,6 +157,12 @@ jobs:
         run: bash harness/tests/wiki-sync-flags-failopen-test.sh .
       - name: wikigraph-single-source — wiki-graph.py và build-wiki-graph.py không được lệch cạnh
         run: bash harness/tests/wikigraph-single-source-test.sh .
+      - name: evidence-terminal — R19 chuỗi kết luận phải chạm chứng cứ + kill-switch
+        run: bash harness/tests/evidence-terminal-test.sh .
+      - name: anti-idle — provider cắt lượt bằng refusal rỗng thì Stop hook chặn dừng
+        run: bash harness/tests/anti-idle-stop-test.sh .
+      - name: token-attrib — quy trách nhiệm token theo nguồn bơm (khuếch đại token·lượt)
+        run: bash harness/tests/token-attrib-test.sh .
       - name: tests-wired — MỌI harness/tests/*-test.sh phải có step trong workflow này
         run: |
           for t in harness/tests/*-test.sh; do

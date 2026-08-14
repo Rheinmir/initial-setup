@@ -13,6 +13,11 @@ set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # nguồn = poc-vendor-neutral/
 ROOT="."; VENDORS=""; VERIFY=1; CLEAN=0; WITH_SKILLS=0; WITH_WIKI=0
+# GH_HOME phải định nghĩa ở TOP LEVEL: trước đây nó chỉ được gán trong nhánh
+# `if [ "$WITH_WIKI" = 1 ]`, nhưng dòng BC="$GH_HOME/hooks/build-capabilities.py" ở dưới lại
+# nằm NGOÀI nhánh đó — nên cài KHÔNG kèm --with-wiki là `set -u` giết script ngay
+# ("GH_HOME: unbound variable"). Đo 2026-08-06 khi cài vào CoopCons: crash sau bước B4.
+GH_HOME="${OVERSTACK_HARNESS_HOME:-$HOME/.claude/harness}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --vendor) VENDORS="${2:-}"; shift 2;;
@@ -193,7 +198,6 @@ if [ "$WITH_WIKI" = 1 ]; then
     # v4 ĐẢO GH#51 (council-038, GH#63 Phase 2): engine KHÔNG travel vào repo nữa — GLOBAL-SHARED
     # ~/.claude/harness là source-of-truth (U10). Repo chỉ giữ llmwiki (data) + .harness-stamp.
     # Hooks fire từ GLOBAL ~/.claude/settings.json (install-harness --global wire, guard theo stamp).
-    GH_HOME="${OVERSTACK_HARNESS_HOME:-$HOME/.claude/harness}"
     # 1) đảm bảo global harness có mặt VÀ KHÔNG CŨ.
     #    Trước đây chỉ cài khi VẮNG → re-curl bootstrap không bao giờ refresh global → global kẹt
     #    ở bản cũ mãi mãi. Hệ quả dây chuyền: stamp dự án == global (cùng bản cũ) → hook
@@ -255,6 +259,26 @@ if [ "$WITH_SKILLS" = 1 ]; then
       || warn "  cài skill lỗi — chạy tay: npx skills add $SKILLS_REF --global --all"
   else
     warn "  không có npx — cài skill tay: npx skills add $SKILLS_REF --global --all"
+  fi
+
+  # OpenClaude quét THƯ MỤC SKILL RIÊNG: ~/.openclaude/skills. `npx skills add --global` chỉ
+  # ghi vào ~/.claude/skills, nên máy có cả hai CLI thì openclaude thấy 0 skill — gõ
+  # /orca-onboard không resolve, agent tự chế lại việc đã có sẵn. Đo 2026-08-06: 87 skill ở
+  # ~/.claude/skills, thư mục ~/.openclaude/skills KHÔNG tồn tại; bundle openclaude grep ra
+  # 10 hit ".openclaude/skills" và 0 hit ".claude/skills".
+  # Symlink thay vì copy: MỘT nguồn chân lý, cài/gỡ skill một lần là cả hai CLI thấy ngay.
+  if command -v openclaude >/dev/null 2>&1; then
+    OC_SKILLS="$HOME/.openclaude/skills"
+    if [ -L "$OC_SKILLS" ]; then
+      log "  ✓ OpenClaude skills → đã trỏ sẵn ($(readlink "$OC_SKILLS"))"
+    elif [ -e "$OC_SKILLS" ]; then
+      warn "  OpenClaude đã có thư mục skill RIÊNG (không phải symlink) — giữ nguyên, không đè"
+    elif [ -d "$HOME/.claude/skills" ]; then
+      mkdir -p "$HOME/.openclaude"
+      ln -s "$HOME/.claude/skills" "$OC_SKILLS" \
+        && log "  ✓ OpenClaude skills → symlink ~/.claude/skills (cả hai CLI dùng chung)" \
+        || warn "  không tạo được symlink ~/.openclaude/skills — openclaude sẽ thấy 0 skill"
+    fi
   fi
 fi
 

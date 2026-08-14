@@ -261,6 +261,201 @@ print("[harness] GLOBAL: settings.json merged (backup .bak.*)")
 PYEOF
 
   python3 -c "import json; json.load(open(\"$SETTINGS\"))" || { warn "settings.json hỏng — khôi phục từ backup!"; exit 1; }
+
+  # OpenClaude dùng cùng hook protocol nhưng chỉ đọc settings scope riêng. Khi CLI có mặt,
+  # đăng ký cùng harness global vào ~/.openclaude mà không đè hook user (đặc biệt Orca).
+  # SessionEnd có parent deadline riêng, nên command timeout thôi chưa đủ: env phải được nâng cùng.
+  #
+  # BẤT BIẾN: mọi trục trặc PHÍA OPENCLAUDE chỉ WARN rồi bỏ qua, KHÔNG được brick cài đặt
+  # Claude global. `set -e` biến mỗi lệnh không guard thành `exit 1` giữa chừng — mà tới đây
+  # ~/.claude/settings.json đã merge xong còn smoke validator thì chưa chạy, tức người dùng nhận
+  # một bản cài dở dang mà cổng tự-kiểm chưa hề nói gì. Đo 2026-08-02: `~/.openclaude` là FILE
+  # (mkdir -p đỏ) và `~/.openclaude` không ghi được (cp backup đỏ) đều bóp chết install ở đây.
+  merge_openclaude_settings() {
+    local settings="$HOME/.openclaude/settings.json"
+    local backup=""
+    if [ -e "$HOME/.openclaude" ] && [ ! -d "$HOME/.openclaude" ]; then
+      warn "~/.openclaude tồn tại nhưng không phải thư mục — bỏ qua đăng ký hook OpenClaude"
+      return 0
+    fi
+    mkdir -p "$HOME/.openclaude" 2>/dev/null \
+      || { warn "không tạo được ~/.openclaude — bỏ qua đăng ký hook OpenClaude"; return 0; }
+    if [ -f "$settings" ]; then
+      backup="$settings.bak.$(python3 -c 'import time; print(time.time_ns())')"
+      cp "$settings" "$backup" 2>/dev/null \
+        || { warn "không ghi được backup ~/.openclaude/settings.json — bỏ qua đăng ký hook OpenClaude"; return 0; }
+    elif [ -e "$settings" ]; then
+      warn "~/.openclaude/settings.json không phải file thường — bỏ qua đăng ký hook OpenClaude"
+      return 0
+    else
+      echo '{}' > "$settings" 2>/dev/null \
+        || { warn "không tạo được ~/.openclaude/settings.json — bỏ qua đăng ký hook OpenClaude"; return 0; }
+    fi
+    if ! python3 - "$settings" <<'PYEOF' 2>/dev/null
+import json, math, sys
+
+def reject_constant(value):
+    raise ValueError(f"non-standard JSON constant: {value}")
+
+with open(sys.argv[1], encoding="utf-8") as f:
+    cur = json.load(f, parse_constant=reject_constant)
+
+def finite(value):
+    if isinstance(value, float):
+        return math.isfinite(value)
+    if isinstance(value, dict):
+        return all(finite(k) and finite(v) for k, v in value.items())
+    if isinstance(value, list):
+        return all(finite(item) for item in value)
+    return True
+
+assert finite(cur)
+assert isinstance(cur, dict)
+assert "env" not in cur or isinstance(cur["env"], dict)
+assert "hooks" not in cur or isinstance(cur["hooks"], dict)
+for definitions in cur.get("hooks", {}).values():
+    assert isinstance(definitions, list)
+    for definition in definitions:
+        assert isinstance(definition, dict)
+        assert "hooks" not in definition or isinstance(definition["hooks"], list)
+        for entry in definition.get("hooks", []):
+            assert isinstance(entry, dict)
+            assert "command" not in entry or isinstance(entry["command"], str)
+PYEOF
+    then
+      warn "OpenClaude settings.json sai cú pháp/cấu trúc — giữ nguyên file và bỏ qua đăng ký hook"
+      return 0
+    fi
+    if ! python3 - "$settings" <<'PYEOF'
+import json, os, sys, tempfile
+
+path = sys.argv[1]
+
+def reject_constant(value):
+    raise ValueError(f"non-standard JSON constant: {value}")
+
+with open(path, encoding="utf-8") as f:
+    cur = json.load(f, parse_constant=reject_constant)
+
+HOOKS_DIR = '$HOME/.claude/harness/hooks'
+SESSION_END_TIMEOUT_MS = 30000
+
+def cmd(script):
+    return f'if [ -f "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki/.harness-stamp" ]; then python3 "{HOOKS_DIR}/{script}"; fi'
+
+def legacy_cmd(script):
+    return f'if [ -d "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki" ]; then python3 "{HOOKS_DIR}/{script}"; fi'
+
+OWNED_SCRIPTS = {
+    "pre_tool_use.py", "orca_guard.py", "post_tool_use.py", "stop.py",
+    "session_end.py", "session_start.py", "code_graph_keeper.py", "user_prompt_submit.py",
+}
+
+def owned(command):
+    return isinstance(command, str) and any(
+        command in (cmd(script), legacy_cmd(script))
+        for script in OWNED_SCRIPTS
+    )
+
+def hook(script, matcher=None):
+    entry = {"hooks": [{"type": "command", "command": cmd(script), "timeout": 30}]}
+    if matcher:
+        entry["matcher"] = matcher
+    return entry
+
+tpl = {
+    "PreToolUse": [hook("pre_tool_use.py", "Write|Edit|MultiEdit|NotebookEdit|Bash"),
+                   hook("orca_guard.py", "Bash")],
+    "PostToolUse": [hook("post_tool_use.py", "Write|Edit|MultiEdit")],
+    "Stop": [hook("stop.py")],
+    "SessionEnd": [hook("session_end.py")],
+    "SessionStart": [hook("session_start.py"), hook("code_graph_keeper.py")],
+    "UserPromptSubmit": [hook("user_prompt_submit.py")],
+}
+
+# Xóa hook harness-owned cũ trước khi thêm canonical entries. Quyền sở hữu là ALLOW-LIST KHỚP
+# NGUYÊN VĂN hai dạng đã từng phát hành (canonical .harness-stamp + legacy [ -d llmwiki ]) — cố ý
+# hẹp: dò theo substring HOOKS_DIR sẽ nuốt luôn hook của user chỉ TÌNH CỜ nhắc đường dẫn đó.
+# Đổi lại, khi phát hành một dạng command thứ ba thì PHẢI thêm nó vào allow-list, nếu không bản cũ
+# ở lại và hook fire đôi. Matcher/timeout đổi thoải mái: khớp trên command nên vẫn idempotent, và
+# hook KHÁC nằm chung matcher group vẫn được giữ nguyên.
+hooks = cur.setdefault("hooks", {})
+for event in list(hooks):
+    kept_defs = []
+    for definition in hooks[event]:
+        if "hooks" not in definition or not definition["hooks"]:
+            kept_defs.append(definition)
+            continue
+        kept_hooks = [h for h in definition["hooks"] if not owned(h.get("command"))]
+        if kept_hooks:
+            definition["hooks"] = kept_hooks
+            kept_defs.append(definition)
+    if kept_defs:
+        hooks[event] = kept_defs
+    else:
+        hooks.pop(event, None)
+for event, definitions in tpl.items():
+    hooks.setdefault(event, []).extend(definitions)
+
+env = cur.setdefault("env", {})
+try:
+    current_timeout = int(env.get("CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS", "0"))
+except (TypeError, ValueError):
+    current_timeout = 0
+if current_timeout < SESSION_END_TIMEOUT_MS:
+    env["CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS"] = str(SESSION_END_TIMEOUT_MS)
+
+# Giữ nguyên chữ user gõ (dấu tiếng Việt, em dash) — settings.json là file NGƯỜI sửa tay, escape
+# hết thành \uXXXX là làm hỏng thứ họ đọc. ensure_ascii=True chỉ là lối thoát cho JSON hợp lệ mà
+# KHÔNG encode được UTF-8 (lone surrogate \ud800 do editor/CLI khác ghi vào). Serialize ra chuỗi
+# TRƯỚC khi mở file: đụng UnicodeEncodeError giữa chừng thì temp file đã dính nửa nội dung.
+try:
+    payload = json.dumps(cur, indent=2, ensure_ascii=False) + "\n"
+    payload.encode("utf-8")
+except UnicodeEncodeError:
+    payload = json.dumps(cur, indent=2, ensure_ascii=True) + "\n"
+
+# mkstemp tạo file 0600 — os.replace mang nguyên mode đó sang, tức merge âm thầm siết quyền
+# file settings của user (đo 2026-08-02: 644 → 600). Chép lại mode cũ.
+directory = os.path.dirname(path)
+try:
+    mode = os.stat(path).st_mode & 0o777
+except OSError:
+    mode = 0o644 & ~0o022
+fd, temporary = tempfile.mkstemp(prefix=".settings.json.", dir=directory, text=True)
+try:
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write(payload)
+        f.flush()
+        os.fsync(f.fileno())
+    os.chmod(temporary, mode)
+    os.replace(temporary, path)
+except BaseException:
+    try:
+        os.unlink(temporary)
+    except FileNotFoundError:
+        pass
+    raise
+print("[harness] GLOBAL: OpenClaude detected — settings.json merged (backup .bak.*)")
+PYEOF
+    then
+      warn "merge ~/.openclaude/settings.json thất bại — ghi atomic nên file không hỏng dở; khôi phục backup"
+      [ -n "$backup" ] && cp "$backup" "$settings" 2>/dev/null || true
+      return 0
+    fi
+    python3 -c "import json; json.load(open(\"$settings\"))" 2>/dev/null || {
+      warn "OpenClaude settings.json hỏng sau merge — khôi phục backup"
+      [ -n "$backup" ] && cp "$backup" "$settings" 2>/dev/null || true
+    }
+    return 0
+  }
+
+  if command -v openclaude >/dev/null 2>&1; then
+    merge_openclaude_settings
+  else
+    log "GLOBAL: không thấy OpenClaude — bỏ qua ~/.openclaude/settings.json"
+  fi
+
   # Smoke: validator phải chặn được
   RC=0; echo '{"action":"write","file_path":"llmwiki/raw/x.md"}' | python3 "$GH/hooks/validators/no_write_raw.py" 2>/dev/null || RC=$?
   [ "$RC" = "2" ] && log "GLOBAL smoke OK: no_write_raw chặn đúng (rc=2)" || { warn "GLOBAL smoke FAIL (rc=$RC)"; exit 4; }

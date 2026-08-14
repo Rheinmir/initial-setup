@@ -80,6 +80,34 @@ Một trong hai, kèm lý do:
 
 > **Verdict là ADVISORY — người quyết, không chặn commit.** Thứ gác cứng là các test tái hiện (đỏ→xanh). Đừng để user tưởng "qc-code PASS = an toàn tuyệt đối"; nó là một cặp mắt senior, không phải bằng chứng.
 
+## Verdict JSON + grounding-check
+
+Kèm verdict văn xuôi ở trên, xuất thêm MỘT block JSON có cấu trúc — "nhìn ổn" không phải feedback, nó là schema-invalid và bị chặn tất định:
+
+```json
+{
+  "decision": "revise",
+  "claim": "paginate() bỏ sót phần tử cuối khi total % size == 0",
+  "reason": "off-by-one ở điều kiện `<` tại api/paginate.py:42",
+  "required_evidence": [
+    "test qc-off-by-one-pagination chạy ĐỎ trên bản hiện tại",
+    "api/paginate.py:42 sau khi sửa dùng `<=`"
+  ]
+}
+```
+
+- `PASS` → `decision: "approve"`. `CẦN SỬA` → `decision: "revise"` + `required_evidence` là danh sách bằng chứng CỤ THỂ cần bổ sung, mỗi mục trỏ `file:line` hoặc tên test-case.
+- `claim` và `reason` không được rỗng; field lạ chỉ bị cảnh báo, không fail (forward-compat).
+- Ghi JSON ra **`harness/out/qc-verdict.json`** (trong repo — KHÔNG phải `/tmp`). Hook `PostToolUse` thấy tên file kết thúc `qc-verdict.json` là **tự chạy** `grounding-check` ngay lúc ghi; verdict không hợp lệ thì tool-call bị chặn (exit 2) và stderr trả về để sửa tại chỗ.
+
+Không phải nhớ gõ lệnh — cổng nằm ở cấu trúc, không ở lời dặn. Muốn kiểm tay (file ngoài repo, hoặc verdict của người khác):
+
+```bash
+python3 harness/scripts/grounding-check.py --check <file.json>
+```
+
+exit 0 = hợp lệ; **exit 2 = verdict CHƯA hợp lệ, phải viết lại** — agent không được nộp verdict mơ hồ hay thiếu bằng chứng.
+
 ## Ghi test tái hiện vào dự án
 Mỗi test ở mục logic:
 - **Đặt vào thư mục test chuẩn của dự án** — tự phát hiện: `tests/` · `test/` · `__tests__/` · file `*_test.py` · `*.spec.ts` · `*.test.js` cạnh nguồn. Không có → báo rõ và để test cạnh file nguồn, KHÔNG đoán bừa cấu trúc.

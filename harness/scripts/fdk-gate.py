@@ -53,6 +53,15 @@ STEPS = [
      "mọi script có --self-test ĐỀU được fdk-gate chạy (anti-drift: thêm feature quên gate → đỏ)"),
     ("policy↔converters drift", ["bash", "harness/tests/policy-converters-drift-test.sh"],
      "adapter sinh khớp policy.yaml"),
+    ("graph-engineering tests", ["bash", "-c",
+        "bash harness/tests/ge-backcompat-test.sh . >/dev/null && "
+        "bash harness/tests/ge-integration-test.sh . >/dev/null && "
+        "bash harness/tests/ge-killswitch-test.sh . >/dev/null && "
+        "bash harness/tests/ge-travel-test.sh . >/dev/null && "
+        "bash harness/tests/ge-reachability-test.sh . >/dev/null && "
+        "bash harness/tests/ge-acceptance-test.sh . >/dev/null && "
+        "bash harness/tests/ge-purpose-test.sh . >/dev/null"],
+     "T1–T7: hồi quy · tích hợp · kill-switch · travel · reachability · §X acceptance · mục đích"),
     ("vendor-neutral demo", ["bash", "harness/poc-vendor-neutral/demo.sh"],
      "self-test lõi (demo)"),
     ("vendor-neutral broad", ["bash", "harness/poc-vendor-neutral/test-broad.sh"],
@@ -71,6 +80,10 @@ STEPS = [
         "python3 harness/scripts/mem-rank.py --self-test >/dev/null && "
         "python3 harness/scripts/token-budget.py --self-test >/dev/null && "
         "python3 harness/scripts/inject-scan.py --self-test >/dev/null && "
+        "python3 harness/scripts/grounding-check.py --self-test >/dev/null && "
+        "python3 harness/scripts/agent-trace.py --self-test >/dev/null && "
+        "python3 harness/scripts/wiki-graph.py --self-test >/dev/null && "
+        "python3 harness/scripts/provenance-log.py --self-test >/dev/null && "
         "python3 harness/scripts/claim-receipts.py --self-test >/dev/null && "
         "python3 harness/scripts/prospect-critic.py --self-test >/dev/null && "
         "python3 harness/scripts/web-crawl.py --self-test >/dev/null && "
@@ -90,7 +103,8 @@ STEPS = [
         "python3 harness/scripts/decision-liveness.py --self-test >/dev/null && "
         "python3 harness/scripts/dep-health.py --self-test >/dev/null && "
         "python3 harness/scripts/orca-dispatch.py --self-test >/dev/null && "
-        "python3 harness/scripts/orca-reconcile.py --self-test >/dev/null"],
+        "python3 harness/scripts/orca-reconcile.py --self-test >/dev/null && "
+        "python3 harness/scripts/hub.py --self-test >/dev/null"],
      "33 chức năng BNAL — self-test phải còn PASS (giữ verified trung thực)"),
 ]
 

@@ -239,20 +239,30 @@
     },
     "docs-site-macos": {
       "files": {
-        "SKILL.md": "2290cb2913300f58516e0bdb1a13d7757d8db8572e6b76830d66d81fa858674a"
+        "SKILL.md": "4a06d557b92c1728b2621c62fea6effe6868f62ff0f6290659f3cee6234ad698"
       },
-      "recorded": "2026-07-07",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "extract-site": {
       "files": {
-        "SKILL.md": "8750e59cfca77d0e818270e806988a8d9e218576c1263ebc7c0531171d1843f1",
+        "SKILL.md": "325cc767ca9382db88b836d0491fe430daeafca904632fae96a2ddc393510eeb",
         "assets/component-spec-template.md": "842e43cbbd90fd9aea1a6b3d722c87d1ca42016ff0bd5de170a630c8db4b2dec",
         "assets/enumerate-assets.js": "6030e3113e88775661a260f7945ce7219358ceaca111404649b7f8f5906e3427",
         "assets/extract-component-styles.js": "38d3497304b8a721f169cbf7da4851eb74270b1e0e47fadaa9b7a043d19162b0",
         "assets/inspection-checklist.md": "e8d338a962a8d8ad6f3fdf1f80e190b697e903b96f9d8a93077dd9ea2ab7d439"
       },
-      "recorded": "2026-07-04",
+      "recorded": "2026-08-03",
+      "source": "local-authored"
+    },
+    "fable5": {
+      "files": {
+        "SKILL.md": "b8d5ed38620ca6b4ffd705fe51f8345fe9f0386d78712adc49fe41ce88e5ba59",
+        "references/content-taste.md": "3466fab5a841db917a8dea252b0fc5dd869f13010d1667091b1ffa74305bcc33",
+        "references/design-taste.md": "9b29c72e97663327b48bc92336202d47e2a41c0b1089e514340075e90ae0a8d9",
+        "references/worked-examples.md": "b0a84f590749d91df3e804b9771335156d3f13aa56dd7d5b5f8b0c7b62e9b7af"
+      },
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "fable5": {
@@ -281,9 +291,9 @@
     },
     "fdk-uat": {
       "files": {
-        "SKILL.md": "f199bfab0151d4409f26b5187db62af612e40259f1376acd03588dcaeab5a203"
+        "SKILL.md": "73d67f69fc8d82c74e237183319b0cd8db8fdb9b92e2121d87be7ec7d184695e"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "find-skills": {
@@ -317,7 +327,7 @@
     "hallmark": {
       "files": {
         "SKILL.md": "8927287d9d0422402a2d1d893014eeae260ce0c88bbd2379869302206278f05a",
-        "references/anti-patterns.md": "a36eb346ad59cafaa26119ed1e7c0bbb8aca6637209ee110eb630dd1a9307070",
+        "references/anti-patterns.md": "1c66f41d68ac32303d52ea49a1d475b212162ff7b38884a0b31774958b4561df",
         "references/assets.md": "60929b3dc2258b69caf3012d99d174e1ad73da9645263db81a9b271cd6fd7d61",
         "references/color.md": "31c470d16ceb17ccce290cbdd00b9e9a88f2094df8eaaefb67c86ec1e1cdb876",
         "references/component-cookbook.md": "4d9ff4eeb675b9d668516ce5d098031d3552453b3671e50da30fb38cb9ab58bb",
@@ -413,7 +423,7 @@
         "references/motion.md": "330d056810315f65819579f8207afe402703a9192bc76a2009558a59b7c84ccf",
         "references/preview-examples.md": "df61c24c9a67457ef7369ec5f20575095326df72ffe6534c8fa9730581ebf7d9",
         "references/responsive.md": "2bf18d72af704ca5dd3c220359a4c77c718efa19c40f62d9bff61ac4a90209b0",
-        "references/slop-test.md": "6eb49fc64ca54929d2c1600e2a6014268f1a7593787c0ed3f6ecb4ac8390ad86",
+        "references/slop-test.md": "7ecf8bc5b9189c81e229d779d403bd6fa3dce70a8218d7e9f29de9fe937625a1",
         "references/structure.md": "ca5c0296ae428f8c4c5214407d431bbda5c453f98f2e7abdec03d644271af32b",
         "references/study.md": "021fe4d001b38ee87414c1bb69321d2e44b67df8ede76ecec225c41a634aab20",
         "references/themes/carnival.md": "119a9c803eac74958e5df6151da8a2575a1cc2d061a619bdb7f32cf972308ee2",
@@ -424,8 +434,8 @@
         "references/verbs/audit.md": "0a5b484453f1697a8675a7020df9159d0b4ce22f059b873501bfd82c26d6a31a",
         "references/verbs/redesign.md": "c2830f3b7d68e9622f55d376048a5a454c5ef59d309a211e716d1142e86acbdf"
       },
-      "recorded": "2026-07-18",
-      "source": "local-authored"
+      "recorded": "2026-08-03",
+      "source": "https://github.com/Nutlope/hallmark"
     },
     "harness-tour": {
       "files": {
@@ -674,9 +684,9 @@
     },
     "lint": {
       "files": {
-        "SKILL.md": "039b7b10dd8057cdcd6cdcaf4bf234f3dacdb604efb6ea9442484be1284518cc"
+        "SKILL.md": "3acd731a83447568ef85a7a71791686de52ab2f8cb486155547dd9f8dbbb89ce"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "loop-runner": {
@@ -752,9 +762,9 @@
     },
     "orca-handover": {
       "files": {
-        "SKILL.md": "9a47fc00f8cf82e6e15a3ad6d1abe7954397b53ad54eb82c7217c3817092bda8"
+        "SKILL.md": "6fed6e847043214e150f75e0f76b1b5f734440fffebb84c9a963e8c36555c576"
       },
-      "recorded": "2026-07-20",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "orca-issue": {
@@ -766,10 +776,10 @@
     },
     "orca-onboard": {
       "files": {
-        "SKILL.md": "a864a970a6a10b2079e0b9666c03b891f739db13310aea0bfdc7b96d46d792cf",
+        "SKILL.md": "79107df043f2c0940abbcb069b0214bc463f11d01d3edf47fdd378e441a4c1c6",
         "assets/docs-site-skeleton.html": "7a031c6a9d4940775b684a1a2d6dcb09c9a339ac796ea6d315ba930b94ba6113"
       },
-      "recorded": "2026-07-13",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "orca-sec-scans": {
@@ -781,9 +791,9 @@
     },
     "orca-workflow": {
       "files": {
-        "SKILL.md": "bc361e75942ccc9d0ead7b6a1b2a5eeaca97d8d4a79196e778eefab1e6fef635"
+        "SKILL.md": "e83cd4f545d2ed396a5b8265d6031bd843c1148edf22817c5957d66f5bc915a3"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "orchestration": {
@@ -816,16 +826,16 @@
     },
     "qc-code": {
       "files": {
-        "SKILL.md": "311576c29b18aa833299c18c67739f5accbc836f709724cde0f60867a915200c"
+        "SKILL.md": "9d791963a7e117c7d517dcf99cabd14ab945cbdd6843b926085525bbeef98b1e"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "query": {
       "files": {
-        "SKILL.md": "11b4960276688475fc8abe3de5fd114b09853641e77a468d714e0797db52d5eb"
+        "SKILL.md": "fd47c9b3e315d69f84a941ca0aaf8b3831dbaef1cdc7ea7d6611df16083ffac1"
       },
-      "recorded": "2026-07-04",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "raise-issue": {
@@ -844,9 +854,9 @@
     },
     "redesign-existing-projects": {
       "files": {
-        "SKILL.md": "fb7b735f0d3179717bdaa3e4071dcbda3e1663b4b321a87172724873cde7e05d"
+        "SKILL.md": "417219394d01c4d96af26119951df4f824b680811444491a93b37405347d4c01"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "safe-change": {
@@ -893,9 +903,9 @@
     },
     "teach-me": {
       "files": {
-        "SKILL.md": "2d171e1713c72aaa08d79eb2a9ade355382686929cfba4a03214027bd8ee2d81"
+        "SKILL.md": "c3b918c5caeb1c96650bb858b892349e32a34a8c4ca80c2683eabdde6fe7b5e3"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-08-03",
       "source": "local-authored"
     },
     "tour-guide": {

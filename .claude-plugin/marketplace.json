@@ -57,6 +57,7 @@
         "./skills/extract-site",
         "./skills/fable5",
         "./skills/failure-flywheel",
+        "./skills/fdk",
         "./skills/fdk-uat",
         "./skills/find-skills",
         "./skills/frontier-scan",

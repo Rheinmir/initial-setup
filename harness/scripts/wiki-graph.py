@@ -13,7 +13,15 @@ Subcommands:
   orphans                      — trang nội dung 0 inbound (không ai trỏ tới)
   broken                       — wikilink trỏ tới đích không tồn tại
                                  (BỎ QUA draft local-only đã .gitignore — như wiki-health)
-  export --format {json,mermaid,dot}  — xuất toàn đồ thị
+  edge <eid>                   — tra một cạnh theo edge ID ổn định (exit 1 nếu không có)
+  cite <page>                  — mọi cạnh chạm <page>, mỗi dòng `eid  from -> to  (type)`
+  export --format {json,mermaid,dot}  — xuất toàn đồ thị (`--json` = alias của json)
+  --self-test                  — kiểm tất định trên wiki tạm (eid, typed edge, edge/cite)
+
+Ngoài cạnh suy ra từ thân bài, đồ thị còn nhận cạnh CÓ KIỂU khai trong frontmatter
+`relations: - {rel: X, to: Y}` (derives-from/depends-on/implements/supports/contradicts/
+supersedes) — cùng cú pháp fdk/tools/build-wiki-graph.py đang đọc. Mỗi cạnh mang một
+`eid` ổn định (hàm thuần của src|dst|type) để câu trả lời trích được bằng chứng mức cạnh.
 
 Mọi subcommand nhận `--wiki-dir` (mặc định llmwiki/wiki); các truy vấn nhận `--json`.
 Git-aware: link tới draft đã gitignore KHÔNG bị tính broken (nhất quán local↔fresh-clone).
@@ -29,11 +37,15 @@ Ví dụ:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import io
 import json
 import re
 import subprocess
 import sys
+import tempfile
 from collections import deque
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 # --- Reuse wiki-health.py's regex + skip-set (shared scripts không được sửa → copy theo
@@ -110,6 +122,34 @@ def mdlink_targets(text: str) -> list:
             out.append(link)
     return out
 
+# ── Edge ID ổn định + cạnh CÓ KIỂU khai trong frontmatter ──────────────────────
+# Câu trả lời của /query phải trích được BẰNG CHỨNG ở mức cạnh, không chỉ mức trang;
+# muốn trích thì cạnh phải có tên gọi bền qua mỗi lần dựng lại. eid là hàm THUẦN của
+# (src, dst, type) nên không cần cất ở đâu cả — dựng lại vẫn ra đúng cái tên cũ.
+#
+# Cú pháp `relations:` KHÔNG phát minh mới: fdk/tools/build-wiki-graph.py đã đọc
+# `- {rel: X, to: Y}` trong frontmatter từ trước (REL_RE của nó), wiki thật đang dùng.
+# Ở đây chỉ nhận `to:` (đích là trang wiki); `path:` là cạnh concept→code, đã có
+# touches_targets lo. Ba rel mới supports/contradicts/supersedes theo Appendix của PDF.
+ALLOWED_RELS = {"derives-from", "depends-on", "implements",
+                "supports", "contradicts", "supersedes"}
+_FM_RE = re.compile(r"^---[ \t]*\n(.*?)\n---", re.DOTALL)
+_REL_RE = re.compile(r"\{[ \t]*rel[ \t]*:[ \t]*([\w-]+)[ \t]*,[ \t]*to[ \t]*:[ \t]*([^}\s]+)[ \t]*\}")
+
+
+def edge_id(src: str, dst: str, typ: str) -> str:
+    """Tên gọi ổn định của một cạnh — thuần, không phụ thuộc thứ tự dựng hay thời điểm."""
+    return "e:" + hashlib.sha1(f"{src}|{dst}|{typ}".encode()).hexdigest()[:8]
+
+
+def frontmatter_relations(text: str) -> list:
+    """[(rel, to)] khai trong frontmatter (KHÔNG cần lib yaml). Rel ngoài whitelist bị bỏ."""
+    m = _FM_RE.match(text)
+    if not m:
+        return []
+    return [(rel, to) for rel, to in _REL_RE.findall(m.group(1)) if rel in ALLOWED_RELS]
+
+
 _DEFAULT_CONTENT_DIRS = ("concepts", "entities", "sources", "draft", "architecture", "tours")
 
 
@@ -176,9 +216,10 @@ class Graph:
         self.pages: list = []          # mọi relpath (nguồn tiềm năng của cạnh)
         self.content: set = set()      # relpath thuộc 6 content dir (đích hợp lệ + xét orphan)
         self.stem_content: dict = {}   # stem -> relpath (chỉ content) — phân giải wikilink
+        self.ambiguous_stems: set = set()  # stem trùng ≥2 trang content — TỪ CHỐI phân giải bare-stem
         self.stem_all: dict = {}       # stem -> relpath (mọi trang) — phân giải tham số <page>
         self.relset: set = set()       # set mọi relpath
-        self.edges: list = []          # list[(src, dst, "wikilink"|"mdlink")]
+        self.edges: list = []          # list[(src, dst, type, eid)]; type: wikilink|mdlink|<rel>
         self.out_adj: dict = {}        # src -> set(dst)
         self.in_adj: dict = {}         # dst -> set(src)
         self.in_unresolved: dict = {}  # tên-đích-local-only -> {src: type} (cho backlinks draft vắng)
@@ -198,8 +239,17 @@ def build_graph(wiki: Path) -> Graph:
     g.content = {rel(p) for p in content}
     g.pages = [rel(p) for p in allp]
     g.relset = set(g.pages)
-    for p in content:                       # content thắng khi trùng stem (phân giải wikilink)
-        g.stem_content[p.stem] = rel(p)
+    # content thắng khi trùng stem (phân giải wikilink) — NHƯNG 2 trang content trùng stem ở
+    # khác thư mục (vd concepts/foo.md và entities/foo.md) không được ghi đè âm thầm: đích sẽ
+    # bị BIND NHẦM và sinh eid trỏ sai trang mà không ai biết. Đánh dấu ambiguous, từ chối
+    # phân giải bare-stem cho các stem đó (wikilink rơi vào broken thay vì trỏ nhầm).
+    _stem_counts: dict = {}
+    for p in content:
+        _stem_counts.setdefault(p.stem, []).append(rel(p))
+    g.ambiguous_stems = {stem for stem, paths in _stem_counts.items() if len(paths) > 1}
+    for stem, paths in _stem_counts.items():
+        if stem not in g.ambiguous_stems:
+            g.stem_content[stem] = paths[0]
     for p in allp:                          # đã sort → deterministic; setdefault giữ bản đầu
         g.stem_all.setdefault(p.stem, rel(p))
     # Index path tuyệt đối cho md-link (chỉ content, như wiki-health) → tra cứu O(1).
@@ -231,7 +281,7 @@ def build_graph(wiki: Path) -> Graph:
             if key in seen_edge:
                 continue
             seen_edge.add(key)
-            g.edges.append((srel, dst, "wikilink"))
+            g.edges.append((srel, dst, "wikilink", edge_id(srel, dst, "wikilink")))
             g.out_adj[srel].add(dst)
             g.in_adj[dst].add(srel)
 
@@ -244,9 +294,23 @@ def build_graph(wiki: Path) -> Graph:
             if key in seen_edge:
                 continue
             seen_edge.add(key)
-            g.edges.append((srel, dst, "mdlink"))
+            g.edges.append((srel, dst, "mdlink", edge_id(srel, dst, "mdlink")))
             g.out_adj[srel].add(dst)
             g.in_adj[dst].add(srel)
+
+        # Cạnh CÓ KIỂU khai tay trong frontmatter. KHÔNG vào out_adj/in_adj: hai bảng đó
+        # đang trả lời "vệ sinh liên kết" (neighbors/orphans đếm theo link thân bài), đổi
+        # chúng sẽ lặng lẽ dịch số orphan của wiki thật. Đích không phân giải được → bỏ
+        # qua, không tính broken (broken là chuyện của wikilink).
+        for rel_type, to in frontmatter_relations(text):
+            dst = resolve_page(to, g)
+            if dst is None or dst == srel:
+                continue
+            key = (dst, rel_type)
+            if key in seen_edge:
+                continue
+            seen_edge.add(key)
+            g.edges.append((srel, dst, rel_type, edge_id(srel, dst, rel_type)))
 
     return g
 
@@ -261,6 +325,8 @@ def resolve_page(arg: str, g: Graph):
         return a
     if a + ".md" in g.relset:
         return a + ".md"
+    if stem in g.ambiguous_stems:
+        return None  # 2+ trang content trùng stem — bắt buộc chỉ định đường dẫn có thư mục
     if stem in g.stem_content:
         return g.stem_content[stem]
     if stem in g.stem_all:
@@ -291,7 +357,7 @@ def cmd_backlinks(g: Graph, page: str):
     stem = _stem_of(page)
     rows = set()
     if target is not None:
-        for (s, d, t) in g.edges:
+        for (s, d, t, _e) in g.edges:
             if d == target:
                 rows.add((s, t))
     for s, t in g.in_unresolved.get(stem, {}).items():   # draft local-only / vắng trên đĩa
@@ -365,10 +431,36 @@ def cmd_broken(g: Graph):
     return lines, obj
 
 
+def cmd_edge(g: Graph, eid: str) -> int:
+    """Tra một cạnh theo eid. In JSON MỘT dòng (dễ nhặt trong pipeline), 1 nếu không có."""
+    for (s, d, t, e) in g.edges:
+        if e == eid:
+            print(json.dumps({"eid": e, "from": s, "to": d, "type": t}, ensure_ascii=False))
+            return 0
+    print(f"[wiki-graph] khong co canh {eid}", file=sys.stderr)
+    return 1
+
+
+def cmd_cite(g: Graph, page: str) -> int:
+    """Mọi cạnh inbound+outbound của một trang, kèm eid — nguồn trích dẫn cho /query."""
+    target = resolve_page(page, g)
+    if target is None:
+        sys.stderr.write(f"[wiki-graph] cite: page not found: {page}\n")
+        return 0                         # tool truy vấn, không phải gate → fail-open
+    for (s, d, t, e) in g.edges:
+        if s == target or d == target:
+            print(f"{e}  {s} -> {d}  ({t})")
+    return 0
+
+
 def _export_nodes(g: Graph):
     indeg = {r: len(g.in_adj.get(r, set())) for r in g.pages}
     outdeg = {r: len(g.out_adj.get(r, set())) for r in g.pages}
-    nodes = sorted(r for r in g.pages if r in g.content or indeg[r] or outdeg[r])
+    # Cạnh typed không nằm trong out_adj/in_adj nên không cộng bậc; vẫn phải khai node hai
+    # đầu, nếu không mermaid/dot sẽ trỏ tới id chưa định nghĩa.
+    typed_ends = {r for (s, d, _t, _e) in g.edges for r in (s, d)}
+    nodes = sorted(r for r in g.pages
+                   if r in g.content or indeg[r] or outdeg[r] or r in typed_ends)
     return nodes, indeg, outdeg
 
 
@@ -388,14 +480,14 @@ def cmd_export(g: Graph, fmt: str) -> str:
             },
             "nodes": [{"id": r, "label": _label(r), "content": r in g.content,
                        "in": indeg[r], "out": outdeg[r]} for r in nodes],
-            "edges": [{"from": s, "to": d, "type": t} for (s, d, t) in g.edges],
+            "edges": [{"eid": e, "from": s, "to": d, "type": t} for (s, d, t, e) in g.edges],
         }
         return json.dumps(obj, ensure_ascii=False, indent=2)
 
     if fmt == "mermaid":
         out = ["flowchart LR"]
         out += [f'  {idmap[r]}["{_label(r)}"]' for r in nodes]
-        for (s, d, t) in g.edges:
+        for (s, d, t, _e) in g.edges:
             out.append(f"  {idmap[s]} {'-->' if t == 'wikilink' else '-.->'} {idmap[d]}")
         if orphan_ids:
             out.append("  classDef orphan stroke-dasharray:4 3,fill:#fff0f0;")
@@ -409,10 +501,106 @@ def cmd_export(g: Graph, fmt: str) -> str:
         if r in g.content and indeg[r] == 0:
             attrs += ", style=dashed, color=red"
         out.append(f"  {idmap[r]} [{attrs}];")
-    for (s, d, t) in g.edges:
+    for (s, d, t, _e) in g.edges:
         out.append(f"  {idmap[s]} -> {idmap[d]}{'' if t == 'wikilink' else ' [style=dashed]'};")
     out.append("}")
     return "\n".join(out)
+
+
+def self_test() -> int:
+    """Wiki tạm 3 trang → eid ổn định, typed edge từ frontmatter, hai lệnh edge/cite."""
+    checks = []
+    with tempfile.TemporaryDirectory() as td:
+        wiki = Path(td) / "wiki"
+        (wiki / "concepts").mkdir(parents=True)
+        (wiki / "concepts" / "a.md").write_text("# A\n\nxem [[b]]\n", encoding="utf-8")
+        (wiki / "concepts" / "b.md").write_text(
+            "---\ntype: concept\nrelations:\n"
+            "  - {rel: supports, to: a}\n"
+            "  - {rel: khong-hop-le, to: a}\n"
+            "---\n\n# B\n", encoding="utf-8")
+        (wiki / "concepts" / "c.md").write_text("# C\n", encoding="utf-8")
+        g = build_graph(wiki)
+
+        # (1) frontmatter relations → cạnh có type, rel ngoài whitelist bị loại
+        types = {t for (_s, _d, t, _e) in g.edges}
+        checks.append(("typed edge supports", {"supports", "wikilink"} <= types))
+        checks.append(("rel ngoài whitelist bị loại", "khong-hop-le" not in types))
+        checks.append(("frontmatter_relations trực tiếp",
+                       frontmatter_relations("---\nrelations:\n  - {rel: supports, to: a}\n---\n")
+                       == [("supports", "a")]))
+        checks.append(("không frontmatter → rỗng", frontmatter_relations("# A\n") == []))
+
+        # (2) edge_id thuần + ổn định
+        checks.append(("mọi cạnh có eid",
+                       bool(g.edges) and all(len(e) == 4 and e[3].startswith("e:") for e in g.edges)))
+        eid = edge_id("concepts/a.md", "concepts/b.md", "wikilink")
+        checks.append(("edge_id tất định", eid == edge_id("concepts/a.md", "concepts/b.md", "wikilink")))
+        checks.append(("edge_id phân biệt type",
+                       eid != edge_id("concepts/a.md", "concepts/b.md", "mdlink")))
+
+        # (3) cite <page> — đủ cả inbound lẫn outbound của a (a->b wikilink, b->a supports)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            cmd_cite(g, "a")
+        cite_lines = [ln for ln in buf.getvalue().splitlines() if ln.strip()]
+        checks.append(("cite a đủ 2 cạnh có eid",
+                       len(cite_lines) == 2 and all(ln.startswith("e:") for ln in cite_lines)))
+
+        # (4) edge <eid> — trúng thì in JSON + exit 0, trượt thì exit 1
+        want = g.edges[0]
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc_hit = cmd_edge(g, want[3])
+        obj = json.loads(buf.getvalue() or "{}")
+        checks.append(("edge <eid> trả đúng cạnh",
+                       rc_hit == 0 and obj.get("eid") == want[3]
+                       and (obj.get("from"), obj.get("to"), obj.get("type")) == want[:3]))
+        with redirect_stderr(io.StringIO()):
+            rc_miss = cmd_edge(g, "e:deadbeef")
+        checks.append(("edge eid lạ → exit 1", rc_miss == 1))
+
+        # (5) mọi consumer unpack 4 phần vẫn chạy; export json mang thêm "eid"
+        exp = json.loads(cmd_export(g, "json"))
+        checks.append(("export json có eid",
+                       len(exp["edges"]) == len(g.edges) and all("eid" in e for e in exp["edges"])))
+        checks.append(("export mermaid/dot còn nguyên",
+                       cmd_export(g, "mermaid").startswith("flowchart LR")
+                       and cmd_export(g, "dot").startswith("digraph wiki {")))
+        _lines, back = cmd_backlinks(g, "a")
+        checks.append(("backlinks thấy cạnh typed",
+                       any(b["type"] == "supports" for b in back["backlinks"])))
+
+    # (6) bug thật đã tìm thấy: 2 trang content TRÙNG STEM ở khác thư mục từng bị ghi đè âm
+    # thầm trong stem_content → wikilink/relations trỏ NHẦM trang mà không ai biết. Giờ phải
+    # bị coi là ambiguous và TỪ CHỐI phân giải bare-stem (rơi vào broken, không bind nhầm).
+    with tempfile.TemporaryDirectory() as td2:
+        wiki2 = Path(td2) / "wiki"
+        (wiki2 / "concepts").mkdir(parents=True)
+        (wiki2 / "entities").mkdir(parents=True)
+        (wiki2 / "concepts" / "dup.md").write_text("# Dup concept\n", encoding="utf-8")
+        (wiki2 / "entities" / "dup.md").write_text("# Dup entity\n", encoding="utf-8")
+        (wiki2 / "concepts" / "z.md").write_text(
+            "---\ntype: concept\nrelations:\n  - {rel: supports, to: dup}\n---\n\n"
+            "# Z\n\nxem [[dup]]\n", encoding="utf-8")
+        g2 = build_graph(wiki2)
+        checks.append(("stem trùng 2 trang content → đánh dấu ambiguous",
+                       "dup" in g2.ambiguous_stems))
+        checks.append(("resolve_page('dup') TỪ CHỐI (None), không bind nhầm 1 trong 2",
+                       resolve_page("dup", g2) is None))
+        checks.append(("wikilink [[dup]] rơi vào broken thay vì trỏ nhầm trang",
+                       any(b["wikilink"] == "dup" for b in g2.broken)))
+        checks.append(("relations to:dup KHÔNG sinh cạnh (đích mơ hồ, không đoán)",
+                       not any(d in ("concepts/dup.md", "entities/dup.md") and t == "supports"
+                               for (_s, d, t, _e) in g2.edges)))
+        checks.append(("dup.md vẫn KHÔNG orphan giả — stem_all vẫn thấy để CLI dùng path đủ",
+                       "concepts/dup.md" in g2.relset and "entities/dup.md" in g2.relset))
+
+    for name, ok in checks:
+        print(f"  {'ok  ' if ok else 'FAIL'} {name}")
+    bad = [n for n, ok in checks if not ok]
+    print("wiki-graph self-test:", "PASS" if not bad else f"FAIL ({len(bad)})")
+    return 0 if not bad else 1
 
 
 def _fail_open(args) -> None:
@@ -436,6 +624,9 @@ def _fail_open(args) -> None:
 
 
 def main() -> None:
+    if "--self-test" in sys.argv[1:]:
+        sys.exit(self_test())
+
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--wiki-dir", default="llmwiki/wiki",
                         help="wiki content root (default: llmwiki/wiki)")
@@ -459,8 +650,15 @@ def main() -> None:
     p = sub.add_parser("broken", parents=[common], help="wikilink trỏ đích không tồn tại")
     p.add_argument("--json", action="store_true")
 
+    p = sub.add_parser("edge", parents=[common], help="tra một cạnh theo eid")
+    p.add_argument("eid")
+
+    p = sub.add_parser("cite", parents=[common], help="mọi cạnh chạm <page>, kèm eid")
+    p.add_argument("page")
+
     p = sub.add_parser("export", parents=[common], help="xuất toàn đồ thị")
     p.add_argument("--format", choices=["json", "mermaid", "dot"], default="json")
+    p.add_argument("--json", action="store_true", help="alias của --format json")
 
     args = ap.parse_args()
 
@@ -473,8 +671,14 @@ def main() -> None:
     g = build_graph(wiki)
 
     if args.cmd == "export":
-        print(cmd_export(g, args.format))
+        print(cmd_export(g, "json" if args.json else args.format))
         sys.exit(0)
+
+    if args.cmd == "edge":
+        sys.exit(cmd_edge(g, args.eid))
+
+    if args.cmd == "cite":
+        sys.exit(cmd_cite(g, args.page))
 
     if args.cmd == "backlinks":
         lines, obj = cmd_backlinks(g, args.page)

@@ -12,6 +12,12 @@ DETERMINISTIC, built-and-tested now (this file):
   • the VERIFY step                        a shell cmd; exit-code 0 == pass (pytest/tsc/lint)
   • all termination guards                 max_iter, wall-clock budget, no-progress, escalate
   • progress detection                     sha256 state-hash of workspace-relevant paths
+  • the ratchet (opt-in, --metric-cmd)     score each iter; beat the best → `git commit` (keep),
+                                           else `git reset --hard` back to the last keep (revert)
+  • the commit-DAG hub (opt-in, OFF)       --hub → each Trial also becomes a `refs/hub/*` node.
+                                           Loaded by PATH from hub.py, never imported at the
+                                           top of this file: delete hub.py and the loop is
+                                           unchanged (llmwiki/wiki/concepts/commit-dag-hub.md).
   • the run-log artifact                   JSON: iterations, verdicts, termination reason
   • reflexion                              append a one-line "lesson" to a wiki episodic page
 
@@ -30,7 +36,9 @@ Usage
                      [--revise "<cmd>"] [--state "<glob>" ...] [--log <path>]
                      [--max-iter N] [--budget-seconds S] [--no-progress-k K]
                      [--escalate-after N] [--episodic <path>] [--cwd <dir>] [--quiet]
-  loop-runner.py selftest        # 5 deterministic scenarios, no LLM, no external deps
+                     [--metric-cmd "<cmd>"] [--direction max|min] [--no-improve-k N] [--min-delta F]
+                     [--hub | --no-hub]
+  loop-runner.py selftest        # 8 deterministic scenarios, no LLM, no external deps
 
 CLI flags override config; config provides the (quarantined) defaults.
 Process exit code: 0 = SUCCESS, 2 = MAX_ITER, 3 = TIMEOUT, 4 = NO_PROGRESS, 5 = ESCALATE.
@@ -39,6 +47,7 @@ import argparse
 import datetime as _dt
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -68,6 +77,13 @@ DEFAULTS = {
         "no_progress_k": 2,
         "escalate_after_iter": 0,
     },
+    "ratchet": {
+        "metric_cmd": None,
+        "direction": "max",
+        "no_improve_k": 3,
+        "min_delta": 0.0,
+    },
+    "hub": {"enabled": False, "agent": "loop-runner"},
     "progress": {"state_paths": []},
     "reflexion": {"episodic_memory_page": None, "enabled": True},
     "run_log": {"path": None},
@@ -169,6 +185,84 @@ def _run_cmd(cmd, cwd):
     return proc.returncode, tail
 
 
+def _git(args, cwd):
+    """git in `cwd`, never raising — the ratchet is fail-open: a broken/absent repo
+    degrades to "no keep, no revert", it must never kill the loop."""
+    return subprocess.run(
+        ["git", "-C", str(cwd), *args], capture_output=True, text=True
+    )
+
+
+# ── Ratchet: score → keep (commit) or revert (git reset) ────────────────────
+_FLOAT = re.compile(r"[-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?")
+
+
+def parse_score(out_tail):
+    """The LAST parseable float in the metric output — the metric prints its score
+    last, so a leading progress line cannot be mistaken for the score."""
+    nums = _FLOAT.findall(out_tail or "")
+    if not nums:
+        return None
+    try:
+        return float(nums[-1])
+    except ValueError:  # fail-open: an unreadable score is treated as no score
+        return None
+
+
+def _better(score, best, direction, min_delta):
+    """min_delta is a DEAD BAND: a move smaller than it does not count as progress."""
+    if score is None:
+        return False
+    if best is None:
+        return True
+    if direction == "min":
+        return score < best - min_delta
+    return score > best + min_delta
+
+
+def _git_head(cwd):
+    return _git(["rev-parse", "HEAD"], cwd).stdout.strip() or None
+
+
+def git_keep(cwd, iteration=0):
+    """Freeze the winning workspace as a commit — the ratchet only ever moves up."""
+    _git(["add", "-A"], cwd)
+    _git(["commit", "-qm", f"ratchet keep iter {iteration}"], cwd)
+    return _git_head(cwd)
+
+
+def git_revert_to(sha, cwd):
+    """R-1.3: revert is `git reset --hard`, never a hand-rolled undo."""
+    _git(["reset", "--hard", sha], cwd)
+
+
+# ── Commit-DAG hub: OPT-IN, default OFF, removable ──────────────────────────
+_HUB_MODULE = {}
+
+
+def _load_hub():
+    """Load `harness/scripts/hub.py` BY PATH, lazily, and only when the hub is enabled.
+
+    There is deliberately NO `import hub` at the top of this file: delete hub.py and this
+    returns None, the hub branch below becomes a no-op, and the loop runs exactly as it did
+    before T7. That one-way, path-based dependency IS the "removes cleanly" guarantee.
+    """
+    if "mod" not in _HUB_MODULE:
+        mod = None
+        try:
+            import importlib.util
+
+            p = Path(__file__).resolve().parent / "hub.py"
+            if p.is_file():
+                spec = importlib.util.spec_from_file_location("hub", p)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+        except Exception:
+            mod = None  # fail-open: a broken hub.py must never break the loop
+        _HUB_MODULE["mod"] = mod
+    return _HUB_MODULE["mod"]
+
+
 def run_loop(
     *,
     verify_cmd,
@@ -177,6 +271,12 @@ def run_loop(
     budget_seconds=0,
     no_progress_k=0,
     escalate_after_iter=0,
+    metric_cmd=None,
+    direction="max",
+    no_improve_k=3,
+    min_delta=0.0,
+    hub_enabled=False,
+    hub_agent="loop-runner",
     state_paths=None,
     episodic_page=None,
     reflexion_enabled=True,
@@ -202,6 +302,33 @@ def run_loop(
     prev_hash = None
     streak = 0  # consecutive iterations with an unchanged state-hash
     it = 0
+    best_score = None
+    last_kept_sha = None
+    no_improve = 0  # consecutive iterations that did not beat the best score
+
+    if metric_cmd:
+        # Guard: the ratchet reverts via `git reset --hard`, which destroys any
+        # uncommitted change in cwd. Refuse to start on a dirty working tree rather
+        # than silently wiping real work on the first "reverted"/"crash" iteration.
+        dirty = _git(["status", "--porcelain"], cwd).stdout.strip()
+        if dirty:
+            raise ValueError(
+                "ratchet (--metric-cmd) requires a CLEAN working tree in cwd — "
+                "git reset --hard would destroy the uncommitted changes below:\n" + dirty
+            )
+        # R-1.1 — the BASELINE Trial is measured before the loop and recorded, so
+        # iteration 1 already has a bar to beat and a commit to fall back to.
+        m_exit, m_out = _run_cmd(metric_cmd, cwd)
+        best_score = parse_score(m_out) if m_exit == 0 else None
+        last_kept_sha = _git_head(cwd)
+        iterations.append({
+            "iter": 0,
+            "ts": _now_iso(),
+            "verify_exit": None,
+            "ratchet": "baseline",
+            "score": best_score,
+            "commit": last_kept_sha,
+        })
 
     while True:
         # GUARD 1 — wall-clock budget (checked before doing more work)
@@ -244,6 +371,47 @@ def run_loop(
         rec["state_hash"] = cur_hash
         rec["unchanged_streak"] = streak
         iterations.append(rec)
+
+        # RATCHET (optional) — score this iteration; a score that beats the best so
+        # far is KEPT as a commit, anything else resets the workspace to the last
+        # keep. Without --metric-cmd this whole block is skipped (verify-only loop).
+        if metric_cmd:
+            m_exit, m_out = _run_cmd(metric_cmd, cwd)
+            score = parse_score(m_out) if m_exit == 0 else None
+            if score is None:
+                rec["ratchet"] = "crash"
+                if last_kept_sha:
+                    git_revert_to(last_kept_sha, cwd)
+            elif _better(score, best_score, direction, min_delta):
+                rec["ratchet"], rec["commit"] = "kept", git_keep(cwd, it)
+                best_score, last_kept_sha, no_improve = score, rec["commit"], 0
+            else:
+                rec["ratchet"] = "reverted"
+                if last_kept_sha:
+                    git_revert_to(last_kept_sha, cwd)
+                no_improve += 1
+            rec["score"] = score
+            # HUB (opt-in, default OFF) — record this Trial as a commit-DAG node so a later
+            # run can ask "which kept result scored best, and what was discarded on the way".
+            # Loaded by path (see _load_hub): no hub.py → no-op, loop unchanged.
+            if hub_enabled and rec.get("ratchet") in ("kept", "reverted"):
+                hub = _load_hub()
+                if hub is not None:
+                    try:
+                        rec["hub_ref"] = hub.hub_push(
+                            cwd,
+                            agent=hub_agent,
+                            hypothesis=f"iter {it}: {verify_cmd}",
+                            metric=rec.get("score"),
+                            status="kept" if rec["ratchet"] == "kept" else "discarded",
+                            commit=rec.get("commit"),
+                        )
+                    except Exception:
+                        pass  # fail-open: a broken hub must never break the ratchet
+            # GUARD 5 — R-1.4: stop after K measurements in a row without improvement.
+            if no_improve_k and no_improve >= no_improve_k:
+                verdict, reason = NO_PROGRESS, f"{no_improve} lần liên tiếp không cải thiện metric"
+                break
 
         # REFLEXION — record a lesson from this failure
         if reflexion_enabled and episodic_page:
@@ -294,6 +462,17 @@ def run_loop(
         "elapsed_s": round(clock() - start, 4),
         "iterations": iterations,
     }
+    if metric_cmd:  # only present on ratchet runs — verify-only run-logs stay identical
+        log["ratchet"] = {
+            "metric_cmd": metric_cmd,
+            "direction": direction,
+            "no_improve_k": no_improve_k,
+            "min_delta": min_delta,
+            "best_score": best_score,
+            "last_kept_commit": last_kept_sha,
+        }
+    if hub_enabled:  # only present on hub runs — hub-off run-logs stay byte-identical
+        log["hub"] = {"enabled": True, "agent": hub_agent}
     if log_path:
         lp = Path(log_path)
         lp.parent.mkdir(parents=True, exist_ok=True)
@@ -309,9 +488,12 @@ def _print_summary(log, log_path):
     for r in log["iterations"]:
         sh = (r.get("state_hash") or "—")
         sh = sh[:8] if sh != "—" else sh
+        rt = ""
+        if r.get("ratchet"):
+            rt = f" ratchet={r['ratchet']} score={r.get('score')}"
         print(
             f"  iter {r['iter']}: verify exit={r['verify_exit']} "
-            f"state={sh} streak={r.get('unchanged_streak', 0)}"
+            f"state={sh} streak={r.get('unchanged_streak', 0)}{rt}"
         )
     if log_path:
         print(f"  run-log: {log_path}")
@@ -341,6 +523,8 @@ def load_config(path):
 def cmd_run(args):
     cfg = load_config(args.config)
     g = cfg["guards"]
+    rt = cfg.get("ratchet") or {}
+    hb = cfg.get("hub") or {}
     settings = dict(
         verify_cmd=args.verify,
         revise_cmd=args.revise if args.revise is not None else cfg["revise"].get("cmd"),
@@ -348,6 +532,12 @@ def cmd_run(args):
         budget_seconds=args.budget_seconds if args.budget_seconds is not None else g["budget_seconds"],
         no_progress_k=args.no_progress_k if args.no_progress_k is not None else g["no_progress_k"],
         escalate_after_iter=args.escalate_after if args.escalate_after is not None else g["escalate_after_iter"],
+        metric_cmd=args.metric_cmd if args.metric_cmd is not None else rt.get("metric_cmd"),
+        direction=args.direction if args.direction is not None else rt.get("direction", "max"),
+        no_improve_k=args.no_improve_k if args.no_improve_k is not None else rt.get("no_improve_k", 3),
+        min_delta=args.min_delta if args.min_delta is not None else rt.get("min_delta", 0.0),
+        hub_enabled=args.hub if args.hub is not None else bool(hb.get("enabled", False)),
+        hub_agent=hb.get("agent") or "loop-runner",
         state_paths=args.state if args.state else cfg["progress"].get("state_paths") or [],
         episodic_page=args.episodic if args.episodic is not None else cfg["reflexion"].get("episodic_memory_page"),
         reflexion_enabled=cfg["reflexion"].get("enabled", True),
@@ -371,9 +561,43 @@ def _scenario(name, **kw):
     return name, log
 
 
+def _mk_git_sandbox(tmp):
+    """A throwaway git repo with one seed commit — the ratchet needs REAL git."""
+    tmp = str(tmp)
+    q = {"capture_output": True, "text": True}
+    subprocess.run(["git", "init", "-q", tmp], check=True, **q)
+    for k, v in (("user.email", "loop@runner.test"),
+                 ("user.name", "loop-runner selftest"),
+                 ("commit.gpgsign", "false")):
+        subprocess.run(["git", "-C", tmp, "config", k, v], check=True, **q)
+    (Path(tmp) / "w.txt").write_text("0")
+    subprocess.run(["git", "-C", tmp, "add", "-A"], check=True, **q)
+    subprocess.run(["git", "-C", tmp, "commit", "-qm", "seed"], check=True, **q)
+
+
+def _commit(cwd, name, body):
+    """Write `name` and commit it — used to seed a CLEAN tree before ratchet scenarios
+    (run_loop now refuses to start the ratchet on a dirty working tree)."""
+    q = {"capture_output": True, "text": True}
+    (Path(cwd) / name).write_text(body)
+    subprocess.run(["git", "-C", str(cwd), "add", "-A"], **q)
+    subprocess.run(["git", "-C", str(cwd), "commit", "-qm", f"seed {name}"], **q)
+
+
+def _git_count(cwd):
+    """Commits reachable from HEAD — proof that keep committed / revert did not."""
+    return int(_git(["rev-list", "--count", "HEAD"], cwd).stdout.strip() or 0)
+
+
+def _ratchet_seq(log):
+    """The per-iteration ratchet decisions, baseline Trial excluded."""
+    return [r.get("ratchet") for r in log["iterations"] if r.get("ratchet") != "baseline"]
+
+
 def selftest():
     results = []
     fake = {"n": 0}
+    rat = {}  # side-facts the ratchet scenarios prove via REAL git state
 
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
@@ -438,6 +662,71 @@ def selftest():
             state_paths=[], cwd=str(d),
         ))
 
+        # ── Ratchet scenarios (need REAL git: keep = commit, revert = reset --hard) ──
+        # 6) RATCHET-KEEP — metric strictly rises each measurement → every iter "kept".
+        #    Baseline is measured BEFORE the loop, so iter 1 already has a bar to beat.
+        rk = d / "rk"
+        _mk_git_sandbox(rk)
+        _commit(rk, "n", "0")  # ratchet now requires a clean tree at start (see R-1.1 guard)
+        metric_up = _py(
+            "import pathlib;"
+            f"p=pathlib.Path({json.dumps(str(rk / 'n'))});"
+            "v=int(p.read_text() or 0)+1;p.write_text(str(v));print(v)"
+        )
+        results.append(_scenario(
+            "RATCHET-KEEP", verify_cmd=verify_fail, revise_cmd=None,
+            max_iter=3, no_progress_k=0, state_paths=[], cwd=str(rk),
+            metric_cmd=metric_up, direction="max", no_improve_k=3,
+        ))
+        rat["keep_commits"] = _git_count(rk)  # seed + seed-n + 3 keeps
+
+        # 7) RATCHET-REVERT — metric flat → never beats baseline by min_delta → every
+        #    iter "reverted", and no_improve_k stops the loop. Nothing may be committed.
+        rv = d / "rv"
+        _mk_git_sandbox(rv)
+        results.append(_scenario(
+            "RATCHET-REVERT", verify_cmd=verify_fail, revise_cmd=None,
+            max_iter=10, no_progress_k=0, state_paths=[], cwd=str(rv),
+            metric_cmd=_py("print(5.0)"), direction="max", no_improve_k=3,
+        ))
+        rat["revert_commits"] = _git_count(rv)  # seed only
+
+        # 8) RATCHET-CRASH — metric exits non-zero from the 3rd measurement on →
+        #    "crash", and the workspace is reset to the last KEPT commit (iter 1's).
+        rc = d / "rc"
+        _mk_git_sandbox(rc)
+        _commit(rc, "c", "0")  # ratchet now requires a clean tree at start (see R-1.1 guard)
+        metric_crash = _py(
+            "import pathlib,sys;"
+            f"p=pathlib.Path({json.dumps(str(rc / 'c'))});"
+            "v=int(p.read_text() or 0)+1;p.write_text(str(v));"
+            "sys.exit(1) if v>=3 else print(v)"
+        )
+        results.append(_scenario(
+            "RATCHET-CRASH", verify_cmd=verify_fail, revise_cmd=None,
+            max_iter=3, no_progress_k=0, state_paths=[], cwd=str(rc),
+            metric_cmd=metric_crash, direction="max", no_improve_k=3,
+        ))
+        rat["crash_commits"] = _git_count(rc)  # seed + seed-c + the single keep
+        rat["crash_head_kept"] = (rc / "c").read_text()  # reset --hard restored "2"
+
+        # 9) RATCHET-DIRTY-REFUSED — a real bug found in review: `git reset --hard`
+        #    on revert/crash silently destroyed uncommitted work that predated the
+        #    loop. run_loop must now refuse to even START the ratchet on a dirty tree.
+        rd = d / "rd"
+        _mk_git_sandbox(rd)
+        (rd / "untracked-work.txt").write_text("this must survive")  # dirty, never committed
+        dirty_refused = False
+        dirty_preserved = False
+        try:
+            run_loop(
+                verify_cmd=verify_fail, max_iter=3, no_progress_k=0, state_paths=[],
+                cwd=str(rd), metric_cmd=_py("print(1.0)"), direction="max", quiet=True,
+            )
+        except ValueError:
+            dirty_refused = True
+            dirty_preserved = (rd / "untracked-work.txt").read_text() == "this must survive"
+
         episodic_written = episodic.exists()
 
     # Assertions (required scenarios 1-3 + guard-proof scenarios 4-5)
@@ -447,6 +736,9 @@ def selftest():
         "NO_PROGRESS@3": (NO_PROGRESS, 3),
         "TIMEOUT": (TIMEOUT, None),
         "ESCALATE@2": (ESCALATE, 2),
+        "RATCHET-KEEP": (MAX_ITER, 3),
+        "RATCHET-REVERT": (NO_PROGRESS, 3),
+        "RATCHET-CRASH": (MAX_ITER, 3),
     }
     print("LoopRunner self-test (no LLM) — deterministic guard scenarios\n" + "-" * 62)
     ok = True
@@ -458,6 +750,31 @@ def selftest():
         tag = "PASS" if passed else "FAIL"
         iters = f"iter={got_iter}" + (f"/exp {want_iter}" if want_iter is not None else "")
         print(f"  [{tag}] {name:<14} verdict={log['verdict']:<11} {iters:<14} ({log['reason']})")
+
+    # Ratchet side-facts: the decisions in the run-log AND the real git state.
+    by_name = dict(results)
+    keep_log, rev_log, crash_log = (
+        by_name["RATCHET-KEEP"], by_name["RATCHET-REVERT"], by_name["RATCHET-CRASH"]
+    )
+    baseline = keep_log["iterations"][0]
+    extra = [
+        ("baseline Trial ghi TRƯỚC vòng lặp",
+         baseline.get("ratchet") == "baseline" and baseline.get("score") == 1.0),
+        ("keep: 3/3 kept, commit thật (seed+seed-n+3)",
+         _ratchet_seq(keep_log) == ["kept"] * 3
+         and all(r.get("commit") for r in keep_log["iterations"][1:])
+         and rat["keep_commits"] == 5),
+        ("revert: 3/3 reverted, không commit nào",
+         _ratchet_seq(rev_log) == ["reverted"] * 3 and rat["revert_commits"] == 1),
+        ("crash: kept→crash→crash, reset về keep cuối",
+         _ratchet_seq(crash_log) == ["kept", "crash", "crash"]
+         and rat["crash_commits"] == 3 and rat["crash_head_kept"] == "2"),
+        ("dirty tree bị TỪ CHỐI trước khi ratchet chạy (không git reset --hard đè uncommitted work)",
+         dirty_refused and dirty_preserved),
+    ]
+    for label, passed in extra:
+        ok = ok and passed
+        print(f"  [{'PASS' if passed else 'FAIL'}] ratchet: {label}")
     print("-" * 62)
     print(f"  reflexion: episodic page written by failing runs = {episodic_written}")
     print(f"  RESULT: {'ALL PASS' if ok else 'FAILURES PRESENT'}")
@@ -482,12 +799,24 @@ def build_parser():
     r.add_argument("--budget-seconds", type=float, default=None)
     r.add_argument("--no-progress-k", type=int, default=None)
     r.add_argument("--escalate-after", type=int, default=None)
+    r.add_argument("--metric-cmd", default=None,
+                   help="shell cmd printing ONE float score last; enables the git ratchet (keep/revert)")
+    r.add_argument("--direction", choices=("max", "min"), default=None,
+                   help="whether a HIGHER or a LOWER score is better (default: max)")
+    r.add_argument("--no-improve-k", type=int, default=None,
+                   help="stop after K consecutive iterations that do not beat the best score (0 = off)")
+    r.add_argument("--min-delta", type=float, default=None,
+                   help="dead band: a score move smaller than this is not an improvement")
+    r.add_argument("--hub", dest="hub", action="store_true", default=None,
+                   help="record each ratchet Trial as a commit-DAG node (opt-in; needs hub.py)")
+    r.add_argument("--no-hub", dest="hub", action="store_false",
+                   help="force the commit-DAG hub off, whatever the config says")
     r.add_argument("--episodic", default=None, help="episodic-memory wiki page for reflexion lessons")
     r.add_argument("--cwd", default=".", help="working directory for verify/revise commands")
     r.add_argument("--quiet", action="store_true")
     r.set_defaults(func=cmd_run)
 
-    s = sub.add_parser("selftest", help="run 5 deterministic guard scenarios (no LLM)")
+    s = sub.add_parser("selftest", help="run 8 deterministic guard/ratchet scenarios (no LLM)")
     s.set_defaults(func=lambda _a: selftest())
     return p
 

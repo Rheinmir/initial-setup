@@ -1,0 +1,13 @@
+# agent-trace.config.yaml — công tắc sổ kiểm chứng agent.
+#
+# TẮT là mặc định có chủ ý: sổ ghi lén thì không ai tin, và transcript agent có thể
+# chứa đường dẫn/nội dung riêng tư. Bật khi bạn CẦN kiểm chứng lại một phiên.
+#
+#   python3 harness/scripts/agent-trace.py on     # bật
+#   python3 harness/scripts/agent-trace.py off    # tắt
+
+enabled: true
+
+# Chỉ chưng cất transcript của project nào (khớp tiền tố slug trong ~/.claude/projects).
+# Để trống = tự suy từ tên thư mục repo, nên worktree con (…-ge-t1) cũng được gom.
+slug_prefix: ""

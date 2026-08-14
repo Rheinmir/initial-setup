@@ -618,6 +618,45 @@ User nhắc lần thứ 2 (2026-07-21 → 2026-07-24, cùng lỗi tái diễn �
 
 Vá `skills/fdk-uat/SKILL.md` (canonical, sync mirror+installed, parity xác nhận `diff`): bỏ chữ "tuỳ chọn", thêm block assert chạy `orca worktree list` verify đúng tên worktree vừa tạo có mặt — fail thì DỪNG, không được báo PASS. Vá tương tự bản CÀI của `fdk-poc` (`~/.claude/skills/fdk-poc/SKILL.md`) — nhưng canonical thật của skill này nằm trên nhánh `Rheinmir/issue-15-br-k`, không sửa được sạch từ `orca`; ghi rõ giới hạn này để không tưởng nhầm đã vá triệt để (bản cài sẽ mất vá nếu `npx skills add` cài lại từ nguồn gốc).
 
+## 2026-07-28 — orca-onboard — onboard-setup
+
+Onboard chính repo overstack (853 file tracked, commit 9032ae4). Pipeline distill: static parse 0-token cho graph, Claude main thread cho layers/tour/domain, opencode+DeepSeek cho wiki/HTML render.
+
+## 2026-07-29 — docs-site-macos — overstack-source-map
+
+Sinh `llmwiki/html/290726-overstack-source-map.html` (138,7 KB, 7 section, self-contained) bằng generator python đọc thẳng knowledge-graph.json + domain-graph.json + policy.yaml. Kiểm chứng bằng cách mở thật trong Chrome: console sạch, 0 request ngoài, mind map/sơ đồ kéo-thả/master-detail/toggle theme đều chạy.
+
+Phát hiện và sửa một bug rò CSS dark sang light: prefix `html[data-theme=dark]` chỉ dán vào selector đầu của danh sách phẩy nên `.steps li` ăn nền tối ở cả light mode. Bản vá đầu cũng sai (nối liền thành `html[data-theme=dark].card`, và `split(",")` xé selector chứa `rgba()`); cách sửa cuối là giữ selector dạng list rồi prefix từng phần tử.
+
+## 2026-07-29 — docs-site-macos — spec-vs-overstack
+
+Đối chiếu overstack (commit 9032ae4) với `graph-engineering-implementation-spec.md` v0.1 trên 67 mục thuộc 8 trục, sinh trang so sánh `llmwiki/html/290726-spec-vs-overstack.html` (94 KB, self-contained).
+
+Kết quả: 15 đủ · 36 một phần · 15 thiếu · 1 khác-thiết-kế. 15 chỗ thiếu quy về ba gốc — (1) loop-runner không ratchet theo điểm số (grep `git reset` ra 0 kết quả, không có bản ghi Trial); (2) cạnh wiki vô danh và không có edge ID, kéo theo 5/11 loại cạnh spec và mắt xích 5 của bài nghiệm thu §10; (3) không có dịch vụ commit-DAG nên không giữ nhiều lineage thí nghiệm sống song song.
+
+Chiều ngược lại, bảy thứ overstack có mà spec không nhắc: chặn trước hành động 0 token, fire-drill chứng minh luật còn cắn, nguyên tắc "tồn tại ≠ dùng được", chống drift ba bản skill, capproof, claim-receipts, hạ tầng bằng không.
+
+## 2026-07-29 — gap-check — pdf-goc-graph-engineering
+
+Đọc PDF gốc `Graph-Engineering-Athropic-Karpathy-Loop.pdf` (11 trang) — nguồn mà spec md derive ra. Không lật kết luận nào của bản đối chiếu 67 mục; bổ sung GỐC THIẾU THỨ 4: graph của overstack là DOCS-graph (chỉ xem/lint/vẽ), PDF đòi RUNTIME-graph (TABLE I: gate signal / classifier input / shared surface / shared memory / grounding layer trong từng workflow pattern). Kèm 2 món rẻ: grounding feedback có schema `required_evidence[]`, và message-board cho giả thuyết đã bỏ. Điểm mạnh nhất theo PDF: persistent world model 7/9 tick ("the agent forgets, the wiki does not"); thiếu temporal facts. Vị trí build path: ~Week 2 + mảnh Month 1. Cập nhật vào draft 290726-spec-vs-overstack.
+
+## 2026-07-29 — docs-site-macos — pdf-gap-html
+
+Sinh trang riêng `llmwiki/html/290726-pdf-gap-overstack.html` (81 KB, 7 section, self-contained) giải thích bằng HTML phần đối chiếu PDF gốc Graph Engineering: tiến trình vibe→agentic→graph với vị trí overstack, 5 cơ chế externalize bottleneck, 4 gốc thiếu kèm bằng chứng file thật, TABLE I runtime-graph (4/6 vai trò chưa có) + diagram DOCS-graph vs RUNTIME-graph, TABLE VI checklist (3✅ 4🟡 2🔴) + 14 bước chuẩn (thiếu 5 bước graph), persistent world model 6✅/2🟡/1🔴, build path ~Week 2, và 3 chỗ chính PDF khuyên ĐỪNG. Generator `.orca-onboard/tmp/build_pdf_gap.py` tái dùng shell build_source_map. Kiểm trong Chrome: console sạch, 0 request ngoài. Footer có đường dẫn tuyệt đối (R16).
+
+## 2026-07-29 — plan — graph-engineering-PLAN
+
+Checkout nhánh `graph-engineering` (từ orca @ 9032ae4, sửa typo "graph-engiering" của user thành tên đúng). Viết `sources/draft/290726-graph-engineering-PLAN.md` — 6 task đóng gap theo PDF: T1 ratchet điểm số cho loop-runner (metric-cmd + direction + git keep/revert + Trial, PDF R-1.1/1.3/1.4) · T2 edge ID sha1 + typed edges đọc frontmatter relations (thêm supports/contradicts/supersedes) · T3 /query đính mục Evidence trích eid · T4 grounding-check.py schema {decision, claim, reason, required_evidence[]} wire vào /qc-code · T5 bốn trần budget mới trong token-budget (model calls, sub-agents, workers, graph-writes) · T6 provenance-log post-hypothesis/read-hypotheses. Mỗi task TDD self-test-trước, mọi cờ optional giữ backward-compat, ngưỡng mới đều ASSUMPTION trong config adapter. Ngoài phạm vi CÓ TRIGGER: commit-DAG hub (chờ đau thật ≥2 lineage), KG extraction LLM (PDF §VIII.C tự khuyên đừng), temporal facts, verification-wave khác vai. R7 plan-executable cắn 3 lần lúc viết (Task 2/5/6 thiếu code block) — bổ sung đủ code thật mới qua.
+
+## 2026-07-30 — docs-site-macos — pr92-flow
+Trang HTML giải thích PR #92 (graph-engineering → orca): 3 gốc thiếu, luồng 7 tính năng T1–T7 (ratchet/edge-id/grounding-gate/token-budget/hypothesis-log/commit-dag-hub), và bảng "gọi ra ntn / khi nào kích hoạt" xác nhận bằng grep thật trên hooks — chỉ T2 (edge ID, qua stop.py) và T3 (/query) tự động, 5/7 còn lại là opt-in gọi tay không hook nào đụng tới. Nối tiếp phiên qc-code review PR #92 (verdict CẦN SỬA, 4 mục blocking).
+
+## 2026-07-30 — cursor-animated-sites — hook-skill-layers
+Walkthrough tương tác giải thích lifecycle thật của Claude Code + overstack khi user gõ 1 câu: SessionStart(1 lần/phiên) → UserPromptSubmit(mỗi câu) → Claude quyết định → nạp Skill(văn bản, không tự chạy) → PreToolUse(validators, CÓ THỂ CHẶN) → code thật(harness/scripts, tất định) → PostToolUse → lặp lại → Stop(medic --ci, CÓ THỂ CHẶN dừng) → SessionEnd. Cursor lề-trái đi qua cây file đúng thứ tự, màu theo vai trò (đọc/ghi/chặn/qua), kèm 2 ví dụ THẬT đã xảy ra ngay trong hội thoại (R16 report-show-path chặn 1 lần Write; medic --ci FAIL vì overstack.html cũ).
+
+## 2026-08-01 — fdk — teach-me: khung bảy bước
+Feedback Rhein: "học cái gì cũng phải có cấu trúc [Tên gọi→Nguồn gốc→Lý do tồn tại→Cơ chế hoạt động→Trade-off→Giới hạn→Vị trí trong hệ thống] để hiểu sâu". Đổi skill teach-me từ khung "bốn phần" (2 cấp + bộ ba + tóm tắt) sang khung bảy bước cố định, đúng thứ tự — dồn nội dung runtime-driven (2 sơ đồ hệ thống/code) vào bước 4, sơ đồ tóm tắt luồng vào bước 7, thêm mới Trade-off (bước 5) và Giới hạn (bước 6) — hai góc trước đây không có chỗ đứng riêng. Sync canonical→mirror→global install (parity 3 bản byte-identical), regen skill-search index, bump capability-stamp 1.3.60→1.3.61, cập nhật fdk-problem-tree.html (node p-45, solved, scope=[skills]). fdk-gate 21/21 PASS.
+
 ## 2026-08-11 — distill (bypass ingest) — repowise-dev/repowise
 
 Yêu cầu trực tiếp "repowise-dev/repowise distill nó đi". `llmwiki/raw/` khoá ghi cho agent (deny rule + luật "chỉ người ghi") — hỏi user, chọn bỏ qua `raw/`, ghi thẳng vào wiki theo mạch [[frontier-gap-scan]] (quét đối thủ) thay vì `/ingest` chuẩn 7 bước.
@@ -631,6 +670,7 @@ User yêu cầu tiếp: không chỉ doc, distill CƠ CHẾ nguyên code sang Py
 Ship `harness/validators/code_complexity.py`: McCabe CCN + NLOC per-function (`ast`), LCOM4-lite cohesion + god-class per-class (connected-components qua `self.attr`/gọi-lẫn-nhau, safety-valve khi 0 tín hiệu), duplicate-code (token-chunk hash, đơn giản hơn sliding Rabin-Karp thật), điểm 1-10/file, advisory-only. Selftest assert-based (`--selftest`) xanh; chạy thật trên 124 file .py trong repo, bắt đúng finding thật (kể cả cặp mirror `proposal_complete.py` trùng gần 100% — xác nhận detector không phải false-positive ngẫu nhiên).
 
 Ghi rõ ceiling KHÔNG làm ở lượt này (cập nhật `llmwiki/innovation/110826-innovation.md`): không "defect-validated" (trọng số tự chọn, không calibrated), chỉ Python (không tree-sitter đa ngôn ngữ), chưa có dead-code/PR-bot/refactor-plan-sinh-cụ-thể, chưa wire vào gate/medic (đứng standalone advisory, cần hỏi trước khi nâng hard-gate).
+
 
 <!-- log:auto:start -->
 
@@ -656,6 +696,16 @@ Ghi rõ ceiling KHÔNG làm ở lượt này (cập nhật `llmwiki/innovation/1
 | 2026-08-01 16:43:45 | `file.write` | llmwiki/wiki/sources/draft/010826-wiki-mental-model-taxonomy.md · tool=Edit · session=8a8ad17d · actor=agent · prev=6d11 |
 | 2026-08-02 22:53:47 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=d2af35c0314085f86aa2dbc1774db08da2c110ed6a8977bfbc3281fe7ff22c0d · h=735a |
 | 2026-08-03 09:09:22 | `file.write` | llmwiki/innovation/030826-innovation.md · tool=Write · session=d1a42e6e · actor=agent · prev=735a51db09cace928d3ff494d88 |
+| 2026-08-03 15:27:26 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=3b20b398 · actor=agent · prev=ee0aaaf25eeab32abbc528dcb86328ce94e8 |
+| 2026-08-03 15:27:26 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=3b20b398 · actor=agent · prev=genesis · h=ee0aaaf25eeab32abbc528dc |
+| 2026-08-03 15:27:36 | `file.write` | llmwiki/skills/utils/docs-site-macos.md · tool=Edit · session=3b20b398 · actor=agent · prev=54cfbbad2d6bf3b196e3d0ec98f4 |
+| 2026-08-03 15:27:36 | `file.write` | llmwiki/skills/utils/docs-site-macos.md · tool=Edit · session=3b20b398 · actor=agent · prev=c54deb946d526ff9501ecebdb093 |
+| 2026-08-03 15:28:19 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=0 · prev=8ee01a899dc3359d1093c440840cd389963793d9eb5ed00404cf6100f3823cd0 · h=3910 |
+| 2026-08-03 15:30:46 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['llmwiki/wiki/sources/030826-session-provenance.md'] · prev=f50f48ed568 |
+| 2026-08-03 15:30:46 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/metrics/.stop-debounce.json', 'llmwiki/wiki/log.md'] · prev=39 |
+| 2026-08-03 15:34:08 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=3b20b398 · actor=agent · prev=1e81b26513467829b547ae6eed360c72dbf1795866c217 |
+| 2026-08-03 15:34:08 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=3b20b398 · actor=agent · prev=fe33e32a8b13cdd6de9d8cedb4529554c3dd2dd98bec94 |
+| 2026-08-03 15:35:32 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=1 · human=['fdk/skills.provenance.json'] · prev=a94bae66b9ceaf32117a8a0c9635912825 |
 | 2026-08-04 09:06:19 | `file.write` | llmwiki/innovation/040826-innovation.md · tool=Write · session=4f625e3f · actor=agent · prev=d68f3e502b114125517938360a1 |
 | 2026-08-05 00:05:24 | `file.write` | llmwiki/wiki/sources/draft/050826-raise-issue-skill-missing-commit-step.md · tool=Write · session=8a8ad17d · actor=agent |
 | 2026-08-05 00:05:31 | `file.write` | llmwiki/wiki/sources/ISSUES.md · tool=Edit · session=8a8ad17d · actor=agent · prev=1e1ff2316a81f673dd08f4819d9fdf07918e2 |

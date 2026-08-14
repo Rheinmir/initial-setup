@@ -135,3 +135,21 @@ không đụng code adapter. Thêm *vendor* mới = thêm 1 nhánh ~15 dòng tro
 - Gộp `policy.yaml` này vào `harness/policy.yaml` (đã cùng tinh thần R1/R2).
 - Đóng gói `bin/llmwiki-validate.py` thành release pin version (xoá copy editable + sync hash-3-mốc).
 - `gen-converters.py` gọi từ `install-harness.sh --vendor claude,opencode,…`.
+
+## Cài từ một FORK — `bootstrap-fork.sh`
+
+`bootstrap.sh` mặc định kéo mọi thứ từ repo gốc ở nhánh chính. Cài từ fork phải trỏ đúng **bốn** biến (`HARNESS_BASE` · `REPO_RAW` · `SKILLS_REF` · `HARNESS_REPO`) — sai một cái là bản cài lặng lẽ trộn hai nguồn mà cổng nghiệm thu vẫn xanh, vì nó chấm nhầm bản cũ. `bootstrap-fork.sh` gói cả bốn:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dragonwar000/setup/graph-engineering/harness/poc-vendor-neutral/bootstrap-fork.sh | bash
+```
+
+Đổi nguồn không cần sửa file, và kiểm trước khi cài:
+
+```bash
+... | FORK_OWNER=<owner> FORK_REPO=<repo> FORK_REF=<ref> bash
+... | bash -s -- --print-source      # chỉ in nguồn rồi thoát, không tải gì
+... | bash -s -- --harness-only      # cờ của bootstrap.sh vẫn dùng nguyên
+```
+
+Script probe hai file nguồn trước khi cài, nên ref sai hoặc fork private báo lỗi 404 nói thẳng, thay vì biểu hiện muộn thành "cài xong mà thiếu file".

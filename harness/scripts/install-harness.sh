@@ -16,7 +16,8 @@
 # khi harness/ + .claude/settings.json được commit vào repo (mode per-project).
 # Global cũng KHÔNG cài pre-commit (L2) và không chạy baseline audit.
 #
-# Nguồn file: ưu tiên bundle cạnh script; thiếu thì clone rheinmir/setup@orca.
+# Nguồn file: ưu tiên bundle cạnh script; thiếu thì clone $HARNESS_REPO@$HARNESS_REF
+# (cả hai suy từ REPO_RAW nếu có — fork nào cũng cài được, xem khối 0).
 set -euo pipefail
 
 # ---------- Flag scan (tách --self-heal khỏi positional) ----------
@@ -66,6 +67,24 @@ if [ -z "$HARNESS_REF" ] && [ -n "${REPO_RAW:-}" ]; then
   esac
 fi
 HARNESS_REF="${HARNESS_REF:-orca}"
+
+# REPO nguồn — cùng lớp lỗi với REF ở trên, phát hiện muộn hơn một vòng (UAT canary 2026-07-30).
+# Lần trước sửa REF nhưng vẫn hardcode `rheinmir/setup` ở 6 chỗ clone, nên canary chạy từ một
+# FORK suy đúng ref rồi lại clone repo GỐC ở ref đó → nhánh không tồn tại → cài global fail →
+# mọi năng lực mới không tới tay, mà cổng local vẫn xanh vì nó cài từ working-tree. Suy owner/repo
+# từ REPO_RAW y hệt cách suy ref, nên fork nào cũng UAT được mà không phải nhớ thêm biến;
+# HARNESS_REPO để ép tay.
+HARNESS_REPO="${HARNESS_REPO:-}"
+if [ -z "$HARNESS_REPO" ] && [ -n "${REPO_RAW:-}" ]; then
+  case "$REPO_RAW" in
+    https://raw.githubusercontent.com/*/*/*)
+      _s="${REPO_RAW#https://raw.githubusercontent.com/}"   # <owner>/<repo>/<ref...>
+      _own="${_s%%/*}"; _s="${_s#*/}"; _rep="${_s%%/*}"
+      [ -n "$_own" ] && [ -n "$_rep" ] && HARNESS_REPO="$_own/$_rep"
+      ;;
+  esac
+fi
+HARNESS_REPO="${HARNESS_REPO:-rheinmir/setup}"
 [ "$PRINT_REF" = "1" ] && { echo "$HARNESS_REF"; exit 0; }
 
 src_ok() { [ -d "$1/harness/validators" ] && [ -d "$1/llmwiki/.claude/hooks" ]; }
@@ -75,10 +94,10 @@ if ! src_ok "$SRC"; then
     warn "Bundle nguồn thiếu và --no-clone bật → fast-fail (không treo mạng). Cung cấp bundle rồi chạy lại."
     exit 1
   fi
-  log "Bundle cạnh script thiếu file nguồn → clone template rheinmir/setup@$HARNESS_REF"
+  log "Bundle cạnh script thiếu file nguồn → clone template $HARNESS_REPO@$HARNESS_REF"
   TMP_CLONE="$(mktemp -d /tmp/llmwiki-harness-src.XXXXXX)"
-  git clone --depth 1 -b "$HARNESS_REF" git@github.com:rheinmir/setup.git "$TMP_CLONE" >/dev/null 2>&1 \
-    || git clone --depth 1 -b "$HARNESS_REF" https://github.com/rheinmir/setup.git "$TMP_CLONE" >/dev/null 2>&1
+  git clone --depth 1 -b "$HARNESS_REF" git@github.com:"$HARNESS_REPO".git "$TMP_CLONE" >/dev/null 2>&1 \
+    || git clone --depth 1 -b "$HARNESS_REF" https://github.com/"$HARNESS_REPO".git "$TMP_CLONE" >/dev/null 2>&1
   SRC="$TMP_CLONE"
   src_ok "$SRC" || { warn "Template repo chưa có harness/ — sync template trước"; exit 1; }
 fi
@@ -278,8 +297,8 @@ else
   # SAME_BUNDLE=1 — pull all harness files from remote (overwrite local)
   if [ "$NO_CLONE" != "1" ]; then
     TMP_SYNC="$(mktemp -d /tmp/llmwiki-harness-sync.XXXXXX)"
-    if git clone --depth 1 -b "$HARNESS_REF" git@github.com:rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 \
-        || git clone --depth 1 -b "$HARNESS_REF" https://github.com/rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1; then
+    if git clone --depth 1 -b "$HARNESS_REF" git@github.com:"$HARNESS_REPO".git "$TMP_SYNC" >/dev/null 2>&1 \
+        || git clone --depth 1 -b "$HARNESS_REF" https://github.com/"$HARNESS_REPO".git "$TMP_SYNC" >/dev/null 2>&1; then
       mkdir -p "$ROOT/harness/validators" "$ROOT/harness/scripts" "$ROOT/harness/evals" "$ROOT/harness/tests"
       cp -R "$TMP_SYNC/harness/validators/"*    "$ROOT/harness/validators/" 2>/dev/null || true
       cp    "$TMP_SYNC/harness/policy.yaml"      "$ROOT/harness/policy.yaml" 2>/dev/null || true
@@ -306,8 +325,8 @@ else
   # SAME_BUNDLE: hooks already pulled in TMP_SYNC from step 3; clone if step 3 skipped
   if [ "$NO_CLONE" != "1" ] && [ ! -d "${TMP_SYNC:-}" ]; then
     TMP_SYNC="$(mktemp -d /tmp/llmwiki-harness-sync.XXXXXX)"
-    git clone --depth 1 -b "$HARNESS_REF" git@github.com:rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 \
-      || git clone --depth 1 -b "$HARNESS_REF" https://github.com/rheinmir/setup.git "$TMP_SYNC" >/dev/null 2>&1 || true
+    git clone --depth 1 -b "$HARNESS_REF" git@github.com:"$HARNESS_REPO".git "$TMP_SYNC" >/dev/null 2>&1 \
+      || git clone --depth 1 -b "$HARNESS_REF" https://github.com/"$HARNESS_REPO".git "$TMP_SYNC" >/dev/null 2>&1 || true
   fi
   if [ -d "${TMP_SYNC:-}" ]; then
     cp "$TMP_SYNC/llmwiki/.claude/hooks/"*.py "$ROOT/llmwiki/.claude/hooks/" 2>/dev/null || true

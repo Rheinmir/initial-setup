@@ -1,3 +1,7 @@
+# Python bytecode — lọt vào từ 33e1484 do `git add -A` khi .gitignore thiếu pattern
+__pycache__/
+*.pyc
+
 # Root-level raw/ is obsolete (moved to llmwiki/raw/).
 # Block accidental recreation here.
 /raw/
@@ -25,6 +29,7 @@ fdk/MANIFEST.md
 
 # code-logger raw event history (local)
 harness/metrics/events.jsonl
+harness/metrics/agent-trace.jsonl
 harness/metrics/unknowns.json
 graph.db
 .graph-agent/
@@ -35,6 +40,7 @@ harness/metrics/failures.jsonl
 # framework-dev docs-site renders (local-only; bản chất bền ở fdk/wiki)
 fdk/html/*.html
 harness/metrics/cost-by-session.json
+harness/metrics/tokens.jsonl
 .DS_Store
 harness/metrics/tasks.json
 

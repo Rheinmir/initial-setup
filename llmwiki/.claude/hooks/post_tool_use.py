@@ -4,7 +4,10 @@ Exit 2 → stderr đưa lại cho Claude để tự sửa ngay trong phiên."""
 import os
 import sys
 
-from hooklib import audit, code_log, find_validators, project_dir, read_payload, run_validator
+import subprocess
+
+from hooklib import (audit, code_log, find_validators, project_dir, read_payload,
+                    resolve_tool, run_validator)
 
 
 def main() -> None:
@@ -30,6 +33,24 @@ def main() -> None:
             append_event(root, fp, tool, payload.get("session_id"))
         except Exception:
             pass  # fail-open
+
+    # Cổng grounding: verdict của evaluator vừa được GHI thì kiểm NGAY, không đợi ai nhớ gõ lệnh.
+    # Trước bản này grounding-check chỉ nằm trong SKILL.md dạng "hãy chạy lệnh này" — không hook,
+    # không validator, nên một verdict "nhìn ổn" lọt thẳng nếu agent quên. Repo này đã trả giá
+    # hai lần cho lớp lỗi đó và kết luận: nhớ tay đã fail thì phải đổi CẤU TRÚC, không nhắc thêm.
+    if os.path.basename(fp).endswith("qc-verdict.json"):
+        gc = resolve_tool(root, "harness/scripts/grounding-check.py")
+        if gc:
+            try:
+                p = subprocess.run([sys.executable, gc, "--check", fp],
+                                   cwd=root, capture_output=True, text=True, timeout=20)
+                if p.returncode == 2:
+                    print((p.stdout or "") + (p.stderr or "")
+                          + "\n[grounding] verdict chưa hợp lệ — sửa rồi ghi lại; "
+                            "'nhìn ổn' không phải một verdict.", file=sys.stderr)
+                    sys.exit(2)
+            except Exception:
+                pass                            # fail-open: hạ tầng lỗi không được phá phiên
 
     vdir = find_validators(root)
     if vdir is None:

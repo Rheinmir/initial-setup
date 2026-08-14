@@ -143,6 +143,21 @@ def regen_docs(root: str) -> None:
         if pl:
             subprocess.run([sys.executable, pl, "record-changed", "--root", root],
                            cwd=root, capture_output=True, timeout=30)
+        # token-budget: đồng bộ token THẬT từ cost-by-session.json (code-logger đã ghi).
+        # Trước đây KHÔNG hook nào gọi `record`, nên tokens.jsonl chưa từng tồn tại và mọi
+        # trần đều cap một con số luôn bằng 0 — trần không có dữ liệu thì không phải trần.
+        # Đọc lại nguồn có sẵn thay vì dựng đường ghi song song (tránh hai sổ lệch nhau).
+        tb = resolve_tool(root, "harness/scripts/token-budget.py")
+        if tb:
+            subprocess.run([sys.executable, tb, "sync", "--root", root],
+                           cwd=root, capture_output=True, timeout=30)
+        # agent-trace: chưng cất transcript phiên (chính + mọi subagent worktree) thành sổ
+        # kiểm chứng được. TỰ NO-OP khi công tắc tắt — mặc định tắt, nên hook này không tốn
+        # gì cho ai chưa bật. Bật: python3 harness/scripts/agent-trace.py on
+        at = resolve_tool(root, "harness/scripts/agent-trace.py")
+        if at:
+            subprocess.run([sys.executable, at, "collect", "--root", root],
+                           cwd=root, capture_output=True, timeout=60)
     except Exception:
         pass
 

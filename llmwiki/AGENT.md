@@ -22,27 +22,14 @@ Trước khi sửa hay xây bất cứ thứ gì, hỏi **"vì sao"** cho tới 
 - **Nghi ngờ chẩn đoán đầu tiên của chính mình.** Nó thường là suy luận từ triệu chứng chứ chưa đọc code. Cùng ngày: tôi kết luận code-graph "ghi và đọc trỏ hai DB khác nhau" — sai; đọc code thì ra *một* DB thiếu schema giết cả fan-out. Chẩn đoán chỉ được tin sau khi **tái hiện** được.
 - **Ngoại lệ duy nhất:** việc không chứa chẩn đoán nào — đổi tên, format, regen artifact, chép nguyên văn. Việc nào có chữ "sửa", "hỏng", "vì sao", "sao lại thế" thì luôn chạy.
 
-## Chứng cứ — chuỗi lập luận phải chấm dứt ở thứ XEM ĐƯỢC
+## Chứng cứ trong CHAT — opt-in qua `/graph-mode`, không auto-bơm mỗi phiên
 
-Được phép lập luận, nhưng cuối mỗi chuỗi phải là chứng cứ mở ra xem được, không phải một lập luận
-nữa. Chuỗi `A vì B vì chứng cứ C` là xong; chuỗi `A vì B vì C` mà C lại là suy luận thì CHƯA xong —
-phải khai tiếp C dựa trên cái gì, cho tới khi chạm đáy.
-
-Sáu loại được tính là điểm cuối:
-- `observed` — đường dẫn `file:line` mở ra được, hoặc lệnh chạy lại được kèm output.
-- `tool-record` — id một mục trong provenance-log / events.jsonl / ledger.
-- `graph-edge` — eid một cạnh trong wiki graph.
-- `web` — dữ liệu tìm trên mạng: phải kèm **link tới ĐÚNG CHỖ tìm được** (không phải trang chủ),
-  ngày truy cập, và trích nguyên văn đoạn đã dựa vào.
-- `parametric` — kiến thức từ **training của model**: phải tự khai đúng là loại này, **chỉ rõ nó ở
-  đâu ra** (tên chuẩn, tài liệu, tác giả), và nói rõ là chưa kiểm chứng. KHÔNG được là điểm cuối duy
-  nhất của một kết luận dùng để quyết định — phải nâng lên `web`/`observed` hoặc đi kèm loại khác.
-- `absence` — chính lệnh/truy vấn đã chạy để tìm, kèm output rỗng của nó.
-
-Không kết luận bằng "rõ ràng là", "ai cũng biết", hay bằng cách trỏ ngược về một mục lập luận khác
-trong cùng câu trả lời. Tài liệu có khối ```evidence-chain thì bị R19 kiểm bằng máy
-(`harness/validators/evidence_terminal.py`); phần CHAT không validator nào với tới, nên đó là kỷ
-luật bắt buộc chứ không phải gợi ý. Chi tiết: [[evidence-terminal-chain]].
+Luật chuỗi-lập-luận-phải-chạm-chứng-cứ (6 loại điểm cuối, chi tiết [[evidence-terminal-chain]])
+GIỜ nằm ở `skills/graph-mode/SKILL.md`, không còn bơm mặc định vào mọi phiên — kỷ luật này buộc
+trích dẫn/mở file nhiều hơn mỗi câu trả lời (nặng token), nên chỉ bật khi thật cần độ tin cậy cao
+(audit, ADR, chẩn đoán lan rộng). Gọi `/graph-mode` để bật, "tắt graph mode"/"normal mode" để tắt.
+Validator máy trên tài liệu ```evidence-chain (R19, `harness/validators/evidence_terminal.py`) KHÔNG
+phụ thuộc skill này — luôn chạy qua `harness/policy.yaml` bất kể graph-mode bật hay tắt.
 
 ## Cái thang chống over-engineering — chạy khi VIẾT/SỬA code
 Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponytail, MIT — nguồn `060726-ponytail-distill`.)
@@ -134,6 +121,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `design-taste-frontend-v1` | The original v1 taste-skill, preserved for projects depending on its exact… | `skills/utils/design-taste-frontend-v1.md` | utils |
 | `extract-site` | Extract and convert a website or docs site into clean markdown (full-code clone → see `web-clone`) | `skills/utils/extract-site.md` | utils |
 | `fable5` | Reasoning protocol distilled from Claude Fable 5 — Floor check, multi-hypothesis diagnosis, adversarial self-review, Constraint Loop. Persists for the session like `/caveman` once invoked | `skills/utils/fable5.md` | utils |
+| `graph-mode` | Bật luật chứng cứ evidence-chain (R19) cho CHAT — mọi kết luận phải chạm điểm cuối xem được (observed/tool-record/graph-edge/web/parametric/absence). Nặng token nên opt-in, không auto-bơm mỗi phiên; tắt bằng "tắt graph mode"/"normal mode" | `skills/utils/graph-mode.md` | utils |
 | `find-skills` | Helps users discover and install agent skills when they ask questions like… | `skills/utils/find-skills.md` | utils |
 | `full-output-enforcement` | Overrides default LLM truncation behavior. | `skills/utils/full-output-enforcement.md` | utils |
 | `gpt-taste` | Elite UX/UI & Advanced GSAP Motion Engineer. | `skills/utils/gpt-taste.md` | utils |

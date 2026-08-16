@@ -63,6 +63,7 @@
         "./skills/frontier-scan",
         "./skills/full-output-enforcement",
         "./skills/gpt-taste",
+        "./skills/graph-mode",
         "./skills/hallmark",
         "./skills/harness-tour",
         "./skills/harness-update",

@@ -155,7 +155,7 @@ LOOP_GROUPS = {
          "check-approve": "utility", "computer-use": "utility", "find-skills": "utility",
          "full-output-enforcement": "utility", "join-project": "utility", "last30days": "utility",
          "raise-issue": "utility", "ovs-notes": "utility", "frontier-scan": "utility",
-         "uat-nonit-testcase": "utility", "fable5": "utility", "i-have-adhd": "utility"}),
+         "uat-nonit-testcase": "utility", "fable5": "utility", "graph-mode": "utility", "i-have-adhd": "utility"}),
 }
 
 

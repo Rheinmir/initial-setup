@@ -5,6 +5,8 @@
 | File | Type | Summary |
 |------|------|---------|
 | [example-concept](concepts/example-concept.md) | concept | Ví dụ một trang concept hợp lệ (Origin + OKF) cho project dùng llmwiki |
+| [140826-session-provenance](sources/140826-session-provenance.md) | source | Auto-distill scratch-log phiên dba79064 ngày 14/08 (stub) — chỉ chạm `gitignore`/`entities/repowise.md`, chưa ghi why thủ công |
+| [160826-session-provenance](sources/160826-session-provenance.md) | source | Auto-distill scratch-log phiên dba79064 ngày 16/08 (stub) — chỉ chạm `gitignore`/`entities/repowise.md`, chưa ghi why thủ công |
 | [repowise](entities/repowise.md) | entity | Đối thủ codebase-intelligence (CLI+MCP, AGPL-3.0, 5088★): 5-lớp index, 10 MCP tool task-shaped, code-health 49-detector defect-validated, PR bot 0-LLM — so sánh điểm chạm thật với code-graph/ingest nội bộ |
 | [adapt-modes](concepts/adapt-modes.md) | concept | 3 kiểu absorb năng lực vào dự án — HÒA TAN / KÉO NGOÀI / NHÚNG-SỞ-HỮU; gọi đúng tên chọn đúng phương án |
 | [decision-anchoring](concepts/decision-anchoring.md) | concept | Neo quyết định vào symbol code, 4 trạng thái LIVE/STALE/ORPHAN/UNAVAILABLE suy từ code-graph, không cất tay |

@@ -40,7 +40,7 @@ LOOP_MAP = {
     "record-episode": "wiki-loop",
     # utils
     "agent-reach": "utils",
-    "cavecrew": "utils", "caveman": "utils", "fable5": "utils",
+    "cavecrew": "utils", "caveman": "utils", "fable5": "utils", "graph-mode": "utils",
     "i-have-adhd": "utils", "caveman-commit": "utils", "caveman-compress": "utils",
     "caveman-help": "utils", "caveman-review": "utils", "caveman-stats": "utils",
     "extract-site": "utils", "harness-tour": "utils",

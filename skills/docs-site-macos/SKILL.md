@@ -443,9 +443,9 @@ Apply to SVG elements: `.flow` (dashed arrows), `.pulse` (nodes), `.float` (outp
 - Use `font-family` from the page (`var(--font-text)` — macOS-first stack, see Font section)
 - Always include `xmlns="http://www.w3.org/2000/svg"` on `<svg>`
 
-### Node-Draggable Diagrams (REQUIRED for every `.diagram-box`)
+### Node-Draggable Diagrams (REQUIRED for hand-authored `.diagram-box` content — read "Diagram engine choice" below first if the diagram has >~6 nodes or any branching)
 
-Every `.diagram-box` MUST be an interactive node graph, NOT a static or merely-pannable picture:
+Every hand-authored `.diagram-box` MUST be an interactive node graph, NOT a static or merely-pannable picture:
 
 - **Drag each box (node) individually** — moving one table/step does NOT move the others. Connector lines re-route to follow the node automatically.
 - **Drag empty background** = pan the whole canvas.
@@ -583,6 +583,39 @@ Notes:
 - Connectors must be `<line>` (with `x1/y1/x2/y2`) to auto-track. `<path>` connectors stay static — use `<line>` for anything that should follow a node.
 - **Auto-fit**: on drag release the SVG `viewBox` grows to contain dragged nodes, so the svg height (and the box) sizes WITH the content — nodes never get clipped after release. `svg{overflow:visible}` keeps a node visible mid-drag too. `fitViewBox()` runs on pointerup + reset.
 - Idempotent (`dataset.draggable` guard); `resize:vertical` lets the user grow the container; flex viewport fills new height.
+
+### Diagram engine choice: hand-authored SVG vs Mermaid (READ before drawing anything with >~6 nodes or branches)
+
+⚠️ **Bài học 18/08/2026 — hand-placed node/arrow coordinates do not self-audit; a diagram with more than ~6 nodes or ANY branching/cross-connecting edges WILL overlap, silently.** A `.diagram-box` built by hand-picking `<rect>`/`<line>`/`<text>` coordinates (the Node-Draggable system above) has no layout engine checking for collisions — the author cannot verify positions are correct without an actual visual screenshot pass. Confirmed on a real build: a 7-node architecture diagram and several 9–14-step branching sequence diagrams rendered with overlapping arrow labels and boxes crossing through text, with **zero console errors and zero DOM anomalies** — nothing flags a bad layout except looking at a screenshot.
+
+**Rule:** hand-authored SVG (Node-Draggable, above) is for diagrams where the author places every position deliberately and can eyeball-verify it — decorative flows, marketing-style animated sequences, a handful of boxes with custom motion. The moment a diagram needs correct automatic layout — more than ~6 nodes, any `alt`/branch fan-out, or cross-connecting edges — render it with **Mermaid** and let this skill's CSS/JS only theme it (color, motion, glass chrome). Mermaid owns layout correctness; the skill owns presentation. Do not hand-place geometry for anything you'd have to double-check.
+
+**Verified recipe** (self-contained, zero CDN, offline `file://`-safe — download `mermaid.min.js` and `svg-pan-zoom.min.js` (both MIT) once, inline both as `<script>` tags BEFORE the page's own script block that calls them):
+
+1. **Render the whole batch in ONE `mermaid.run({querySelector: '.mermaid'})` call rather than looping `mermaid.run({nodes:[node]})` per diagram.** The one-call form is simpler and was reliable across repeated testing (10 diagrams, 3+ headless runs, zero errors). A per-node loop also renders correctly in isolated testing — there's no proven defect in it — but it couples each diagram's render to loop/DOM-mutation timing for no benefit; prefer the simpler one-call form unless you have a specific reason not to.
+2. **Give `.diagram-box` a real default height, not just `min-height`.** Without one, `svgPanZoom`'s `fit` shrinks a diagram down to whatever the box's unstyled default size happens to be — measured as low as ~150px tall in testing, too small to read comfortably. Set something like `height:min(58vh,540px)`.
+3. **After constructing `svgPanZoom(svg, opts)`, explicitly call `pz.resize(); pz.fit(); pz.center();`.** This is the pattern documented by svg-pan-zoom's own maintainers for cases where the container's size may not be final at construction time — cheap, routine, do it every time.
+4. **Escape or avoid literal `<...>` inside Mermaid message/label text** (e.g. a sequence message like `exec cmd <path>` breaks the parser — `<path>` reads as arrow/actor syntax). Use `(path)` or `&lt;path&gt;` instead. Confirmed behavior: a syntax error in ONE diagram makes the overall `mermaid.run()` **promise reject** (wrap the call in try/catch) — but diagrams that DID parse successfully still render correctly. Don't assume a rejected promise means every diagram failed, and don't assume a diagram is fine just because the promise resolved — check `svg.hasAttribute('viewBox')` per diagram either way.
+5. Theme via `mermaid.initialize({ theme:'base', themeVariables:{...} })`, mapping colors from the page's own light/dark CSS custom properties. This is the literal "skill only applies CSS" boundary in practice.
+
+**Honesty note on root cause (read this before citing points 1–3 as "the fix" for a specific crash):** the incident this section is based on showed `svgPanZoom()` throwing `"non-finite" SVGMatrix` errors and some diagrams silently missing their `viewBox` on a real 10-diagram page; applying points 1–4 above made that page render cleanly (verified 3× headless with zero console errors, plus two visual screenshot passes). When isolated minimal test cases were built afterward specifically to pin down *which* change caused *which* failure, the missing-`viewBox`-from-per-node-calls mechanism and the flex/`max-height`-collapse mechanism did **not** reproduce on their own — the original page also had an extra `svg.style.width='100%'; svg.style.height='100%'` override (removed during the fix) that most likely explains the crash, not the per-node-call pattern or the missing box height. Treat 1–3 as verified-good practice for building this kind of page, not as proven root-cause fixes for an isolated, reproduced bug — an earlier draft of this section overstated that causal link, and it was caught by re-testing against the real artifact rather than trusting the original debugging narrative.
+
+```js
+mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'base', themeVariables: {/* map from page tokens, light+dark */} });
+try { await mermaid.run({ querySelector: '.mermaid' }); } catch (e) { console.error('MERMAID_BATCH_RENDER_FAILED', e.message); }
+document.querySelectorAll('.diagram-box pre.mermaid').forEach((node) => {
+  const box = node.closest('.diagram-box');
+  const svg = node.querySelector('svg');
+  if (!svg || !svg.hasAttribute('viewBox')) { box.innerHTML = '<div>diagram failed to render — see console</div>'; return; }
+  const vp = document.createElement('div'); vp.className = 'diagram-viewport';
+  box.insertBefore(vp, node); vp.appendChild(node);
+  const pz = svgPanZoom(svg, { zoomEnabled:true, panEnabled:true, controlIconsEnabled:true, dblClickZoomEnabled:true,
+    fit:true, center:true, contain:true, minZoom:.2, maxZoom:14, zoomScaleSensitivity:.35 });
+  pz.resize(); pz.fit(); pz.center();  // do not skip — see point 3 above
+});
+```
+
+**Verification discipline for either diagram system:** a diagram bug throws no exception and fails no assertion — it just looks wrong. Before calling a diagram "done," render the page headless (`chrome --headless=new --dump-dom --enable-logging=stderr` and grep for `CONSOLE`) to catch silent render failures, AND take an actual screenshot (`chrome --headless=new --screenshot`) to catch layout/overlap bugs that throw nothing. Checking the DOM/console alone is NOT sufficient — it was clean in this incident while the diagram was visibly broken.
 
 ### Copy Button on Code Panels (REQUIRED for every `pre.code-block`)
 

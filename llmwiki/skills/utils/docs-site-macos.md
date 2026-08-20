@@ -1088,6 +1088,72 @@ Notify user: open `http://localhost:8765/llmwiki/html/DDMMYY-<file>.html`
 
 If port 8765 is already in use, skip (server already running).
 
+## Playwright Audit (REQUIRED — final step before handoff, run BEFORE telling the user it's ready)
+
+⚠️ **Bài học 200826, thật, không phải giả thuyết:** một trang được sinh ra để tự đọc code rồi làm ĐÚNG THEO SPEC (nút toggle dark/light, collapse sidebar) lại tự bị viết tắt sai — nút theme thành một chip nổi góc-trên-phải rời rạc, đúng anti-pattern chính SKILL.md này cấm (§Theme Toggle, "KHÔNG phải chip icon rải góc"), và sidebar không hề có `.nav-toggle`/`.nav-close`. Lỗi này KHÔNG bị bắt lúc sinh trang — chỉ lộ ra khi user tự mở trang và báo lại. Đọc code (hay đọc SKILL.md) không đủ để biết trang trông ra sao và có tương tác đúng không; phải MỞ THẬT bằng trình duyệt và ĐO, giống hệt kỷ luật đã áp cho mọi PoC trong phiên 200826.
+
+**Sau khi Auto-Host chạy, PHẢI verify bằng Playwright thật trước khi báo user trang đã xong.** Nếu không có sẵn `@playwright/test` trong project, cài theo `/playwright-verify` (skill riêng, đã có sẵn nếu framework này cài). Viết một script `.mjs` chạy thẳng bằng `node` (không qua `npx playwright test`), tối thiểu kiểm:
+
+1. **0 lỗi console/pageerror** khi trang load.
+2. **Nếu trang có `<nav>` sidebar**: `.nav-toggle` và `.nav-close` PHẢI tồn tại trong DOM (không phải suy đoán từ CSS — query DOM thật). Click `.nav-close` → `document.body` PHẢI có class `nav-collapsed` VÀ `.nav-toggle` PHẢI hiện (`opacity` khác 0). Click lại `.nav-toggle` → `nav-collapsed` PHẢI mất. Đây chính là round-trip đã KHÔNG được kiểm trong bài học 200826.
+3. **Nếu trang có theme toggle**: PHẢI là `.theme-row`/`.theme-switch` nằm bên trong `<nav>` (kiểm bằng `nav.contains(themeRowElement)`), KHÔNG phải một control `position:fixed` độc lập ở góc màn hình. Click toggle → `document.documentElement` đổi `data-theme`, chụp ảnh cả 2 theme.
+4. **Chụp ảnh tối thiểu 3 trạng thái**: theme sáng, theme tối, và (nếu có sidebar) sidebar đã đóng — lưu vào scratchpad, không cần giữ lại sau khi audit qua.
+
+```js
+import { chromium } from "@playwright/test";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
+let errors = [];
+page.on("pageerror", e => errors.push(e.message));
+page.on("console", m => { if (m.type()==='error') errors.push(m.text()); });
+await page.goto("file://<đường-dẫn-tuyệt-đối-tới-file-vừa-sinh>.html", { waitUntil: "load" });
+await page.waitForTimeout(500);
+
+const hasNav = await page.evaluate(() => !!document.querySelector('nav'));
+if (hasNav) {
+  const dom = await page.evaluate(() => ({
+    hasToggle: !!document.querySelector('.nav-toggle'),
+    hasClose: !!document.querySelector('.nav-close'),
+  }));
+  if (!dom.hasToggle || !dom.hasClose) errors.push('THIẾU .nav-toggle/.nav-close — sidebar không đóng/mở được');
+  if (dom.hasClose) {
+    await page.click('.nav-close'); await page.waitForTimeout(300);
+    const collapsed = await page.evaluate(() => document.body.classList.contains('nav-collapsed'));
+    if (!collapsed) errors.push('Click .nav-close không collapse được sidebar');
+    await page.screenshot({ path: '/tmp/audit-collapsed.png' });
+    await page.click('.nav-toggle'); await page.waitForTimeout(300);
+  }
+}
+await page.screenshot({ path: '/tmp/audit-light.png' });
+
+// Dò control đổi theme bằng HÀNH VI thật (bấm thử), KHÔNG đoán theo tên
+// class/id — bug 200826 dùng class="toggle" (không chứa chữ "theme"), nên một
+// bộ dò theo tên class sẽ bỏ sót đúng case đã xảy ra thật. Bấm lần lượt mọi
+// control có thể bấm được tới khi data-theme đổi, rồi kiểm nó có nằm trong
+// .theme-row hay không — bất kể tên class/id của nó là gì.
+const themeBefore = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+// loại .nav-toggle/.nav-close khỏi ứng viên — chúng CŨNG là <button>, và bấm
+// nhầm .nav-close giữa vòng dò sẽ sập sidebar, khiến .theme-switch biến mất
+// khỏi tầm bấm cho các lần thử sau (bug thật gặp khi tự viết script này)
+const clickables = await page.$$('button:not(.nav-toggle):not(.nav-close), [role="switch"]');
+let themeCtl = null, inThemeRow = false;
+for (const el of clickables) {
+  await el.click().catch(() => {});
+  await page.waitForTimeout(150);
+  const themeAfter = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  if (themeAfter !== themeBefore) { themeCtl = el; inThemeRow = await el.evaluate(n => !!n.closest('.theme-row')); break; }
+}
+if (!themeCtl) errors.push('Bấm thử mọi <button>/[role=switch] không thấy data-theme đổi — thiếu theme toggle');
+else if (!inThemeRow) errors.push('Tìm thấy control đổi được data-theme nhưng KHÔNG nằm trong .theme-row — khả năng là chip nổi góc rời sidebar (bug 200826)');
+await page.screenshot({ path: '/tmp/audit-dark.png' });
+
+if (errors.length) { console.log('AUDIT FAIL:', errors); process.exit(1); }
+console.log('AUDIT PASS');
+await browser.close();
+```
+
+**Nếu audit FAIL: SỬA rồi audit lại — không báo trang đã xong ở trạng thái đỏ.** Đây là cổng chất lượng cuối cùng, tương đương `medic --ci` ở tầng code: đỏ thì đừng giao. Không cần giữ lại script hay ảnh chụp sau khi audit qua — đây là bước verify-rồi-vứt, không phải artifact phải commit (theo đúng quy ước `/playwright-verify`: "File script standalone không vào git — chạy từ scratchpad").
+
 ## Multi-File Mode
 
 When generating separate pages per wiki file (all files share the same `DDMMYY-` date prefix):

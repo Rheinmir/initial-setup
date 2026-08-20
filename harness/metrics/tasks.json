@@ -334,5 +334,28 @@
         "note": "file SPEC/HTML/unknown đã xoá theo yêu cầu user 2026-08-07; backup ở scratchpad"
       }
     ]
+  },
+  "T-260820-01": {
+    "id": "T-260820-01",
+    "title": "docs-site-macos: Mermaid diagram engine + sidebar/toggle position fix",
+    "state": "completed",
+    "created": "2026-08-20T09:21:34",
+    "updated": "2026-08-20T16:25:19",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-08-20T09:21:34"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-08-20T16:25:19",
+        "note": "user duyet truc tiep trong chat, yeu cau lam ngay + day remote"
+      },
+      {
+        "state": "completed",
+        "ts": "2026-08-20T16:25:19",
+        "note": "implement xong, verified Playwright, push remote"
+      }
+    ]
   }
 }

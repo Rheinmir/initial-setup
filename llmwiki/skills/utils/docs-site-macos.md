@@ -591,16 +591,29 @@ Notes:
 
 The hand-authored path above works because the LLM hand-picks every node's `x`/`y` — fine for small diagrams (≤~5 nodes, mostly linear), but coordinates get uneven once a diagram has real branching, because there is no layout algorithm behind it, only judgment. **Use this Mermaid path instead when a diagram has ≥6 nodes OR has branches/merges** — anything a real auto-layout engine earns its cost on. Below that threshold, stay on the hand-SVG path (ladder: YAGNI — don't pull in a 1.5MB engine for a 3-box flow).
 
-This renders real Mermaid DSL through `beautiful-mermaid` (MIT, `github.com/lukilabs/beautiful-mermaid`) — a synchronous renderer built on ELK.js, chosen over official Mermaid.js because it's lighter, has no async flash, and its two-color theme (`bg`/`fg` + optional `line`/`accent`/`muted`/`surface`/`border`) is CSS-custom-properties on the `<svg>` root, so it re-themes instantly on the existing dark/light toggle with zero re-render. The vendored bundle lives at `vendor/beautiful-mermaid.min.js` next to this file (see `vendor/README.md` for provenance and the exact rebuild command) — built **once**, off-band; generating a page never runs a bundler or touches the network.
+This renders real Mermaid DSL through `beautiful-mermaid` (MIT, `github.com/lukilabs/beautiful-mermaid`) — a synchronous renderer built on ELK.js, chosen over official Mermaid.js because it's lighter, has no async flash, and its two-color theme (`bg`/`fg` + optional `line`/`accent`/`muted`/`surface`/`border`) is CSS-custom-properties on the `<svg>` root, so it re-themes instantly on the existing dark/light toggle with zero re-render. The vendored bundle is shipped **gzip-compressed** at `vendor/beautiful-mermaid.min.js.gz.b64` (see `vendor/README.md` for provenance and the exact rebuild command) — built **once**, off-band; generating a page never runs a bundler or touches the network.
 
-**1. Assembly — copy the vendor bundle into the output `<script>` verbatim.** When writing the output HTML file, after composing the rest of the page, splice the vendor file's content into its own `<script>` block (this is a file-concat step, not something to retype by hand):
+**Why compressed:** the raw bundle is 1.56MB — embedded verbatim, that's added to EVERY generated page regardless of how many diagrams it has. Gzipped + base64'd it's **625KB** (measured: `gzip -9` → 468,777 bytes raw, → 625,037 bytes once base64'd for inline embedding — 40% of original). Decompressed client-side via `DecompressionStream('gzip')`, a browser-native API (Chrome/Edge 80+ 2020, Firefox 113+ 2021, Safari 16.4+ 2023 — ~95% global coverage), so this adds **zero** extra library weight. Brotli compresses smaller (364KB raw) but was rejected: cross-browser support for `DecompressionStream("brotli")` isn't reliably confirmed yet (MDN sources disagree) — gzip is the well-established, unambiguous choice for a skill that must render everywhere.
 
-```bash
-# conceptually: head.html + vendor/beautiful-mermaid.min.js + tail.html -> output.html
-cat page-before-vendor.html skills/docs-site-macos/vendor/beautiful-mermaid.min.js page-after-vendor.html > llmwiki/html/DDMMYY-<slug>.html
+**1. Assembly — embed the compressed vendor blob + a decompress-and-eval bootstrap.** When writing the output HTML file, splice the base64 text of `vendor/beautiful-mermaid.min.js.gz.b64` into a JS string constant, followed by this bootstrap (file-concat + one fixed snippet, not something to retype differently per page):
+
+```html
+<script>
+var __BM_GZ_B64 = "PASTE vendor/beautiful-mermaid.min.js.gz.b64 CONTENTS HERE, verbatim, no line breaks inside the string";
+window.__bmReady = (typeof DecompressionStream === 'undefined')
+  ? Promise.reject(new Error('DecompressionStream unsupported'))
+  : (async function(){
+      var bin = atob(__BM_GZ_B64);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+      var code = await new Response(stream).text();
+      (0, eval)(code); // indirect eval -> runs in global scope, defines window.BeautifulMermaid
+    })();
+</script>
 ```
 
-If generating the file directly (no intermediate head/tail split), read `vendor/beautiful-mermaid.min.js` and inline its exact contents inside one `<script>…</script>` block in the output — before the render/interactive-layer JS below, since that code calls `window.BeautifulMermaid.renderMermaidSVG()`.
+This makes vendor loading **async** (decompression takes a tick) — `renderMermaidDiagram` below awaits `window.__bmReady` as its first line, so every call site must `await renderMermaidDiagram(...)` (or `.then()`), never call it expecting a synchronous return.
 
 **2. Theme tokens** — add these to the SAME `:root` / dark-override blocks already required by §Theme Toggle sáng/tối (mapped to this skill's real palette: text `#0f0f12`/`#4a4a55`, border `rgba(30,90,170,.14)`, accent `#0a84ff` — dòng 28-29, 103):
 
@@ -635,7 +648,14 @@ html[data-theme=dark]{ /* CÙNG token như trong @media ở trên */
 **4. Render, theme-map, and Self-Contained fix** — call once per `.diagram-box` that crosses the complexity threshold:
 
 ```js
-function renderMermaidDiagram(container, dsl){
+async function renderMermaidDiagram(container, dsl){
+  try { await window.__bmReady; }
+  catch (e){
+    // Graceful degradation (no DecompressionStream — pre-2020 Chrome/Edge, pre-2021
+    // Firefox, pre-16.4 Safari): explain instead of a silent blank box or a crash.
+    container.textContent = 'Sơ đồ này cần trình duyệt mới hơn (Chrome/Edge 80+, Firefox 113+, Safari 16.4+).';
+    return null;
+  }
   function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
   var svg = BeautifulMermaid.renderMermaidSVG(dsl, {
     bg: cssVar('--mm-bg'), fg: cssVar('--mm-fg'), accent: cssVar('--mm-accent'),
@@ -654,6 +674,8 @@ function renderMermaidDiagram(container, dsl){
   return svgEl;
 }
 ```
+
+Every call site becomes `await renderMermaidDiagram(container, dsl)` — wrap the page's diagram-init code in an `async function` (or top-level `(async()=>{...})()`), never call this expecting a synchronous SVG element back.
 
 **5. Glassmorphism post-processing (REQUIRED)** — beautiful-mermaid's default rendering is flat; this makes it match the rest of the page (rounded corners, soft blue drop-shadow, specular sheen — same recipe as `.diagram-box`/`.card`, never a fake `backdrop-filter` since SVG doesn't support it reliably) plus a subtle flowing-dash on edges for liveliness, reusing the exact `flowArrow` keyframe already defined above (§Key Animations) rather than inventing new vocabulary. **Never touches node/edge coordinates** — ELK.js already computed those; this only adds visual layers on top:
 

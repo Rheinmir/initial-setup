@@ -1,6 +1,6 @@
 ---
 name: orca-onboard
-description: "Parallel codebase onboarding — distilled understand-anything pipeline (scan + git history + batch analyze + layers/tour, no plugin), then domain enrichment (Claude), wiki + HTML via opencode+DeepSeek Flash v4."
+description: "Parallel codebase onboarding — distilled understand-anything pipeline (scan + git history + batch analyze + layers/tour, no plugin), then domain enrichment (Claude), wiki + HTML via opencode (model free dò lúc chạy), fallback Sonnet 5 subagent."
 requires:
   - name: docs-site-macos
     source: rheinmir/setup@orca
@@ -27,8 +27,8 @@ Onboard codebase via distilled understand-anything pipeline (graph + git history
 ```
 [Phase 1/4] Graph generation (scan + git history + batch analyze + layers/tour)...
 [Phase 2/4] Domain enrichment (Claude)...
-[Phase 3/4] Wiki generation (opencode + DeepSeek Flash v4)...
-[Phase 4/4] HTML docs (opencode + DeepSeek Flash v4)...
+[Phase 3/4] Wiki generation (opencode, fallback Sonnet 5 subagent)...
+[Phase 4/4] HTML docs (opencode, fallback Sonnet 5 subagent)...
 ```
 
 ---
@@ -58,11 +58,12 @@ Batch file analyze → python static parse → (no LLM — PRIMARY; opencode ch�
 Merge + validate   → python inline       → (no LLM)
 Layers / tour      → Claude main thread  → Sonnet (never dispatch out)
 Domain reasoning   → Claude main thread  → Sonnet (never dispatch out)
-Wiki / HTML render → opencode            → opencode/deepseek-v4-flash-free
+Wiki / HTML render → opencode            → $OC_MODEL (dò lúc chạy — xem Phase 0 bước 0)
+Fallback khi opencode chết → Sonnet 5 subagent (Agent tool, model:"sonnet") — KHÔNG ôm về main thread
 ```
 
 **Reasoning tasks MUST stay in Claude main thread. NO reasoning to opencode/agy.**
-**opencode + DeepSeek: template fill, wiki render, HTML only.**
+**opencode + model free: template fill, wiki render, HTML only.**
 
 ---
 
@@ -76,11 +77,19 @@ Wiki / HTML render → opencode            → opencode/deepseek-v4-flash-free
 
 > **Không cần plugin Understand-Anything.** Phase 1 dùng phương pháp đã distill từ Understand-Anything (scan → batch analyze → merge → layers → tour → validate) viết thẳng trong skill này — chạy bằng bash/python + opencode prompt thuần + Claude main thread. Không cài thêm gì vào agy/opencode.
 
-**OpenCode with DeepSeek Flash v4:**
+> **macOS KHÔNG có `timeout`/`gtimeout`.** Đừng bọc dispatch bằng `timeout` — chết ngay với
+> `command not found`. Chạy nền (`run_in_background`) rồi đọc log.
+>
+> **Drift theo git KHÔNG dùng được ở repo nhiều submodule.** Nếu `git ls-files | wc -l` nhỏ bất thường so
+> với số file trên đĩa (Ecobar: 2 vs 5,535), `git diff <meta.gitCommitHash>..HEAD` trả rỗng dù code đổi
+> hàng chục file. Dò bằng mtime: `find . -newermt "<lastAnalyzedAt>" ...`, rồi ghi `changedFiles` vào
+> `meta.json` cho lần sau.
+
+**OpenCode dispatch (model dò lúc chạy, KHÔNG hardcode):**
 ```bash
-opencode run "$SPEC" --model opencode/deepseek-v4-flash-free < /dev/null \
+opencode run "$SPEC" --model ${OC_MODEL} < /dev/null \
 # Fallback if flag unsupported:
-echo "$SPEC" | opencode --model opencode/deepseek-v4-flash-free
+echo "$SPEC" | opencode --model ${OC_MODEL}
 # Last resort: Claude main thread
 ```
 
@@ -106,6 +115,15 @@ update_phase_status() {
 ## Phase 0 — Pre-flight & Setup
 
 ```bash
+# --- 0. Chốt model opencode (tên model TRÔI: 22/08/2026 deepseek-v4-flash-free bị gỡ khỏi registry) ---
+# ĐỪNG hardcode. Dò registry thật, lấy free model đầu tiên còn sống.
+OC_MODEL=""
+for m in opencode/nemotron-3.5-lightning-free opencode/hy3-free opencode/mimo-v2.5-free opencode/nemotron-3-ultra-free; do
+  opencode models 2>/dev/null | grep -qx "$m" && OC_MODEL="$m" && break
+done
+[ -z "$OC_MODEL" ] && OC_MODEL=$(opencode models 2>/dev/null | grep -- '-free$' | head -1)
+echo "[pre-flight] OC_MODEL=${OC_MODEL:-<none — mọi dispatch fallback Sonnet subagent>}"
+
 # --- 1. Dependency check (agy optional — Phase 1 dùng distilled pipeline, không cần agy) ---
 MISSING=()
 opencode --version >/dev/null 2>&1  || MISSING+=("opencode")
@@ -262,10 +280,10 @@ timestamp: $(date +%Y-%m-%d)
 ## Agent Task Assignment
 | Task | Agent | Model | Status |
 |------|-------|-------|--------|
-| Phase 1 — Graph generation ($FILE_COUNT files) | $AGENT_GRAPH | DeepSeek Flash v4 + Sonnet | pending |
+| Phase 1 — Graph generation ($FILE_COUNT files) | $AGENT_GRAPH | $OC_MODEL + Sonnet | pending |
 | Phase 2 — Domain enrichment | Claude main thread | Sonnet | pending |
-| Phase 3 — Wiki generation | opencode | DeepSeek Flash v4 | pending |
-| Phase 4 — HTML docs | opencode | DeepSeek Flash v4 | pending |
+| Phase 3 — Wiki generation | opencode | $OC_MODEL (free) | pending |
+| Phase 4 — HTML docs | opencode | $OC_MODEL (free) | pending |
 
 ## What
 Onboard \`$PROJECT_ROOT\` — understand-anything graph, domain enrichment, wiki, HTML.
@@ -297,15 +315,15 @@ Onboard \`$PROJECT_ROOT\` — understand-anything graph, domain enrichment, wiki
 - Project root: \`$PROJECT_ROOT\`
 - Files tracked: $FILE_COUNT
 - Reasoning phases in Claude main thread — NOT dispatched to cheap models
-- Mechanical phases: opencode + DeepSeek Flash v4
+- Mechanical phases: opencode (model free dò lúc chạy)
 
 ## Cost Estimate
 | Phase | Agent | Est. tokens | Est. cost |
 |-------|-------|-------------|-----------|
-| Phase 1 (graph) | bash + opencode batches + Claude layers/tour | ~1.5M (DeepSeek) + ~50k (Sonnet) | ~\$0.50 |
+| Phase 1 (graph) | bash + opencode batches + Claude layers/tour | ~1.5M (opencode free) + ~50k (Sonnet) | ~\$0.50 |
 | Phase 2 (domain) | Claude Sonnet | ~50k | ~\$0.50 |
-| Phase 3 (wiki) | DeepSeek Flash | ~100k | ~\$0.02 |
-| Phase 4 (HTML) | DeepSeek Flash | ~50k | ~\$0.01 |
+| Phase 3 (wiki) | opencode free | ~100k | ~\$0.02 |
+| Phase 4 (HTML) | opencode free | ~50k | ~\$0.01 |
 
 ## Origin
 - **Draft:** \`wiki/draft/orca/${DATE}-onboard-${PROJECT_SLUG}.md\`
@@ -329,10 +347,10 @@ echo " Files   : $FILE_COUNT"
 echo " Draft   : $DRAFT_FILE"
 echo "----------------------------------------------------------------------"
 printf " %-7s %-22s %-24s %-20s %s\n" "PHASE" "TASK" "AGENT" "MODEL" "EST.COST"
-printf " %-7s %-22s %-24s %-20s %s\n" "1" "Graph generation" "bash+opencode+Claude" "DeepSeek+Sonnet" "~\$0.50"
+printf " %-7s %-22s %-24s %-20s %s\n" "1" "Graph generation" "bash+opencode+Claude" "$OC_MODEL+Sonnet" "~\$0.50"
 printf " %-7s %-22s %-24s %-20s %s\n" "2" "Domain enrichment" "Claude main thread" "Sonnet" "~\$0.50"
-printf " %-7s %-22s %-24s %-20s %s\n" "3" "Wiki generation" "opencode" "DeepSeek Flash v4" "~\$0.02"
-printf " %-7s %-22s %-24s %-20s %s\n" "4" "HTML docs" "opencode" "DeepSeek Flash v4" "~\$0.01"
+printf " %-7s %-22s %-24s %-20s %s\n" "3" "Wiki generation" "opencode" "$OC_MODEL (free)" "~\$0.02"
+printf " %-7s %-22s %-24s %-20s %s\n" "4" "HTML docs" "opencode" "$OC_MODEL (free)" "~\$0.01"
 [ -n "$P1_NOTE" ] && echo " Phase 1 $P1_NOTE"
 echo "======================================================================"
 
@@ -351,7 +369,7 @@ Ask for confirmation before continuing.
 
 ## Phase 1 — Graph Generation (distilled understand-anything — KHÔNG cần plugin)
 
-**Pipeline:** scan (bash) → git history (bash) → batch analyze (opencode + DeepSeek) → merge (python) → layers + tour (Claude main thread) → validate + save (python + Claude). Phương pháp distill từ Understand-Anything; mọi prompt/schema nằm ngay dưới đây — không dispatch `/understand`, không cài plugin.
+**Pipeline:** scan (bash) → git history (bash) → batch analyze (opencode, model free dò lúc chạy) → merge (python) → layers + tour (Claude main thread) → validate + save (python + Claude). Phương pháp distill từ Understand-Anything; mọi prompt/schema nằm ngay dưới đây — không dispatch `/understand`, không cài plugin.
 
 **Required output:**
 - `.understand-anything/knowledge-graph.json` (nodes, edges, layers, tour)
@@ -409,12 +427,12 @@ Chỉ dispatch opencode khi cần summary giàu ngữ nghĩa hơn cho file phứ
 Chia file list thành batch ~25 file (file liên quan cùng batch: Dockerfile+compose, migrations, CI configs, docs). Mỗi batch dispatch:
 
 ```bash
-opencode run "$BATCH_SPEC" --model opencode/deepseek-v4-flash-free < /dev/null
+opencode run "$BATCH_SPEC" --model ${OC_MODEL} < /dev/null
 # ⚠ KHÔNG thêm --dangerously-skip-permissions: Claude Code auto-mode classifier sẽ DENY lệnh dispatch.
 # opencode treo chờ permission / bị chặn → dùng STATIC PARSE fallback bên dưới (ưu tiên mặc định).
 ```
 
-`BATCH_SPEC` (inject đủ context — DeepSeek không tự đọc gì ngoài danh sách được giao):
+`BATCH_SPEC` (inject đủ context — model rẻ không tự đọc gì ngoài danh sách được giao):
 
 > Analyze these files in project <name> (<description>, languages: <langs>). For EACH file produce GraphNode `{id, type, name, filePath, summary (1-2 câu), tags[]}` and GraphEdges `{source, target, type, weight}` for imports/calls/configures/documents visible in file content. Read each listed file. Write ONLY valid JSON `{"nodes":[...], "edges":[...]}` to `.orca-onboard/tmp/batch-<i>.json`. ID convention: `file:<relpath>`, `config:<relpath>`, `document:<relpath>`. Files: <list kèm line counts>
 
@@ -519,6 +537,27 @@ echo "[1.7] code-graph: gọi reindex_repo cho mỗi repo code có manifest"
 
 **Output:** `.orca-onboard/intermediate/domain-graph.json`
 
+**GATE bắt buộc — verify mọi `file:line` TRƯỚC khi sang Phase 3.** Run 18/08 để lọt 13 ref bịa (file không
+tồn tại, hoặc path là thư mục trần) và chúng sống tới tận HTML:
+
+```bash
+python3 - <<'PY'
+import json,os
+d=json.load(open('.orca-onboard/intermediate/domain-graph.json'))
+bad=[]
+for dom in d['domains']:
+    for fl in dom.get('flows',[]):
+        for st in fl.get('steps',[]):
+            f,l=st.get('file'),st.get('line')
+            if not f: continue
+            if not os.path.isfile(f): bad.append((st['id'],f,'MISSING')); continue
+            n=sum(1 for _ in open(f,encoding='utf-8',errors='ignore'))
+            if l and l>n: bad.append((st['id'],f,'line %s>%s'%(l,n)))
+print("BAD refs:",bad or "none")
+assert not bad, "sua het ref hong roi moi sang Phase 3"
+PY
+```
+
 **Skip check:** `RESUME_MODE=true` + `PHASE2_STATUS=done` → skip to Phase 3.
 
 ```bash
@@ -543,9 +582,9 @@ fi
 
 ## Phase 3 — Wiki Generation
 
-**Agent:** opencode | **Model:** `opencode/deepseek-v4-flash-free`
+**Agent:** opencode | **Model:** `${OC_MODEL}`
 
-> **READ FIRST** (inject into SPEC before dispatch — DeepSeek won't read files unless injected):
+> **READ FIRST** (inject into SPEC before dispatch — model rẻ won't read files unless injected):
 > 1. `.understand-anything/ONBOARDING.md` — full read
 > 2. `.orca-onboard/intermediate/domain-graph.json` — full read
 > 3. If `UPDATE_MODE=true`: grep `llmwiki/wiki/` for refs to `CHANGED_FILES` → identify stale pages
@@ -587,7 +626,7 @@ R5: chỉ được ghi vào concepts/ hoặc entities/. R2: mọi trang có '## 
 Use wikilink format [[page-name]]. Do NOT read knowledge-graph.json directly."
   fi
 
-  opencode run "$SPEC" --model opencode/deepseek-v4-flash-free < /dev/null \
+  opencode run "$SPEC" --model ${OC_MODEL} < /dev/null \
     || echo "[WARN] opencode unavailable — Claude main thread fallback for wiki"
 
   update_phase_status "Phase 3 —" "done"
@@ -601,14 +640,14 @@ fi
 **Agent:** assemble JSON = opencode (mechanical) / Claude fallback · **fill skeleton = python (no LLM)**
 
 **Cách hoạt động (KHÁC bản cũ — chống sơ sài + đứt UX):** KHÔNG để model sinh HTML thô
-(DeepSeek tự chế CSS/JS → mất "gương", ấn không ăn, output 173–816 dòng không ổn định).
+(model rẻ tự chế CSS/JS → mất "gương", ấn không ăn, output 173–816 dòng không ổn định).
 Thay vào đó: model CHỈ phát **một object JSON** theo schema; UI do **skeleton v2 frozen**
 (`assets/docs-site-skeleton.html`, đã áp đúng design-system `/docs-site-macos`) render.
 Skeleton = nav 5 tab CỐ ĐỊNH (Overview/Architecture/Guided Tour/Modules/Docker) + sidebar
 fixed + collapse + scroll-spy + tour master-detail + draggable diagram; **Modules/Docker tự
 ẩn khi mono**. Nội dung con (layer/tour/module/docker) DATA-DRIVEN từ JSON.
 
-> **READ FIRST** (nguồn GIÀU — inject vào SPEC; DeepSeek không tự đọc file):
+> **READ FIRST** (nguồn GIÀU — inject vào SPEC; model rẻ không tự đọc file):
 > 1. `.understand-anything/ONBOARDING.md` — full (overview, hot files, flows, tour narrative)
 > 2. `.orca-onboard/intermediate/domain-graph.json` — domain→flow→step (tour + lifecycle)
 > 3. `knowledge-graph.json` **chỉ** `layers` + `tour` + node entry-point (⛔ KHÔNG full — overflow)
@@ -641,7 +680,7 @@ $SKELETON, ghi vào $JSON_OUT. Yêu cầu chất lượng:
 - tour[] 5–15 bước, MỖI bước GIÀU: role(1-2 câu), file+line THẬT, in[]/out[], hot(churn), narr — KHÔNG 1–2 dòng.
 - modules[] = mỗi container/image (đọc $DKFILE): name,img,meta(port/env/volume),life[[read|proc|write,desc]],arch. Repo mono ($N_SVC≤1) → modules:[].
 - docker = {strategy, cmd[[text,c|p|]], table[[svc,img,cmd/port,deps]], order[]} nếu có compose; mono → docker:null."
-  opencode run "$SPEC" --model opencode/deepseek-v4-flash-free < /dev/null 2>/dev/null \
+  opencode run "$SPEC" --model ${OC_MODEL} < /dev/null 2>/dev/null \
     || echo "[Phase 4] opencode unavailable — Claude main thread tự assemble $JSON_OUT theo schema skeleton"
   # Nếu opencode treo/trống → Claude main thread đọc 2 nguồn trên, tự viết $JSON_OUT (reasoning OK ở đây).
 
@@ -650,11 +689,28 @@ $SKELETON, ghi vào $JSON_OUT. Yêu cầu chất lượng:
   mkdir -p "$PROJECT_ROOT/llmwiki/html"
   python3 - "$SKELETON" "$JSON_OUT" "$OUT" <<'PY'
 import json,sys,html
-sk=open(sys.argv[1]).read(); data=json.load(open(sys.argv[2]))
+# CAM BAY (22/08/2026): comment hop dong o DAU skeleton co literal {{TITLE}}, {{ONBOARD_JSON}} va ca
+# chuoi <script id="ob-data">. str.replace() tho thay CA 3 cho -> payload nhan doi, file phinh gap doi.
+# Chi thay dung 2 chuoi DAY DU duoi day.
+sk=open(sys.argv[1],encoding='utf-8').read(); data=json.load(open(sys.argv[2],encoding='utf-8'))
 name=(data.get("project") or {}).get("name","Project")
-out=sk.replace("{{TITLE}}",html.escape(name)).replace("{{ONBOARD_JSON}}",json.dumps(data,ensure_ascii=False))
-assert "{{ONBOARD_JSON}}" not in out and "{{TITLE}}" not in out, "token chưa thay hết"
-open(sys.argv[3],"w").write(out); print("✅ filled →",sys.argv[3],len(out),"bytes")
+payload=json.dumps(data,ensure_ascii=False)
+assert "-->" not in payload and "</script" not in payload.lower(), "payload chua chuoi pha vo HTML"
+ISLAND='<script id="ob-data" type="application/json">{{ONBOARD_JSON}}</script>'
+TITLE='<title>{{TITLE}} — Onboarding</title>'
+assert sk.count(ISLAND)==1 and sk.count(TITLE)==1, "skeleton doi hinh dang — kiem lai truoc khi thay"
+out=(sk.replace(ISLAND,'<script id="ob-data" type="application/json">'+payload+'</script>')
+       .replace(TITLE,'<title>'+html.escape(name)+' — Onboarding</title>'))
+open(sys.argv[3],"w",encoding='utf-8').write(out)
+print("✅ filled →",sys.argv[3],len(out),"chars | payload",len(payload))
+PY
+  # Kiem dao nguoc: JSON island phai parse duoc. Regex PHAI co type="application/json" —
+  # thieu no se khop nham chuoi <script id="ob-data"> nam trong comment o dau skeleton.
+  python3 - "$OUT" <<'PY'
+import json,re,sys
+s=open(sys.argv[1],encoding='utf-8').read()
+d=json.loads(re.search(r'<script id="ob-data" type="application/json">(.*?)</script>',s,re.S).group(1))
+print("✅ JSON island OK:",{k:(len(v) if isinstance(v,list) else 'obj') for k,v in d.items()})
 PY
 
   ls "$OUT" && echo "✅ Phase 4 done" || echo "❌ Phase 4 FAIL: HTML not found"
@@ -711,6 +767,7 @@ echo "→ http://localhost:8765/llmwiki/html/onboarding-${PROJECT_SLUG}.html"
 - Phase 2 domain empty → no HTTP/CLI/event entry points found; write empty domains array
 - Phase 3 fail → check opencode model config; fallback Claude main thread
 - Phase 4 fail → fallback: invoke docs-site-macos skill directly in Claude
+- Dispatch opencode có thể fail 2 kiểu: (a) model không còn trong registry → xử lý bằng cơ chế dò `$OC_MODEL` ở Phase 0; (b) opencode chạy, đọc hết nguồn, rồi thoát mà KHÔNG ghi file nào (gặp 22/08/2026 với nemotron-3.5-lightning-free ở Phase 3) → kiểm bằng `ls` file mong đợi sau mỗi dispatch, thiếu thì fallback **Sonnet 5 subagent** (Agent tool, `model: "sonnet"`), KHÔNG ôm việc về main thread.
 
 ---
 
@@ -740,8 +797,8 @@ timestamp: YYYY-MM-DD
 |------|-------|-------|--------|
 | Phase 1 — Graph generation | agy /understand | Claude (agy) | done |
 | Phase 2 — Domain enrichment | Claude main | Sonnet | done |
-| Phase 3 — Wiki generation | opencode | DeepSeek Flash v4 | done |
-| Phase 4 — HTML docs | opencode | DeepSeek Flash v4 | done |
+| Phase 3 — Wiki generation | opencode | $OC_MODEL (free) | done |
+| Phase 4 — HTML docs | opencode | $OC_MODEL (free) | done |
 
 ## What
 <One sentence>
@@ -777,7 +834,7 @@ timestamp: YYYY-MM-DD
   cp ~/.agents/skills/orca-onboard/SKILL.md /tmp/rheinmir-setup-sync/skills/orca-onboard/SKILL.md
   cd /tmp/rheinmir-setup-sync
   git add .
-  git commit -m "skill: orca-onboard — wrap understand-anything, DeepSeek mechanical dispatch"
+  git commit -m "skill: orca-onboard — wrap understand-anything, opencode mechanical dispatch"
   git push origin orca
   rm -rf /tmp/rheinmir-setup-sync
   ```
@@ -808,8 +865,8 @@ proposed: YYYY-MM-DD
 |------|-------|-------|--------|
 | Phase 1 — Graph generation | agy /understand | Claude (agy) | done |
 | Phase 2 — Domain enrichment | Claude main | Sonnet | done |
-| Phase 3 — Wiki generation | opencode | DeepSeek Flash v4 | done |
-| Phase 4 — HTML docs | opencode | DeepSeek Flash v4 | done |
+| Phase 3 — Wiki generation | opencode | $OC_MODEL (free) | done |
+| Phase 4 — HTML docs | opencode | $OC_MODEL (free) | done |
 
 ## What
 <One sentence>
@@ -845,7 +902,7 @@ proposed: YYYY-MM-DD
   cp ~/.agents/skills/orca-onboard/SKILL.md /tmp/rheinmir-setup-sync/skills/orca-onboard/SKILL.md
   cd /tmp/rheinmir-setup-sync
   git add .
-  git commit -m "skill: orca-onboard — wrap understand-anything, DeepSeek mechanical dispatch"
+  git commit -m "skill: orca-onboard — wrap understand-anything, opencode mechanical dispatch"
   git push origin orca
   rm -rf /tmp/rheinmir-setup-sync
   ```

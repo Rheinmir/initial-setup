@@ -80,6 +80,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `ship` | User nhắc release/push/ship — checklist điều kiện trước push & release (medic gate/git sạch/version x.x.x+1/patch note trung thực) | `skills/dev-loop/ship.md` | dev-loop |
 | `ovs-notes` | Xem release notes/changelog — liệt kê các bản (tag/GH release) newest-first để chọn & đọc, read-only (khác /ship = cắt release) | `skills/utils/ovs-notes.md` | utils |
 | `onboard-codebase` | Deep analysis of legacy code to populate Wiki | `skills/dev-loop/onboard-codebase.md` | dev-loop |
+| `doyourmagic` | Freshly-cloned external repo/tool → clone→explore→analysis→write-workflows, sinh bộ `doyourmagic/<repo-name>/workflows.md` + `index.html` chạy được ngay. KHÁC `onboard-codebase` (phân tích DỰ ÁN CHÍNH → wiki nội bộ, không phải tool ngoài) | `skills/dev-loop/doyourmagic.md` | dev-loop |
 | `orca-workflow` | Daily propose → gate → dispatch with Orca | `skills/orchestrate/orca-workflow.md` | orchestrate |
 | `orca-onboard` | Parallel codebase onboarding with Orca | `skills/orchestrate/orca-onboard.md` | orchestrate |
 | `orca-handover` | Sinh MỘT file .md bàn giao đủ dày để phiên KHÁC (không có context nào) mở ra là làm được ngay — việc dở + thứ tự có lý do + số đo làm bằng chứng + cạm bẫy đã trả giá + hướng đã thử và BỎ. KHÁC record-episode (ghi cho MÁY) và plan (task ĐÃ duyệt, đã rõ) | `skills/orchestrate/orca-handover.md` | orchestrate |

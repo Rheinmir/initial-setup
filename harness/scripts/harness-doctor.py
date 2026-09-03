@@ -377,9 +377,10 @@ def build_r12(base):
     _w(ahead / "f.txt", "2")
     _git(ahead, "add", "."); _git(ahead, "commit", "-q", "-m", "b"); _git(ahead, "push", "-q", "origin", "main")
     env = {**os.environ, "GIT_TERMINAL_PROMPT": "0", "PULL_GATE_FRESH_SECS": "0"}
-    bad = subprocess.run(["bash", str(gate), "gate2"], cwd=str(behind),
+    gate_posix = str(gate).replace("\\", "/")  # MSYS bash mangles backslash argv on Windows
+    bad = subprocess.run(["bash", gate_posix, "gate2"], cwd=str(behind),
                          capture_output=True, text=True, env=env).returncode
-    good = subprocess.run(["bash", str(gate), "gate2"], cwd=str(ahead),
+    good = subprocess.run(["bash", gate_posix, "gate2"], cwd=str(ahead),
                           capture_output=True, text=True, env=env).returncode
     return _result("block-git", "pull-gate.sh",
                    [("behind:block", bad, 2), ("uptodate:pass", good, 0)])

@@ -1,4 +1,10 @@
+# Operation Log
 
+## 2026-09-02 — maintenance — vá R3 index-sync + soi duplicate-basename (fdk-gate drift)
+
+`python3 harness/validators/index_sync.py --wiki-dir llmwiki/wiki` báo 18 file thiếu khỏi `wiki/index.md` (8 `sources/*-session-provenance.md` từ 24/07 đến 13/08, 10 `sources/draft/*.md`). Đọc từng file thật (không suy đoán tên/ngày) rồi thêm đúng 18 dòng vào bảng, theo house-style sẵn có: 8 dòng session-provenance khớp khuôn `Auto-distill scratch-log phiên <hash> ngày DD/MM...` (5 dòng `(stub) — chỉ chạm ...` vì chỉ đụng `gitignore`/`entities/repowise.md`, 1 dòng có nội dung thật vì phiên đó soạn draft BIV); 6 dòng `draft` + 4 dòng `issue` khớp khuôn "SPEC ..."/"Issue: ..." đã dùng cho các `sources/draft/*` khác. Validator giờ exit 0.
+
+Soi `python3 harness/validators/duplicate_basename.py --wiki-dir llmwiki/wiki`: `200826-docs-site-macos-mermaid-sidebar-fix.md` trùng basename ở `draft/unknown/` và `sources/draft/`. Diff hai file: **KHÔNG phải bản sao** — `sources/draft/` là SPEC (`type: draft`), `draft/unknown/` là unknown-ledger (`type: unknown-ledger`, khai `source_spec:` trỏ ngược về chính SPEC đó), nội dung hoàn toàn khác nhau. Đối chiếu 2 file unknown-ledger khác cùng thư mục (`unknown-context-hygiene.md`, `unknown-frontend-design.md`) lộ ra quy ước đặt tên: file trong `draft/unknown/` phải mang tiền tố `unknown-<slug>.md`, không được trùng basename với SPEC nguồn — file `200826-...` phá quy ước đó (thiếu tiền tố `unknown-`) nên mới đụng basename. Không xoá/gộp file nào — nội dung khác nhau thật, cần người quyết hướng sửa (nhiều khả năng: đổi tên `draft/unknown/200826-docs-site-macos-mermaid-sidebar-fix.md` → `draft/unknown/unknown-docs-site-macos-mermaid-sidebar-fix.md`), báo lại thay vì tự đoán. `duplicate_basename.py` vẫn đỏ, cố ý để nguyên.
 
 <!-- log:auto:start -->
 

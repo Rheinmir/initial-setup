@@ -27,7 +27,7 @@ def fail(reason: str) -> None:
 
 
 def check_path(path: str) -> None:
-    if RAW_PATH.search(path or ""):
+    if RAW_PATH.search((path or "").replace("\\", "/")):
         fail(f"Chan ghi file vao raw/: {path}")
 
 

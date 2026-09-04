@@ -36,7 +36,7 @@ VẪN KHÔNG BẮT ĐƯỢC: server sống + code mới nhưng trả kết quả
 CLI:
     dep-health.py [--json]        # bảng người đọc / JSON cho máy
     dep-health.py --quiet-ok      # chỉ in khi CÓ vấn đề (dùng ở hook)
-    dep-health.py --reap-orphans  # kill server orphan, GIỮ tiến trình mới nhất
+    dep-health.py --reap-orphans  # kill server đã MẤT CHA (không đụng phiên đang mở)
     dep-health.py --self-test
 """
 from __future__ import annotations
@@ -186,12 +186,20 @@ def probe_code_graph(root: Path) -> dict:
                 "reason": (f"server đang chạy CODE CŨ — tiến trình mới nhất khởi động trước "
                            f"commit cuối của repo server {int((commit - newest) / 60)} phút"),
                 "fix": "khởi động lại Claude Code để nạp code mới"}
-    # Orphan: mỗi phiên spawn một server, không ai dọn. Không sập ngay (idle ~15MB) nhưng
-    # tích luỹ, và trước khi vá rò rỉ thì mỗi con còn gom fd theo số lượt reindex.
-    if len(pids) > 2:
-        return {**res, "status": DEGRADED,
-                "reason": f"{len(pids)} tiến trình server cùng sống — orphan tích luỹ qua các phiên",
-                "fix": "dep-health.py --reap-orphans (giữ tiến trình mới nhất, kill phần còn lại)"}
+    # "Nhiều server" KHÔNG suy ra "có orphan". Mỗi phiên Claude Code đang mở hợp lệ giữ
+    # một server riêng, và máy dev ở đây thường chạy nhiều phiên song song — đo thật
+    # 2026-09-04: 9 server, cả 9 đều còn cha `claude` SỐNG, không con nào mồ côi.
+    #
+    # Bản đầu đếm `len(pids) > 2` rồi kết luận "orphan tích luỹ" — đúng lớp lỗi mà
+    # `--reap-orphans` đã sửa ngày 2026-07-20 (đọc docstring is_orphan: "mới nhất" không
+    # suy ra "của tôi"). Sửa ở tay HÀNH ĐỘNG mà quên tay ĐO, nên cổng kêu oan mỗi phiên
+    # và lời "fix" in ra còn mô tả hành vi kill-tất-trừ-cái-mới-nhất đã bị gỡ. Hai tay
+    # nay dùng chung đúng một định nghĩa: orphan = CHA ĐÃ CHẾT (reparent PPID 1).
+    orphans = [p for p in pids if is_orphan(p)]
+    if orphans:
+        return {**res, "status": DEGRADED, "orphans": len(orphans),
+                "reason": f"{len(orphans)}/{len(pids)} tiến trình server MỒ CÔI (cha đã chết)",
+                "fix": "dep-health.py --reap-orphans (chỉ kill tiến trình đã mất cha)"}
     return res
 
 
@@ -264,6 +272,12 @@ def self_test() -> int:
         import os as _os2
         ck("tiến trình còn CHA SỐNG → KHÔNG phải orphan (bất biến đã bị vi phạm)",
            is_orphan(str(_os2.getpid())) is False)
+        # Tay ĐO phải dùng chung định nghĩa với tay HÀNH ĐỘNG. Bản đầu đo bằng
+        # `len(pids) > 2` nên báo "orphan tích luỹ" trên một máy chỉ đang mở nhiều
+        # phiên hợp lệ. Chốt lại: nhiều PID mà đều còn cha sống thì 0 orphan.
+        _live = [str(_os2.getpid()), str(_os2.getppid())]
+        ck("nhiều tiến trình còn cha sống → 0 orphan (cổng không kêu oan)",
+           [p for p in _live if is_orphan(p)] == [])
 
     print(f"\nSELF-TEST: {'ALL PASS' if not fails else str(len(fails)) + ' FAIL'}")
     return 1 if fails else 0
@@ -275,7 +289,7 @@ def main() -> None:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--quiet-ok", action="store_true", help="chỉ in khi có vấn đề")
     ap.add_argument("--reap-orphans", action="store_true",
-                    help="kill tiến trình server orphan, GIỮ cái mới nhất (hành động có chủ ý)")
+                    help="kill tiến trình server đã mất cha; phiên đang mở không bị đụng")
     ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
     if a.self_test:

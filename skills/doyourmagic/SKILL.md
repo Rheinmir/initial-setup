@@ -22,13 +22,20 @@ description: Given a freshly-cloned external repo/tool, run clone->explore->anal
    - `workflows.md` — an index table (file, one-line purpose, run order/track), a "suggested run order" section, and a short "how this was verified, not just paraphrased" section listing exactly which source files backed each claim.
    - One `NN-<workflow-name>.md` file per distinct workflow, each immediately runnable: concrete copy-pasteable commands, exact paths, expected output/exit behavior, a one-line "why you'd use this", and a one-line "what it produces". Don't force a fixed file count — a single-script tool may only need `workflows.md` + `01-usage.md`.
    - `index.html` — a single self-contained file (inline CSS, no CDN/external assets, no build step, must render correctly opened via `file://`) listing every workflow in run order with a 2-3 sentence explainer and a relative link to its `.md` file.
-9. Confirm the result with the user. If they want it turned into an installable skill (not just a one-off doc bundle), hand off to the `new-skill`/`fdk` skill-authoring flow — never silently start scaffolding a skill without asking first.
+9. **Close at the adapt-modes gate — a bundle is not the finish line.** A doc bundle only records what the tool does; it decides nothing. Before handing back, put ONE explicit verdict to the user, naming the mode from `[[adapt-modes]]`:
+   - **HÒA TAN (dissolve)** — distill the essence and rewrite it as *our* code/concept (validator, internal skill, ADR). Pick when the essence is small, must be a deterministic gate, and we want zero external dependency. Cost: we maintain it, no upstream updates.
+   - **KÉO NGOÀI (external-pull)** — keep only a pointer + pin (mirror `SKILL.md` + `fdk/skills.provenance.json` with source/commit/sha); the engine lives outside. Pick when the tool is large, fast-moving, and an external dependency is acceptable.
+   - **NHÚNG-SỞ-HỮU (vendor)** — copy the bytes in and own the fork. Pick when we need hard ownership, offline, and no runtime dep; accept the bloat.
+   - **KHÔNG LẤY (skip)** — say what we already own that covers it, by file path. A legitimate and common verdict.
+   Before claiming overlap, OPEN our counterpart and compare on the axis that decides cost — agent calls per use and whether code can generate it without an LLM — not on file size or feature count. Measured example (2026-09-04): diagram-design produces prettier, dependency-free SVG, but its own docs say every diagram costs one agent turn; our Mermaid path costs 610KB once and a script can emit it with zero LLM. Comparing bytes alone reversed the verdict.
+   If the verdict is HÒA TAN or NHÚNG, hand off to the `new-skill`/`fdk` authoring flow — never silently start scaffolding without asking first.
 
 ## Rules
 - Never paraphrase a README's command list straight into "runnable" docs — check each command exists in the manifest's scripts / the CLI's `--help` output / the argument parser first.
 - Never assume exit-code conventions are 0/1 by default — read the literal exit calls; tools sometimes use specific codes (e.g. 2 = "findings present") that callers must branch on deliberately.
 - Never copy a tool's own `.github/workflows/*.yml` into a "how to add this to your CI" doc for the consumer — always write a minimal, purpose-built example instead.
 - Keep chat-only/slash commands and real shell CLI commands in separate workflow files — mixing them produces copy-paste failures when a reader tries a chat command in a terminal or vice versa.
+- **Never run the target tool's own installer without pinning scope.** Measured failure (2026-09-04): `npx impeccable install --help` does not print help on the published build — it runs a real install, and with no TTY the prompt takes its default and writes into `$HOME` across 13 provider directories. Explore in a sandbox, and when an install is genuinely needed pass explicit scope flags (`-y --scope=project`) so nothing escapes the sandbox.
 - The exploration/clone phase is read-only against the target repo — never modify files inside the cloned tool itself; only write new files under the `doyourmagic/<repo-name>/` output path.
 - `index.html` must be self-contained and readable in both light and dark viewing — no external CDN, no absolute local paths.
 

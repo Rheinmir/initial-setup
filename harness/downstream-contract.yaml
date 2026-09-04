@@ -11,16 +11,21 @@
 # installer thật sự ship được nó. Đó chính là forcing function — không phải nhớ, mà bị chặn.
 
 # File PHẢI tồn tại trong dự án cài mới.
+# CHUẨN THƯ MỤC (040926-downstream-dot-layout): dự án CÀI MỚI luôn ra layout ẨN
+# `.harness/` + `.llmwiki/` — để cổng thiết kế của dự án (hallmark, impeccable, linter bên
+# thứ ba) quét **/*.html không vớ phải artifact framework rồi chấm như UI sản phẩm.
+# Bản cài CŨ (trần) vẫn chạy được nhờ resolver overstack_paths.py, và được installer tự
+# migrate sang layout ẩn ở lần install/update kế tiếp.
 must_exist:
-  - harness/poc-vendor-neutral/policy.yaml
-  - harness/poc-vendor-neutral/test-broad.sh
-  - harness/poc-vendor-neutral/gen-converters.py
-  - harness/poc-vendor-neutral/bin/llmwiki-validate.py
+  - .harness/poc-vendor-neutral/policy.yaml
+  - .harness/poc-vendor-neutral/test-broad.sh
+  - .harness/poc-vendor-neutral/gen-converters.py
+  - .harness/poc-vendor-neutral/bin/llmwiki-validate.py
   - .claude/settings.json
   - .pre-commit-config.yaml
   - .github/workflows/harness.yml
-  - llmwiki/wiki/index.md
-  - llmwiki/html/overstack.html
+  - .llmwiki/wiki/index.md
+  - .llmwiki/html/overstack.html
   # Bản đồ năng lực cho MODEL (ADR-005). Thiếu file này = agent vào dự án KHÔNG BIẾT mình có
   # đồ nghề gì: hook orientation (session_start.py) trỏ tới nó, không có thì hook câm.
   # Cài xong mà model vẫn mù là hỏng, kể cả khi mọi file khác đủ.
@@ -28,7 +33,7 @@ must_exist:
 
 # Lệnh PHẢI chạy xanh trong dự án cài mới (harness cắn thật, không chỉ file có mặt).
 must_bite:
-  - bash harness/poc-vendor-neutral/test-broad.sh
+  - bash .harness/poc-vendor-neutral/test-broad.sh
 
 # Skill PHẢI reachable (global) để dự án mới dùng được ngay.
 must_reach_skills:

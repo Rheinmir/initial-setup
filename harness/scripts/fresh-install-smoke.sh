@@ -96,15 +96,15 @@ fi
 
 # ── (C) 3 trụ có mặt trên dự án mới ──────────────────────────────────────────
 echo "${Y}3 trụ:${X}"
-[ -f "$TARGET/harness/poc-vendor-neutral/policy.yaml" ] && ok "harness (policy.yaml)"       || bad "thiếu harness/policy.yaml"
+[ -f "$TARGET/.harness/poc-vendor-neutral/policy.yaml" ] && ok "harness (policy.yaml)"       || bad "thiếu harness/policy.yaml"
 [ -f "$TARGET/.claude/settings.json" ]                  && ok "wiring (.claude/settings.json)" || bad "thiếu .claude wiring"
 [ -f "$TARGET/.pre-commit-config.yaml" ]                && ok "pre-commit wired"             || bad "thiếu pre-commit"
-[ -f "$TARGET/llmwiki/wiki/index.md" ]                  && ok "llmwiki (wiki/index.md)"      || bad "thiếu llmwiki seed"
+[ -f "$TARGET/.llmwiki/wiki/index.md" ]                  && ok "llmwiki (wiki/index.md)"      || bad "thiếu llmwiki seed"
 
 # ── (D) harness CẮN THẬT trên dự án mới (không chỉ file có mặt) ───────────────
 echo "${Y}harness cắn:${X}"
-if [ -f "$TARGET/harness/poc-vendor-neutral/test-broad.sh" ]; then
-  if ( cd "$TARGET" && bash harness/poc-vendor-neutral/test-broad.sh ) >/dev/null 2>&1; then
+if [ -f "$TARGET/.harness/poc-vendor-neutral/test-broad.sh" ]; then
+  if ( cd "$TARGET" && bash .harness/poc-vendor-neutral/test-broad.sh ) >/dev/null 2>&1; then
     ok "test-broad.sh xanh (validator GOOD-pass/BAD-block)"
   else
     bad "test-broad.sh ĐỎ — guardrail không cắn đúng trên fresh install"

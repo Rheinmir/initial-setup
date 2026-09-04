@@ -12,6 +12,20 @@ import json
 import os
 import sys
 
+
+def _overstack_prefix(root: str) -> str:
+    """Thư mục overstack của dự án: chuẩn mới `.llmwiki` trước, `llmwiki` để tương thích ngược.
+    Giữ đồng bộ với harness/scripts/overstack_paths.py::OVERSTACK_DIRS — đổi một nơi phải đổi
+    nơi kia (harness-lint bắt hằng-số-lệch giữa script).
+
+    Lưu ý glob (đo 2026-09-04, python 3.9): prefix dấu chấm VIẾT NGUYÊN VĂN thì `glob.glob`
+    vẫn khớp bình thường — chỉ wildcard phải-khớp-dấu-chấm (`**/*.md` từ gốc) mới mù. Nên
+    dựng prefix bằng hàm này là đủ, không cần đổi sang os.walk."""
+    for name in (".llmwiki", "llmwiki"):
+        if os.path.isdir(os.path.join(root, name)):
+            return name
+    return "llmwiki"
+
 REMOTE_POLICY = ("https://raw.githubusercontent.com/Rheinmir/setup/orca/"
                  "harness/poc-vendor-neutral/policy.yaml")
 
@@ -66,7 +80,7 @@ def _gitignored(path, cwd):
 def m_stop():
     r = root()
     _machine_log()  # R4: làm tươi log.md cuối lượt
-    idx = os.path.join(r, "llmwiki/wiki/index.md")
+    idx = os.path.join(r, _overstack_prefix(r), "wiki", "index.md")
     if not os.path.exists(idx):
         return 0
     try:
@@ -75,7 +89,7 @@ def m_stop():
         return 0
     missing = []
     for sub in ("concepts", "entities", "sources", "draft", "architecture", "tours"):  # khớp global index_sync
-        for f in glob.glob(os.path.join(r, "llmwiki/wiki", sub, "**", "*.md"), recursive=True):
+        for f in glob.glob(os.path.join(r, _overstack_prefix(r), "wiki", sub, "**", "*.md"), recursive=True):
             base = os.path.basename(f)
             if base in ("README.md", "_template.md", "index.md", "log.md"):
                 continue
@@ -159,7 +173,8 @@ def m_session_end():
     import subprocess
     r = root()
     tree = None
-    for rel in ("llmwiki/html/fdk-problem-tree.html", "llmwiki/html/problem-tree.html"):
+    for rel in (f"{_overstack_prefix(r)}/html/fdk-problem-tree.html",
+                f"{_overstack_prefix(r)}/html/problem-tree.html"):
         if os.path.isfile(os.path.join(r, rel)):
             tree = os.path.join(r, rel)
             break
@@ -175,7 +190,7 @@ def m_session_end():
         return 0
     names = ("fdk-problem-tree.html", "problem-tree.html")
     fw = sorted(p for p in touched
-                if p.startswith(("skills/", "harness/", "llmwiki/", "fdk/")) and not p.endswith(names))
+                if p.startswith(("skills/", "harness/", ".harness/", "llmwiki/", ".llmwiki/", "fdk/")) and not p.endswith(names))
     if not fw or any(p.endswith(names) for p in touched):
         return 0
     try:

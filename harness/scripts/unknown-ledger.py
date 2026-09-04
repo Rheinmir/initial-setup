@@ -26,7 +26,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DIR = ROOT / "llmwiki" / "wiki" / "draft" / "unknown"
+# Chuẩn mới `.llmwiki` trước, `llmwiki` để tương thích ngược (xem overstack_paths.py).
+DIR = next((ROOT / n / "wiki" / "draft" / "unknown" for n in (".llmwiki", "llmwiki")
+            if (ROOT / n).is_dir()), ROOT / "llmwiki" / "wiki" / "draft" / "unknown")
 U_RE = re.compile(r"^##\s+(U-\d+)\s+—\s+(.*)$", re.M)
 FIELD_RE = {
     "trace": re.compile(r"^-\s+\*\*Trace:\*\*\s*(.*)$", re.M),

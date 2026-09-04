@@ -1,6 +1,6 @@
 # 040926-downstream-dot-layout
 **Type:** draft
-**Status:** proposed
+**Status:** implementing
 **Tags:** install, downstream, layout, migration, hallmark, gate-scope
 **Proposed:** 2026-09-04
 
@@ -69,19 +69,40 @@ Chạy trước mọi bước seed, idempotent, có `--dry-run`:
    - `llmwiki/.harness-stamp` → `.llmwiki/.harness-stamp`
 5. **Verify**: chạy lại `session_start.py` một lượt khô + `medic --ci` nếu có; đỏ thì rollback bằng cách dời ngược.
 
-## Cần chốt trước khi code
+## Đã chốt (2026-09-04)
 
-1. Đổi cả `harness/` hay chỉ `llmwiki/`? (`harness/` ở downstream chỉ giữ state cục bộ, ít tham chiếu hơn nhiều — có thể làm cùng lượt hoặc để sau.)
-2. Có giữ tương thích ngược **vĩnh viễn** trong resolver, hay đặt hạn (vd 2 minor version rồi bỏ nhánh `llmwiki/`)?
-3. Migration chạy **tự động** trong `install`/`update`, hay là một lệnh riêng người dùng gọi tay?
+1. **Đổi cả hai** — `llmwiki/` và `harness/`.
+2. **Giữ tương thích ngược trong resolver**, nhưng migration **dọn sạch bản cũ**: sau khi dời thì chỉ còn layout dấu chấm, không để hai bản song song.
+3. **Chạy tự động** trong `install`/`update`. Đúng chuẩn rồi thì im lặng bỏ qua; còn rơi rớt ở ngoài thì dọn vào.
 
-## Files (dự kiến — CHƯA code)
+## Rủi ro phát hiện thêm khi đo (đổi thiết kế)
+
+Thư mục ẩn KHÔNG trong suốt với mọi cách quét. Đo trong sandbox 2026-09-04, python 3.9.6:
+
+| Cách quét | Thấy `.llmwiki/`? |
+|---|---|
+| `grep -r` · `os.walk` · `pathlib.rglob` | có |
+| `glob.glob('**/*.md', recursive=True)` | **KHÔNG** |
+| `rg` (ripgrep) mặc định — tức Grep của agent | **KHÔNG** |
+| `rg --hidden` | có |
+| `glob.glob('.llmwiki/wiki/**/*.md')` — prefix dấu chấm VIẾT NGUYÊN VĂN | **có** |
+
+Dòng cuối là chìa khoá: chỉ **wildcard phải-khớp-dấu-chấm** mới mù. Prefix viết nguyên văn vẫn khớp bình thường → phần lớn công cụ chỉ cần dựng prefix qua resolver, không phải đổi sang `os.walk`. (`include_hidden=True` của `glob` là python 3.11+, máy này 3.9.6 → không dùng được.)
+
+Hệ quả: thêm hai việc bắt buộc — (a) định tuyến prefix qua resolver ở công cụ chạy downstream, (b) `session_start` PHẢI nhắc vì ta không sửa được ripgrep của agent.
+
+## Files (đã làm)
 | File | Action |
 |------|--------|
-| `harness/scripts/overstack_paths.py` | created — resolver dùng chung |
-| `harness/poc-vendor-neutral/install.sh` | modified — seed `.llmwiki/` + bước migrate |
-| `harness/scripts/wiki-sync.py` | modified — dùng resolver chung |
-| 79 file dựng path lúc chạy | modified dần, không big-bang |
+| `harness/scripts/overstack_paths.py` | created — resolver dùng chung, self-test 7 ca |
+| `harness/poc-vendor-neutral/install.sh` | modified — `migrate_dot_layout()` tự động + seed theo biến layout |
+| `harness/tests/dot-layout-migrate-test.sh` | created — 7 assertion, trích ĐÚNG hàm từ installer thật |
+| `llmwiki/.claude/hooks/session_start.py` | modified — nhắc ripgrep, CHỈ khi layout ẩn |
+| `harness/downstream-contract.yaml` | modified — hợp đồng fresh-install chuyển sang `.harness/` + `.llmwiki/` |
+| `harness/scripts/fresh-install-smoke.sh` | modified — assert layout mới |
+| `harness/poc-vendor-neutral/bin/harness-events.py` · `harness/scripts/unknown-ledger.py` | modified — prefix theo layout |
+
+**Còn lại (chưa gấp):** các công cụ dùng `glob.glob` với prefix hardcode `llmwiki/` chỉ chạy trong repo framework (repo này không bao giờ migrate) nên chưa hỏng; định tuyến dần khi chạm tới.
 
 ## Notes
 - Invoked via: `/fdk`

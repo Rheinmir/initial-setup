@@ -31,10 +31,69 @@ while [ $# -gt 0 ]; do
   esac
 done
 ROOT="$(cd "$ROOT" && pwd)"
-DEST="$ROOT/harness/poc-vendor-neutral"; OUT="$DEST/out"
 log(){ printf '\033[1;32m[install]\033[0m %s\n' "$*"; }
 warn(){ printf '\033[1;33m[install]\033[0m %s\n' "$*"; }
 has(){ case ",$VENDORS," in *",$1,"*) return 0;; *) return 1;; esac; }
+
+# ─── Chuẩn thư mục: ẩn sau dấu chấm (đề xuất 040926-downstream-dot-layout) ───
+# Framework nằm TRẦN ở gốc dự án đích khiến cổng thiết kế của dự án (hallmark,
+# impeccable, linter bên thứ ba) quét **/*.html là vớ phải llmwiki/html/overstack.html
+# 530KB rồi chấm nó như UI sản phẩm. Mọi thứ khác installer đặt (.claude .cursor .kiro)
+# vốn đã ẩn; hai thư mục này bị bỏ sót.
+#
+# Migrate TỰ ĐỘNG, idempotent: đúng chuẩn rồi thì im lặng bỏ qua; còn rơi rớt ở ngoài
+# thì dọn vào. Repo framework (nhận diện bằng fdk/wiki) KHÔNG BAO GIỜ tự migrate.
+migrate_dot_layout(){
+  [ -d "$ROOT/fdk/wiki" ] && { log "  · repo framework (có fdk/wiki) → KHÔNG migrate layout"; return 0; }
+  local moved=0 old new
+  for pair in "llmwiki:.llmwiki" "harness:.harness"; do
+    old="${pair%%:*}"; new="${pair##*:}"
+    [ -d "$ROOT/$old" ] || continue                 # không có bản cũ → bỏ qua
+    if [ -d "$ROOT/$new" ]; then
+      warn "  có CẢ HAI $old/ và $new/ — không tự gộp, dọn tay rồi chạy lại"
+      continue
+    fi
+    if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1 \
+       && [ -n "$(git -C "$ROOT" ls-files -- "$old" 2>/dev/null | head -1)" ]; then
+      git -C "$ROOT" mv "$old" "$new" 2>/dev/null || mv "$ROOT/$old" "$ROOT/$new"
+    else
+      mv "$ROOT/$old" "$ROOT/$new"
+    fi
+    log "  ✓ migrate $old/ → $new/"
+    moved=1
+  done
+  [ "$moved" = 1 ] || { log "  · layout đã đúng chuẩn (.llmwiki/.harness) → bỏ qua"; return 0; }
+  # Viết lại con trỏ. Chỉ đụng ĐÚNG chuỗi đường dẫn, không format lại file.
+  for f in .claude/settings.json .claude/settings.local.json .pre-commit-config.yaml \
+           .cursor/hooks.json .codex/hooks.json .gitignore; do
+    [ -f "$ROOT/$f" ] || continue
+    if python3 - "$ROOT/$f" <<'PYEOF'
+import re, sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+# Chỉ thay khi 'llmwiki/' hoặc 'harness/' đứng ở đầu path hoặc sau / hoặc sau " ' = : (
+n = re.sub(r'(?<![\w.-])(llmwiki|harness)/', lambda m: "." + m.group(1) + "/", s)
+if n != s:
+    open(p, "w", encoding="utf-8").write(n)
+    sys.exit(0)
+sys.exit(1)
+PYEOF
+    then log "    · cập nhật con trỏ trong $f"; fi
+  done
+  for g in "$ROOT"/.grok/hooks/*.json; do
+    [ -f "$g" ] && python3 -c "
+import re,sys;p=sys.argv[1];s=open(p,encoding='utf-8').read()
+n=re.sub(r'(?<![\w.-])(llmwiki|harness)/', lambda m: '.'+m.group(1)+'/', s)
+s!=n and open(p,'w',encoding='utf-8').write(n)" "$g" 2>/dev/null
+  done
+}
+migrate_dot_layout
+
+# Sau migrate mới chốt DEST: nó phải trỏ vào layout ĐANG dùng, không đoán.
+OVERSTACK_DIR="llmwiki"; [ -d "$ROOT/.llmwiki" ] && OVERSTACK_DIR=".llmwiki"
+HARNESS_DIR="harness";   [ -d "$ROOT/.harness" ] && HARNESS_DIR=".harness"
+[ -d "$ROOT/fdk/wiki" ] || { OVERSTACK_DIR=".llmwiki"; HARNESS_DIR=".harness"; }
+DEST="$ROOT/$HARNESS_DIR/poc-vendor-neutral"; OUT="$DEST/out"
 
 # --clean: gỡ bản cũ trước khi cài (cài mới sạch). Cần uninstall.sh cạnh script.
 if [ "$CLEAN" = 1 ] && [ -f "$SRC/uninstall.sh" ]; then
@@ -61,6 +120,7 @@ if [ -z "$VENDORS" ]; then
   det=""
   [ -d "$ROOT/.claude" ] && det="${det}claude,"
   { [ -f "$ROOT/opencode.json" ] || [ -d "$ROOT/.opencode" ]; } && det="${det}opencode,"
+  [ -d "$ROOT/.openclaude" ] && det="${det}openclaude,"
   [ -d "$ROOT/.cursor" ] && det="${det}cursor,"
   { [ -f "$ROOT/AGENTS.md" ] || [ -d "$ROOT/.codex" ]; } && det="${det}codex,"
   [ -d "$ROOT/.kiro" ] && det="${det}kiro,"
@@ -100,12 +160,13 @@ elif grep -q 'llmwiki-harness' "$PC"; then
 else
   warn "  pre-commit đã tồn tại → thêm tay khối repo:local id=llmwiki-harness (xem out/pre-commit-snippet.yaml)"
 fi
-# Claude (merge hooks vào settings.json)
-if has claude; then
-  python3 - "$ROOT" "$OUT/claude/settings.snippet.json" <<'PY'
+# Claude / OpenClaude (merge hooks vào settings.json — cùng schema hook + cùng $CLAUDE_PROJECT_DIR,
+# OpenClaude là fork của Claude Code; chỉ khác path project-settings: .openclaude/ thay vì .claude/)
+merge_claude_hooks(){
+  python3 - "$ROOT" "$OUT/claude/settings.snippet.json" "$1" <<'PY'
 import json,os,sys,shutil
-root,snip=sys.argv[1],sys.argv[2]
-sp=os.path.join(root,'.claude','settings.json')
+root,snip,subdir=sys.argv[1],sys.argv[2],sys.argv[3]
+sp=os.path.join(root,subdir,'settings.json')
 os.makedirs(os.path.dirname(sp),exist_ok=True)
 cur=json.load(open(sp,encoding='utf-8')) if os.path.exists(sp) else {}
 if os.path.exists(sp): shutil.copy(sp, sp+'.bak')
@@ -125,9 +186,11 @@ for ev,defs in list(cur['hooks'].items()):
 for ev,entries in add.get('hooks',{}).items():
     cur['hooks'].setdefault(ev,[]).extend(entries)
 json.dump(cur,open(sp,'w',encoding='utf-8'),ensure_ascii=False,indent=2)
-print('  \033[1;32m✓\033[0m Claude   → .claude/settings.json (merged, backup .bak)')
+print(f'  \033[1;32m✓\033[0m {subdir:<9}→ {subdir}/settings.json (merged, backup .bak)')
 PY
-fi
+}
+if has claude; then merge_claude_hooks .claude; fi
+if has openclaude; then merge_claude_hooks .openclaude; fi
 # opencode (permission.edit native — merge tự động)
 if has opencode; then
   python3 - "$ROOT" "$OUT/opencode/opencode.json" <<'PY'
@@ -165,22 +228,22 @@ fi
 # ── (tùy chọn) trụ 3: seed khung llmwiki (nhanh, idempotent — không đè file có sẵn) ──
 if [ "$WITH_WIKI" = 1 ]; then
   log "+ seed khung llmwiki"
-  mkdir -p "$ROOT/llmwiki/raw" "$ROOT/llmwiki/wiki/concepts" "$ROOT/llmwiki/wiki/entities" "$ROOT/llmwiki/wiki/sources/adr" "$ROOT/llmwiki/wiki/sources/draft"
-  [ -f "$ROOT/llmwiki/wiki/index.md" ] || printf '# Wiki index\n\n| File | Type | Date |\n|---|---|---|\n' > "$ROOT/llmwiki/wiki/index.md"
-  [ -f "$ROOT/llmwiki/wiki/log.md" ]   || printf '# Log\n' > "$ROOT/llmwiki/wiki/log.md"
+  mkdir -p "$ROOT/$OVERSTACK_DIR/raw" "$ROOT/$OVERSTACK_DIR/wiki/concepts" "$ROOT/$OVERSTACK_DIR/wiki/entities" "$ROOT/$OVERSTACK_DIR/wiki/sources/adr" "$ROOT/$OVERSTACK_DIR/wiki/sources/draft"
+  [ -f "$ROOT/$OVERSTACK_DIR/wiki/index.md" ] || printf '# Wiki index\n\n| File | Type | Date |\n|---|---|---|\n' > "$ROOT/$OVERSTACK_DIR/wiki/index.md"
+  [ -f "$ROOT/$OVERSTACK_DIR/wiki/log.md" ]   || printf '# Log\n' > "$ROOT/$OVERSTACK_DIR/wiki/log.md"
   log "  ✓ llmwiki/ (wiki/{concepts,entities,sources/draft} · raw/ · index.md · log.md)"
   # tài liệu hướng dẫn overstack — TRAVEL cùng khung xương (luôn refresh bản mới nhất)
   if command -v curl >/dev/null 2>&1; then
     REPO_RAW="${REPO_RAW:-https://raw.githubusercontent.com/Rheinmir/setup/orca}"
-    mkdir -p "$ROOT/llmwiki/html"
-    if curl -fsSL "$REPO_RAW/llmwiki/html/overstack.html" -o "$ROOT/llmwiki/html/overstack.html" 2>/dev/null; then
+    mkdir -p "$ROOT/$OVERSTACK_DIR/html"
+    if curl -fsSL "$REPO_RAW/llmwiki/html/overstack.html" -o "$ROOT/$OVERSTACK_DIR/html/overstack.html" 2>/dev/null; then
       log "  ✓ llmwiki/html/overstack.html (tài liệu overstack — mở bằng trình duyệt)"
     else
       warn "  overstack.html chưa tải được (mạng?) → lấy tay: $REPO_RAW/llmwiki/html/overstack.html"
     fi
     # foundation.yaml — nguồn mục "Nền tảng" (GH#6): seed CHỈ khi chưa có, không đè bản đã điền
     if [ ! -f "$ROOT/harness/foundation.yaml" ]; then
-      mkdir -p "$ROOT/harness"
+      mkdir -p "$ROOT/$HARNESS_DIR"
       if curl -fsSL "$REPO_RAW/harness/templates/foundation-template.yaml" -o "$ROOT/harness/foundation.yaml" 2>/dev/null; then
         log "  ✓ harness/foundation.yaml (nguồn mục Nền tảng — điền rồi regen overstack.html; medic probe foundation gác drift)"
       else
@@ -188,8 +251,8 @@ if [ "$WITH_WIKI" = 1 ]; then
       fi
     fi
     # sổ cây vấn đề (problem-tree) — seed CHỈ khi chưa có, không bao giờ ghi đè sổ đang dùng
-    if [ ! -f "$ROOT/llmwiki/html/problem-tree.html" ] && [ ! -f "$ROOT/llmwiki/html/fdk-problem-tree.html" ]; then
-      if curl -fsSL "$REPO_RAW/harness/templates/problem-tree-template.html" -o "$ROOT/llmwiki/html/problem-tree.html" 2>/dev/null; then
+    if [ ! -f "$ROOT/$OVERSTACK_DIR/html/problem-tree.html" ] && [ ! -f "$ROOT/$OVERSTACK_DIR/html/fdk-problem-tree.html" ]; then
+      if curl -fsSL "$REPO_RAW/harness/templates/problem-tree-template.html" -o "$ROOT/$OVERSTACK_DIR/html/problem-tree.html" 2>/dev/null; then
         log "  ✓ llmwiki/html/problem-tree.html (sổ cây vấn đề — hook R17 tự xả sổ khi phiên kết thúc)"
       else
         warn "  problem-tree template chưa tải được (mạng?) — hook R17 sẽ fail-open tới khi có sổ"
@@ -233,7 +296,7 @@ if [ "$WITH_WIKI" = 1 ]; then
     fi
     # 2) stamp — hợp đồng travel "repo này được gác bản vX" (session_start so với global → warn skew, U11)
     TV="$(python3 -c "import json,sys;print(json.load(open(sys.argv[1])).get('template_version','0'))" "$GH_HOME/version.json" 2>/dev/null || echo 0)"
-    printf '{"schema": 1, "guarded_by": "%s"}\n' "${TV:-0}" > "$ROOT/llmwiki/.harness-stamp"
+    printf '{"schema": 1, "guarded_by": "%s"}\n' "${TV:-0}" > "$ROOT/$OVERSTACK_DIR/.harness-stamp"
     log "  ✓ llmwiki/.harness-stamp (guarded_by: ${TV:-0})"
     # 3) U10: gỡ engine bản GH#51 từng copy vào repo (fdk/tools, harness/scripts) — global thay thế.
     #    KHÔNG đụng repo framework (nhận diện: có fdk/wiki — framework_only, downstream không có).

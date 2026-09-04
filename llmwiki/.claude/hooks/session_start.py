@@ -144,9 +144,21 @@ def orient(root: Path) -> None:
                         "cho HÀM/LỚP/METHOD (search_symbols / get_symbol_context) và nhất là "
                         "get_callers (quan hệ gọi — grep không làm được). HẰNG SỐ · config · chuỗi "
                         "thì grep THẲNG: code-graph không index chúng, thử trước chỉ tốn thêm lượt.")
-        wiki = root / "fdk" / "wiki" if (root / "fdk" / "wiki").is_dir() else root / "llmwiki" / "wiki"
-        if wiki.is_dir():
+        wiki = None
+        for cand in (root / "fdk" / "wiki", root / ".llmwiki" / "wiki", root / "llmwiki" / "wiki"):
+            if cand.is_dir():
+                wiki = cand
+                break
+        if wiki is not None:
             bits.append(f"• wiki `{wiki.relative_to(root)}` — query concept/entity/sources/adr/decisions cho context.")
+            # Layout ẨN: ripgrep (và Grep của agent) BỎ QUA thư mục dấu chấm theo mặc định.
+            # Đo 2026-09-04 trong sandbox: file trong .llmwiki/ thì `grep -r` tìm ra, `rg` KHÔNG.
+            # Ta không sửa được ripgrep của agent → phải NHẮC. Chỉ nhắc khi dự án thật sự dùng
+            # layout ẩn: repo framework và bản chưa migrate im lặng (no-op là kết quả tốt).
+            if wiki.parts and wiki.relative_to(root).parts[0].startswith("."):
+                bits.append(f"• ⚠ `{wiki.relative_to(root).parts[0]}/` là thư mục ẨN — `rg`/Grep bỏ qua "
+                            f"hidden theo MẶC ĐỊNH. Tìm trong đó phải thêm `--hidden`, hoặc trỏ "
+                            f"đường dẫn thẳng. `grep -r` thì vẫn thấy bình thường.")
         for cap in (root / "fdk" / "CAPABILITIES.md", root / "CAPABILITIES.md"):
             if cap.is_file():
                 bits.append(f"• `{cap.relative_to(root)}` — bản đồ skill/tool đang có (đọc khi chưa chắc có đồ nghề gì).")

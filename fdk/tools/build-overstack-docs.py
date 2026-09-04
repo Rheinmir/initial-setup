@@ -649,15 +649,20 @@ def sections(root: Path):
         "<li><b>retrieval-eval</b> chạy trong CI — chất lượng truy hồi không được tụt dưới sàn (tất định, không LLM).</li></ul></div></div>",
     ]))
 
-    _flow = [("agent định ghi", "#9aa4b2", ""), ("L0 · hook", "#0a84ff", "PreToolUse"),
-             ("L2 · pre-commit", "#5856d6", "fdk-gate"), ("L4 · CI", "#ff9500", "harness.yml (merge)"),
-             ("✓ vào main", "#34c759", "")]
+    # data-src = neo bằng chứng: node trỏ vào file THẬT làm ra tầng chặn đó. Cổng
+    # frontend-antipattern FAIL nếu đường dẫn không resolve → sơ đồ không nói dối được về code.
+    _flow = [("agent định ghi", "#9aa4b2", "", ""),
+             ("L0 · hook", "#0a84ff", "PreToolUse", "llmwiki/.claude/hooks/pre_tool_use.py"),
+             ("L2 · pre-commit", "#5856d6", "fdk-gate", "harness/scripts/fdk-gate.py"),
+             ("L4 · CI", "#ff9500", "harness.yml (merge)", ".github/workflows/harness.yml"),
+             ("✓ vào main", "#34c759", "", "")]
     _hsvg = ['<svg role="img" viewBox="0 0 900 165" xmlns="http://www.w3.org/2000/svg"><title>bốn tầng chặn: agent định ghi → L0 hook → L2 pre-commit → L4 CI → vào main</title>'
              '<defs><marker id="arrH" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">'
              '<path d="M0,0 L9,4.5 L0,9 Z" fill="#9aa4b2"/></marker></defs>']
-    for _i, (_nm, _c, _sub) in enumerate(_flow):
+    for _i, (_nm, _c, _sub, _src) in enumerate(_flow):
         _x = 16 + _i * 180
-        _hsvg.append(f'<rect x="{_x}" y="46" width="152" height="52" rx="8" fill="rgba(255,255,255,.7)" stroke="{_c}" stroke-width="1.6"/>')
+        _ev = f' data-src="{_src}"' if _src else ""
+        _hsvg.append(f'<rect x="{_x}" y="46" width="152" height="52" rx="8" fill="rgba(255,255,255,.7)" stroke="{_c}" stroke-width="1.6"{_ev}/>')
         _hsvg.append(f'<text x="{_x + 76}" y="{68 if _sub else 76}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f0f12">{_nm}</text>')
         if _sub:
             _hsvg.append(f'<text x="{_x + 76}" y="86" text-anchor="middle" font-size="8.5" fill="#4a4a55">{_sub}</text>')

@@ -24,6 +24,11 @@ không nhìn NỘI DUNG lỗi. Bắt các bẫy rẻ-tiền, tất định làm 
   [WARN] sơ đồ thiếu role="img" · thiếu <title> · <title> không phải con đầu.
          WARN vì nợ cũ (20/33 và 17/33 lúc cắm); icon trang trí (aria-hidden hoặc thân <400B) được tha.
 
+  Neo bằng chứng cho node sơ đồ (hấp thụ archify `repository-evidence.mjs`, 09/2026):
+  [FAIL] node khai `data-src="path"` / `data-src="path:line"` mà đường dẫn không resolve,
+         hoặc số dòng vượt độ dài file → sơ đồ đang NÓI DỐI về code. Fail-closed có chủ ý:
+         không khai thì không bị hỏi; đã khai thì phải đúng.
+
 Exit: 0 sạch · 1 có FAIL · 2 chỉ WARN (medic map: 1→fail, 2→warn, 0→ok). Fail-open:
 thiếu file → sạch (không chặn). Mặc định quét llmwiki/html/overstack.html; nhận path khác qua arg.
 
@@ -84,6 +89,43 @@ SVG_FIRST_EL = re.compile(r"\s*<(\w+)")
 # Đo 2026-09-04 trên 86 <svg> của repo: 53 rơi vào nhóm này, 33 là sơ đồ thật.
 SVG_DECORATIVE_MAX = 400
 SVG_ARIA_HIDDEN = re.compile(r"aria-hidden\s*=\s*[\"']true", re.I)
+
+
+# Neo bằng chứng cho NODE sơ đồ (hấp thụ archify `repository-evidence.mjs`, 09/2026).
+# archify từ chối RENDER khi sources[] của một component không verify được — fail-closed.
+# Bản của ta gọn hơn vì SVG do chính code ta sinh: node khai `data-src="path"` hoặc
+# `data-src="path:line"`, và cổng FAIL nếu đường dẫn không resolve trên đĩa. Cùng nguyên
+# lý với claim-receipts (ref phải tồn tại), khác chỗ áp: đây là node HÌNH, không phải câu văn.
+SVG_DATA_SRC = re.compile(r'data-src\s*=\s*"([^"]+)"')
+
+
+def scan_svg_evidence(html: str, rel: str, root) -> list:
+    """FAIL khi node sơ đồ khai bằng chứng mà bằng chứng không tồn tại.
+
+    Fail-closed có chủ ý: một node trỏ vào file đã bị đổi tên/xoá là sơ đồ đang NÓI DỐI
+    về code — tệ hơn node không khai gì. Không khai thì không bị hỏi.
+    """
+    out = []
+    for m in SVG_DATA_SRC.finditer(html):
+        ref = m.group(1)
+        path_part, _, line_part = ref.partition(":")
+        target = root / path_part
+        if not target.exists():
+            out.append({"level": "FAIL", "file": rel,
+                        "msg": f"node sơ đồ khai bằng chứng `{ref}` nhưng đường dẫn KHÔNG tồn tại "
+                               "— sơ đồ đang nói dối về code. Sửa neo hoặc bỏ data-src.",
+                        "snippet": ref[:70]})
+            continue
+        if line_part.isdigit():
+            try:
+                n = sum(1 for _ in target.open(encoding="utf-8", errors="ignore"))
+            except OSError:
+                continue
+            if int(line_part) > n:
+                out.append({"level": "FAIL", "file": rel,
+                            "msg": f"node sơ đồ neo `{ref}` nhưng file chỉ có {n} dòng — neo trôi.",
+                            "snippet": ref[:70]})
+    return out
 
 
 def scan_svg(html: str, rel: str) -> list:
@@ -181,6 +223,7 @@ def scan(path: Path) -> list:
                     "snippet": m.group(0)[:60]})
         break
     out += scan_svg(html, str(rel))
+    out += scan_svg_evidence(html, str(rel), ROOT)
     # [WARN] prose lọt <pre> — chữ Việt có dấu ở dòng không-comment
     for block in PRE.findall(html):
         text = _unesc(TAG.sub("", block))
@@ -226,6 +269,12 @@ def self_test() -> int:
                 + "<path d='M0 0'/>" * 40 + '</svg>'
                 '<svg aria-hidden="true" viewBox="0 0 4 4">' + "<path d='M1 1'/>" * 40
                 + '</svg></body></html>')
+    EV_BAD = '<html><body><svg role="img"><title>x</title>' + "<path d='M0 0'/>" * 40 + \
+             '<rect data-src="harness/scripts/khong-he-ton-tai.py"/></svg></body></html>'
+    EV_GOOD = '<html><body><svg role="img"><title>x</title>' + "<path d='M0 0'/>" * 40 + \
+              '<rect data-src="harness/scripts/fdk-gate.py"/></svg></body></html>'
+    ev_bad = _scan_text(EV_BAD)
+    ev_good = [f for f in _scan_text(EV_GOOD) if "bằng chứng" in f["msg"] or "neo" in f["msg"]]
     svg_bad = _scan_text(SVG_BAD)
     svg_good = [f for f in _scan_text(SVG_GOOD) if "SVG" in f["msg"]]
     bad = _scan_text(BAD)
@@ -244,6 +293,9 @@ def self_test() -> int:
         ("SVG BAD bắt thiếu role (WARN)",
          any("role=" in f["msg"] and f["level"] == "WARN" for f in svg_bad)),
         ("SVG GOOD sạch — icon aria-hidden được tha", len(svg_good) == 0),
+        ("neo data-src trỏ file KHÔNG tồn tại → FAIL",
+         any("KHÔNG tồn tại" in f["msg"] and f["level"] == "FAIL" for f in ev_bad)),
+        ("neo data-src trỏ file có thật → sạch", len(ev_good) == 0),
     ]
     for label, passed in checks:
         print(f"  {'✓' if passed else '✗'} {label}")

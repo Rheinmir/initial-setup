@@ -652,7 +652,7 @@ def sections(root: Path):
     _flow = [("agent định ghi", "#9aa4b2", ""), ("L0 · hook", "#0a84ff", "PreToolUse"),
              ("L2 · pre-commit", "#5856d6", "fdk-gate"), ("L4 · CI", "#ff9500", "harness.yml (merge)"),
              ("✓ vào main", "#34c759", "")]
-    _hsvg = ['<svg viewBox="0 0 900 165" xmlns="http://www.w3.org/2000/svg">'
+    _hsvg = ['<svg role="img" viewBox="0 0 900 165" xmlns="http://www.w3.org/2000/svg"><title>bốn tầng chặn: agent định ghi → L0 hook → L2 pre-commit → L4 CI → vào main</title>'
              '<defs><marker id="arrH" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">'
              '<path d="M0,0 L9,4.5 L0,9 Z" fill="#9aa4b2"/></marker></defs>']
     for _i, (_nm, _c, _sub) in enumerate(_flow):
@@ -696,7 +696,7 @@ def sections(root: Path):
            ("gate", "#5856d6", "R7 đủ cặp .md+.html", "approved"),
            ("dispatch", "#30b0c7", "agent + CLI rẻ", "dispatched"),
            ("verify", "#34c759", "dispatch-verify + trace-grader", "done")]
-    _wsvg = ['<svg viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg">'
+    _wsvg = ['<svg role="img" viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg"><title>vòng orca-workflow: propose → gate → dispatch → verify</title>'
              '<defs><marker id="arrW" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">'
              '<path d="M0,0 L9,4.5 L0,9 Z" fill="#9aa4b2"/></marker></defs>']
     for _i, (_nm, _c, _mech, _state) in enumerate(_wf):
@@ -720,7 +720,7 @@ def sections(root: Path):
     ]))
 
     _agents = [("claude", "#0a84ff"), ("opencode", "#30b0c7"), ("agy/kiro", "#ff9500")]
-    _osvg = ['<svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">'
+    _osvg = ['<svg role="img" viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg"><title>điều phối đa-agent: claude · opencode · agy/kiro cùng một hàng đợi task</title>'
              '<defs><marker id="arrO" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">'
              '<path d="M0,0 L9,4.5 L0,9 Z" fill="#9aa4b2"/></marker></defs>'
              '<rect x="18" y="76" width="150" height="48" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.6"/>'
@@ -752,7 +752,7 @@ def sections(root: Path):
         "<li>trace-grader chấm tool/thứ tự/pass^k — không chỉ kết quả.</li></ul></div></div>",
     ]))
 
-    _bsvg = ('<svg viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg">'
+    _bsvg = ('<svg role="img" viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg"><title>ba lớp gác hành vi đa-agent: orca_guard · dispatch-verify · trace-grader</title>'
              '<defs><marker id="arrB" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">'
              '<path d="M0,0 L9,4.5 L0,9 Z" fill="#9aa4b2"/></marker></defs>'
              '<rect x="16" y="68" width="140" height="52" rx="8" fill="rgba(255,255,255,.7)" stroke="#ff9500" stroke-width="1.6"/>'
@@ -841,7 +841,7 @@ def sections(root: Path):
         ("4 · Quality", "#34c759", "code-health + fdk-gate", "STRONG", "ok"),
         ("5 · Audit", "#ff9500", "--audit hash-chain", "STRONG", "ok"),
     ]
-    _svg = ['<svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg">'
+    _svg = ['<svg role="img" viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg"><title>năm trụ overstack: Harness · Knowledge · Task · Quality · Audit</title>'
             '<defs><marker id="arrR" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">'
             '<path d="M0,0 L9,4.5 L0,9 Z" fill="#9aa4b2"/></marker></defs>'
             '<rect x="22" y="118" width="150" height="46" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.6"/>'

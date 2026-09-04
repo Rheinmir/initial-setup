@@ -17,6 +17,13 @@ không nhìn NỘI DUNG lỗi. Bắt các bẫy rẻ-tiền, tất định làm 
   Nhóm genre-scoped (Inter/system làm display, pure đen-trắng) KHÔNG ở đây — false-positive trên
   chính seq.html của ta. Để model xử lúc dựng UI sản phẩm qua skills/hallmark.
 
+  Cổng SVG (hấp thụ diagram-design `self_check.py`, 09/2026) — ta sinh SVG bằng code ở 37 chỗ
+  mà trước nay không gác gì trên output:
+  [FAIL] SVG tham chiếu remote http → trang tự-chứa mở offline khuyết hình.
+  [FAIL] <title>/<desc> RỖNG → screen reader đọc khoảng trắng rồi bỏ qua hình.
+  [WARN] sơ đồ thiếu role="img" · thiếu <title> · <title> không phải con đầu.
+         WARN vì nợ cũ (20/33 và 17/33 lúc cắm); icon trang trí (aria-hidden hoặc thân <400B) được tha.
+
 Exit: 0 sạch · 1 có FAIL · 2 chỉ WARN (medic map: 1→fail, 2→warn, 0→ok). Fail-open:
 thiếu file → sạch (không chặn). Mặc định quét llmwiki/html/overstack.html; nhận path khác qua arg.
 
@@ -61,6 +68,70 @@ FAKE_METRIC = re.compile(
     r"|\+\s*\d+\s*%\s*(?:conversion|growth|faster|revenue|increase)"
     r"|\btrusted by\s+[\d,]+\+?\b"
     r"|\b[\d,]+\+\s*(?:teams|companies|customers|users)\s+(?:trust|use|love)\b)", re.I)
+
+
+# ── Cổng SVG: accessibility + self-containment (hấp thụ diagram-design self_check.py, 09/2026) ──
+# Ta tự viết SVG bằng code ở 37 chỗ trong build-overstack-docs.py / build-wiki-graph.py mà KHÔNG
+# gác gì trên output. diagram-design gác đúng bốn thứ này; port sang vì nó tất định, 0 token, và
+# áp được cho SVG do code sinh (khác các luật khác ở đây vốn nhắm CSS).
+SVG_TAG = re.compile(r"<svg\b[^>]*>(.*?)</svg>", re.S | re.I)
+SVG_REMOTE = re.compile(
+    r"(?:href|xlink:href)\s*=\s*[\"']https?://|url\(\s*[\"']?https?://", re.I)
+SVG_TITLE = re.compile(r"<title\b[^>]*>(.*?)</title>", re.S | re.I)
+SVG_DESC = re.compile(r"<desc\b[^>]*>(.*?)</desc>", re.S | re.I)
+SVG_FIRST_EL = re.compile(r"\s*<(\w+)")
+# Icon trang trí không cần nhãn: đã khai aria-hidden, HOẶC thân quá nhỏ để là sơ đồ.
+# Đo 2026-09-04 trên 86 <svg> của repo: 53 rơi vào nhóm này, 33 là sơ đồ thật.
+SVG_DECORATIVE_MAX = 400
+SVG_ARIA_HIDDEN = re.compile(r"aria-hidden\s*=\s*[\"']true", re.I)
+
+
+def scan_svg(html: str, rel: str) -> list:
+    """Bốn luật của diagram-design, chia mức theo NỢ ĐANG CÓ chứ không theo cảm tính.
+
+    FAIL cho hai luật hôm nay đang 0 vi phạm (remote ref, title/desc rỗng) — gác ngay
+    không tốn gì, và chặn đúng thứ làm hỏng offline/screen-reader.
+    WARN cho hai luật đang có nợ thật (20 thiếu role, 17 thiếu title trên 33 sơ đồ) —
+    FAIL ngay sẽ làm đỏ cổng vì code CŨ, biến medic thành thứ người ta tắt đi.
+    # ponytail: WARN là bậc thang, nâng lên FAIL khi nợ về 0.
+    """
+    out = []
+    for m in SVG_TAG.finditer(html):
+        whole = m.group(0)
+        head = whole[: whole.find(">") + 1]
+        body = m.group(1)
+        if SVG_REMOTE.search(body):
+            out.append({"level": "FAIL", "file": rel,
+                        "msg": "SVG tham chiếu tài nguyên REMOTE (http) — trang tự-chứa mà mở "
+                               "offline sẽ khuyết hình. Nhúng data: URI hoặc vẽ thẳng.",
+                        "snippet": (SVG_REMOTE.search(body).group(0))[:60]})
+        for tag, rx in (("title", SVG_TITLE), ("desc", SVG_DESC)):
+            el = rx.search(body)
+            if el and not el.group(1).strip():
+                out.append({"level": "FAIL", "file": rel,
+                            "msg": f"SVG có <{tag}> RỖNG — tệ hơn không có: screen reader đọc ra "
+                                   f"khoảng trắng và bỏ qua hình. Điền nội dung hoặc xoá thẻ.",
+                            "snippet": f"<{tag}></{tag}>"})
+        if SVG_ARIA_HIDDEN.search(head) or len(body) < SVG_DECORATIVE_MAX:
+            continue  # icon trang trí — không đòi nhãn
+        if "role=" not in head:
+            out.append({"level": "WARN", "file": rel,
+                        "msg": "SVG sơ đồ thiếu role=\"img\" — screen reader coi nó là nhóm hình "
+                               "vô nghĩa. Icon trang trí thì khai aria-hidden=\"true\" thay vì bỏ trống.",
+                        "snippet": head[:70]})
+        elif not SVG_TITLE.search(body):
+            out.append({"level": "WARN", "file": rel,
+                        "msg": "SVG sơ đồ có role nhưng thiếu <title> — role=img mà không tên thì "
+                               "vẫn câm. <title> phải là CON ĐẦU TIÊN của <svg>.",
+                        "snippet": head[:70]})
+        else:
+            first = SVG_FIRST_EL.match(body)
+            if first and first.group(1).lower() != "title":
+                out.append({"level": "WARN", "file": rel,
+                            "msg": "SVG có <title> nhưng KHÔNG phải con đầu tiên — một số screen "
+                                   "reader chỉ đọc con đầu, đặt sau là mất tên.",
+                            "snippet": f"con đầu đang là <{first.group(1)}>"})
+    return out
 
 
 def _unesc(s: str) -> str:
@@ -109,6 +180,7 @@ def scan(path: Path) -> list:
                            "dùng placeholder có nhãn hoặc đổi macrostructure.",
                     "snippet": m.group(0)[:60]})
         break
+    out += scan_svg(html, str(rel))
     # [WARN] prose lọt <pre> — chữ Việt có dấu ở dòng không-comment
     for block in PRE.findall(html):
         text = _unesc(TAG.sub("", block))
@@ -146,6 +218,16 @@ def self_test() -> int:
     GOOD = ("<html><head><style>.h1{color:#0a2540;font-weight:800}"
             "code{font-variant-ligatures:none}</style></head>"
             "<body><h1>x</h1><p>đo thật: 74/74 test PASS, cắt ~2.307 token</p></body></html>")
+    # Cổng SVG (hấp thụ diagram-design): BAD phải bị bắt, GOOD phải sạch.
+    SVG_BAD = ('<html><body><svg viewBox="0 0 10 10"><desc></desc>'
+               '<image href="https://cdn.example.com/x.png"/>' + "<path d='M0 0'/>" * 40
+               + '</svg></body></html>')
+    SVG_GOOD = ('<html><body><svg role="img" viewBox="0 0 10 10"><title>Sơ đồ luồng</title>'
+                + "<path d='M0 0'/>" * 40 + '</svg>'
+                '<svg aria-hidden="true" viewBox="0 0 4 4">' + "<path d='M1 1'/>" * 40
+                + '</svg></body></html>')
+    svg_bad = _scan_text(SVG_BAD)
+    svg_good = [f for f in _scan_text(SVG_GOOD) if "SVG" in f["msg"]]
     bad = _scan_text(BAD)
     good = _scan_text(GOOD)
     bad_kinds = {f["msg"][:20] for f in bad}
@@ -155,6 +237,13 @@ def self_test() -> int:
         ("BAD bắt italic-header (em)", any("italic header" in f["msg"] for f in bad)),
         ("BAD bắt số liệu marketing", any("marketing" in f["msg"] for f in bad)),
         ("GOOD sạch (0 finding)", len(good) == 0),
+        ("SVG BAD bắt remote ref (FAIL)",
+         any("REMOTE" in f["msg"] and f["level"] == "FAIL" for f in svg_bad)),
+        ("SVG BAD bắt <desc> rỗng (FAIL)",
+         any("RỖNG" in f["msg"] and f["level"] == "FAIL" for f in svg_bad)),
+        ("SVG BAD bắt thiếu role (WARN)",
+         any("role=" in f["msg"] and f["level"] == "WARN" for f in svg_bad)),
+        ("SVG GOOD sạch — icon aria-hidden được tha", len(svg_good) == 0),
     ]
     for label, passed in checks:
         print(f"  {'✓' if passed else '✗'} {label}")

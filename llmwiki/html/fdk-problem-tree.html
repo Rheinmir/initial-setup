@@ -162,6 +162,17 @@
     "solvedBy": "convention vào orca-workflow (skill distribute) + install.sh seed template sổ + session_end.py fallback problem-tree.html (harness travel, test sandbox pass) + concept wiki problem-tree.md — T-260702-01."
   },
   {
+    "id": "p-46",
+    "parent": null,
+    "title": "Thư mục framework nằm TRẦN ở gốc dự án đích — cổng thiết kế chấm nhầm artifact framework thành UI sản phẩm",
+    "desc": "installer đặt llmwiki/ và harness/ không có dấu chấm ngay gốc dự án người dùng, trong khi .claude/ .cursor/ .kiro/ đều đã ẩn. Hệ quả: skill/tool quét **/*.html (hallmark khi audit app, impeccable detect ., linter design bên thứ ba) vớ phải llmwiki/html/overstack.html 530KB và chấm như UI sản phẩm; cây thư mục dự án bị framework chiếm chỗ ngang hàng src/. Đo blast radius: 200 file đi xuống downstream nhắc llmwiki//harness/ (1287 lần), trong đó 79 file thật sự DỰNG ĐƯỜNG DẪN lúc chạy (261 chỗ). Đề xuất B: một resolver chấp cả .llmwiki/ lẫn llmwiki/ (đổi luồng thông tin — bậc Meadows cao hơn sửa 261 tham số), installer tự migrate bản cũ, sửa consumer dần không big-bang.",
+    "status": "open",
+    "scope": [],
+    "date": "2026-09-04",
+    "session": "3e970e77",
+    "solvedBy": null
+  },
+  {
     "id": "p-auto-01",
     "parent": "p-03",
     "title": "Thẻ ghi-tạm tự động (đã chưng lọc xong) — bằng chứng cơ chế chạy được",
@@ -994,6 +1005,17 @@
     "scope": [],
     "date": "14/08/26",
     "session": "dba79064",
+    "pending": true
+  },
+  {
+    "id": "p-auto-23",
+    "parent": null,
+    "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
+    "desc": "Bề mặt bị chạm: harness/metrics/.stop-debounce.json, harness/metrics/provenance-log.jsonl, harness/metrics/scratch-log.jsonl, llmwiki/html/wiki-graph.html, llmwiki/innovation/170826-innovation.md, llmwiki/innovation/180826-innovation.md, llmwiki/wiki/log.md, llmwiki/wiki/sources/170826-session-provenance.md …. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát); lần /fdk kế tiếp sẽ chưng lọc về đúng nhánh.",
+    "status": "open",
+    "scope": [],
+    "date": "18/08/26",
+    "session": "72190e1c",
     "pending": true
   }
 ]</script>

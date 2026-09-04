@@ -5,6 +5,8 @@
 | File | Type | Summary |
 |------|------|---------|
 | [example-concept](concepts/example-concept.md) | concept | Ví dụ một trang concept hợp lệ (Origin + OKF) cho project dùng llmwiki |
+| [030926-memory-retrieval-improvement-summary](../html/030926-memory-retrieval-improvement-summary.html) | draft | Trang docs-site-macos tóm tắt luồng: phát hiện agent không tự nhớ → /last30days lấy bằng chứng ngoài → /propose T-260902-01 chọn hướng A. Audit Playwright xanh (0 lỗi console, sidebar/theme round-trip đúng) |
+| [020926-sessionstart-episodic-recall](sources/draft/020926-sessionstart-episodic-recall.md) | draft | Đề xuất T-260902-01: nudge tất định 1-2 dòng ở SessionStart đọc episode gần nhất qua `mem-rank.py recent` (mới) — đóng khoảng trống "agent phiên mới không tự nhớ", KHÔNG auto-inject toàn bộ (rẻ hơn ~20 lần theo Memori paper) |
 | [140826-session-provenance](sources/140826-session-provenance.md) | source | Auto-distill scratch-log phiên dba79064 ngày 14/08 (stub) — chỉ chạm `gitignore`/`entities/repowise.md`, chưa ghi why thủ công |
 | [160826-session-provenance](sources/160826-session-provenance.md) | source | Auto-distill scratch-log phiên dba79064 ngày 16/08 (stub) — chỉ chạm `gitignore`/`entities/repowise.md`, chưa ghi why thủ công |
 | [repowise](entities/repowise.md) | entity | Đối thủ codebase-intelligence (CLI+MCP, AGPL-3.0, 5088★): 5-lớp index, 10 MCP tool task-shaped, code-health 49-detector defect-validated, PR bot 0-LLM — so sánh điểm chạm thật với code-graph/ingest nội bộ |
@@ -223,3 +225,4 @@
 | [210726-code-as-truth-migration](sources/draft/210726-code-as-truth-migration.md) | draft | SPEC migration kiến trúc code-là-nguồn-chân-lý: 3 lớp artifact AUTHORED/DERIVED/STATE, quan hệ suy từ code thay vì khai tay, merge = regen thay vì hoà giải tay file sinh |
 | [210726-codegraph-external-pull](sources/draft/210726-codegraph-external-pull.md) | draft | SPEC chính thức hoá code-graph thành phụ thuộc KÉO NGOÀI (pin `travel-policy.yaml` Tầng 1 + bootstrap cài trong `install-harness.sh --global`), thay vì vendor bytes hay viết lại engine |
 | [240726-global-tool-path-resolution-broken](sources/draft/240726-global-tool-path-resolution-broken.md) | issue | Issue: `skill-provenance.py`/`build-skill-search.py` suy sai đường dẫn `skills/` sau khi travel xuống global harness home, im lặng trả về rỗng thay vì báo lỗi |
+| [040926-lint-drift-catchup](sources/draft/040926-lint-drift-catchup.md) | draft | Bù drift 159 commit / 6 tuần: đóng 3 cờ hạ tầng (medic docs, pattern-health thiếu `llmwiki/commands/serve`, harness-stamp 1.3.54→1.3.65) và phân loại 157 cờ `code-drift` — 145 là nhiễu heuristic hoặc bản ghi lịch sử, 12 trang LIVE rà từng trang bằng claim-receipts, sửa đúng 1 câu |

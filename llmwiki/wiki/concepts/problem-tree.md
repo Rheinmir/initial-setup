@@ -34,5 +34,5 @@ Convention nằm ở các trụ **được distribute**: skill `orca-workflow` (
 
 ## Origin
 
-- **Nguồn:** session 020726 — thiết kế ledger + R16/R17 + proposal `sources/draft/020726-orca-issue-ledger-travel.md` (task T-260702-01, node p-02/p-04 của chính cây này).
+- **Nguồn:** session 020726 — thiết kế ledger + R16/R17 + proposal `sources/020726-orca-issue-ledger-travel.md` (task T-260702-01, node p-02/p-04 của chính cây này).
 - **Code:** `llmwiki/.claude/hooks/session_end.py::flush_problem_tree`, `harness/validators/report_show_path.py`, `harness/templates/problem-tree-template.html`, policy R16/R17.

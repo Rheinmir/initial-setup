@@ -44,13 +44,43 @@ def load_config(root: Path) -> dict:
 
 _DOMAIN_RE = re.compile(r"https?://([^/\s:'\"]+)", re.I)
 _HOST_RE = re.compile(r"\b([a-z0-9.-]+\.[a-z]{2,})\b", re.I)
+# Đuôi file và tên thuộc tính hay bị `_HOST_RE` đọc nhầm thành hostname. Đo 2026-09-04:
+# một lệnh UAT hợp lệ bị CHẶN vì guard trích ra `bootstrap.sh`, `uat.env`, `spec.loader`,
+# `importlib.util`, `c.lower` như thể chúng là host. Guard cắn vào việc thường ngày thì
+# người ta tắt nó đi — mà tắt hẳn còn tệ hơn nhiều so với một fallback hẹp hơn.
+_NOT_A_TLD = {
+    "sh", "py", "env", "json", "yaml", "yml", "md", "txt", "js", "mjs", "cjs", "ts", "tsx",
+    "html", "htm", "css", "png", "jpg", "svg", "gz", "zip", "tar", "log", "jsonl", "lock",
+    "cfg", "ini", "toml", "sql", "csv", "pdf", "mmd", "bak", "tmp", "out", "err",
+    # tên thuộc tính python/JS hay đứng sau dấu chấm trong code được quote
+    "loader", "util", "utils", "lower", "upper", "path", "name", "group", "text", "read",
+    "write", "keys", "items", "join", "split", "format", "encode", "decode", "get", "set",
+}
 
 
-def _domains_in(command: str):
-    """Extract candidate host(s) a command would reach (URLs first, then bare hosts)."""
+def _plausible_host(h: str) -> bool:
+    """Token này có thật sự trông như hostname không — dùng CHO NHÁNH FALLBACK.
+
+    `_DOMAIN_RE` (có scheme) là bằng chứng chắc, không cần lọc. Fallback bare-host thì
+    đoán, nên phải loại hai lớp nhiễu đo được: đuôi file (`bootstrap.sh`) và chuỗi truy cập
+    thuộc tính trong code được quote (`spec.loader`). Vẫn giữ nguyên khả năng bắt
+    `curl evil.tld/x` — đó là lý do fallback tồn tại.
+    """
+    tld = h.rsplit(".", 1)[-1]
+    return tld not in _NOT_A_TLD
+
+
+def _domains_in(command: str, bare_ok: bool = True):
+    """Host mà lệnh sẽ chạm tới. URL trước; bare-host chỉ khi `bare_ok`.
+
+    `bare_ok=False` cho nhánh heredoc-nuốt-cả-lệnh: ở đó thân heredoc là CODE, đầy token
+    dạng `a.b`, nên đoán bare-host chỉ đẻ ra báo động giả. URL có scheme vẫn bị soi bình
+    thường — exfil thật trong heredoc gần như luôn viết đủ `https://`.
+    """
     hosts = set(m.group(1).lower() for m in _DOMAIN_RE.finditer(command))
-    if not hosts:
-        hosts = set(m.group(1).lower() for m in _HOST_RE.finditer(command))
+    if not hosts and bare_ok:
+        hosts = {m.group(1).lower() for m in _HOST_RE.finditer(command)}
+        hosts = {h for h in hosts if _plausible_host(h)}
     return {h.split("@")[-1] for h in hosts}
 
 
@@ -109,25 +139,27 @@ def _egress_scope(cmd: str, netcmds) -> str:
         # words: inside a heredoc the call is usually quoted, so the char before it is a
         # quote or a paren rather than whitespace.
         hit = any(re.search(r"\b" + re.escape(c) + r"\b", cmd) for c in netcmds)
-        return cmd if hit else ""
+        # bare_ok=False: thân heredoc là CODE, đầy token `a.b` — đoán bare-host ở đây chỉ
+        # đẻ báo động giả (đo 2026-09-04: một lệnh UAT hợp lệ bị chặn vì `spec.loader`).
+        return (cmd, False) if hit else ("", True)
     net = [s for s in segs if _command_word(s) in netcmds]
     if not net:
-        return ""
+        return "", True
     # A variable in the net segment may carry the host (H=evil.tld; curl "https://$H") —
     # the literal is outside the segment, so widen back to the whole command rather than
     # hand out a bypass.
-    return cmd if any("$" in s for s in net) else " ".join(net)
+    return (cmd if any("$" in s for s in net) else " ".join(net)), True
 
 
 def check_bash(command: str, cfg: dict):
     """Return list of violation reasons (empty = clean)."""
     cmd = command or ""
     netcmds = [c.lower() for c in cfg.get("egress", {}).get("net_commands", [])]
-    scope = _egress_scope(cmd, netcmds)
+    scope, bare_ok = _egress_scope(cmd, netcmds)
     if not scope:
         return []   # no network command invoked -> nothing to guard
     allow = cfg.get("egress", {}).get("allow_domains") or []
-    bad = [h for h in _domains_in(scope) if not _allowed(h, allow)]
+    bad = [h for h in _domains_in(scope, bare_ok=bare_ok) if not _allowed(h, allow)]
     return [f"egress to non-allow-listed host: {h}" for h in sorted(bad)]
 
 

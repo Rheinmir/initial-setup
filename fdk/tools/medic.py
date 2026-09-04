@@ -131,6 +131,22 @@ def p_wikisummary():
     return "ok", "mọi Summary trong index.md đều là mô tả thật", ""
 
 
+def p_prose():
+    """AI-tell trong VĂN XUÔI người đọc (ADR/proposal/wiki) — chỗ p_frontend không với tới.
+
+    p_frontend gác HTML sinh; probe này gác GIỌNG của trang concept/entity. Toàn WARN có
+    chủ ý: chất lượng văn, không phải an toàn. Xem docstring prose-antipattern.py để biết
+    hai luật (em-dash, bold) đã bị LOẠI vì đo ra nhiễu 36%/42% trên corpus của ta."""
+    chk = ROOT / "fdk/tools/prose-antipattern.py"
+    if not chk.exists():
+        return "skip", "chưa có prose-antipattern.py", ""
+    rc, out = sh([PY, str(chk)], timeout=30)
+    tail = next((ln.strip() for ln in reversed(out.splitlines()) if ln.strip()), "")
+    if rc == 2:
+        return "warn", tail or "có AI-tell trong văn xuôi", "python3 fdk/tools/prose-antipattern.py"
+    return "ok", tail or "văn xuôi sạch AI-tell", ""
+
+
 def p_frontend():
     """Anti-pattern FRONTEND ở HTML sinh (ligature code, prose lọt code block) — p_docs không bắt."""
     chk = ROOT / "fdk/tools/frontend-antipattern.py"
@@ -156,6 +172,7 @@ def p_frontend():
 #   phải lỗi ngữ nghĩa (string không khớp).
 PROBE_MECH_MAP = {
     "rules": None, "coverage": None, "backstop": None, "docs": None, "frontend": None,
+    "prose": None,
     "narrative": None, "foundation": None, "code": None, "eval": None, "freshinstall": None,
     "selfstate": "code-state", "capsurface": "capsurface",
     "capproof": "capproof", "provenance": "provenance-scope",
@@ -485,6 +502,7 @@ PROBES = [
     ("docs",     ["docs", "capabilities"],       p_docs),
     ("wikisummary", ["wikisummary", "docs", "index"], p_wikisummary),
     ("frontend", ["frontend", "docs", "html"],    p_frontend),
+    ("prose",    ["prose", "docs", "ai-tell", "giọng"], p_prose),
     ("narrative", ["narrative", "docs", "drift"], p_narrative),
     ("foundation", ["foundation", "docs", "drift"], p_foundation),
     ("selfstate", ["selfstate", "state", "narrative"], p_selfstate),

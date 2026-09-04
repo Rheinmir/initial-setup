@@ -129,7 +129,7 @@ Quy ước hóa thứ đang làm ứng biến thành cơ chế đặt tên đư�
 - **Tier B — bơm theo truy vấn:** trang OKF đầy đủ của đúng các node liên quan (đi theo `relations` 1 bước từ chủ đề đang làm). Force-query hiện có nâng cấp: trả kèm hàng xóm quan hệ, không chỉ trang trúng keyword.
 - **Tier C — room:** khi phiên chính đã rot (context dài, tóm tắt nhiều), mở **subagent Explore/general-purpose** với brief = Tier A + danh sách id cần đào; room nạp Tier B/C đầy đủ, trả về kết luận nén. Room là chỗ "nạp chi tiết hơn tất cả" mà không phá phiên chính. Quy ước này viết thành skill nhỏ (`/wiki-room`) để gọi được chủ động thay vì tùy hứng.
 
-Chống rot không phải "bơm ít đi" mà là **bơm đúng tầng**: phiên chính giữ bản đồ, chi tiết sống trong room dùng-xong-bỏ.
+Chống rot là **bơm đúng tầng**: phiên chính giữ bản đồ, chi tiết sống trong room dùng-xong-bỏ. Bơm ít đi không giải quyết được.
 
 ### 2.5 Hiển thị cho người
 

@@ -1,10 +1,14 @@
-# Operation Log
 
-## 2026-09-02 — maintenance — vá R3 index-sync + soi duplicate-basename (fdk-gate drift)
 
-`python3 harness/validators/index_sync.py --wiki-dir llmwiki/wiki` báo 18 file thiếu khỏi `wiki/index.md` (8 `sources/*-session-provenance.md` từ 24/07 đến 13/08, 10 `sources/draft/*.md`). Đọc từng file thật (không suy đoán tên/ngày) rồi thêm đúng 18 dòng vào bảng, theo house-style sẵn có: 8 dòng session-provenance khớp khuôn `Auto-distill scratch-log phiên <hash> ngày DD/MM...` (5 dòng `(stub) — chỉ chạm ...` vì chỉ đụng `gitignore`/`entities/repowise.md`, 1 dòng có nội dung thật vì phiên đó soạn draft BIV); 6 dòng `draft` + 4 dòng `issue` khớp khuôn "SPEC ..."/"Issue: ..." đã dùng cho các `sources/draft/*` khác. Validator giờ exit 0.
+## 2026-09-04 — absorb — 9 năng lực từ 8 repo ngoài
 
-Soi `python3 harness/validators/duplicate_basename.py --wiki-dir llmwiki/wiki`: `200826-docs-site-macos-mermaid-sidebar-fix.md` trùng basename ở `draft/unknown/` và `sources/draft/`. Diff hai file: **KHÔNG phải bản sao** — `sources/draft/` là SPEC (`type: draft`), `draft/unknown/` là unknown-ledger (`type: unknown-ledger`, khai `source_spec:` trỏ ngược về chính SPEC đó), nội dung hoàn toàn khác nhau. Đối chiếu 2 file unknown-ledger khác cùng thư mục (`unknown-context-hygiene.md`, `unknown-frontend-design.md`) lộ ra quy ước đặt tên: file trong `draft/unknown/` phải mang tiền tố `unknown-<slug>.md`, không được trùng basename với SPEC nguồn — file `200826-...` phá quy ước đó (thiếu tiền tố `unknown-`) nên mới đụng basename. Không xoá/gộp file nào — nội dung khác nhau thật, cần người quyết hướng sửa (nhiều khả năng: đổi tên `draft/unknown/200826-docs-site-macos-mermaid-sidebar-fix.md` → `draft/unknown/unknown-docs-site-macos-mermaid-sidebar-fix.md`), báo lại thay vì tự đoán. `duplicate_basename.py` vẫn đỏ, cố ý để nguyên.
+8 lượt `/doyourmagic` cùng ngày đẻ ra 8 bundle tài liệu và 0 thay đổi framework. Đóng vòng: 9 absorb, mỗi cái một phán quyết `[[adapt-modes]]` có tên và một bite-test. 8 HÒA TAN + 1 KÉO NGOÀI (impeccable, pin `@3.6.1`, opt-in vì nó kéo npm+puppeteer vào một medic vốn stdlib-only).
+
+Số đo quyết định, không phải cảm tính: loại luật em-dash (khớp 96/266 trang) và bold (113/266) khỏi cổng văn xuôi vì trong tài liệu kỹ thuật tiếng Việt chúng là dấu câu bình thường, không phải AI-tell — đó là tell của văn marketing tiếng Anh. `ui-detect` báo 342 finding trên overstack.html trong khi cổng nhà 9 luật báo sạch: đó đúng là khoảng 61-trừ-9 ta không nhìn thấy.
+
+Bài học đắt nhất ghi thẳng vào step 9 của `/doyourmagic`: lượt đầu tôi kết luận diagram-design rẻ hơn Mermaid vì so DUNG LƯỢNG. Trục đúng là số lượt agent mỗi sơ đồ và code có tự sinh được không — trên trục đó diagram-design tốn một lượt agent mãi mãi, còn generator Python của ta tốn 0. Đo thêm mới lộ: hai generator chính không dùng mermaid lần nào, dựng SVG thẳng ở 37 chỗ.
+
+Một khuôn lặp ba lần trong đợt: BỎ QUA ≠ SẠCH. Bản nháp đầu của `ui-detect` in "✓ sạch theo 61 luật" trong khi chưa quét nổi. Quy ước rc=2-là-skipped mượn của archify.
 
 <!-- log:auto:start -->
 
@@ -12,8 +16,6 @@ Soi `python3 harness/validators/duplicate_basename.py --wiki-dir llmwiki/wiki`: 
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-20 16:50:41 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=2aedc924b9e0561933ebbe966def9820d88f |
-| 2026-08-20 16:51:03 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=d37df70991273fabc0aa0299b63201c58501 |
 | 2026-08-20 16:51:03 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=86219564e5016e70436f872b88e3065c285c |
 | 2026-08-20 16:52:41 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=69bd47f08ef961c5a2c8b000edfaba003d66 |
 | 2026-08-20 16:52:41 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=975ce6988d22b8f1b1c3621ce28988518e77 |
@@ -52,5 +54,7 @@ Soi `python3 harness/validators/duplicate_basename.py --wiki-dir llmwiki/wiki`: 
 | 2026-09-04 09:11:53 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=60c00ca6158856fc2de0ccba12fa11f8b5d4af1 |
 | 2026-09-04 10:28:45 | `file.write` | harness/scripts/dep-health.py · tool=Edit · session=3e970e77 · actor=agent · prev=da98f5ddaeb2fec629737762f78e1732ac9fff |
 | 2026-09-04 10:28:45 | `file.write` | harness/scripts/dep-health.py · tool=Edit · session=3e970e77 · actor=agent · prev=8a73f81581c475b25ef0b1e525719ec15085b9 |
+| 2026-09-04 12:36:57 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=d212f056da6b29711d8dcd37ff6c5d25ef |
+| 2026-09-04 12:36:57 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=fc0ada65565a22840c18c2bf3ce84f5280 |
 
 <!-- log:auto:end -->

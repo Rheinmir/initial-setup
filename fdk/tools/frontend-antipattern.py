@@ -128,6 +128,98 @@ def scan_svg_evidence(html: str, rel: str, root) -> list:
     return out
 
 
+# ── Cổng HÌNH HỌC cho SVG (hấp thụ archify `check-render-output.mjs`, 09/2026) ──
+# archify có 9 check hình học có tên (orthogonal_arrows, relationship_crossings,
+# label_route_clearance, legend_clearance…) và TỪ CHỐI giao artifact khi chúng đỏ. Ta vẽ SVG
+# bằng code ở 37 chỗ mà không kiểm hình học lần nào — cổng SVG hiện có chỉ soi a11y và
+# tự-chứa. Một sơ đồ có ô đè nhau hay chữ tràn viền vẫn qua cổng trót lọt.
+#
+# Đo trên 5 sơ đồ thật của overstack trước khi chọn luật (cùng kỷ luật đã dùng cho em-dash):
+#   · rect đè nhau          0 vi phạm → nhận, FAIL
+#   · phần tử ngoài viewBox 0 vi phạm → nhận, FAIL
+#   · chữ tràn/sát viền ô   0 vi phạm → nhận, FAIL
+#   · mũi tên phải thẳng ngang/dọc — LOẠI: sơ đồ của ta cố ý toả nan quạt từ một node
+#     (6·4·10 đường chéo hợp lệ ở 3 sơ đồ). Đó là ràng buộc phong cách CỦA archify,
+#     không phải lỗi của ta. Bê nguyên là lặp lại lỗi genre-scoped.
+SVG_VIEWBOX = re.compile(r'viewBox\s*=\s*"([\d.\-\s]+)"', re.I)
+SVG_RECT = re.compile(
+    r'<rect\b[^>]*?x="([\d.]+)"[^>]*?y="([\d.]+)"[^>]*?width="([\d.]+)"[^>]*?height="([\d.]+)"[^>]*>', re.I)
+SVG_TEXT = re.compile(r"<text\b([^>]*)>([^<]*)</text>", re.I)
+SVG_ATTR = re.compile(r'(\w[\w-]*)\s*=\s*"([^"]*)"')
+# Bề rộng chữ ước lượng: ký tự × cỡ chữ × hệ số. 0.55 là xấp xỉ chuẩn cho font sans tỉ lệ.
+# Cố ý ước lượng RỘNG RÃI (ngưỡng 2px) — cổng này bắt lỗi bố cục thật, không phải trọng tài
+# kerning. Muốn đo chính xác thì đó là việc của visual-receipt.py (trình duyệt thật).
+SVG_CHAR_W = 0.55
+SVG_EDGE_PAD = 2.0
+SVG_GEOM_MIN_BOX = 400   # cùng ngưỡng "là sơ đồ thật" với luật a11y ở trên
+
+
+def _svg_attrs(blob: str) -> dict:
+    return {k.lower(): v for k, v in SVG_ATTR.findall(blob)}
+
+
+def scan_svg_geometry(html: str, rel: str) -> list:
+    """Ba lỗi bố cục mà mắt thấy ngay nhưng cổng tĩnh hiện tại mù hoàn toàn."""
+    out = []
+    for m in SVG_TAG.finditer(html):
+        whole, body = m.group(0), m.group(1)
+        if len(body) < SVG_GEOM_MIN_BOX:
+            continue                      # icon trang trí — không có bố cục để hỏng
+        vb = SVG_VIEWBOX.search(whole[: whole.find(">") + 1])
+        rects = [tuple(map(float, r)) for r in SVG_RECT.findall(body)]
+
+        for a, b in ((i, j) for i in range(len(rects)) for j in range(i + 1, len(rects))):
+            x1, y1, w1, h1 = rects[a]
+            x2, y2, w2, h2 = rects[b]
+            # Ô LỒNG hẳn trong ô khác là bố cục hợp lệ (khung bao, nền nhóm) — chỉ bắt ĐÈ MỘT PHẦN.
+            inner = (x1 >= x2 and y1 >= y2 and x1 + w1 <= x2 + w2 and y1 + h1 <= y2 + h2) or \
+                    (x2 >= x1 and y2 >= y1 and x2 + w2 <= x1 + w1 and y2 + h2 <= y1 + h1)
+            if inner:
+                continue
+            if x1 < x2 + w2 and x2 < x1 + w1 and y1 < y2 + h2 and y2 < y1 + h1:
+                out.append({"level": "FAIL", "file": rel,
+                            "msg": "hai ô sơ đồ ĐÈ NHAU một phần — bố cục hỏng, người đọc không "
+                                   "phân biệt được node. Giãn toạ độ hoặc thu ô.",
+                            "snippet": f"({x1:g},{y1:g},{w1:g}×{h1:g}) ∩ ({x2:g},{y2:g},{w2:g}×{h2:g})"})
+                break
+
+        if vb:
+            try:
+                vx, vy, vw, vh = (float(n) for n in vb.group(1).split()[:4])
+            except ValueError:
+                vx = vy = vw = vh = None
+            if vw:
+                for x, y, w, h in rects:
+                    if x < vx - 0.5 or y < vy - 0.5 or x + w > vx + vw + 0.5 or y + h > vy + vh + 0.5:
+                        out.append({"level": "FAIL", "file": rel,
+                                    "msg": "ô sơ đồ nằm NGOÀI viewBox — phần đó không bao giờ hiện "
+                                           "ra. Nới viewBox hoặc kéo ô vào trong.",
+                                    "snippet": f"ô ({x:g},{y:g},{w:g}×{h:g}) vs viewBox {vw:g}×{vh:g}"})
+                        break
+
+        for blob, label in SVG_TEXT.findall(body):
+            at = _svg_attrs(blob)
+            if not {"x", "y", "font-size"} <= at.keys() or not label.strip():
+                continue
+            try:
+                tx, ty, fs = float(at["x"]), float(at["y"]), float(at["font-size"])
+            except ValueError:
+                continue
+            host = next((r for r in rects
+                         if r[0] <= tx <= r[0] + r[2] and r[1] - 14 <= ty <= r[1] + r[3] + 4), None)
+            if not host:
+                continue                  # chữ tự do ngoài ô — không có viền để tràn
+            tw = len(label) * fs * SVG_CHAR_W
+            left = tx - tw / 2 if at.get("text-anchor") == "middle" else tx
+            if min(left - host[0], host[0] + host[2] - (left + tw)) < -SVG_EDGE_PAD:
+                out.append({"level": "FAIL", "file": rel,
+                            "msg": "chữ TRÀN RA NGOÀI ô chứa nó — nhãn bị cắt hoặc đè lên node "
+                                   "bên cạnh. Rút ngắn nhãn, giảm cỡ chữ, hoặc nới ô.",
+                            "snippet": f'"{label[:28]}" rộng ~{tw:.0f}px trong ô {host[2]:g}px'})
+                break
+    return out
+
+
 def scan_svg(html: str, rel: str) -> list:
     """Bốn luật của diagram-design, chia mức theo NỢ ĐANG CÓ chứ không theo cảm tính.
 
@@ -224,6 +316,7 @@ def scan(path: Path) -> list:
         break
     out += scan_svg(html, str(rel))
     out += scan_svg_evidence(html, str(rel), ROOT)
+    out += scan_svg_geometry(html, str(rel))
     # [WARN] prose lọt <pre> — chữ Việt có dấu ở dòng không-comment
     for block in PRE.findall(html):
         text = _unesc(TAG.sub("", block))
@@ -275,6 +368,26 @@ def self_test() -> int:
               '<rect data-src="harness/scripts/fdk-gate.py"/></svg></body></html>'
     ev_bad = _scan_text(EV_BAD)
     ev_good = [f for f in _scan_text(EV_GOOD) if "bằng chứng" in f["msg"] or "neo" in f["msg"]]
+    PAD = "<path d='M0 0'/>" * 40
+    GEO_OVERLAP = ('<html><body><svg role="img" viewBox="0 0 200 100"><title>t</title>' + PAD +
+                   '<rect x="10" y="10" width="80" height="40"/>'
+                   '<rect x="50" y="20" width="80" height="40"/></svg></body></html>')
+    GEO_OUTSIDE = ('<html><body><svg role="img" viewBox="0 0 200 100"><title>t</title>' + PAD +
+                   '<rect x="180" y="10" width="80" height="40"/></svg></body></html>')
+    GEO_OVERFLOW = ('<html><body><svg role="img" viewBox="0 0 200 100"><title>t</title>' + PAD +
+                    '<rect x="10" y="10" width="40" height="30"/>'
+                    '<text x="30" y="28" font-size="12" text-anchor="middle">'
+                    'nhãn dài quá khổ so với ô</text></svg></body></html>')
+    GEO_GOOD = ('<html><body><svg role="img" viewBox="0 0 200 100"><title>t</title>' + PAD +
+                '<rect x="10" y="10" width="80" height="40"/>'
+                '<rect x="100" y="10" width="80" height="40"/>'
+                # ô LỒNG hẳn trong ô khác = khung bao hợp lệ, KHÔNG được coi là đè
+                '<rect x="15" y="15" width="20" height="10"/>'
+                '<text x="140" y="34" font-size="10" text-anchor="middle">vừa</text>'
+                '<line x1="90" y1="30" x2="100" y2="44"/></svg></body></html>')
+    geo_ov = _scan_text(GEO_OVERLAP); geo_out = _scan_text(GEO_OUTSIDE)
+    geo_of = _scan_text(GEO_OVERFLOW)
+    geo_good = [f for f in _scan_text(GEO_GOOD) if f["level"] == "FAIL"]
     svg_bad = _scan_text(SVG_BAD)
     svg_good = [f for f in _scan_text(SVG_GOOD) if "SVG" in f["msg"]]
     bad = _scan_text(BAD)
@@ -296,6 +409,10 @@ def self_test() -> int:
         ("neo data-src trỏ file KHÔNG tồn tại → FAIL",
          any("KHÔNG tồn tại" in f["msg"] and f["level"] == "FAIL" for f in ev_bad)),
         ("neo data-src trỏ file có thật → sạch", len(ev_good) == 0),
+        ("hình học: hai ô ĐÈ NHAU → FAIL", any("ĐÈ NHAU" in f["msg"] for f in geo_ov)),
+        ("hình học: ô NGOÀI viewBox → FAIL", any("NGOÀI viewBox" in f["msg"] for f in geo_out)),
+        ("hình học: chữ TRÀN ô → FAIL", any("TRÀN RA NGOÀI" in f["msg"] for f in geo_of)),
+        ("hình học: bố cục lành + ô LỒNG + đường chéo → sạch", len(geo_good) == 0),
     ]
     for label, passed in checks:
         print(f"  {'✓' if passed else '✗'} {label}")

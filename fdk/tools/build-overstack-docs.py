@@ -1119,8 +1119,42 @@ def main():
         print("overstack.html khớp đĩa ✓")
         sys.exit(0)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(content, encoding="utf-8")
-    print(f"✓ wrote {OUT.relative_to(ROOT)} ({len(content)} bytes, {content.count(chr(10)) + 1} dòng)")
+    _deliver(OUT, content)
+
+
+def _deliver(out_path, content: str) -> None:
+    """Giao artifact NGUYÊN TỬ, giữ bản tốt cũ nếu bản mới hỏng.
+
+    Hấp thụ `deliver` của archify (09/2026): render vào một file tạm, KIỂM file tạm đó, chỉ
+    khi xanh mới `os.replace` — thao tác nguyên tử ở tầng filesystem. Bản mới hỏng thì file
+    đích giữ nguyên bản tốt trước đó, và người dùng biết CHÍNH XÁC vì sao.
+
+    Trước đây là `OUT.write_text(...)` ghi thẳng: một lỗi giữa chừng (đĩa đầy, generator sinh
+    HTML hỏng) là mất luôn bản tốt, và cổng frontend chỉ phát hiện SAU KHI file đã bị thay.
+    Đúng câu archify nói: không bao giờ nhả ra một artifact rác.
+
+    Cảnh báo mượn nguyên từ archify: sau một lần deliver ĐỎ, đừng đi soi file đích — bạn sẽ
+    soi bản tốt CŨ chứ không phải bản vừa hỏng. Bản hỏng nằm ở đường dẫn `.rejected` in ra.
+    """
+    import os
+    import subprocess
+
+    tmp = out_path.with_suffix(out_path.suffix + ".tmp")
+    tmp.write_text(content, encoding="utf-8")
+    checker = ROOT / "fdk" / "tools" / "frontend-antipattern.py"
+    if checker.is_file():
+        r = subprocess.run([sys.executable, str(checker), str(tmp)],
+                           capture_output=True, text=True, timeout=120)
+        if r.returncode == 1:                      # 1 = có FAIL (2 = chỉ WARN, vẫn giao)
+            rejected = out_path.with_suffix(out_path.suffix + ".rejected")
+            tmp.replace(rejected)
+            print(f"✗ KHÔNG giao: bản mới đỏ ở cổng frontend — {out_path.name} giữ nguyên "
+                  f"bản tốt cũ.\n  bản bị từ chối: {rejected}\n{r.stdout.strip()[-600:]}",
+                  file=sys.stderr)
+            sys.exit(1)
+    os.replace(tmp, out_path)                      # nguyên tử
+    print(f"✓ wrote {out_path.relative_to(ROOT)} ({len(content)} bytes, "
+          f"{content.count(chr(10)) + 1} dòng)")
 
 
 if __name__ == "__main__":

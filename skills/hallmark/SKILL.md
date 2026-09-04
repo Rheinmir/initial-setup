@@ -59,6 +59,13 @@ These six disciplines are **not** verb-specific. They apply to default Design, `
 
 8. **Variety memory — cưỡng chế xuyên phiên (tất định).** Mỗi trang emit ra mang stamp `<!-- design: macrostructure=<M> theme=<T> -->`; sau khi emit, nếu repo có harness thì chạy `python3 harness/scripts/design-variety.py` (hoặc `--stamp <file> --macro <M> --theme <T>` để ghi log) — nó BÁO khi trang mới LẶP cấu trúc trang trước (structural distance, không phải colour-swap), đưa trục Variety từ tự-giác thành kiểm được. Trên project có `design.md` luật đảo chiều (các màn hình phải CHUNG hệ) — bỏ qua cảnh báo lặp ở đó.
 
+
+9. **Charts — load `dataviz` first, and let the chart refuse.** Any chart, graph, plot, KPI tile, or dashboard: load the `dataviz` skill **before writing the first line of chart code**, in any medium (HTML artifact, inline SVG, matplotlib/plotly/d3/Recharts, a PNG you will render). Measured 2026-09-04: `dataviz` had **0 of 22** recorded Skill calls and exactly **one** mention anywhere in this repo — inside an archived draft. It was never bad, it simply had no door; this discipline is the door. Four rules absorbed from `lieflat-charts` that outrank aesthetics:
+   - **Refusing is correct behaviour, not stubbornness.** A truncated (broken) axis → refuse, offer three honest alternatives. Glow / glassmorphism / 3-D on data marks → refuse. More than six categories still demanding colour → fall back to a mono ramp. Data too thin for the requested form (three nodes, force graph) → downgrade and say why.
+   - **Chart count = number of independent conclusions**, never number of data columns. One question → one chart; a whole article → four to six; hard ceiling six per page, then split.
+   - **The title is the conclusion**, not the chart type. "Churn doubled after the April release", not "Bar chart of churn".
+   - **Show the evidence for the form you chose.** Name at least three candidate forms and why each was rejected, before drawing. "I used a bar chart" with no alternatives considered means the choice was never made.
+   Rendering must be deterministic: no `Math.random()` in a chart — refresh twice, get the identical picture.
 ---
 
 ## When the brief is a component, not a page

@@ -75,4 +75,48 @@ assert not any(v.get('action')=='code-drift' for v in s.values()), s"
 rc=0; python3 "$SYNC" --check >/dev/null || rc=$?
 assert "sau neo lại → current" 0 "$rc"
 
-echo "wiki-sync-test: $pass/8 assertion XANH"
+# 7. trang archive KHÔNG bị cờ (bản ghi lịch sử — /lint cấm sửa) và basename
+#    không-định-danh không tự sinh cờ (chỉ path đầy đủ mới cờ).
+mkdir -p llmwiki/wiki/sources/draft/archive llmwiki/wiki/concepts
+cat > llmwiki/wiki/sources/draft/archive/old-plan.md <<'EOF'
+---
+type: draft
+---
+# old-plan
+Kế hoạch cũ, có nhắc `src/app.py`.
+EOF
+# basename trần không đuôi: "serve" là từ tiếng Anh, không được làm needle
+mkdir -p bin && echo "#!/bin/sh" > bin/serve
+cat > llmwiki/wiki/concepts/prose.md <<'EOF'
+---
+type: concept
+---
+# prose
+Trang này nói "we serve users" — không hề trích file nào.
+## Origin
+- test fixture
+EOF
+# basename dùng chung vượt trần: 9 trang cùng nhắc "SHARED.md"
+mkdir -p pkg-a pkg-b && echo x > pkg-a/SHARED.md
+for i in 1 2 3 4 5 6 7 8 9; do
+  printf -- '---\ntype: concept\n---\n# common%s\nTham chiếu SHARED.md trong văn xuôi.\n' "$i" \
+    > "llmwiki/wiki/concepts/common$i.md"
+done
+git add -A && git -c core.hooksPath=/dev/null commit --no-verify -qm "test: archive + basename fixtures"
+python3 "$SYNC" --mark-synced >/dev/null
+echo "print('v3')" > src/app.py; echo "#!/bin/sh -e" > bin/serve; echo y > pkg-a/SHARED.md
+git add -A && git -c core.hooksPath=/dev/null commit --no-verify -qm "feat: đổi cả ba"
+rc=0; out=$(python3 "$SYNC" --check --json) || rc=$?
+assert "code đổi lần hai → drift exit 3" 3 "$rc"
+echo "$out" | python3 -c "
+import json,sys
+d=json.load(sys.stdin); sus=d['suspects']
+assert not any(p.startswith('sources/draft/archive/') for p in sus), \
+    f'trang archive không được cờ: {[p for p in sus if \"archive\" in p]}'
+assert 'concepts/prose.md' not in sus, 'basename không đuôi (\"serve\") không được làm needle'
+assert not any(p.startswith('concepts/common') for p in sus), \
+    f'basename vượt trần (SHARED.md) không được làm needle: {[p for p in sus if p.startswith(\"concepts/common\")]}'
+assert 'concepts/app-core.md' in sus, 'path đầy đủ vẫn phải cờ (không được lọc mất recall thật)'"
+pass=$((pass+1)); echo "  ✓ archive bỏ qua · basename không-định-danh không sinh cờ · path đầy đủ vẫn cờ"
+
+echo "wiki-sync-test: $pass/10 assertion XANH"

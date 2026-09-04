@@ -38,6 +38,15 @@ CONTENT_DIRS = ("concepts/", "entities/", "sources/", "draft/", "architecture/",
 ANCHOR_NAME = ".last-sync.json"
 MAX_CHANGED_LIST = 200  # cap hiển thị — vượt thì nói rõ, không cắt im lặng
 
+# Trang chỉ-ghi-lịch-sử: bản ghi ĐÚNG-TẠI-THỜI-ĐIỂM, /lint có luật không sửa chúng
+# (progression, không phải drift). Cờ code-drift ở đây chỉ sinh việc không ai được
+# làm → không quét luôn.
+ARCHIVE_PREFIXES = ("sources/draft/archive/", "sources/handover/")
+
+# Basename chỉ được làm needle khi nó ĐỊNH DANH được. Trần đo trên chính wiki đang
+# quét: một tên khớp quá nhiều trang thì nó không chỉ ra trang nào đang trích file đó.
+BASENAME_PAGE_CAP = 8
+
 
 def run_git(root: pathlib.Path, *args: str) -> str:
     """Trả stdout RAW (không strip) — `git status --short` mã hoá trạng thái bằng
@@ -112,26 +121,48 @@ def changed_since(root: pathlib.Path, wiki_dir: pathlib.Path, head_anchor: str):
 
 
 def map_suspects(wiki_dir: pathlib.Path, changed: list[str]) -> dict[str, list[str]]:
-    """Trang wiki nhắc tới file code đã đổi (theo path đầy đủ hoặc basename).
-    Heuristic tất định, thiên về recall — /lint là người phán xử cuối."""
-    needles = {}
-    for f in changed:
-        base = f.rsplit("/", 1)[-1]
-        needles[f] = {f, base} if len(base) >= 5 else {f}
-    suspects: dict[str, list[str]] = {}
+    """Trang wiki nhắc tới file code đã đổi (theo path đầy đủ, hoặc basename khi
+    basename ĐỊNH DANH được). Heuristic tất định, thiên về recall — /lint là người
+    phán xử cuối.
+
+    Hai bộ lọc giữ recall mà bỏ cờ-sai-lý-do (đo 2026-09-04, neo 6 tuần / 337 file
+    đổi: 159 → 114 cờ; hai cờ LIVE bị gỡ đúng là hai cờ đã rà tay ra false positive):
+      1. Trang trong ARCHIVE_PREFIXES: không quét (xem hằng số).
+      2. Basename phải có đuôi VÀ khớp ≤ BASENAME_PAGE_CAP trang. Không đạt thì chỉ
+         khớp path đầy đủ. Đo thật trên wiki này: "serve" khớp 30/240 trang vì là từ
+         tiếng Anh; "SKILL.md" khớp 42/240 vì tên đó có ở 85 chỗ trong repo.
+    """
+    docs: dict[str, str] = {}
     for d in CONTENT_DIRS:
         basedir = wiki_dir / d.rstrip("/")
         if not basedir.is_dir():
             continue
         for p in basedir.rglob("*.md"):
+            rel = p.relative_to(wiki_dir).as_posix()
+            if rel.startswith(ARCHIVE_PREFIXES):
+                continue
             try:
-                text = p.read_text(encoding="utf-8", errors="ignore")
+                docs[rel] = p.read_text(encoding="utf-8", errors="ignore")
             except OSError:
                 continue
-            rel = p.relative_to(wiki_dir).as_posix()
-            hits = [f for f, ns in needles.items() if any(n in text for n in ns)]
-            if hits:
-                suspects[rel] = hits
+
+    base_pages: dict[str, int] = {}  # memo: basename → số trang khớp
+    needles = {}
+    for f in changed:
+        base = f.rsplit("/", 1)[-1]
+        ns = {f}
+        if len(base) >= 5 and "." in base:
+            if base not in base_pages:
+                base_pages[base] = sum(1 for t in docs.values() if base in t)
+            if base_pages[base] <= BASENAME_PAGE_CAP:
+                ns.add(base)
+        needles[f] = ns
+
+    suspects: dict[str, list[str]] = {}
+    for rel, text in docs.items():
+        hits = [f for f, ns in needles.items() if any(n in text for n in ns)]
+        if hits:
+            suspects[rel] = hits
     return suspects
 
 

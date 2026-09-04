@@ -6,34 +6,12 @@
 
 Soi `python3 harness/validators/duplicate_basename.py --wiki-dir llmwiki/wiki`: `200826-docs-site-macos-mermaid-sidebar-fix.md` trùng basename ở `draft/unknown/` và `sources/draft/`. Diff hai file: **KHÔNG phải bản sao** — `sources/draft/` là SPEC (`type: draft`), `draft/unknown/` là unknown-ledger (`type: unknown-ledger`, khai `source_spec:` trỏ ngược về chính SPEC đó), nội dung hoàn toàn khác nhau. Đối chiếu 2 file unknown-ledger khác cùng thư mục (`unknown-context-hygiene.md`, `unknown-frontend-design.md`) lộ ra quy ước đặt tên: file trong `draft/unknown/` phải mang tiền tố `unknown-<slug>.md`, không được trùng basename với SPEC nguồn — file `200826-...` phá quy ước đó (thiếu tiền tố `unknown-`) nên mới đụng basename. Không xoá/gộp file nào — nội dung khác nhau thật, cần người quyết hướng sửa (nhiều khả năng: đổi tên `draft/unknown/200826-docs-site-macos-mermaid-sidebar-fix.md` → `draft/unknown/unknown-docs-site-macos-mermaid-sidebar-fix.md`), báo lại thay vì tự đoán. `duplicate_basename.py` vẫn đỏ, cố ý để nguyên.
 
-## 2026-09-02 — propose — sessionstart-episodic-recall
-
-Câu hỏi "phần nào đảm bảo agent phiên mới không quên phiên cũ" (phiên này) → grep thật xác nhận: KHÔNG có gì tự động, `session_start.py::orient()` chỉ nhắc chung "đi query đi". Chạy `/last30days "AI agent memory across sessions"` lấy bằng chứng ngoài (Mem0/Zep/Letta, MCP session-continuity servers, Memori paper: selective retrieval rẻ hơn ~20 lần so với auto-inject).
-
-`/propose` T-260902-01: `020926-sessionstart-episodic-recall.md` + companion HTML — 3 approach (A: nudge tất định 1-2 dòng qua lệnh mới `mem-rank.py recent`, KHUYẾN NGHỊ · B: auto-inject đầy đủ kiểu MCP, loại · C: giữ nguyên hiện trạng, loại), chọn A. Không trùng GH#101 (`050826-distill-zero-mem-graph-branch` — cải thiện CHẤT LƯỢNG ranking, trục khác). 2 task: T1 thêm subcommand `recent` vào `mem-rank.py` (tất định, sort theo `ts`, không ranking); T2 wire `episodic_recall()` vào `session_start.py` đúng khuôn fail-open có sẵn. R7 gate xanh. Đang chờ duyệt — chưa code.
-
-## 2026-09-03 — docs-site-macos — memory-retrieval-improvement-summary
-
-Đáp ứng docs-gate R10 (5 prompt thiếu tài liệu). Sinh `llmwiki/html/030926-memory-retrieval-improvement-summary.html` — 3 section (Phát hiện gốc / Nghiên cứu /last30days / Quyết định /propose), mind map 4 nhánh 10 lá, diagram-box kéo-thả cho mỗi section, theme toggle + sidebar collapse. Audit Playwright thật (không chỉ đọc code): 0 lỗi console, round-trip `.nav-close`/`.nav-toggle` đúng, control đổi `data-theme` nằm trong `.theme-row`, cấu trúc 3 section = 3 diagram-box = 3 nav-link khớp. `npm install playwright` chạy nhầm ở gốc repo lúc đầu (lệnh `cd` scratchpad thất bại âm thầm) — phát hiện ngay, dọn sạch, chuyển đúng vào scratchpad trước khi tiếp tục.
-
-## 2026-09-04 — lint — drift-catchup
-
-Neo wiki đứng yên từ 2026-07-20 (`b226621183`), 159 commit / 336 file sau đó → `wiki-sync --check` bung 157 cờ `code-drift`. Không sửa rộng: phân loại trước, 108 cờ rơi vào `sources/`+`draft/` và 37 cờ vào `archive/` — đều là bản ghi theo thời điểm (progression), không đụng. Còn 12 trang LIVE (`concepts/` + `entities/`), rà từng trang bằng `claim-receipts.py --check`.
-
-Kết quả: đúng **1** drift thật — `concepts/problem-tree.md` còn trỏ proposal ở `sources/draft/020726-orca-issue-ledger-travel.md` trong khi file đã được promote lên `sources/`. Contradiction → sửa đè 1 câu. 11 trang còn lại kiểm từng cờ đều KHÔNG phải drift: ref nằm trong khối ví dụ có rào (`a.txt`, `openclaude-usage.json`), đường dẫn repo ngoài (`mattpocock/skills`), câu văn đã tự phân biệt tên file framework vs downstream, hoặc số đo lịch sử ("migrate 82 trang" 2026-07-02).
-
-Đóng kèm 3 drift hạ tầng: regen `overstack.html` (medic `✗ docs` → 0 fail 0 warn 16 ok); khôi phục `llmwiki/commands/serve` bị xoá nhầm ở 1474a88 (hash `e1846847abcedbea` khớp đúng byte template global → xác nhận xoá nhầm chứ không phải retire); ghi lại `.harness-stamp` 1.3.54 → 1.3.65 đúng cách installer làm.
-
-Maintainer duyệt sửa nốt heuristic. Đo ngược "file nào sinh nhiều cờ nhất" cho ra thủ phạm thật, khác giả thuyết ban đầu: không phải việc dữ liệu đổi, mà là needle **basename** trong `map_suspects` — `log.py` khớp 64/240 trang, `scratch-log.jsonl` 58, `ledger.jsonl` 56, `SKILL.md` 42 (tên có ở 85 chỗ trong repo), `serve` 30 (từ tiếng Anh). Sửa: (1) không quét `sources/draft/archive/` + `sources/handover/` — bản ghi lịch sử /lint cấm sửa; (2) basename chỉ làm needle khi có đuôi VÀ khớp ≤ 8 trang. Đo lại đúng neo cũ: **159 → 115 cờ**; 2 cờ LIVE bị gỡ đúng là 2 false positive đã rà tay. Test 8 → 10 assertion, kèm bite-test.
-
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-20 16:47:31 | `file.write` | llmwiki/html/200826-session-summary-mermaid-sidebar.html · tool=Edit · session=72190e1c · actor=agent · prev=f20318dcc7a |
-| 2026-08-20 16:50:41 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=1e42b1ad9b45f8023466b49014316f5e05df |
 | 2026-08-20 16:50:41 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=2aedc924b9e0561933ebbe966def9820d88f |
 | 2026-08-20 16:51:03 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=d37df70991273fabc0aa0299b63201c58501 |
 | 2026-08-20 16:51:03 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=86219564e5016e70436f872b88e3065c285c |
@@ -72,5 +50,7 @@ Maintainer duyệt sửa nốt heuristic. Đo ngược "file nào sinh nhiều c
 | 2026-09-04 09:11:37 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=99341691ce6394f752acb8a141f296bf0e8411b |
 | 2026-09-04 09:11:53 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=f91c12fbf75fbedeaa09215e5c006fc439b4e77 |
 | 2026-09-04 09:11:53 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=60c00ca6158856fc2de0ccba12fa11f8b5d4af1 |
+| 2026-09-04 10:28:45 | `file.write` | harness/scripts/dep-health.py · tool=Edit · session=3e970e77 · actor=agent · prev=da98f5ddaeb2fec629737762f78e1732ac9fff |
+| 2026-09-04 10:28:45 | `file.write` | harness/scripts/dep-health.py · tool=Edit · session=3e970e77 · actor=agent · prev=8a73f81581c475b25ef0b1e525719ec15085b9 |
 
 <!-- log:auto:end -->

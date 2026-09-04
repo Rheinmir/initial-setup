@@ -26,6 +26,9 @@ must_exist:
   - .github/workflows/harness.yml
   - .llmwiki/wiki/index.md
   - .llmwiki/html/overstack.html
+  # +2026-09-04: UAT layout-ẩn XANH trong khi foundation.yaml vẫn seed vào ĐƯỜNG CŨ —
+  # lỗi lọt vì hợp đồng không khai nó. Đúng lớp lỗi file này sinh ra để chặn.
+  - .harness/foundation.yaml
   # Bản đồ năng lực cho MODEL (ADR-005). Thiếu file này = agent vào dự án KHÔNG BIẾT mình có
   # đồ nghề gì: hook orientation (session_start.py) trỏ tới nó, không có thì hook câm.
   # Cài xong mà model vẫn mù là hỏng, kể cả khi mọi file khác đủ.

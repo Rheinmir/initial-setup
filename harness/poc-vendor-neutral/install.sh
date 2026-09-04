@@ -231,21 +231,21 @@ if [ "$WITH_WIKI" = 1 ]; then
   mkdir -p "$ROOT/$OVERSTACK_DIR/raw" "$ROOT/$OVERSTACK_DIR/wiki/concepts" "$ROOT/$OVERSTACK_DIR/wiki/entities" "$ROOT/$OVERSTACK_DIR/wiki/sources/adr" "$ROOT/$OVERSTACK_DIR/wiki/sources/draft"
   [ -f "$ROOT/$OVERSTACK_DIR/wiki/index.md" ] || printf '# Wiki index\n\n| File | Type | Date |\n|---|---|---|\n' > "$ROOT/$OVERSTACK_DIR/wiki/index.md"
   [ -f "$ROOT/$OVERSTACK_DIR/wiki/log.md" ]   || printf '# Log\n' > "$ROOT/$OVERSTACK_DIR/wiki/log.md"
-  log "  ✓ llmwiki/ (wiki/{concepts,entities,sources/draft} · raw/ · index.md · log.md)"
+  log "  ✓ $OVERSTACK_DIR/ (wiki/{concepts,entities,sources/draft} · raw/ · index.md · log.md)"
   # tài liệu hướng dẫn overstack — TRAVEL cùng khung xương (luôn refresh bản mới nhất)
   if command -v curl >/dev/null 2>&1; then
     REPO_RAW="${REPO_RAW:-https://raw.githubusercontent.com/Rheinmir/setup/orca}"
     mkdir -p "$ROOT/$OVERSTACK_DIR/html"
     if curl -fsSL "$REPO_RAW/llmwiki/html/overstack.html" -o "$ROOT/$OVERSTACK_DIR/html/overstack.html" 2>/dev/null; then
-      log "  ✓ llmwiki/html/overstack.html (tài liệu overstack — mở bằng trình duyệt)"
+      log "  ✓ $OVERSTACK_DIR/html/overstack.html (tài liệu overstack — mở bằng trình duyệt)"
     else
       warn "  overstack.html chưa tải được (mạng?) → lấy tay: $REPO_RAW/llmwiki/html/overstack.html"
     fi
     # foundation.yaml — nguồn mục "Nền tảng" (GH#6): seed CHỈ khi chưa có, không đè bản đã điền
-    if [ ! -f "$ROOT/harness/foundation.yaml" ]; then
+    if [ ! -f "$ROOT/$HARNESS_DIR/foundation.yaml" ]; then
       mkdir -p "$ROOT/$HARNESS_DIR"
-      if curl -fsSL "$REPO_RAW/harness/templates/foundation-template.yaml" -o "$ROOT/harness/foundation.yaml" 2>/dev/null; then
-        log "  ✓ harness/foundation.yaml (nguồn mục Nền tảng — điền rồi regen overstack.html; medic probe foundation gác drift)"
+      if curl -fsSL "$REPO_RAW/harness/templates/foundation-template.yaml" -o "$ROOT/$HARNESS_DIR/foundation.yaml" 2>/dev/null; then
+        log "  ✓ $HARNESS_DIR/foundation.yaml (nguồn mục Nền tảng — điền rồi regen overstack.html; medic probe foundation gác drift)"
       else
         warn "  foundation-template chưa tải được (mạng?) — điền tay: $REPO_RAW/harness/templates/foundation-template.yaml"
       fi
@@ -253,7 +253,7 @@ if [ "$WITH_WIKI" = 1 ]; then
     # sổ cây vấn đề (problem-tree) — seed CHỈ khi chưa có, không bao giờ ghi đè sổ đang dùng
     if [ ! -f "$ROOT/$OVERSTACK_DIR/html/problem-tree.html" ] && [ ! -f "$ROOT/$OVERSTACK_DIR/html/fdk-problem-tree.html" ]; then
       if curl -fsSL "$REPO_RAW/harness/templates/problem-tree-template.html" -o "$ROOT/$OVERSTACK_DIR/html/problem-tree.html" 2>/dev/null; then
-        log "  ✓ llmwiki/html/problem-tree.html (sổ cây vấn đề — hook R17 tự xả sổ khi phiên kết thúc)"
+        log "  ✓ $OVERSTACK_DIR/html/problem-tree.html (sổ cây vấn đề — hook R17 tự xả sổ khi phiên kết thúc)"
       else
         warn "  problem-tree template chưa tải được (mạng?) — hook R17 sẽ fail-open tới khi có sổ"
       fi
@@ -367,7 +367,7 @@ echo ""
 # THẬT đo được trên máy, và chỉ bật `mode: block` khi người dùng tự chọn.
 # `--if-tty`: không có terminal (CI, curl|bash trong script) thì im lặng giữ mặc định,
 # TUYỆT ĐỐI không treo chờ nhập.
-TB="$ROOT/harness/scripts/token-budget.py"
+TB="$ROOT/$HARNESS_DIR/scripts/token-budget.py"
 [ -f "$TB" ] || TB="$HOME/.claude/harness/harness/scripts/token-budget.py"
 if [ -f "$TB" ]; then
   python3 "$TB" configure --if-tty --root "$ROOT" </dev/null 2>/dev/null || true
@@ -381,7 +381,7 @@ else
   warn "  2. Skills   — BỎ QUA         → thêm cờ --with-skills (hoặc --full)"
 fi
 if [ "$WITH_WIKI" = 1 ]; then
-  log  "  3. llmwiki  ✓ seed khung     (llmwiki/wiki + raw + index/log)"
+  log  "  3. llmwiki  ✓ seed khung     ($OVERSTACK_DIR/wiki + raw + index/log)"
 else
   warn "  3. llmwiki  — BỎ QUA         → thêm cờ --with-wiki (hoặc --full)"
 fi

@@ -106,6 +106,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `frontier-scan` | Quét đối thủ + đối chiếu overstack 8 trục (gọi instant) — "frontier scan", "chúng ta thua gì" | `skills/utils/frontier-scan.md` | utils |
 | `brandkit` | Premium brand-kit image generation skill for creating high-end… | `skills/utils/brandkit.md` | utils |
 | `hallmark` | **NỀN design mặc định** (Together AI) — 6 discipline + 57 cổng slop-test, từ chối trông AI-generated. Mọi UI đứng trên nó; skill taste khác là flavour. 4 verb: build/audit/redesign/study. Xem [[design-foundation]] | `skills/utils/hallmark.md` | utils |
+| `diagram` | Vẽ SƠ ĐỒ (hộp+mũi tên) và BIỂU ĐỒ (số liệu) bằng máy — router tới `archify` cho sơ đồ, `dataviz` + kỷ luật lieflat cho biểu đồ; model điền tờ khai, code dựng hình, cổng soi hình học rồi mới giao | `skills/utils/diagram.md` | utils |
 | `build-now-adapt-later` | When a task is blocked by missing or unverified information (an… | `skills/dev-loop/build-now-adapt-later.md` | dev-loop |
 | `cavecrew` | Decision guide for delegating to caveman-style subagents. | `skills/utils/cavecrew.md` | utils |
 | `i-have-adhd` | Định hình OUTPUT cho người đọc ADHD — hành động trước, đánh số bước, nêu lại state mỗi lượt, chặn lạc đề, ước lượng thời gian cụ thể, không mở bài/kết bài xã giao. Áp cho phần CHAT; tài liệu người đọc vẫn theo luật văn xuôi đầy đủ | `skills/utils/i-have-adhd.md` | utils |

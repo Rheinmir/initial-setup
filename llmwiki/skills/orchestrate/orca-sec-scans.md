@@ -72,6 +72,22 @@ trivy fs . <cờ skip-dirs như trên> --no-progress -f template --template "@$T
 
 Chạy lại Bước 2 trên target đã fix, xác nhận `remaining = NONE`.
 
+## Quét RA NGOÀI — chuỗi cung ứng & thương hiệu (chân thứ ba, keyless)
+
+Hai phần trên đều nhìn VÀO TRONG dự án. Không gì nhìn RA NGOÀI: ai đang dựng domain hoặc package na ná tên bạn để lừa người dùng, hoặc để chèn một dependency giả vào lệnh cài của chính bạn.
+
+```bash
+python3 fdk/tools/supply-watch.py <tên-thương-hiệu>            # sweep mặc định 7 TLD
+python3 fdk/tools/supply-watch.py <tên> --tld com,dev --json   # cho CI
+python3 fdk/tools/supply-watch.py --self-test
+```
+
+Sinh biến thể **tất định, offline** theo sáu kiểu — bỏ chữ, lặp chữ, đảo chữ, gõ nhầm phím kề (bàn phím QWERTY), chữ nhìn giống (`o`→`0`, `l`→`1`), thêm gạch nối — rồi hỏi DNS xem cái nào **đang sống**. Kèm CT monitor đọc Certificate Transparency (crt.sh) xem có chứng chỉ nào vừa được cấp cho domain na ná.
+
+**Không cần API key**, không cần `.venv`. Mã thoát: `0` sạch · `2` có phát hiện. Không gọi được crt.sh thì nó nói **BỎ QUA**, không phán là sạch.
+
+> Hấp thụ hẹp từ `7onez/cti-expert` (workflow 08). Cố ý **chỉ lấy mẩu này**: cti-expert là 121 op + 78 MCP tool để điều tra mối đe doạ bên ngoài, cần `.venv` + API key + mạng outbound. Gộp nguyên khối là kéo phụ thuộc key/mạng vào một cổng đang keyless và chạy được offline.
+
 ## Quét ĐỘNG — kiểm chứng giả định của dev (bổ sung cho Trivy)
 
 > **Nguyên tắc: Trivy (static) KHÔNG bắt được lỗi kiến trúc/logic/cấu hình runtime.** Lỗ hổng nặng nhất thường nằm ở **giả định mặc định của developer** — phải kiểm chứng bằng **request thật**, không tin lời. "Chạy được" ≠ "an toàn".

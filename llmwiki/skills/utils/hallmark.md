@@ -59,6 +59,8 @@ These six disciplines are **not** verb-specific. They apply to default Design, `
 
 8. **Variety memory — cưỡng chế xuyên phiên (tất định).** Mỗi trang emit ra mang stamp `<!-- design: macrostructure=<M> theme=<T> -->`; sau khi emit, nếu repo có harness thì chạy `python3 harness/scripts/design-variety.py` (hoặc `--stamp <file> --macro <M> --theme <T>` để ghi log) — nó BÁO khi trang mới LẶP cấu trúc trang trước (structural distance, không phải colour-swap), đưa trục Variety từ tự-giác thành kiểm được. Trên project có `design.md` luật đảo chiều (các màn hình phải CHUNG hệ) — bỏ qua cảnh báo lặp ở đó.
 
+
+9. **Charts and diagrams — hand off to `diagram`.** Any chart, graph, plot, KPI tile, dashboard, or box-and-arrow diagram: load the `diagram` skill, which is the canonical home for both families. It routes data charts to `dataviz` (load it before the first line of chart code, in any medium) and relationship/flow diagrams to the deterministic `archify` engine, and it carries the refusal rules that outrank aesthetics — a truncated axis, glow/3-D on data marks, more than six coloured categories, or data too thin for the requested form are all *refused with an honest alternative*, not drawn. Two measurements that made this a discipline rather than a suggestion: `dataviz` had **0 of 22** recorded Skill calls and exactly one mention anywhere in this repo (inside an archived draft) — it was never bad, it simply had no door; and a chart's title must state the conclusion ("Churn doubled after the April release"), never the chart type. Rendering must be deterministic: no `Math.random()` in a chart.
 ---
 
 ## When the brief is a component, not a page

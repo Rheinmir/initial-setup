@@ -78,6 +78,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `safe-change` | Editing code called from more than one place | `skills/dev-loop/safe-change.md` | dev-loop |
 | `verify-before-commit` | Before every commit | `skills/dev-loop/verify-before-commit.md` | dev-loop |
 | `ship` | User nhắc release/push/ship — checklist điều kiện trước push & release (medic gate/git sạch/version x.x.x+1/patch note trung thực) | `skills/dev-loop/ship.md` | dev-loop |
+| `reskin` | Áp DNA của một thiết kế tham chiếu lên app đang chạy rồi gác bằng `impeccable detect` tới khi hết slop, ship kèm biên bản audit (đo runtime → hallmark → contract → tokenize → gate → git/Vercel) | `skills/dev-loop/reskin.md` | dev-loop |
 | `ovs-notes` | Xem release notes/changelog — liệt kê các bản (tag/GH release) newest-first để chọn & đọc, read-only (khác /ship = cắt release) | `skills/utils/ovs-notes.md` | utils |
 | `onboard-codebase` | Deep analysis of legacy code to populate Wiki | `skills/dev-loop/onboard-codebase.md` | dev-loop |
 | `doyourmagic` | Freshly-cloned external repo/tool → clone→explore→analysis→write-workflows, sinh bộ `doyourmagic/<repo-name>/workflows.md` + `index.html` chạy được ngay. KHÁC `onboard-codebase` (phân tích DỰ ÁN CHÍNH → wiki nội bộ, không phải tool ngoài) | `skills/dev-loop/doyourmagic.md` | dev-loop |

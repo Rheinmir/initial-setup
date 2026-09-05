@@ -29,7 +29,7 @@ LOOP_MAP = {
     "verify-before-commit": "dev-loop", "build-now-adapt-later": "dev-loop", "ship": "dev-loop",
     "new-skill": "dev-loop", "loop-runner": "dev-loop", "failure-flywheel": "dev-loop", "wikieval": "dev-loop",
     "skill-provenance": "dev-loop", "qc-code": "dev-loop", "teach-me": "dev-loop",
-    "doyourmagic": "dev-loop",
+    "doyourmagic": "dev-loop", "reskin": "dev-loop",
     # orchestrate
     "orca-dispatch-reference": "orchestrate", "orca-onboard": "orchestrate", "orca-issue": "orchestrate",
     "orca-handover": "orchestrate",

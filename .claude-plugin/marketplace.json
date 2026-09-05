@@ -101,6 +101,7 @@
         "./skills/raise-issue",
         "./skills/record-episode",
         "./skills/redesign-existing-projects",
+        "./skills/reskin",
         "./skills/safe-change",
         "./skills/ship",
         "./skills/skill-provenance",

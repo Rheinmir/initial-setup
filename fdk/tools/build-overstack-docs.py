@@ -127,7 +127,8 @@ LOOP_GROUPS = {
          "build-now-adapt-later": "edit",
          "new-project-setup": "build", "onboard-codebase": "build", "new-skill": "build",
          "skill-provenance": "build", "doyourmagic": "build",
-         "wikieval": "eval", "ship": "eval", "loop-runner": "eval", "failure-flywheel": "eval"}),
+         "wikieval": "eval", "ship": "eval", "loop-runner": "eval", "failure-flywheel": "eval",
+         "reskin": "eval"}),
     "orchestrate": (
         [("dispatch", "🐳 điều phối"), ("eval", "📊 đánh giá"), ("ops", "🚀 vận hành & deploy")],
         {"orca-workflow": "dispatch", "orca-onboard": "dispatch", "orchestration": "dispatch",
@@ -138,7 +139,7 @@ LOOP_GROUPS = {
     "utils": (
         [("docs", "📄 tài liệu & render"), ("taste", "🎨 thiết kế & style"), ("imagegen", "🖼️ image→code/gen"),
          ("caveman", "🦴 caveman"), ("fdk", "🛠️ framework-dev"), ("utility", "🔧 tiện ích khác")],
-        {"docs-site-macos": "docs", "extract-site": "docs", "md-to-html": "docs",
+        {"docs-site-macos": "docs", "extract-site": "docs", "md-to-html": "docs", "diagram": "docs",
          "web-crawl": "docs", "web-clone": "docs",
          "tour-guide": "taste", "tour-guide-supademo": "taste",
          "brandkit": "taste", "hallmark": "taste", "design-taste-frontend": "taste", "design-taste-frontend-v1": "taste",

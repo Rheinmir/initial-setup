@@ -1,6 +1,14 @@
 ---
 name: reskin
-description: Lột da một app đang chạy theo DNA của một thiết kế tham chiếu, gác bằng luật tất định cho tới khi hết AI-slop, rồi ship. Sáu chặng nối liền: đo DNA từ URL/ảnh thật bằng runtime (WAAPI keyframes, scroll trace, hover diff) chứ không đọc HTML tĩnh; khoá vào design.md của hallmark; đổ thành DESIGN.md contract cho impeccable; tokenize hex cứng thành CSS var để đổi bảng màu là đổi ~20 dòng chứ không sed 18 file; chạy vòng impeccable detect trên BẢN BUILD PRODUCTION tới khi sạch; ship ra git + Vercel kèm biên bản audit. Gọi khi user nói: 'lấy theme trang này', 'áp design này vào app', 'trang trông AI quá dọn đi', 'đổi bộ màu theo brand book', 'quét slop', 'reskin', 'redesign rồi deploy demo', hoặc invoke /reskin.
+description: >-
+  Lột da một app đang chạy theo DNA của một thiết kế tham chiếu, gác bằng luật tất định cho tới
+  khi hết AI-slop, rồi ship. Sáu chặng nối liền: đo DNA từ URL/ảnh thật bằng runtime (WAAPI
+  keyframes, scroll trace, hover diff) chứ không đọc HTML tĩnh; khoá vào design.md của hallmark;
+  đổ thành DESIGN.md contract cho impeccable; tokenize hex cứng thành CSS var để đổi bảng màu là
+  đổi ~20 dòng chứ không sed 18 file; chạy vòng impeccable detect trên BẢN BUILD PRODUCTION tới
+  khi sạch; ship ra git + Vercel kèm biên bản audit. Gọi khi user nói: 'lấy theme trang này', 'áp
+  design này vào app', 'trang trông AI quá dọn đi', 'đổi bộ màu theo brand book', 'quét slop',
+  'reskin', 'redesign rồi deploy demo', hoặc invoke /reskin.
 ---
 
 # Skill: reskin

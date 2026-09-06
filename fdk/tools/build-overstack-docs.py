@@ -127,7 +127,8 @@ LOOP_GROUPS = {
          "build-now-adapt-later": "edit",
          "new-project-setup": "build", "onboard-codebase": "build", "new-skill": "build",
          "skill-provenance": "build", "doyourmagic": "build",
-         "wikieval": "eval", "ship": "eval", "loop-runner": "eval", "failure-flywheel": "eval"}),
+         "wikieval": "eval", "ship": "eval", "loop-runner": "eval", "failure-flywheel": "eval",
+         "playwright-verify": "eval"}),
     "orchestrate": (
         [("dispatch", "🐳 điều phối"), ("eval", "📊 đánh giá"), ("ops", "🚀 vận hành & deploy")],
         {"orca-workflow": "dispatch", "orca-onboard": "dispatch", "orchestration": "dispatch",

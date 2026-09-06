@@ -839,6 +839,13 @@
       "recorded": "2026-07-18",
       "source": "local-authored"
     },
+    "playwright-verify": {
+      "files": {
+        "SKILL.md": "87e1a19de3fcb192032584cb3fecdb38efc37cbe17005442034a979adcf952a1"
+      },
+      "recorded": "2026-09-07",
+      "source": "local-authored"
+    },
     "propose": {
       "files": {
         "SKILL.md": "ae957f4db22281aff985b18da4a7d883e9c4e64a9657d9f794de7c35e7a271f2"

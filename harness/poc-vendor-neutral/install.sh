@@ -86,6 +86,10 @@ import re,sys;p=sys.argv[1];s=open(p,encoding='utf-8').read()
 n=re.sub(r'(?<![\w.-])(llmwiki|harness)/', lambda m: '.'+m.group(1)+'/', s)
 s!=n and open(p,'w',encoding='utf-8').write(n)" "$g" 2>/dev/null
   done
+  # GH#106 gốc thật: vòng .grok ở trên là lệnh CUỐI của hàm — không có .grok/ thì `[ -f ]` trả 1,
+  # hàm trả 1, `set -e` giết script NGAY SAU khi migrate (trước B0). Mọi dự án được migrate đều
+  # bị bỏ dở: con trỏ đã đổi sang .harness/ mà .harness/ chưa có gì → pre-commit đỏ mọi commit.
+  return 0
 }
 migrate_dot_layout
 
@@ -161,6 +165,29 @@ elif grep -q 'llmwiki-harness' "$PC"; then
   log "  · pre-commit → đã có hook llmwiki-harness, bỏ qua"
 else
   warn "  pre-commit đã tồn tại → thêm tay khối repo:local id=llmwiki-harness (xem out/pre-commit-snippet.yaml)"
+fi
+if [ ! -d "$ROOT/fdk/wiki" ]; then
+  # GH#106 (downstream, mọi lần chạy): pre-commit của dự án có thể còn hook trỏ harness/scripts|validators
+  # (bản GH#51 từng copy engine vào repo; migrate dot-layout lại đổi tiền tố thành .harness/). U10 gỡ
+  # thư mục đó nên MỌI commit đỏ "can't open file" — kể cả commit không dính wiki.
+  # Trỏ lại về bản global; thiếu file thì bỏ qua (exit 0), không khoá người dùng. Idempotent.
+  PCF="$ROOT/.pre-commit-config.yaml"
+  if [ -f "$PCF" ] && grep -qE 'python3 "?\.?harness/(scripts|validators)/' "$PCF"; then
+    python3 - "$PCF" "$ROOT" <<'PYEOF'
+import os, re, sys
+pc, root = sys.argv[1], sys.argv[2]
+s = open(pc, encoding="utf-8").read()
+def sub(m):
+    rel = m.group(2)                                   # harness/scripts/x.py
+    if os.path.exists(os.path.join(root, m.group(1) + rel)):
+        return m.group(0)                              # còn file → giữ nguyên
+    return ('bash -c \'f="$HOME/.claude/harness/%s"; [ -f "$f" ] && exec python3 "$f" "$@" || exit 0\' --' % rel)
+n = re.sub(r'python3 "?(\.?)(harness/(?:scripts|validators)/[^\s"]+)"?', sub, s)
+if n != s:
+    open(pc, "w", encoding="utf-8").write(n)
+    print("  \033[1;32m✓\033[0m pre-commit: hook trỏ engine đã gỡ → dùng bản global, thiếu thì bỏ qua (GH#106)")
+PYEOF
+  fi
 fi
 # Claude / OpenClaude (merge hooks vào settings.json — cùng schema hook + cùng $CLAUDE_PROJECT_DIR,
 # OpenClaude là fork của Claude Code; chỉ khác path project-settings: .openclaude/ thay vì .claude/)

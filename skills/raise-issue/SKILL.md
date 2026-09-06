@@ -37,7 +37,8 @@ Mọi file trong `llmwiki/wiki/` phải có: **(R9)** YAML frontmatter OKF ở �
 4. **Assign**: điền `assignee` (người/agent chịu trách nhiệm) + `dispatch` (đề xuất Claude/opencode/human) + `entry` (mở bằng `/fdk` hay `/propose`). Nêu lý do chọn.
 5. **Đăng ký vào index**: thêm một dòng vào `llmwiki/wiki/sources/ISSUES.md` (tạo file nếu chưa có, header `# Issues — ledger local`).
 6. **Mirror lên tracker remote (nếu có)**: phát hiện host + CLI (bảng trên); nếu có → tạo issue remote (body link ngược file ledger), ghi URL vào cột `tracker`. Không có → bỏ qua, ledger-only. Hỏi assignee (username) nếu chưa rõ.
-7. **Xác nhận, KHÔNG thực hiện**: báo lại issue id + đường dẫn ledger + link tracker + assignee. Dừng ở đây — việc thực thi là của phiên nhận.
+7. **Commit ledger** (GH#99): `git add llmwiki/wiki/sources/draft/<DDMMYY-slug>.md llmwiki/wiki/sources/ISSUES.md && git commit -m "issue: <DDMMYY-slug> — <tiêu đề>"`. Ledger chỉ là nguồn chân lý khi nó **travel theo repo** — file untracked thì người pull về không thấy, `git log --all` rỗng, tức issue chưa tồn tại. Không push ở bước này (đó là việc của `/ship`); nếu đang ở nhánh chính và không được commit thẳng → tạo nhánh `issue/<DDMMYY-slug>` rồi commit vào đó và nói rõ.
+8. **Xác nhận, KHÔNG thực hiện**: báo lại issue id + đường dẫn ledger + link tracker + assignee. Dừng ở đây — việc thực thi là của phiên nhận.
 
 ## Template issue (frontmatter + thân)
 ```markdown

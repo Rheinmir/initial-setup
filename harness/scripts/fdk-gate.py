@@ -90,6 +90,7 @@ STEPS = [
         "python3 harness/scripts/web-crawl.py --self-test >/dev/null && "
         "python3 harness/scripts/web-clone.py --self-test >/dev/null && "
         "python3 harness/scripts/sweep-gate.py --self-test >/dev/null && "
+        "python3 harness/scripts/overstack_paths.py --self-test >/dev/null && "
         "python3 harness/scripts/archetype.py --self-test >/dev/null && "
         "python3 harness/scripts/capability-stamp.py --self-test >/dev/null && "
         "python3 harness/scripts/design-variety.py --self-test >/dev/null && "

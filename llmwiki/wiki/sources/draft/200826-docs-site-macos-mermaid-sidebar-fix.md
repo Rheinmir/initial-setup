@@ -19,7 +19,7 @@ Nâng cấp skill `docs-site-macos` ở hai điểm user chỉ ra qua feedback t
 
 Query wiki (Tầng 1–2 của `/query`) tìm thấy ba mảnh liên quan trực tiếp, không mảnh nào phủ được yêu cầu này:
 
-`[[docs-site-macos-skill]]` (fdk concept, stub) xác nhận file canonical là `skills/docs-site-macos/SKILL.md`, mirror `llmwiki/skills/utils/docs-site-macos.md`, và ghi rõ skill này là **chuẩn style của seq HTML** mà rule R11 enforce — nghĩa là thay đổi ở đây ảnh hưởng luôn tới chính trang HTML mà `/propose` sinh ra kèm draft này.
+``fdk/wiki/concepts/docs-site-macos-skill.md`` (fdk concept, stub) xác nhận file canonical là `skills/docs-site-macos/SKILL.md`, mirror `llmwiki/skills/utils/docs-site-macos.md`, và ghi rõ skill này là **chuẩn style của seq HTML** mà rule R11 enforce — nghĩa là thay đổi ở đây ảnh hưởng luôn tới chính trang HTML mà `/propose` sinh ra kèm draft này.
 
 `wiki/draft/uiux/300626-audit-fix-docs-site-macos.md` là audit gần nhất trên chính skill này (2026-06-30): tám fix a11y/head (focus ring, viewport meta, collapse-clip, favicon inline, blue-tinted shadow, smooth scroll, `prefers-reduced-motion`). Audit đó **không đụng** tới engine diagram lẫn cụm positioning sidebar/toggle — hai vùng này chưa từng được rà kể từ khi skill ra đời. Audit cũng chốt "Parity strategy": canonical là nguồn chân lý, mirror generate-and-commit qua `harness/scripts/sync-skills.py`, enforce bằng `fdk-gate.py` + CI + hook `stop.py` — đề xuất này đi đúng khuôn đó, không mở lại quyết định.
 
@@ -44,7 +44,7 @@ Chép nguyên văn giá trị thật từ SKILL.md và wiki — mỗi task ngầ
 - **Self-Contained — CRITICAL** (chép nguyên văn dòng 885-887 của SKILL.md): *"The user opens these files directly (`file://`, offline, double-click). The output HTML must make ZERO external requests: no font/CSS/JS CDN links, no remote images, no `@import`, no `<script src>`. Everything (CSS, JS, SVG, icons) lives inline in the one file."* Mọi engine diagram mới PHẢI tuân luật này — không `<script src="https://cdn...">`.
 - **Canonical + mirror byte-identical** (chốt ở audit 300626): `skills/docs-site-macos/SKILL.md` là nguồn chân lý; `llmwiki/skills/utils/docs-site-macos.md` phải giữ byte-identical qua `harness/scripts/sync-skills.py`, gác bởi `fdk-gate.py` ("skill mirror parity"), CI `.github/workflows/skills-sync.yml --check`, và hook `stop.py` tự sync cuối lượt.
 - **Ladder chống over-engineering** (CLAUDE.md, bậc 1 YAGNI): không phải mọi diagram đều cần layout engine — diagram nhỏ/tuyến tính giữ nguyên hand-authored SVG, chỉ diagram phức tạp mới trả giá cho Mermaid.
-- **R11 enforce style seq HTML** (fdk concept `[[docs-site-macos-skill]]`): companion `.html` của chính draft này phải theo đúng docs-site-macos hiện hành — nên bản thân trang này vừa là spec vừa là bằng chứng sống của style đang áp dụng.
+- **R11 enforce style seq HTML** (fdk concept ``fdk/wiki/concepts/docs-site-macos-skill.md``): companion `.html` của chính draft này phải theo đúng docs-site-macos hiện hành — nên bản thân trang này vừa là spec vừa là bằng chứng sống của style đang áp dụng.
 - **Wiki rules** (CLAUDE.md): mọi file wiki phải có `## Origin`; thêm file phải thêm dòng vào `wiki/index.md`; không ghi vào `raw/`; văn xuôi đầy đủ cho tài liệu người đọc (ADR/proposal/report/HTML) — không caveman.
 
 ## Non-goals
@@ -168,7 +168,7 @@ Chép nguyên văn giá trị thật từ SKILL.md và wiki — mỗi task ngầ
 - **Yêu cầu gốc:** user, phiên hiện tại, 2026-08-20 — qua `/orca-workflow`, dán nguyên văn tài liệu kỹ thuật "Biến Mermaid SVG thành diagram tương tác" (9 mục: vấn đề giải quyết, zoom viewBox vs CSS transform, SVG thành component động, tách Render/Behavior, 3 cấp độ tương tác, `getBBox`+`getScreenCTM`, kiến trúc hoàn chỉnh, giới hạn của Mermaid, báo cáo tổng kết) làm căn cứ kỹ thuật cho Task 1-2, cộng yêu cầu "scouting và xử lý nó luôn" cho cụm sidebar/toggle.
 - **Prior art đã đọc:** `skills/docs-site-macos/SKILL.md` (dòng 161-274, 418-582, 782-826), `wiki/draft/uiux/300626-audit-fix-docs-site-macos.md`, `skills/cursor-animated-sites/SKILL.md` (dòng 9, 13, 156, 192), `fdk/wiki/concepts/docs-site-macos-skill.md`.
 - **Web đã đọc:** `github.com/lukilabs/beautiful-mermaid` README qua `gh api repos/lukilabs/beautiful-mermaid/readme` (fetch 2026-08-20); `registry.npmjs.org/beautiful-mermaid` qua WebFetch (fetch 2026-08-20).
-- **Wiki đã query:** [[docs-site-macos-skill]].
+- **Wiki đã query:** `fdk/wiki/concepts/docs-site-macos-skill.md`.
 - **Unknown ghi nợ, đã trả:** [[unknown-docs-site-macos-mermaid-sidebar-fix]] U-01 — resolved 2026-08-20, bằng chứng là PoC thật `llmwiki/html/200826-beautiful-mermaid-poc.html` (verify bằng Playwright/Chromium: `node /tmp/bm-poc/verify.mjs`, ảnh chụp `/tmp/bm-poc/shot-{light,dark,zoomed}.png`).
 - **Task ID:** `T-260820-01`.
 - **Commit:** _(filled by verify-before-commit)_

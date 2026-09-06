@@ -19,7 +19,7 @@ source_session: "/frontier-scan thủ công 10/08/2026, kỳ tiếp nối innova
 `/skill-provenance` hiện chỉ kiểm nguồn (URL/commit) + sha256 checksum tĩnh khi cài skill — không có bước đối chiếu "SKILL.md khai báo làm gì" với "tool-call/side-effect thật khi skill chạy", trong khi thế giới đã có framework hình thức + sản phẩm thương mại làm đúng lớp này.
 
 ## Bối cảnh & bằng chứng
-Kỳ scan trước ([[innovation-070826]], mục 4) đã ghi nhận đây là "hạt giống" chưa đủ chín — chỉ có 1 khảo sát 42k-skill nói 80% mismatch, chưa đủ để raise. Quét lại hôm nay (10/08) phát hiện đã leo thang thành:
+Kỳ scan trước (`llmwiki/innovation/070826-innovation.md`, mục 4) đã ghi nhận đây là "hạt giống" chưa đủ chín — chỉ có 1 khảo sát 42k-skill nói 80% mismatch, chưa đủ để raise. Quét lại hôm nay (10/08) phát hiện đã leo thang thành:
 
 1. **BIV (Behavioral Integrity Verification)** — framework hình thức, arXiv 2605.11770v1 ("Behavioral Integrity Verification for AI Agent Skills"): định nghĩa bài toán như typed-set-comparison giữa capability khai báo và capability thật, qua một taxonomy chung nối code + instruction + metadata. Test trên registry OpenClaw: 250,706 behavioral deviations, 80.0% skill (39,933/49,918) có ≥1 mismatch. Root-cause: 81.1% oversight (không cố ý), 18.9% adversarial intent, 5.0% skill có multi-stage attack chain dự đoán được.
 2. **Mondoo "AI Agent Skill Security Scanner"** — Layer 3 chạy LLM-powered threat analysis, phát hiện behavior-mismatch giữa mục đích khai báo và hành vi thật.
@@ -49,4 +49,4 @@ So khớp mô tả trong SKILL.md/frontmatter (`description`, các tool được
 `@Rheinmir` / dispatch `Claude` / mở bằng `/fdk` — đây là gap tầng framework (không phải dự án con), tiếp nối trực tiếp công cụ `skill-provenance` đã có, hợp để Claude tự triển khai khi rảnh tay.
 
 ## Origin
-Raised bởi phiên frontier-scan thủ công 2026-08-10 (tiếp nối [[innovation-070826]], gap chuỗi 3 kỳ: 070826 nêu hạt giống → 100826 xác nhận đủ chín để raise). Bằng chứng: arXiv 2605.11770v1, Mondoo AI Agent Skill Security Scanner, Cisco Skill Scanner, arXiv 2603.00195 (đã cite ở GH#13 gốc).
+Raised bởi phiên frontier-scan thủ công 2026-08-10 (tiếp nối `llmwiki/innovation/070826-innovation.md`, gap chuỗi 3 kỳ: 070826 nêu hạt giống → 100826 xác nhận đủ chín để raise). Bằng chứng: arXiv 2605.11770v1, Mondoo AI Agent Skill Security Scanner, Cisco Skill Scanner, arXiv 2603.00195 (đã cite ở GH#13 gốc).

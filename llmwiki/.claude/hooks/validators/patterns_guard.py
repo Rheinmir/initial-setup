@@ -44,7 +44,9 @@ def _unlocked(cfg) -> bool:
 
 
 def _in_protected(path: str, protected_dir: str) -> bool:
-    return bool(re.search(r"(^|/)" + re.escape(protected_dir) + r"/", (path or "").replace("\\", "/")))
+    # `\.?`: dự án downstream cài vào .llmwiki/ (layout dot) — protected_dir mặc định là
+    # "llmwiki/patterns" nên thiếu nó thì ".llmwiki/patterns/x" trượt và R14 chết (GH#112 audit).
+    return bool(re.search(r"(^|/)\.?" + re.escape(protected_dir) + r"/", (path or "").replace("\\", "/")))
 
 
 def main() -> None:

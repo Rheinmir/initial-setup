@@ -114,10 +114,14 @@ DESC="installer thay hook harness-owned canonical cũ thay vì nhân đôi" chec
 import json, sys
 x=json.load(open(sys.argv[1]))
 commands=[h["command"] for defs in x["hooks"].values() for d in defs for h in d.get("hooks", [])]
-canonical='if [ -f "${CLAUDE_PROJECT_DIR:-.}/llmwiki/.harness-stamp" ]; then python3 "$HOME/.claude/harness/hooks/pre_tool_use.py"; fi'
+# canonical từ GH#111/#114: guard nhận CẢ HAI stamp (llmwiki/ và .llmwiki/ — layout dot downstream)
+canonical='if [ -f "${CLAUDE_PROJECT_DIR:-.}/llmwiki/.harness-stamp" ] || [ -f "${CLAUDE_PROJECT_DIR:-.}/.llmwiki/.harness-stamp" ]; then python3 "$HOME/.claude/harness/hooks/pre_tool_use.py"; fi'
+# dạng phát hành TRƯỚC #114 (1 stamp) cũng phải bị thay, không được sót lại → fire đôi
+legacy_stamp='if [ -f "${CLAUDE_PROJECT_DIR:-.}/llmwiki/.harness-stamp" ]; then python3 "$HOME/.claude/harness/hooks/pre_tool_use.py"; fi'
 legacy='if [ -d "${CLAUDE_PROJECT_DIR:-.}/llmwiki" ]; then python3 "$HOME/.claude/harness/hooks/pre_tool_use.py"; fi'
 assert commands.count(canonical) == 1
 assert legacy not in commands
+assert legacy_stamp not in commands
 PY
 
 FIRST=$(python3 - "$SETTINGS" <<'PY'

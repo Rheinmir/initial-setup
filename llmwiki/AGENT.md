@@ -70,6 +70,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `wiki-room` | Context phiên chính rot — mở room 1 tầng nạp chi tiết wiki (budget cứng) | `skills/wiki-loop/wiki-room.md` | wiki-loop |
 | `record-episode` | Chốt phiên vào tầng nhớ episodic (mem-rank store) để phiên sau truy hồi "phiên trước làm gì" theo nghĩa | `skills/wiki-loop/record-episode.md` | wiki-loop |
 | `lint` | After every 10 ingests, or wiki feels stale | `skills/wiki-loop/lint.md` | wiki-loop |
+| `playwright-verify` | Verify code nhanh bằng Playwright standalone `.mjs` (không qua test runner): chụp ảnh `localhost`/`file://`, đọc console/pageerror, đo `getBoundingClientRect` khi phần tử "không thấy/không bấm được", auth bypass dev-login. Dùng khi claude-in-chrome bị chặn localhost. | `skills/dev-loop/playwright-verify.md` | dev-loop |
 | `propose` | Any new feature or change is requested | `skills/dev-loop/propose.md` | dev-loop |
 | `qc-code` | Review code phong cách senior 10 năm — 4 mục (security/performance/naming/logic) điểm/10 + lỗi nặng nhất + fix + verdict PASS/CẦN SỬA; sinh test tái hiện qc-* auto-chạy tất định. KHÁC /orca-sec-scans (Trivy tĩnh) | `skills/dev-loop/qc-code.md` | dev-loop |
 | `teach-me` | Giải thích MỘT thứ ở 2 cấp (hệ thống + code) + bộ ba (vấn đề/workflow/chi tiết os·cơ chế·vai trò) + tóm tắt luồng, mỗi phần có sơ đồ; CHỨNG bằng runtime thật (chạy + breakpoint/debugger), không đoán tĩnh. KHÁC /onboard-codebase (cả dự án→wiki) | `skills/dev-loop/teach-me.md` | dev-loop |

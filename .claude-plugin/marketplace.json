@@ -95,6 +95,7 @@
         "./skills/orchestration",
         "./skills/ovs-notes",
         "./skills/plan",
+        "./skills/playwright-verify",
         "./skills/propose",
         "./skills/qc-code",
         "./skills/query",

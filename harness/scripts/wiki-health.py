@@ -72,6 +72,41 @@ def all_pages(wiki: Path) -> list[Path]:
                   if f.name not in SKIP_BASENAMES and not _archived(f.relative_to(wiki)))
 
 
+# Cây kiến-thức anh em trong CÙNG repo mà một wikilink được phép trỏ tới. `fdk/wiki/`
+# là wiki RIÊNG của framework (ADR-001..010, concepts harness/fdk — xem README §fdk/),
+# `llmwiki/innovation/` là sổ frontier-scan. Trước đây resolver chỉ quét --wiki-dir nên
+# [[ADR-004-...]] / [[frontier-gap-scan]] / [[docs-site-macos-skill]] bị báo broken OAN:
+# file có thật, chỉ nằm ở cây bên cạnh.
+SIBLING_TREES = ("fdk/wiki", "llmwiki/innovation")
+_ID_RE = re.compile(r"^id:\s*(.+?)\s*$", re.MULTILINE)
+
+
+def sibling_targets(wiki: Path) -> dict:
+    """stem + `id:` frontmatter của mọi trang trong các cây anh em → đích wikilink hợp lệ.
+
+    Hai cách đánh địa chỉ đều đang được dùng trong repo: theo TÊN FILE (ADR-004-...) và
+    theo `id:` khai trong frontmatter (innovation-110826 sống ở file 110826-innovation.md).
+    Resolver phải hiểu cả hai, nếu không thì link đúng vẫn bị báo hỏng.
+    """
+    repo = wiki
+    while repo.parent != repo and not (repo / ".git").is_dir():
+        repo = repo.parent
+    out: dict = {}
+    for tree in SIBLING_TREES:
+        base = repo / tree
+        if not base.is_dir():
+            continue
+        for f in base.rglob("*.md"):
+            if f.name in SKIP_BASENAMES:
+                continue
+            out.setdefault(f.stem, f)
+            head = f.read_text(encoding="utf-8", errors="replace")[:800]
+            m = _ID_RE.search(head)
+            if m:
+                out.setdefault(m.group(1).strip().strip('"\''), f)
+    return out
+
+
 _CODE_FENCE_RE = re.compile(r"```.*?```", re.S)
 _CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
 
@@ -112,7 +147,8 @@ def main() -> None:
     # đích wikilink = MỌI trang trong cây wiki (kể cả skills/) — trước chỉ lấy CONTENT_DIRS
     # nên [[fdk]]/[[failure-flywheel]] (trang thật dưới skills/) bị báo broken oan;
     # orphan/index vẫn đo trên content_files như cũ.
-    stems = {p.stem: p for p in all_pages(wiki)}
+    stems = dict(sibling_targets(wiki))          # cây anh em: đích hợp lệ, ưu tiên THẤP nhất
+    stems.update({p.stem: p for p in all_pages(wiki)})
     stems.update({p.stem: p for p in pages})
     rel = {p: p.relative_to(wiki).as_posix() for p in pages}
 

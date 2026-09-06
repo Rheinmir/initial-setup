@@ -338,7 +338,7 @@
   "T-260820-01": {
     "id": "T-260820-01",
     "title": "docs-site-macos: Mermaid diagram engine + sidebar/toggle position fix",
-    "state": "completed",
+    "state": "done",
     "created": "2026-08-20T09:21:34",
     "updated": "2026-08-20T16:25:19",
     "history": [
@@ -352,9 +352,70 @@
         "note": "user duyet truc tiep trong chat, yeu cau lam ngay + day remote"
       },
       {
-        "state": "completed",
+        "state": "dispatched",
         "ts": "2026-08-20T16:25:19",
-        "note": "implement xong, verified Playwright, push remote"
+        "note": "ghi bù 2026-09-06: user duyet va yeu cau lam ngay trong cung mot luot nen buoc dispatched khong duoc ghi luc do; bang chung la note cua buoc ke tiep"
+      },
+      {
+        "state": "done",
+        "ts": "2026-08-20T16:25:19",
+        "note": "implement xong, verified Playwright, push remote (ban ghi goc dung state 'completed' — khong thuoc tu vung ORDER)"
+      }
+    ]
+  },
+  "T-260721-01": {
+    "id": "T-260721-01",
+    "title": "code-graph → KÉO NGOÀI: pin travel-policy Tầng 1 + bootstrap cài trong install-harness.sh",
+    "state": "proposed",
+    "created": "2026-07-21T00:00:00",
+    "updated": "2026-07-21T00:00:00",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-21T00:00:00",
+        "note": "ghi bu 2026-09-06 tu draft da commit khai `task:` nhung ledger thieu entry; state lay dung `status:` cua draft"
+      }
+    ]
+  },
+  "T-260721-02": {
+    "id": "T-260721-02",
+    "title": "Migration: code là source of truth — 3 lớp artifact, quan hệ suy ra được, merge = regen",
+    "state": "proposed",
+    "created": "2026-07-21T00:00:00",
+    "updated": "2026-07-21T00:00:00",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-21T00:00:00",
+        "note": "ghi bu 2026-09-06 tu draft da commit khai `task:` nhung ledger thieu entry; state lay dung `status:` cua draft"
+      }
+    ]
+  },
+  "T-260720-02": {
+    "id": "T-260720-02",
+    "title": "Vệ sinh dữ liệu nền + trần ngân sách cho cái gì được vào context",
+    "state": "proposed",
+    "created": "2026-07-20T00:00:00",
+    "updated": "2026-07-20T00:00:00",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-07-20T00:00:00",
+        "note": "ghi bu 2026-09-06 tu draft da commit khai `task:` nhung ledger thieu entry; state lay dung `status:` cua draft"
+      }
+    ]
+  },
+  "T-260902-01": {
+    "id": "T-260902-01",
+    "title": "SessionStart episodic recall — nudge tất định 1-2 dòng, không auto-inject",
+    "state": "proposed",
+    "created": "2026-09-02T00:00:00",
+    "updated": "2026-09-02T00:00:00",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-09-02T00:00:00",
+        "note": "ghi bu 2026-09-06 tu draft da commit khai `task:` nhung ledger thieu entry; state lay dung `status:` cua draft"
       }
     ]
   }

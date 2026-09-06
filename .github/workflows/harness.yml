@@ -157,6 +157,8 @@ jobs:
         run: bash harness/tests/wiki-sync-flags-failopen-test.sh .
       - name: wikigraph-single-source — wiki-graph.py và build-wiki-graph.py không được lệch cạnh
         run: bash harness/tests/wikigraph-single-source-test.sh .
+      - name: stop-hook-all-wikis — Stop auto-index + R3 soi MỌI wiki (fdk/wiki + llmwiki/wiki), GH#76
+        run: bash harness/tests/stop-hook-all-wikis-test.sh .
       - name: evidence-terminal — R19 chuỗi kết luận phải chạm chứng cứ + kill-switch
         run: bash harness/tests/evidence-terminal-test.sh .
       - name: anti-idle — provider cắt lượt bằng refusal rỗng thì Stop hook chặn dừng

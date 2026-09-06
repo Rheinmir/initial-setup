@@ -3,12 +3,13 @@
 Exit 2 = chặn dừng, Claude phải sửa index trước. Có guard chống lặp vô hạn."""
 import json
 import os
+import pathlib
 import re
 import subprocess
 import sys
 import time
 
-from hooklib import audit, code_log, find_validators, find_wiki_dir, project_dir, read_payload, resolve_tool, run_validator
+from hooklib import audit, code_log, find_validators, project_dir, read_payload, resolve_tool, run_validator
 
 
 # file code (đa ngôn ngữ) trong git-status → trigger regen phần code-graph của wiki-graph.
@@ -321,6 +322,20 @@ def provider_stall(transcript_path: str) -> bool:
         return False  # fail-open: hạ tầng lỗi không được phá phiên
 
 
+def all_wiki_dirs(root: str):
+    """MỌI wiki có thật của repo (ADR-008: repo framework có cả fdk/wiki lẫn llmwiki/wiki).
+
+    Khác hooklib.find_wiki_dir() — hàm đó trả đúng MỘT (fdk/wiki thắng) và 3 caller khác chỉ cần
+    biết "có wiki hay không". Auto-index + R3 ở Stop thì phải soi cùng tập wiki như CI (GH#76).
+    """
+    out = []
+    for cand in (pathlib.Path(root) / "fdk" / "wiki", pathlib.Path(root) / "wiki",
+                 pathlib.Path(root) / "llmwiki" / "wiki"):
+        if cand.is_dir():
+            out.append(cand)
+    return out
+
+
 def main() -> None:
     payload = read_payload()
     audit(payload, "Stop")
@@ -361,23 +376,29 @@ def main() -> None:
     if not wiki_changed(root):
         sys.exit(0)  # phiên không đụng wiki → không can thiệp
 
-    wiki = find_wiki_dir(root)
+    wikis = all_wiki_dirs(root)
     vdir = find_validators(root)
-    if wiki is None or vdir is None:
+    if not wikis or vdir is None:
         sys.exit(0)
 
     # (1) AUTO-INDEX: tự thêm row cho file wiki MỚI vào index.md (self-heal) NGAY khi có thay đổi —
     # index khớp mà không bắt agent sửa tay. Chiều 'stale' (xóa file mà còn row) vẫn để check bên dưới
     # chặn (gỡ row là quyết định của người). Fail-open: lỗi git/python → bỏ qua, không chặn lượt.
-    try:
-        subprocess.run([sys.executable, os.path.join(vdir, "index_sync.py"),
-                        "--wiki-dir", str(wiki), "--fix"], capture_output=True, timeout=15)
-    except Exception:
-        pass
-
-    rc, err = run_validator("index_sync.py", {"action": "stop", "wiki_dir": str(wiki)}, vdir)
-    if rc == 2:
-        print(err, file=sys.stderr)
+    # Chạy trên TỪNG wiki (GH#76): find_wiki_dir() chỉ trả fdk/wiki ở repo framework, trong khi
+    # distill() ghi vào llmwiki/wiki và harness-events.py R3 soi llmwiki/wiki → auto-heal chữa wiki A,
+    # kẻ chặn soi wiki B, agent vá tay index mỗi phiên. CI đã soi cả hai root; hook phải khớp CI.
+    errs = []
+    for wiki in wikis:
+        try:
+            subprocess.run([sys.executable, os.path.join(vdir, "index_sync.py"),
+                            "--wiki-dir", str(wiki), "--fix"], capture_output=True, timeout=15)
+        except Exception:
+            pass
+        rc, err = run_validator("index_sync.py", {"action": "stop", "wiki_dir": str(wiki)}, vdir)
+        if rc == 2:
+            errs.append(err)
+    if errs:
+        print("\n".join(e for e in errs if e), file=sys.stderr)
         sys.exit(2)
     sys.exit(0)
 

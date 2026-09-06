@@ -27,9 +27,17 @@ except ImportError:
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_POLICY = os.path.normpath(os.path.join(HERE, "..", "policy.yaml"))
 
-# bash ghi vào raw/ (mượn semantics no_write_raw.py)
-BASH_WRITE = re.compile(r"(?:>>?|\btee\b(?:\s+-a)?|\btouch\b|\bsed\s+-i\S*)\s+['\"]?(?:\S*/)?raw/")
-BASH_COPY = re.compile(r"\b(?:cp|mv|rsync)\b[^|;&]*\s['\"]?(?:\S*/)?raw/\S*['\"]?\s*(?:$|[|;&])")
+# Đường GHI trích ra từ câu lệnh bash (mượn semantics no_write_raw.py). Trước đây hai regex này
+# hardcode "raw/" nên MỌI rule deny_write đều bị chấm bằng cùng một phép thử: R14 báo nhầm trên
+# lệnh ghi raw/, mà ghi vào patterns/ (đích thật của nó) thì lọt (GH#113). Nay chỉ TRÍCH path,
+# việc khớp để glob của từng rule quyết định.
+# Cố ý giữ nguyên độ phủ cũ, gồm cả 3 GAP đã ghi trong test-broad.sh: `rm` (xoá ≠ ghi),
+# `python3 -c open(...,'w')` (né regex), và `sed -i <expr> <path>` (expr đứng trước path).
+BASH_WRITE_TARGET = re.compile(
+    r"(?:>>?|\btee\b(?:\s+-a)?|\btouch\b|\bsed\s+-i\S*)\s+['\"]?([^\s'\"|;&]+)")
+# cp/mv/rsync: chỉ token CUỐI là đích ghi — `mv raw/x.md /tmp/` là chuyển RA khỏi raw, không chặn.
+BASH_COPY_DEST = re.compile(
+    r"\b(?:cp|mv|rsync)\b[^|;&]*\s['\"]?([^\s'\"|;&]+)['\"]?\s*(?:$|[|;&])")
 # phần đường dẫn sau "wiki/" (boundary (^|/) để không dính "llmwiki/" nhầm — khớp global)
 WIKI_REL = re.compile(r"(?:^|/)wiki/(.+)$")
 
@@ -86,10 +94,25 @@ def check_deny_write_path(path, rule):
     return None
 
 
-def check_deny_write_bash(command, rule):
+def bash_write_targets(command):
+    """Các đường mà câu lệnh bash này GHI vào (rỗng nếu chỉ đọc)."""
     cmd = command or ""
-    if "raw/" in cmd and (BASH_WRITE.search(cmd) or BASH_COPY.search(cmd)):
-        return f"[{_tag(rule)}] chặn bash ghi raw/: {cmd[:100]}"
+    seen, out = set(), []
+    for rx in (BASH_WRITE_TARGET, BASH_COPY_DEST):
+        for m in rx.finditer(cmd):
+            t = norm(m.group(1))
+            if t and t not in seen:
+                seen.add(t)
+                out.append(t)
+    return out
+
+
+def check_deny_write_bash(command, rule):
+    globs = rule.get("deny_write_globs", [])
+    for target in bash_write_targets(command):
+        for g in globs:
+            if glob_to_regex(g).match(target):
+                return f"[{_tag(rule)}] chặn bash ghi: {target} — {rule.get('statement', '')}"
     return None
 
 

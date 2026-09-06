@@ -133,7 +133,7 @@ log "B1 · vendor: $VENDORS"
 
 # ── B2. Sinh wiring từ policy ──
 log "B2 · gen-converters → out/"
-( cd "$DEST" && python3 gen-converters.py >/dev/null )
+( cd "$DEST" && OVERSTACK_HARNESS_DIR="$HARNESS_DIR" python3 gen-converters.py >/dev/null )
 
 # ── B3. Cắm wiring ──
 log "B3 · cắm wiring"
@@ -144,13 +144,15 @@ log "  ✓ CI       → .github/workflows/harness.yml"
 # pre-commit (sàn)
 PC="$ROOT/.pre-commit-config.yaml"
 if [ ! -f "$PC" ]; then
-  cat > "$PC" <<'YML'
+  # heredoc KHÔNG quote để $HARNESS_DIR nở ra — hardcode "harness/" ở đây làm pre-commit
+  # đỏ với "can't open file" trên mọi commit chạm .md ở dự án layout dot (GH#111).
+  cat > "$PC" <<YML
 repos:
   - repo: local
     hooks:
       - id: llmwiki-harness
         name: llmwiki harness validator (layer=repo)
-        entry: python3 harness/poc-vendor-neutral/bin/llmwiki-validate.py files
+        entry: python3 $HARNESS_DIR/poc-vendor-neutral/bin/llmwiki-validate.py files
         language: system
         files: '\.md$'
 YML
@@ -222,7 +224,7 @@ if has codex;  then warn "  Codex → thêm nội dung out/codex/AGENTS.snippet.
 if [ "$VERIFY" = 1 ]; then
   log "B4 · verify"
   if bash "$DEST/demo.sh" >/dev/null 2>&1; then log "  ✓ demo.sh (13)"; else warn "  demo.sh FAIL — kiểm pyyaml"; fi
-  if bash "$DEST/test-broad.sh" >/dev/null 2>&1; then log "  ✓ test-broad.sh (68)"; else warn "  test-broad.sh FAIL"; fi
+  if bash "$DEST/test-broad.sh" >/dev/null 2>&1; then log "  ✓ test-broad.sh (80)"; else warn "  test-broad.sh FAIL"; fi
 fi
 
 # ── (tùy chọn) trụ 3: seed khung llmwiki (nhanh, idempotent — không đè file có sẵn) ──

@@ -144,7 +144,7 @@ LOOP_GROUPS = {
          "brandkit": "taste", "hallmark": "taste", "design-taste-frontend": "taste", "design-taste-frontend-v1": "taste",
          "gpt-taste": "taste", "high-end-visual-design": "taste", "stitch-design-taste": "taste",
          "minimalist-ui": "taste", "industrial-brutalist-ui": "taste", "redesign-existing-projects": "taste",
-         "cursor-animated-sites": "docs",
+         "cursor-animated-sites": "docs", "diagram": "docs",
          "image-to-code": "imagegen", "imagegen-frontend-mobile": "imagegen",
          "imagegen-frontend-web": "imagegen",
          "cavecrew": "caveman", "caveman": "caveman", "caveman-commit": "caveman", "caveman-compress": "caveman",

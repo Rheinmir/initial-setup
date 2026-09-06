@@ -230,6 +230,13 @@
       "recorded": "2026-07-18",
       "source": "local-authored"
     },
+    "diagram": {
+      "files": {
+        "SKILL.md": "82a4098dd15284f8441d446c3aed2e01b0aaf7ba3de5cf3c262ab5e5fa92ac9b"
+      },
+      "recorded": "2026-09-07",
+      "source": "local-authored"
+    },
     "docs-curate": {
       "files": {
         "SKILL.md": "0aa107a85ce5cfddab929f3945a5f1807174fde792e72b1a40d460e56b85bf80"
@@ -239,9 +246,27 @@
     },
     "docs-site-macos": {
       "files": {
-        "SKILL.md": "4a06d557b92c1728b2621c62fea6effe6868f62ff0f6290659f3cee6234ad698"
+        "SKILL.md": "dfb6db8cb6d58a9b94fb6825728aac0ccfd4ee6ed619c0b199e5b18a227ba75c",
+        "vendor/README.md": "637090466e5c66282a3e092751982f95f05eeca3ebf3f7eadc29596960ced445",
+        "vendor/beautiful-mermaid.min.js.gz.b64": "89e9982b5e5b5f06c7b07ed44ee525df4e8fa5372b93c70bc79cd492acf29b37"
       },
-      "recorded": "2026-08-03",
+      "recorded": "2026-09-07",
+      "source": "local-authored"
+    },
+    "doyourmagic": {
+      "files": {
+        "SKILL.md": "40f61cb79b31c9f83d1cb19c30626904b1a91395f1d77411a1bb0c9ba4195203",
+        "references/example-impeccable/01-install-and-init.md": "28b5d6af2adf1df018268896914c2805a098bc65041ae6abf4768b83f79fb0ad",
+        "references/example-impeccable/02-use-design-commands.md": "2faec5c4f29d53288a6526f3ecf24d458aa2d90f3aa323a6907d0ccdaf987518",
+        "references/example-impeccable/03-cli-anti-pattern-scan.md": "dfa8d6847eed1ee217ab0a571b503710e9639d1623705b0eeabd9ef47fab270b",
+        "references/example-impeccable/04-manage-detector-ignores.md": "02720e019855b56082ed7fc477974da92f428bca4be2539b64c6ed6dd8278dc7",
+        "references/example-impeccable/05-ci-integration.md": "ca3d6a131c66967232313bfc162e115fa75c8bfa4de04da92bc331da0044004c",
+        "references/example-impeccable/06-keep-impeccable-updated.md": "2ef7c2564805d071274491e942f1619f028d85ee036978d85225d62f6f34f985",
+        "references/example-impeccable/07-contributor-build-and-test.md": "998f833c4412da74d5c193d8837ccf499a10e005243353e68ee17e98a8a0e0e2",
+        "references/example-impeccable/index.html": "8803ab80eb0daf2eff653701b66b410f24483947515e853bff1818e40c218dc6",
+        "references/example-impeccable/workflows.md": "8e0bc56040145fb4c1188a3159e4aae73e9a1e9e756f4df4ae560ab9b649b2ca"
+      },
+      "recorded": "2026-09-07",
       "source": "local-authored"
     },
     "extract-site": {
@@ -262,24 +287,14 @@
         "references/design-taste.md": "9b29c72e97663327b48bc92336202d47e2a41c0b1089e514340075e90ae0a8d9",
         "references/worked-examples.md": "b0a84f590749d91df3e804b9771335156d3f13aa56dd7d5b5f8b0c7b62e9b7af"
       },
-      "recorded": "2026-08-03",
-      "source": "local-authored"
-    },
-    "fable5": {
-      "files": {
-        "SKILL.md": "b8d5ed38620ca6b4ffd705fe51f8345fe9f0386d78712adc49fe41ce88e5ba59",
-        "references/content-taste.md": "3466fab5a841db917a8dea252b0fc5dd869f13010d1667091b1ffa74305bcc33",
-        "references/design-taste.md": "9b29c72e97663327b48bc92336202d47e2a41c0b1089e514340075e90ae0a8d9",
-        "references/worked-examples.md": "b0a84f590749d91df3e804b9771335156d3f13aa56dd7d5b5f8b0c7b62e9b7af"
-      },
       "recorded": "2026-07-22",
       "source": "https://github.com/mrgoonie/fable-thinking"
     },
     "failure-flywheel": {
       "files": {
-        "SKILL.md": "c29797b3765b1313b0c130f865c3e005c150a0cbaf2d847969f1ff7f87192059"
+        "SKILL.md": "40da82b648db598c8747abcc96cfb572f37ef4fadc4d812dfc335bc45a0f8e6c"
       },
-      "recorded": "2026-07-04",
+      "recorded": "2026-09-07",
       "source": "local-authored"
     },
     "fdk": {
@@ -324,9 +339,16 @@
       "recorded": "2026-07-18",
       "source": "local-authored"
     },
+    "graph-mode": {
+      "files": {
+        "SKILL.md": "9feabecafa00c0b3b92929b7a78dde5b4ded93e379e7f6daafa6936ab5970d2a"
+      },
+      "recorded": "2026-09-07",
+      "source": "local-authored"
+    },
     "hallmark": {
       "files": {
-        "SKILL.md": "8927287d9d0422402a2d1d893014eeae260ce0c88bbd2379869302206278f05a",
+        "SKILL.md": "ff3b43da336ef4d8017829d1cd63a44649bab0cf45a6cf812db3ec158df46c2c",
         "references/anti-patterns.md": "1c66f41d68ac32303d52ea49a1d475b212162ff7b38884a0b31774958b4561df",
         "references/assets.md": "60929b3dc2258b69caf3012d99d174e1ad73da9645263db81a9b271cd6fd7d61",
         "references/color.md": "31c470d16ceb17ccce290cbdd00b9e9a88f2094df8eaaefb67c86ec1e1cdb876",
@@ -434,7 +456,7 @@
         "references/verbs/audit.md": "0a5b484453f1697a8675a7020df9159d0b4ce22f059b873501bfd82c26d6a31a",
         "references/verbs/redesign.md": "c2830f3b7d68e9622f55d376048a5a454c5ef59d309a211e716d1142e86acbdf"
       },
-      "recorded": "2026-08-03",
+      "recorded": "2026-09-07",
       "source": "https://github.com/Nutlope/hallmark"
     },
     "harness-tour": {
@@ -784,9 +806,9 @@
     },
     "orca-sec-scans": {
       "files": {
-        "SKILL.md": "276c80f86cdb8523fd9e33ff7e52b07d957ee0af0c0f6f8c852abb03e14844fc"
+        "SKILL.md": "752aa867e246a5cd345b0a3755a53b30f185ef7bef2024a8c86546bd05a4a922"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-09-07",
       "source": "local-authored"
     },
     "orca-workflow": {

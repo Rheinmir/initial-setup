@@ -33,7 +33,7 @@ Hai tool `fdk/tools/skill-provenance.py` và `fdk/tools/build-skill-search.py` t
   ```
 - Đối chiếu: chạy đúng bản trong repo (`python3 fdk/tools/build-skill-search.py`) → `✓ indexed 84 skills · 1886 terms …` bình thường. Vậy lỗi chỉ phát sinh SAU KHI travel, không phải lỗi logic BM25/provenance.
 - Cả hai **im lặng trả về rỗng** thay vì lỗi rõ ràng — tool tự coi như "chạy xong" trong khi vô dụng, cùng lớp với dòng dưới.
-- **Đây là một instance MỚI của một lớp lỗi đã biết**: [[190726-travel-gap-forcing-functions]] (T-260719-01, status `proposed`) đã ghi nhận "34/69 skill global dính path repo-relative" cho *skill* — nhưng quét đó chưa phủ 2 *tool* này ở `fdk/tools/`. Liên quan thêm: [[030726-skill-resolve-supplychain]] (GH#13 — chính là issue gốc sinh ra `skill-provenance.py`) và [[110726-shipped-vs-documented-parity]] (GH#77, done — lớp lỗi "tài liệu hứa N năng lực, installer chỉ giao M").
+- **Đây là một instance MỚI của một lớp lỗi đã biết**: [[190726-travel-gap-forcing-functions]] (T-260719-01, status `proposed`) đã ghi nhận "34/69 skill global dính path repo-relative" cho *skill* — nhưng quét đó chưa phủ 2 *tool* này ở `fdk/tools/`. Liên quan thêm: `030726-skill-resolve-supplychain` (GH#13 — chính là issue gốc sinh ra `skill-provenance.py`) và [[110726-shipped-vs-documented-parity]] (GH#77, done — lớp lỗi "tài liệu hứa N năng lực, installer chỉ giao M").
 
 ## Phạm vi
 - `fdk/tools/skill-provenance.py` (biến `REPO`/`SKILLS`, dòng ~39-40).

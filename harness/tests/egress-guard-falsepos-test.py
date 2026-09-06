@@ -39,7 +39,9 @@ CASES = [
      'python3 - <<PY\nimport importlib.util\nspec.loader.exec_module(m)\nx = c.lower()\n'
      'print("curl")\nPY', True),
     ("commit message nhắc chữ curl + tên miền",
-     'git commit -m "sửa curl để tới example.com"', True),
+     # --no-verify: đây là CHUỖI fixture, không chạy; nhưng hook-guard-invariant-test quét
+     # tests/ theo regex nên vẫn phải mang cửa hợp lệ (GH#30), nếu không CI repo-health đỏ.
+     'git commit --no-verify -m "sửa curl để tới example.com"', True),
     ("không có lệnh mạng nào → không soi gì",
      'echo "https://evil.tld/steal"', True),
 

@@ -107,7 +107,8 @@ rules:
     kind: content_check
     statement: "Tai lieu mang ket luan co khoi ```evidence-chain PHAI de MOI duong di tu goc toi la ket thuc o nut CHUNG CU (observed/tool-record/graph-edge/web/parametric/absence), khong duoc ket thuc o nut suy luan. web doi url tuyet doi tro DUNG CHO da doc + ngay truy cap + trich nguyen van; parametric (kien thuc tu TRAINING cua model) doi origin + co unverified va KHONG duoc lam diem cuoi duy nhat. Chuoi vong tron = khong hop le."
     enforce_at: [session, repo]
-    target_globs: ["**/llmwiki/wiki/**/*.md"]
+    # layout dot: dự án downstream cài vào .llmwiki/ — thiếu biến thể này luật im lặng (GH#112).
+    target_globs: ["**/llmwiki/wiki/**/*.md", "**/.llmwiki/wiki/**/*.md"]
     when_contains: ["```evidence-chain"]
     handler: "harness/validators/evidence_terminal.py --check FILE. Cong tac 3 tang uu tien tu hep toi rong: co --no-evidence-chain > env OVERSTACK_EVIDENCE_TERMINAL > harness/evidence-terminal.config.yaml (enabled). Tat o tang nao van in mot dong len stderr."
     blocking: false
@@ -216,6 +217,9 @@ rules:
     deny_write_globs:
       - "**/llmwiki/patterns/**"
       - "llmwiki/patterns/**"
+    # layout dot: dự án downstream cài vào .llmwiki/ — thiếu biến thể này luật im lặng (GH#112).
+      - "**/.llmwiki/patterns/**"
+      - ".llmwiki/patterns/**"
     handler: "harness/validators/patterns_guard.py · PreToolUse; unlock qua env. Adapter pattern-library.config.yaml (verified:false). ADR-014."
 
   report_show_path:
@@ -224,7 +228,8 @@ rules:
     kind: content_check
     statement: "HTML report/visualization dưới llmwiki/html/ (trừ archive/, assets/) phải chứa đường dẫn tuyệt đối của chính nó (footer/titlebar) — người xem biết file nằm đâu để mở lại/sửa."
     enforce_at: [session]
-    target_globs: ["**/llmwiki/html/*.html"]
+    # layout dot: dự án downstream cài vào .llmwiki/ — thiếu biến thể này luật im lặng (GH#112).
+    target_globs: ["**/llmwiki/html/*.html", "**/.llmwiki/html/*.html"]
     handler: "harness/validators/report_show_path.py · PostToolUse (llmwiki/.claude/hooks/post_tool_use.py nhánh .html). Nguồn: feedback 020726 + rule skill fdk."
     blocking: true
 

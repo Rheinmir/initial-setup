@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   selftest:
-    name: self-test lõi (demo 13 + broad 54 = 67 assertion)
+    name: self-test lõi (demo 13 + broad 80 = 93 assertion)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

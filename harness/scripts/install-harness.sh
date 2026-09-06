@@ -216,11 +216,20 @@ def cmd(script):
     # if-guard (KHÔNG dùng `&& ... || true` — nó nuốt exit 2, mất khả năng chặn)
     # v4 (GH#63 Phase 2): gate theo .harness-stamp (hợp đồng install ghi ra, travel theo git)
     # thay vì [ -d llmwiki ] — repo chưa curl-bootstrap thì hook global KHÔNG fire (opt-in tường minh).
-    return f'if [ -f "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki/.harness-stamp" ]; then python3 "{HOOKS_DIR}/{script}"; fi'
+    # Dự án downstream dùng layout dot (.llmwiki/) — installer ghi stamp ở ĐÓ, nên guard chỉ
+    # nhìn "llmwiki/.harness-stamp" thì mọi hook global im lặng bỏ qua (GH#111). Nhận cả hai.
+    return (f'if [ -f "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki/.harness-stamp" ] '
+            f'|| [ -f "${{CLAUDE_PROJECT_DIR:-.}}/.llmwiki/.harness-stamp" ]; '
+            f'then python3 "{HOOKS_DIR}/{script}"; fi')
 # dọn entry harness-global đời cũ (guard [ -d llmwiki ] hoặc format khác) trước khi thêm bản mới —
 # idempotent qua các lần đổi format, không để hook fire đôi; hook KHÁC của user giữ nguyên.
 def _is_stale(c):
-    return HOOKS_DIR in (c or "") and '/llmwiki/.harness-stamp" ]' not in (c or "")
+    c = c or ""
+    if HOOKS_DIR not in c:
+        return False
+    # canonical hiện tại = guard nhận CẢ HAI stamp. Dạng cũ (chỉ llmwiki/) và dạng
+    # cổ ([ -d llmwiki ]) đều phải bị dọn, nếu không hook fire đôi sau update (GH#111).
+    return '/.llmwiki/.harness-stamp" ]' not in c
 tpl = {
     "PreToolUse":  [{"matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash", "script": "pre_tool_use.py"},
                     {"matcher": "Bash", "script": "orca_guard.py"}],
@@ -232,7 +241,10 @@ tpl = {
     "UserPromptSubmit": {"matcher": None, "script": "user_prompt_submit.py"},
 }
 cur.setdefault("permissions", {}).setdefault("deny", [])
-for d in ["Write(./llmwiki/raw/**)", "Edit(./llmwiki/raw/**)", "MultiEdit(./llmwiki/raw/**)"]:
+# layout dot (.llmwiki/) là mặc định của dự án downstream — thiếu biến thể này thì
+# deny-glob không phủ gì cả (GH#111).
+for d in ["Write(./llmwiki/raw/**)", "Edit(./llmwiki/raw/**)", "MultiEdit(./llmwiki/raw/**)",
+          "Write(./.llmwiki/raw/**)", "Edit(./.llmwiki/raw/**)", "MultiEdit(./.llmwiki/raw/**)"]:
     if d not in cur["permissions"]["deny"]:
         cur["permissions"]["deny"].append(d)
 cur.setdefault("hooks", {})
@@ -341,10 +353,18 @@ HOOKS_DIR = '$HOME/.claude/harness/hooks'
 SESSION_END_TIMEOUT_MS = 30000
 
 def cmd(script):
-    return f'if [ -f "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki/.harness-stamp" ]; then python3 "{HOOKS_DIR}/{script}"; fi'
+    # Dự án downstream dùng layout dot (.llmwiki/) — installer ghi stamp ở ĐÓ, nên guard chỉ
+    # nhìn "llmwiki/.harness-stamp" thì mọi hook global im lặng bỏ qua (GH#111). Nhận cả hai.
+    return (f'if [ -f "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki/.harness-stamp" ] '
+            f'|| [ -f "${{CLAUDE_PROJECT_DIR:-.}}/.llmwiki/.harness-stamp" ]; '
+            f'then python3 "{HOOKS_DIR}/{script}"; fi')
 
 def legacy_cmd(script):
     return f'if [ -d "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki" ]; then python3 "{HOOKS_DIR}/{script}"; fi'
+
+def legacy_stamp_cmd(script):
+    # dạng phát hành trước GH#111: guard CHỈ nhìn llmwiki/.harness-stamp (không có .llmwiki/).
+    return f'if [ -f "${{CLAUDE_PROJECT_DIR:-.}}/llmwiki/.harness-stamp" ]; then python3 "{HOOKS_DIR}/{script}"; fi'
 
 OWNED_SCRIPTS = {
     "pre_tool_use.py", "orca_guard.py", "post_tool_use.py", "stop.py",
@@ -353,7 +373,7 @@ OWNED_SCRIPTS = {
 
 def owned(command):
     return isinstance(command, str) and any(
-        command in (cmd(script), legacy_cmd(script))
+        command in (cmd(script), legacy_cmd(script), legacy_stamp_cmd(script))
         for script in OWNED_SCRIPTS
     )
 

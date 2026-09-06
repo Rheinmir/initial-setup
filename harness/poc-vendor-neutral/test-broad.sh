@@ -43,6 +43,18 @@ hk '{"tool_name":"Bash","tool_input":{"command":"ls llmwiki/raw/"}}';           
 hk '{"tool_name":"Bash","tool_input":{"command":"mv llmwiki/raw/x.md /tmp/out.md"}}'; assert 0 "mv RA khỏi raw" $?
 hk '{"tool_name":"Bash","tool_input":{"command":"echo hi > llmwiki/wiki/notes.md"}}'; assert 0 "redirect nơi khác" $?
 
+echo "── B''. layout dot .llmwiki/ + deny_write theo GLOB CỦA RULE (GH#111/112/113) ──"
+hk '{"tool_name":"Bash","tool_input":{"command":"echo hi > .llmwiki/raw/a.md"}}';      assert 2 "bash ghi .llmwiki/raw/" $?
+hk '{"tool_name":"Write","tool_input":{"file_path":".llmwiki/raw/a.md","content":"x"}}'; assert 2 "Write .llmwiki/raw/" $?
+# R14 patterns-protected: trước GH#113 nhánh Bash chỉ grep chuỗi "raw/" nên đích THẬT của R14 lọt
+hk '{"tool_name":"Bash","tool_input":{"command":"echo x > llmwiki/patterns/p.md"}}';   assert 2 "bash ghi patterns/ (R14)" $?
+hk '{"tool_name":"Bash","tool_input":{"command":"echo x > .llmwiki/patterns/p.md"}}';  assert 2 "bash ghi .llmwiki/patterns/ (R14)" $?
+hk '{"tool_name":"Write","tool_input":{"file_path":".llmwiki/patterns/p.md","content":"x"}}'; assert 2 "Write .llmwiki/patterns/ (R14)" $?
+# và KHÔNG được báo R14 trên lệnh ghi raw/ (dương tính giả cũ). grep -q: 1 = không thấy = đúng.
+printf '%s' '{"tool_name":"Bash","tool_input":{"command":"echo hi > llmwiki/raw/x.md"}}' \
+  | python3 "$CLI" claude-hook 2>&1 | grep -q 'R14'
+assert 1 "không có R14 thừa khi ghi raw/ (chỉ R1)" $?
+
 echo "── C. KNOWN GAPS — lõi session soi bề mặt, KHÔNG bắt (đúng như đã verify) ──"
 echo "      → đây là LÝ DO sàn đảm bảo phải ở CI/sandbox, không phải hook regex."
 hk '{"tool_name":"Bash","tool_input":{"command":"python3 -c \"open('llmwiki/raw/x.md','w')\""}}'; assert 0 "GAP: python -c open(w) né regex" $?

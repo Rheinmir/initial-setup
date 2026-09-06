@@ -21,8 +21,13 @@ except ImportError:
 HERE = os.path.dirname(os.path.abspath(__file__))
 POLICY = os.path.join(HERE, "policy.yaml")
 OUT = os.path.join(HERE, "out")
-# Đường gọi CLI trong các config sinh ra (chỉnh theo vị trí harness thực tế của bạn).
-CLI = "harness/poc-vendor-neutral/bin/llmwiki-validate.py"
+# Đường gọi CLI trong các config sinh ra. Tên thư mục harness KHÔNG được hardcode: installer
+# đặt lõi ở `harness/` cho repo framework nhưng `.harness/` cho dự án downstream (install.sh
+# `[ -d "$ROOT/fdk/wiki" ] || HARNESS_DIR=".harness"`). Hardcode ở đây thì hook sinh ra trỏ vào
+# đường không tồn tại và rơi vào nhánh `|| exit 0` — im lặng, dự án tưởng có rào mà không có
+# (GH#111). Mặc định giữ "harness" nên output không đổi khi env không set → drift-test vẫn xanh.
+HARNESS_DIR = os.environ.get("OVERSTACK_HARNESS_DIR", "harness")
+CLI = f"{HARNESS_DIR}/poc-vendor-neutral/bin/llmwiki-validate.py"
 GEN = "# ⚙️  GENERATED FROM policy.yaml — đừng sửa tay; sửa policy.yaml rồi chạy gen-converters.py"
 
 
@@ -46,7 +51,7 @@ def main():
 
     # ---- 1. Claude — PreToolUse (lõi chặn) + 4 hook sự kiện R3/R4/R8/R10 ----
     import json
-    EVT = "harness/poc-vendor-neutral/bin/harness-events.py"
+    EVT = f"{HARNESS_DIR}/poc-vendor-neutral/bin/harness-events.py"
     def _ev(c, t=15): return [{"type": "command", "command": c, "timeout": t}]
     # CHẶN-ĐƯỢC (PreToolUse/Stop): exec giữ exit 2 khi script chặn; file THIẾU → exit 0 (fail-open, không khoá cứng)
     def _block(f, a): return f'[ -f "$CLAUDE_PROJECT_DIR/{f}" ] && exec python3 "$CLAUDE_PROJECT_DIR/{f}" {a} || exit 0'

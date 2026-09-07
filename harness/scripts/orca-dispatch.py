@@ -42,12 +42,15 @@ CLI:
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import re
 import shutil
 import subprocess
+import tempfile
 import sys
 import time
+from pathlib import Path
 
 SENTINEL_PREFIX = "__ORCA_DONE__"
 DEFAULT_TIMEOUT_MS = 300_000
@@ -81,6 +84,31 @@ def find_sentinel(lines, token: str):
     return None
 
 
+@functools.lru_cache(maxsize=1)
+def _handoff():
+    """Nạp sổ bàn giao dùng chung (harness/scripts/handoff-log.py).
+
+    Sổ đó hút mốc từ `orca orchestration inbox` — nhưng terminal do dispatch() tạo là
+    terminal TRẦN, không sinh message orchestration nào, nên nó mù với đường này
+    (đo 2026-09-05: 0/20 mốc đến từ orca-dispatch). Ta tự khai vào đúng schema của nó.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "handoff_log", Path(__file__).with_name("handoff-log.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _log(token: str, suffix: str, **row) -> None:
+    """Ghi một mốc. Fail-open TUYỆT ĐỐI: sổ hỏng không được làm hỏng việc giao."""
+    try:
+        _handoff().append({"id": f"dsp_{token}{suffix}", "run_id": f"dispatch_{token}",
+                           "source": "orca-dispatch", **row})
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def _orca(*args, timeout=30):
     out = subprocess.run(["orca", *args], capture_output=True, text=True, timeout=timeout)
     try:
@@ -112,21 +140,34 @@ def dispatch(cmd: str, worktree="current", title=None, timeout_ms=DEFAULT_TIMEOU
         args[2:2] = ["--title", title]
     d = _orca(*args)
     if not d or not d.get("ok"):
-        return {"ok": False, "done": False,
-                "error": f"terminal create thất bại: {(d or {}).get('error')}"}
+        err = f"terminal create thất bại: {(d or {}).get('error')}"
+        _log(token, "_error", from_handle="orca-dispatch", subject=cmd[:120],
+             phase=err, outcome="failed")
+        return {"ok": False, "done": False, "error": err}
     handle = (d.get("result", {}).get("terminal", {}) or {}).get("handle")
     if not handle:
+        _log(token, "_error", from_handle="orca-dispatch", subject=cmd[:120],
+             phase="không lấy được terminal handle", outcome="failed")
         return {"ok": False, "done": False, "error": "không lấy được terminal handle"}
+    _log(token, "", from_handle="orca-dispatch", to_handle=handle,
+         subject=title or cmd[:120], phase=f"giao vào {worktree}", outcome="in_flight")
 
     t0 = time.monotonic()
     while (time.monotonic() - t0) * 1000 < timeout_ms:
         lines = _read_lines(handle)
         code = find_sentinel(lines, token)
         if code is not None:
+            _log(token, "_done", from_handle=handle, to_handle="orca-dispatch",
+                 subject=f"exit={code}",
+                 phase=f"xong sau {int((time.monotonic() - t0) * 1000)}ms",
+                 outcome="succeeded" if code == 0 else "failed")
             return {"ok": True, "done": True, "exit_code": code, "handle": handle,
                     "waited_ms": int((time.monotonic() - t0) * 1000),
                     "output": [l for l in lines if make_sentinel(token) not in l]}
         time.sleep(poll_ms / 1000)
+    _log(token, "_timeout", from_handle=handle, to_handle="orca-dispatch",
+         subject=f"hết hạn {timeout_ms}ms", phase="treo — chưa thấy sentinel",
+         outcome="failed")
     return {"ok": True, "done": False, "handle": handle,
             "waited_ms": int((time.monotonic() - t0) * 1000),
             "error": f"hết hạn {timeout_ms}ms mà chưa thấy sentinel",
@@ -156,6 +197,32 @@ def self_test() -> int:
        find_sentinel(["agent nói: __ORCA_DONE__khac:0"], "t1") is None)
     ck("thiếu orca → fail-open, không raise",
        isinstance(dispatch("echo hi"), dict) if shutil.which("orca") is None else True)
+
+    # nối vào sổ bàn giao dùng chung: mốc ghi ra phải HỢP LỆ với probe của sổ đó,
+    # nếu không thì medic đỏ vì chính cái ta ghi.
+    hl = _handoff()
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d)
+        (root / "harness" / "metrics").mkdir(parents=True)
+        for suffix, row in (("", {"outcome": "in_flight", "phase": "giao vào current"}),
+                            ("_done", {"outcome": "succeeded", "subject": "exit=0"}),
+                            ("_timeout", {"outcome": "failed", "phase": "treo"})):
+            hl.append({"id": f"dsp_t1{suffix}", "run_id": "dispatch_t1",
+                       "source": "orca-dispatch", **row}, root)
+        rows = hl.read_rows(root)
+        ck("sổ bàn giao: 3 mốc dispatch ghi ra đọc lại được", len(rows) == 3)
+        ck("sổ bàn giao: 3 mốc chụm về một run, dựng lại được chuỗi",
+           len(hl.show_run("dispatch_t1", root)) == 3)
+        ck("sổ bàn giao: probe của sổ SẠCH với mốc ta ghi", hl.check(root) == [])
+    # fail-open: giả lập sổ hỏng, KHÔNG được ghi gì vào sổ thật khi chạy test
+    def _boom():
+        raise RuntimeError("sổ hỏng")
+    real, globals()["_handoff"] = _handoff, _boom
+    try:
+        ck("sổ bàn giao: sổ hỏng → nuốt lỗi, không raise",
+           _log("t9", "_x", outcome="succeeded") is None)
+    finally:
+        globals()["_handoff"] = real
 
     print(f"\nSELF-TEST: {'ALL PASS' if not fails else str(len(fails)) + ' FAIL'}")
     return 1 if fails else 0

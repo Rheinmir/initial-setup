@@ -11,8 +11,10 @@ TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/llmwiki/wiki" "$TMP/harness/metrics" "$TMP/.claude"
 cp -R "$ROOT/llmwiki/.claude/hooks" "$TMP/.claude/hooks"; cp -R "$ROOT/harness/scripts" "$TMP/harness/scripts"
 cp "$ROOT/harness/token-budget.config.yaml" "$TMP/harness/"
+# cap model calls thấp để phiên s-over vượt theo trigger MẶC ĐỊNH (per_task_usd không kích hoạt — subscription)
+sed -i.bak "s/^  per_session_model_calls: 500/  per_session_model_calls: 10/" "$TMP/harness/token-budget.config.yaml" && rm -f "$TMP/harness/token-budget.config.yaml.bak"
 git -C "$TMP" -c init.defaultBranch=main init -q
-# phiên "s-over": 12 lượt, $6 — vượt per_task_usd 5.0 mặc định
+# phiên "s-over": 12 lượt > cap 10 (và $6 — không kích hoạt vì per_task_usd không trong triggers mặc định)
 printf '{"s-over":{"session":"s-over","turns":12,"tokens":{"input_tokens":100,"output_tokens":100},"cost_usd":6.0},"s-ok":{"session":"s-ok","turns":2,"tokens":{"input_tokens":50,"output_tokens":50},"cost_usd":0.1}}' > "$TMP/harness/metrics/cost-by-session.json"
 printf '{"type":"user","message":{"content":"sửa nốt validator"}}\n' > "$TMP/t.jsonl"
 run_hook(){ printf '{"session_id":"%s","transcript_path":"%s","prompt":"%s","cwd":"%s"}' "$1" "$TMP/t.jsonl" "$2" "$TMP" \

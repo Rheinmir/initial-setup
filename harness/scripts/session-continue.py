@@ -45,6 +45,7 @@ except Exception:           # bản global cũ thiếu file → fallback đườ
 
 COST_FILE = "harness/metrics/cost-by-session.json"   # shortcut: cùng đường cứng với code-logger — đổi cùng lúc khi code-logger qua overstack_paths
 DEFAULT_THRESHOLD = 0.85
+DEFAULT_TRIGGERS = ["per_session_tokens", "per_session_model_calls"]   # per_task_usd: opt-in
 
 
 # ── config + dữ liệu ─────────────────────────────────────────────────────────────────────
@@ -63,10 +64,17 @@ def load_cfg(root: Path) -> dict:
     except Exception:
         cfg = {}
     ah = cfg.get("auto_handover") if isinstance(cfg.get("auto_handover"), dict) else {}
+    trig = ah.get("triggers")
+    if isinstance(trig, str):
+        trig = [t.strip() for t in trig.split(",") if t.strip()]
     cfg["_auto"] = {
         "enabled": str(ah.get("enabled", True)).lower() not in ("0", "false", "no", "off"),
         "threshold": float(ah.get("threshold", DEFAULT_THRESHOLD) or DEFAULT_THRESHOLD),
         "agent": str(ah.get("agent", "auto") or "auto"),
+        # per_task_usd KHÔNG kích hoạt mặc định: gói subscription (Claude Max…) không tính tiền theo
+        # token, $ chỉ là số quy đổi từ đơn giá minh hoạ — bàn giao vì "hết $5" là cắt phiên vô cớ.
+        # Vẫn ghi sổ + hiện ở --report; ai trả theo token thì thêm 'per_task_usd' vào triggers.
+        "triggers": list(trig) if isinstance(trig, list) and trig else DEFAULT_TRIGGERS,
     }
     return cfg
 
@@ -97,6 +105,8 @@ def evaluate(usage: dict, cfg: dict) -> dict:
     }
     over, near = [], []
     for key, cur in metrics.items():
+        if key not in cfg["_auto"]["triggers"]:
+            continue                       # trần vẫn ghi sổ (--report), chỉ không kích hoạt bàn giao
         cap = b.get(key)
         try:
             cap = float(cap)
@@ -283,8 +293,11 @@ def self_test() -> int:
         cost("s1", 5, 450, 450, 0.5); e = evaluate(session_usage(root, "s1"), cfg)   # tokens 900/1000=90% → near; calls 5/10 +1=6 ok
         ok &= e["status"] == "near" and any("per_session_tokens" in x for x in e["near"])
         print(("  ✓ " if e["status"] == "near" else "  ✗ ") + "dự đoán +1 lượt chạm cap token → near")
-        cost("s1", 12, 100, 100, 6.0); e = evaluate(session_usage(root, "s1"), cfg)
-        ok &= e["status"] == "over" and len(e["over"]) == 2; print(("  ✓ " if e["status"] == "over" else "  ✗ ") + f"vượt $ + calls → over ({e['over']})")
+        cost("s1", 3, 100, 100, 6.0); e = evaluate(session_usage(root, "s1"), cfg)
+        ok &= e["status"] == "ok"; print(("  ✓ " if e["status"] == "ok" else "  ✗ ") + f"vượt $ nhưng per_task_usd KHÔNG trong triggers mặc định → ok (subscription) ({e['status']})")
+        cfg_usd = dict(cfg); cfg_usd["_auto"] = dict(cfg["_auto"], triggers=["per_task_usd", "per_session_model_calls"])
+        cost("s1", 12, 100, 100, 6.0); e = evaluate(session_usage(root, "s1"), cfg_usd)
+        ok &= e["status"] == "over" and len(e["over"]) == 2; print(("  ✓ " if e["status"] == "over" else "  ✗ ") + f"bật trigger usd: vượt $ + calls → over ({e['over']})")
         tr = root / "t.jsonl"
         tr.write_text('{"type":"user","message":{"content":"làm tiếp việc A"}}\n{"type":"assistant","message":{"content":[{"type":"text","text":"đã xong bước 1"}]}}\n', encoding="utf-8")
         hf = write_handover(root, "s1abcdef0000", str(tr), e, "", "", "claude")

@@ -1,6 +1,7 @@
 ---
 name: dym-setup-agent-workflow
 description: "Vòng làm việc hằng ngày bằng lệnh CHAT /propose → /plan → /verify-before-commit → /ship và bảng skill theo việc (KHÔNG phải lệnh shell). Gọi khi: 'workflow overstack', 'dùng skill nào', 'propose rồi làm gì'."
+disable-model-invocation: true
 ---
 
 # Skill: dym-setup-agent-workflow — Vòng làm việc hằng ngày: các lệnh `/<skill>` (CHAT, không phải terminal)

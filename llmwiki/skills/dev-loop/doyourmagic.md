@@ -42,7 +42,7 @@ doyourmagic/<repo>/
 6. **Chia workflow theo ĐỐI TƯỢNG, không theo tính năng**: tiêu thụ (dùng tool trong dự án của mình) vs đóng góp (sửa chính tool). Lệnh chat (`/x`) và lệnh shell tách skill riêng — trộn là copy-paste gãy.
 7. **Chốt tên** theo bảng Naming (kiểm trùng nếu `--humanize`).
 8. **Viết mỗi workflow thành một sub-skill** `doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md`:
-   - frontmatter `name: <hub>-<slug>`, `description` = một câu nói KHI NÀO gọi + từ khoá trigger (router dùng dòng này).
+   - frontmatter `name: <hub>-<slug>`, `description` = một câu nói KHI NÀO gọi + từ khoá trigger, và **`disable-model-invocation: true`** — để khi cài cả bundle qua `npx skills add` (7 skill) cũng không có dòng description nào tự nhồi vào context; chỉ nạp khi gõ.
    - `## When to use` — tình huống + "tại sao chạy / sinh ra gì".
    - `## Steps` — lệnh copy-paste được, đường dẫn chính xác, output/mã thoát kỳ vọng. Lệnh nào đã chạy thật thì ghi rc đo được.
    - `## Rules` — bẫy đã ĐO (không phải đoán), kèm cách né; carve-out "không được làm".
@@ -56,11 +56,18 @@ doyourmagic/<repo>/
    ---
    ## Steps
    1. Đọc ARGUMENTS → <slug>. Không có slug → in bảng slug + một dòng mục đích, dừng.
-   2. Đọc ĐÚNG MỘT file `doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md` (đường tương đối từ gốc dự án) rồi làm theo Steps của nó. Không đọc các file con khác.
+   2. Tìm file con theo thứ tự, lấy file ĐẦU TIÊN tồn tại rồi đọc ĐÚNG MỘT file:
+      (1) `.claude/skills/<hub>-<slug>/SKILL.md` — đã cài qua `npx skills add rheinmir/dym`;
+      (2) `doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md` — bundle nằm trong dự án, hub symlink;
+      (3) `doyourmagic-bundles/<repo>/skills/<hub>-<slug>/SKILL.md` — clone `rheinmir/dym` cạnh dự án.
+      Làm theo Steps/Rules của file đó; không đọc file con khác; không thấy cả 3 → nói rõ, dừng.
    ```
 10. **`workflows.md`**: bảng (skill · mục đích · nhánh · lệnh gọi), "thứ tự chạy đề xuất", "bẫy đắt nhất", bảng **"kiểm chứng thế nào"** (khẳng định → file:dòng / ca chạy thật / rc), chế độ đặt tên đã dùng, và **lệnh symlink 1 dòng** (mục Install bên dưới).
 11. **`flow.html`** — sinh theo skill `docs-site-macos` (BẮT BUỘC: sidebar kính, background orbs, mind map collapsible, nút gạt sáng/tối ở footer sidebar + chống FOUC, cỡ chữ compact 13″, skip-link/focus ring, footer hiện **đường dẫn tuyệt đối** của chính file). Nội dung = **luồng chính xác các skill thực hiện**: mỗi skill một node, cạnh `skill → sản phẩm → skill kế` (connector do JS vẽ từ `getBoundingClientRect`, vẽ lại khi resize — không hardcode toạ độ), thứ tự chạy theo nhánh, mỗi node ghi lệnh gọi + sản phẩm + bẫy 1 dòng. Thuật ngữ có giải nghĩa trong ngoặc. **Mở thật bằng trình duyệt** (hoặc `/playwright-verify`) trước khi giao — đọc code không đủ.
 12. **Gate adapt-modes** — bundle không phải đích đến. Đưa MỘT verdict cho user: **HÒA TAN** (rewrite thành code/skill của ta) · **KÉO NGOÀI** (pointer + pin) · **NHÚNG-SỞ-HỮU** (vendor) · **KHÔNG LẤY** (đã có gì phủ, ghi path). So trên trục quyết định chi phí — số lượt agent/lần dùng, code sinh được không cần LLM — không so byte. Verdict HÒA TAN/NHÚNG → hỏi trước khi scaffold.
+
+## Kho bundle đã chạy — `rheinmir/dym`
+Mỗi lượt chạy xong, đẩy `doyourmagic/<repo>/` lên https://github.com/Rheinmir/dym thành `<repo>/` (PR) để người sau **kéo về thay vì chạy lại**: `npx skills add rheinmir/dym` (cài hub + sub-skill, project-scope; thêm `-g` cho global) hoặc `git clone --depth 1 https://github.com/Rheinmir/dym.git doyourmagic-bundles`. Trước khi chạy `/doyourmagic <repo>` mới: **xem ở đó đã có bundle chưa**.
 
 ## Install (dùng tại chỗ) — một lệnh, chỉ nạp khi cần
 ```bash

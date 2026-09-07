@@ -1,6 +1,7 @@
 ---
 name: dym-setup-install
 description: "Cài overstack vào dự án (bootstrap 1 dòng), cờ nào có thật ở đâu, ghi gì vào $HOME, xác nhận rào cắn, gỡ. Gọi khi: 'cài overstack', 'bootstrap', 'setup harness', 'gỡ overstack'."
+disable-model-invocation: true
 ---
 
 # Skill: dym-setup-install — Cài overstack vào dự án của bạn

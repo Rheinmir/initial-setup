@@ -1,6 +1,7 @@
 ---
 name: dym-setup-contributor
 description: "Sửa CHÍNH overstack: fdk-gate 21 step (exit 0/2), medic 18 probe, sửa luật đúng đường policy→gen-converters, /fdk-uat canary, /ship, R15 no-ai-attribution. Gọi khi: 'contribute overstack', 'sửa rule harness', 'fdk-gate', 'release overstack'."
+disable-model-invocation: true
 ---
 
 # Skill: dym-setup-contributor — Đóng góp: sửa chính overstack

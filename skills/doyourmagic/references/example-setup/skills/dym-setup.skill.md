@@ -22,7 +22,11 @@ description: "overstack (rheinmir/setup) — workflow đã kiểm chứng. Gõ /
    | `maintain` | nâng bản, migrate, rc 0/3/4/1, tool nào chạy được ở downstream | tiêu thụ |
    | `contributor` | sửa chính overstack: fdk-gate, medic, UAT canary, ship | đóng góp |
 
-2. Đọc ĐÚNG MỘT file `doyourmagic/setup/skills/dym-setup-<slug>/SKILL.md` (đường tương đối từ gốc dự án) rồi làm theo `## Steps` và `## Rules` của nó. Không đọc file con khác.
+2. Tìm file con theo thứ tự, lấy file ĐẦU TIÊN tồn tại rồi đọc ĐÚNG MỘT file đó:
+   1. `.claude/skills/dym-setup-<slug>/SKILL.md` (đã cài qua `npx skills add rheinmir/dym`)
+   2. `doyourmagic/setup/skills/dym-setup-<slug>/SKILL.md` (bundle nằm trong dự án, hub được symlink)
+   3. `doyourmagic-bundles/setup/skills/dym-setup-<slug>/SKILL.md` (clone `rheinmir/dym` cạnh dự án)
+   Làm theo `## Steps` và `## Rules` của file đó. Không đọc file con khác. Không thấy ở cả 3 chỗ → nói rõ và dừng.
 3. Slug lạ → in bảng ở bước 1, dừng.
 
 ## Rules

@@ -189,8 +189,10 @@ def secondary_memory(root: str, session: str) -> None:
                                       capture_output=True, text=True, timeout=8).stdout.strip()
             changed = [ln[3:] for ln in dirty.splitlines() if len(ln) > 3][:8]
             did = subject or "(phiên có sửa, chưa commit)"
+            # --parent auto: nối episode này vào phiên NGAY TRƯỚC → một CHUỖI đọc được
+            # (mem-rank chain), thay vì một đống episode rời không biết cái nào tiếp cái nào.
             subprocess.run([sys.executable, mr, "episode", did,
-                             "--files", ",".join(changed), "--session", session],
+                             "--files", ",".join(changed), "--session", session, "--parent", "auto"],
                            cwd=root, capture_output=True, timeout=15)
         except Exception:
             pass
@@ -330,6 +332,17 @@ def main() -> None:
     tp = payload.get("transcript_path")  # Trụ 1 Cost Attribution: 1 cost record / run, upsert theo session (cumulative, idempotent)
     if tp:
         code_log(root, "--run-cost", f"--transcript={tp}", f"--session={payload.get('session_id') or ''}")
+        # okf-scan verify: đối chiếu transcript xem agent MỞ bao nhiêu mục đã trả về đầu phiên.
+        # Vế đầu của biên lai (SessionStart) chứng minh việc quét đã chạy; vế này chứng minh —
+        # hoặc bác bỏ — rằng thứ quét được có được đọc. Thiếu nó thì "đã nạp context" là lời khai.
+        ok_tool = resolve_tool(root, "harness/scripts/okf-scan.py")
+        if ok_tool:
+            try:
+                subprocess.run([sys.executable, ok_tool, "verify", "--session",
+                                payload.get("session_id") or "", "--transcript", tp, "--root", root],
+                               cwd=root, capture_output=True, timeout=20)
+            except Exception:
+                pass
 
     # ANTI-IDLE: provider cắt lượt bằng refusal rỗng → chặn dừng, bảo agent làm tiếp.
     # `stop_hook_active` đã được guard ở đầu main() nên không lặp vô hạn.

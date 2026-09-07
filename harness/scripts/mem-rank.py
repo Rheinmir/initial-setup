@@ -14,6 +14,7 @@ the missing piece: a queryable store you write to by code and retrieve top-k fro
                                       EPISODIC memory layer (what a past session did), retrievable.
   delete ID                           remove a memory (DELETE).
   export                              dump store as JSONL to stdout (memory portability).
+  export-okf [--out DIR] [--kind K]   write each memory as an OKF v0.1 .md (type + ## Origin).
   import <file.jsonl>                 load JSONL, dedupe by id (local store wins).
   retrieve "<query>" [--k N]          top-N memories by relevance (NOOP if nothing relevant).
   --kind-filter K                     with retrieve: only rank memories of kind K (e.g. episode).
@@ -121,7 +122,11 @@ def add(root, text, kind=None, mid=None, meta=None, ts=None, supersedes=None):
     mems = _read(root)
     rid = mid or _next_id(mems)
     replaced = next((m for m in mems if m.get("id") == rid), None)
-    rec = {"id": rid, "text": (text or "").strip(), "kind": kind or "note", "ts": _now_iso(ts)}
+    # OKF v0.1 dùng từ khoá `type`; store này vốn dùng `kind`. Ghi CẢ HAI: `type` để mọi thứ
+    # đọc wiki (validator R9, okf-check, bên thứ ba) hiểu được record memory mà không cần
+    # bộ chuyển; `kind` giữ nguyên cho code cũ. OKF cho phép khoá lạ nên thêm là hợp lệ.
+    rec = {"id": rid, "text": (text or "").strip(), "kind": kind or "note",
+           "type": kind or "note", "ts": _now_iso(ts)}
     sup = supersedes or (replaced.get("id") if replaced else None)
     if sup:
         rec["supersedes"] = sup
@@ -136,7 +141,7 @@ def add(root, text, kind=None, mid=None, meta=None, ts=None, supersedes=None):
     return rec
 
 
-def episode(root, did, files=None, outcome=None, session=None, ts=None, supersedes=None, mid=None):
+def episode(root, did, files=None, outcome=None, session=None, ts=None, supersedes=None, mid=None, parent=None):
     """Record a SESSION EPISODE — the episodic memory layer. Composes a retrievable `text` from
     the structured fields (so token-overlap retrieval works) and keeps the fields as metadata."""
     files = files or []
@@ -148,8 +153,81 @@ def episode(root, did, files=None, outcome=None, session=None, ts=None, supersed
     if outcome:
         parts.append("outcome: " + outcome.strip())
     text = ". ".join(p for p in parts if p)
-    meta = {"did": (did or "").strip(), "files": files, "outcome": outcome, "session": session}
+    # parent = phiên NGAY TRƯỚC trong cùng repo (episode gần nhất khác session). Đây là thứ
+    # biến một đống episode rời thành một CHUỖI đọc được: bàn giao (session-continue) hay chỉ
+    # là mở phiên mới thì cha vẫn đúng, không cần state riêng. "auto" → tự suy lúc ghi.
+    if parent == "auto":
+        parent = last_session(root, exclude=session)
+    meta = {"did": (did or "").strip(), "files": files, "outcome": outcome,
+            "session": session, "parent": parent}
     return add(root, text, kind="episode", mid=mid, meta=meta, ts=ts, supersedes=supersedes)
+
+
+def last_session(root, exclude=None):
+    """Session của episode gần nhất (bỏ qua chính phiên đang ghi). None nếu chưa có."""
+    for m in reversed(_read(Path(root))):
+        if m.get("kind") != "episode":
+            continue
+        sid = m.get("session")            # add() phẳng hoá meta lên top-level, không lồng "meta"
+        if sid and sid != exclude:
+            return sid
+    return None
+
+
+def chain(root, session=None, limit=20):
+    """Chuỗi phiên nối tiếp: đi ngược parent từ `session` (mặc định: phiên mới nhất).
+
+    Đây là cái MAP mà từng episode rời rạc không cho được — "phiên này tiếp phiên nào, đã làm
+    gì, chạm file nào" đọc một mạch, không phải ghép tay từ nhiều sổ.
+    """
+    eps = [m for m in _read(Path(root)) if m.get("kind") == "episode"]
+    by_sess = {}
+    for m in eps:                                   # episode mới nhất của mỗi phiên thắng
+        sid = m.get("session")
+        if sid:
+            by_sess[sid] = m
+    cur = session or last_session(root)
+    out, seen = [], set()
+    while cur and cur not in seen and len(out) < limit:
+        seen.add(cur)
+        m = by_sess.get(cur)
+        if not m:
+            break
+        out.append(m)
+        cur = m.get("parent")
+    return out
+
+
+def export_okf(root, outdir, kind_filter="episode") -> int:
+    """Xuất store thành file .md ĐÚNG CHUẨN OKF v0.1 — mỗi memory một file, frontmatter YAML có
+    `type` không rỗng + section `## Origin`, nên bỏ vào cây wiki là qua được R9/R2 mà không phải
+    sửa gì. Đây là cầu nối "memory (máy ghi) → wiki (người đọc/kiểm)", trước đây phải chép tay.
+    """
+    root, out = Path(root), Path(outdir)
+    out.mkdir(parents=True, exist_ok=True)
+    n = 0
+    for m in _read(root):
+        if kind_filter and m.get("kind") != kind_filter:
+            continue
+        mid = m.get("id") or f"mem-{n}"
+        fm = ["---", f'type: {m.get("type") or m.get("kind") or "note"}',
+              f'title: "{(m.get("did") or m.get("text") or mid).splitlines()[0][:90].replace(chr(34), chr(39))}"',
+              f'id: {mid}', f'timestamp: {(m.get("ts") or "")[:10]}',
+              "tags: [memory, episode]"]
+        for k in ("session", "parent", "supersedes"):
+            if m.get(k):
+                fm.append(f"{k}: {m[k]}")
+        if m.get("files"):
+            fm.append("files: [" + ", ".join(m["files"]) + "]")
+        fm.append("---")
+        body = [f"\n# {(m.get('did') or mid)}\n", (m.get("text") or "").strip(), "",
+                "## Origin", f"- **Source:** `harness/metrics/memory.jsonl` (mem-rank, id `{mid}`)",
+                f"- **Session:** {m.get('session') or '(không rõ)'}"
+                + (f" · tiếp nối `{m['parent']}`" if m.get("parent") else ""),
+                f"- **Date:** {(m.get('ts') or '')[:10]}", ""]
+        (out / f"{mid}.md").write_text("\n".join(fm + body), encoding="utf-8")
+        n += 1
+    return n
 
 
 def delete(root, mid) -> int:
@@ -343,7 +421,35 @@ def self_test() -> int:
         n1, _ = import_file(dst, str(f))
         n2, _ = import_file(dst, str(f))          # import lần 2 phải skip hết (dedupe)
         roundtrip_ok = n1 == 1 and n2 == 0 and _read(dst)[0]["id"] == "port1"
-    ok = bool(top_ok) and none_ok and evict_ok and ep_ok and embed_ok and roundtrip_ok
+    # CHUỖI PHIÊN: parent="auto" phải bắt đúng phiên trước; chain() đi ngược đủ 3 mắt, không lặp.
+    with tempfile.TemporaryDirectory() as d3:
+        r3 = Path(d3); (r3 / "harness").mkdir()
+        _config_file(r3).write_text("verified: false\n", encoding="utf-8")
+        episode(r3, "phiên A: dựng validator", files=["a.py"], session="sessA", parent="auto")
+        episode(r3, "phiên B: vá hook", files=["b.py"], session="sessB", parent="auto")
+        episode(r3, "phiên C: viết test", files=["c.py"], session="sessC", parent="auto")
+        ch = chain(r3)
+        sids = [m.get("session") for m in ch]
+        parents = [m.get("parent") for m in ch]
+        chain_ok = sids == ["sessC", "sessB", "sessA"] and parents == ["sessB", "sessA", None]
+        # phiên ghi 2 episode: không tự trỏ chính mình (parent bỏ qua session hiện tại)
+        episode(r3, "phiên C: thêm ca", files=["c2.py"], session="sessC", parent="auto")
+        self_ok = chain(r3)[0].get("parent") == "sessB"
+        # chain từ một phiên GIỮA chuỗi
+        mid_ok = [m.get("session") for m in chain(r3, "sessB")] == ["sessB", "sessA"]
+        chain_ok = chain_ok and self_ok and mid_ok
+
+        # OKF: file xuất ra phải qua ĐÚNG validator R9 đang gác wiki, không tự chấm mình.
+        okdir = r3 / "okf"
+        n_okf = export_okf(r3, okdir)
+        v = Path(__file__).resolve().parents[1] / "validators" / "okf_frontmatter.py"
+        files = sorted(str(f) for f in okdir.glob("*.md"))
+        rc_okf = subprocess.run([sys.executable, str(v), *files], capture_output=True).returncode if v.exists() else 0
+        first = Path(files[0]).read_text(encoding="utf-8") if files else ""
+        okf_ok = n_okf == 4 and rc_okf == 0 and "## Origin" in first and "type: episode" in first
+
+    ok = (bool(top_ok) and none_ok and evict_ok and ep_ok and embed_ok and roundtrip_ok
+          and chain_ok and okf_ok)
     print("mem-rank self-test:", "PASS" if ok else "FAIL")
     return 0 if ok else 1
 
@@ -382,12 +488,31 @@ def main() -> None:
         print(f"added {rec['id']}: {rec['text'][:60]}"); return
     if args and args[0] == "episode":
         if len(args) < 2:
-            print('usage: mem-rank.py episode "<did>" [--files a,b] [--outcome o] [--session s] [--supersedes ID]',
+            print('usage: mem-rank.py episode "<did>" [--files a,b] [--outcome o] [--session s] [--parent S|auto] [--supersedes ID]',
                   file=sys.stderr); sys.exit(2)
-        rec = episode(root, args[1], files=files, outcome=outcome, session=session,
+        rec = episode(root, args[1], files=files, outcome=outcome, session=session, parent=_opt(args, "--parent"),
                       supersedes=supersedes, mid=mid)
         sup = f" (supersedes {rec['supersedes']})" if rec.get("supersedes") else ""
         print(f"episode {rec['id']} @ {rec['ts']}{sup}: {rec['text'][:60]}"); return
+    if args and args[0] == "export-okf":
+        d = _opt(args, "--out") or "llmwiki/wiki/sources/memory"
+        n = export_okf(root, root / d if not str(d).startswith("/") else d,
+                       kind_filter=_opt(args, "--kind") or "episode")
+        print(f"export-okf: {n} file .md (OKF v0.1) → {d}"); return
+    if args and args[0] == "chain":
+        rows = chain(root, args[1] if len(args) > 1 and not args[1].startswith("-") else None)
+        if "--json" in args:
+            print(json.dumps(rows, ensure_ascii=False, indent=1)); return
+        if not rows:
+            print("mem-rank: chưa có episode nào — chuỗi rỗng"); return
+        print(f"CHUỖI PHIÊN ({len(rows)}, mới → cũ)")
+        for i, m in enumerate(rows):
+            mt = m
+            arrow = "└─" if i == len(rows) - 1 else "├─"
+            print(f"  {arrow} {(mt.get('session') or '?')[:8]}  {m.get('ts', '')[:16]}  {mt.get('did', '')[:70]}")
+            for f in (mt.get("files") or [])[:4]:
+                print(f"  {'  ' if i == len(rows) - 1 else '│ '}    · {f}")
+        return
     if args and args[0] == "delete":
         if len(args) < 2:
             print("usage: mem-rank.py delete ID", file=sys.stderr); sys.exit(2)

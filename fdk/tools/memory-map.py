@@ -34,6 +34,8 @@ def _load(modpath, name):
 WG = _load("fdk/tools/build-wiki-graph.py", "wg")
 WG.REL_COLORS["elaborates"] = "#5856d6"     # session → file đã chạm
 WG.REL_VI["elaborates"] = "phiên chạm/làm rõ file"
+WG.REL_COLORS["continues"] = "#ff9500"      # phiên → phiên trước (chuỗi, mem-rank chain)
+WG.REL_VI["continues"] = "tiếp nối phiên trước"
 
 
 def _read(p):
@@ -87,7 +89,30 @@ def build():
                               "title": fp, "wiki": "memory", "label": fp.rsplit("/", 1)[-1]})
                 seen_files.add(fp)
             edges.append({"from": f"s:{sid}", "rel": "elaborates", "to": fp, "kind": "to"})
+    # CHUỖI phiên (mem-rank episode --parent): map không chỉ là "phiên nào chạm file nào" mà còn
+    # "phiên nào tiếp phiên nào" — đọc một mạch được. Thiếu store/episode → bỏ qua, không vẽ thêm.
+    for child, parent in _session_parents().items():
+        if f"s:{child}" in {n["id"] for n in nodes} and f"s:{parent}" in {n["id"] for n in nodes}:
+            edges.append({"from": f"s:{child}", "rel": "continues", "to": f"s:{parent}", "kind": "to"})
     return nodes, edges
+
+
+def _session_parents() -> dict:
+    """{session con: session cha} từ store mem-rank (harness/metrics/memory.jsonl). Fail-open."""
+    out = {}
+    try:
+        p = Path("harness/metrics/memory.jsonl")
+        for ln in p.read_text(encoding="utf-8").splitlines():
+            if not ln.strip():
+                continue
+            m = json.loads(ln)
+            if m.get("kind") != "episode":
+                continue
+            if m.get("session") and m.get("parent"):   # add() phẳng hoá meta lên top-level
+                out[m["session"]] = m["parent"]
+    except Exception:
+        pass
+    return out
 
 
 def main():

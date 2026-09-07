@@ -1,6 +1,7 @@
 ---
 name: dym-setup-guardrail-cli
 description: "Gọi validator overstack từ SHELL: 3 mode (path/files/claude-hook), 19 luật R1–R19, mã thoát 0/1/2 không đồng nhất, 4 đường fail-open. Gọi khi: 'luật còn cắn không', 'chạy validator', 'test rule', 'exit code validator'."
+disable-model-invocation: true
 ---
 
 # Skill: dym-setup-guardrail-cli — Gọi guardrail từ terminal: 3 mode, 19 luật, mã thoát

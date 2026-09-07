@@ -1,6 +1,7 @@
 ---
 name: dym-setup-maintain
 description: "Nâng bản, migrate dự án cũ (/harness-update --self-heal rc 0/3/4/1), công cụ nào chạy được ở downstream, 16 tool bị gỡ khỏi global, trần token, gỡ. Gọi khi: 'update overstack', 'nâng bản harness', 'migrate llmwiki cũ', 'health-check'."
+disable-model-invocation: true
 ---
 
 # Skill: dym-setup-maintain — Nâng bản, migrate dự án cũ, và những gì bạn KHÔNG chạy được ở downstream

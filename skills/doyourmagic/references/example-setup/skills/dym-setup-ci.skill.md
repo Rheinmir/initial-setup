@@ -1,6 +1,7 @@
 ---
 name: dym-setup-ci
 description: "Cắm luật overstack vào CI dự án TIÊU THỤ: workflow GitHub Actions tối giản viết mới, 3 bẫy CI xanh giả, pre-commit, adapter non-Claude. Gọi khi: 'thêm overstack vào CI', 'github actions cho wiki rules', 'pre-commit overstack'."
+disable-model-invocation: true
 ---
 
 # Skill: dym-setup-ci — Cắm luật overstack vào CI của **dự án bạn**

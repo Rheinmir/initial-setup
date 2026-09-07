@@ -1,0 +1,22 @@
+# harness/self-report.config.yaml — adapter cho self-report.py (tự chấm hệ + raise issue sớm).
+# Mọi ngưỡng ở đây là GIẢ ĐỊNH chưa hiệu chỉnh: chúng quyết định khi nào một tín hiệu trở thành
+# "vấn đề". Đặt sai thì hoặc báo động giả (nhiễu, người dùng học cách lờ đi) hoặc không bao giờ
+# cắn (tưởng khoẻ). Chỉnh theo dữ liệu thật rồi mới siết.
+
+verified: false                 # ASSUMPTION (not verified) — ngưỡng dưới đây chưa hiệu chỉnh
+
+every: 50                       # bao nhiêu lượt prompt thì tự chấm một lần (hook UserPromptSubmit)
+raise: auto                     # auto = tự mở issue · propose = chỉ in đề xuất · off = không raise
+repo: rheinmir/setup            # repo MẸ nhận issue (issue chỉ mang SỐ ĐO, không nội dung file)
+
+cooldown_days: 7                # cùng một lớp vấn đề: không raise lại trong N ngày
+max_per_run: 2                  # trần chống spam — áp cho cả raise LẪN propose
+min_sessions: 3                 # dưới ngưỡng này thì chưa đủ dữ liệu để kết luận, im lặng
+
+coverage_floor: 0.34            # ASSUMPTION — recall trả về mà agent mở dưới mức này = tín hiệu xấu
+budget_near: 0.85               # ASSUMPTION — coi là "sắp chạm trần"
+
+# ADAPT-CHECKLIST (chốt khi có dữ liệu thật):
+#   1. Chạy `self-report.py --report` sau ~20 phiên thật, xem finding nào là báo động giả.
+#   2. Chỉnh coverage_floor / min_sessions theo phân bố thật, KHÔNG theo cảm giác.
+#   3. Chỉ đặt verified: true khi đã có ít nhất một lần finding dẫn tới sửa thật.

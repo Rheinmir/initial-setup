@@ -157,6 +157,8 @@ jobs:
         run: bash harness/tests/wiki-sync-flags-failopen-test.sh .
       - name: wikigraph-single-source — wiki-graph.py và build-wiki-graph.py không được lệch cạnh
         run: bash harness/tests/wikigraph-single-source-test.sh .
+      - name: self-report — hệ tự chấm từ sổ + raise issue sớm (dedupe/cooldown/trần/riêng tư)
+        run: bash harness/tests/self-report-test.sh .
       - name: session-chain — episodic có CHUỖI (parent) + quay lại prompt ở SessionStart + xuất OKF
         run: bash harness/tests/session-chain-test.sh .
       - name: session-continue — trần token-budget → bàn giao + phiên mới tự động (hook UserPromptSubmit)

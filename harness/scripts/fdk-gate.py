@@ -108,8 +108,9 @@ STEPS = [
         "python3 harness/scripts/hub.py --self-test >/dev/null && "
         "python3 harness/scripts/overstack_paths.py --self-test >/dev/null && "
         "python3 harness/scripts/session-continue.py --self-test >/dev/null && "
-        "python3 harness/scripts/okf-scan.py --self-test >/dev/null"],
-     "36 chức năng BNAL — self-test phải còn PASS (giữ verified trung thực)"),
+        "python3 harness/scripts/okf-scan.py --self-test >/dev/null && "
+        "python3 harness/scripts/self-report.py --self-test >/dev/null"],
+     "37 chức năng BNAL — self-test phải còn PASS (giữ verified trung thực)"),
 ]
 
 

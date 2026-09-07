@@ -187,20 +187,20 @@ def self_test() -> int:
         obs_ok = obs.get("turns") == 100 and obs.get("tokens") == 3000 and obs.get("usd", 0) > 0
 
         # Enter hết = nhận gợi ý; gợi ý phải bám SỐ ĐO (2× turns = 200 calls), không phải số đoán.
-        t = _FakeTTY(["\n"] * 8 + ["warn\n"])
+        t = _FakeTTY(["y\n"] + ["\n"] * 8 + ["warn\n"])
         configure_with(r, t)
         c1 = load_config(r)
         sug_ok = c1["budgets"]["per_session_model_calls"] == 200
         warn_ok = c1.get("mode") == "warn" and c1.get("verified") is False
 
         # chọn block ⇒ verified bật theo (chữ ký "tôi đã xem và chấp nhận các con số này")
-        t2 = _FakeTTY(["\n"] * 8 + ["block\n"])
+        t2 = _FakeTTY(["y\n"] + ["\n"] * 8 + ["block\n"])
         configure_with(r, t2)
         c2 = load_config(r)
         block_ok = c2.get("mode") == "block" and c2.get("verified") is True
 
         # giá trị gõ tay phải thắng gợi ý
-        t3 = _FakeTTY(["12345\n", "1.5\n", "7\n", "\n", "\n", "\n", "\n", "\n", "warn\n"])
+        t3 = _FakeTTY(["y\n", "12345\n", "1.5\n", "7\n", "\n", "\n", "\n", "\n", "\n", "warn\n"])
         configure_with(r, t3)
         c3 = load_config(r)
         typed_ok = (c3["budgets"]["per_session_tokens"] == 12345
@@ -208,17 +208,24 @@ def self_test() -> int:
                     and c3["budgets"]["per_session_model_calls"] == 7)
 
         # nhập rác KHÔNG được phá config (giữ nguyên bản trước, không crash)
-        t4 = _FakeTTY(["không-phải-số\n"] + ["\n"] * 8)
+        t4 = _FakeTTY(["y\n", "không-phải-số\n"] + ["\n"] * 8)
         rc_bad = configure_with(r, t4)
         c4 = load_config(r)
         junk_ok = rc_bad == 0 and c4["budgets"]["per_session_tokens"] == 12345
 
-    conf_ok = obs_ok and sug_ok and warn_ok and block_ok and typed_ok and junk_ok
+        # MẶC ĐỊNH KHÔNG HỎI THÊM: Enter ở câu đầu → thoát ngay, không hỏi câu nào, không ghi file.
+        t5 = _FakeTTY(["\n"])
+        rc_skip = configure_with(r, t5)
+        c5 = load_config(r)
+        skip_ok = (rc_skip == 0 and c5["budgets"]["per_session_tokens"] == 12345
+                   and "◇" not in "".join(t5.out))
+
+    conf_ok = obs_ok and sug_ok and warn_ok and block_ok and typed_ok and junk_ok and skip_ok
     ok = (cost_ok and not within and len(over) == 2 and sum_ok and calls_ok
           and legacy_ok and conf_ok)
     if not conf_ok:
         print(f"  configure: obs={obs_ok} sug={sug_ok} warn={warn_ok} "
-              f"block={block_ok} typed={typed_ok} junk={junk_ok}")
+              f"block={block_ok} typed={typed_ok} junk={junk_ok} skip={skip_ok}")
     print("token-budget self-test:", "ALL PASS" if ok else "FAIL")
     return 0 if ok else 1
 
@@ -258,17 +265,58 @@ def observed(root: Path) -> dict:
         return {}
 
 
-def _ask(prompt: str, default, tty):
-    """Hỏi một câu qua /dev/tty. Enter = giữ mặc định. Không có tty → trả mặc định im lặng."""
+# ── khung hỏi (wizard một cột, không phải log thô) ───────────────────────────────────────
+# Đây là thứ ĐẦU TIÊN người mới thấy sau curl|bash. Log thô trông như tràn lỗi; một cột
+# ┌ │ └ tách câu hỏi khỏi gợi ý thì đọc được ngay cả khi terminal đang cuộn nhanh.
+_D, _C, _G, _B, _R = "\033[2m", "\033[36m", "\033[32m", "\033[1m", "\033[0m"
+
+
+def _w(tty, text: str) -> None:
+    try:
+        tty.write(text); tty.flush()
+    except Exception:
+        pass
+
+
+def _open(tty, title: str) -> None:
+    _w(tty, f"\n{_D}┌{_R}  {_B}{title}{_R}\n{_D}│{_R}\n")
+
+
+def _note(tty, text: str) -> None:
+    _w(tty, f"{_D}│{_R}  {_D}{text}{_R}\n")
+
+
+def _close(tty, text: str) -> None:
+    _w(tty, f"{_D}│{_R}\n{_D}└{_R}  {text}\n\n")
+
+
+def _ask(prompt: str, default, tty, hint: str = ""):
+    """Hỏi một câu qua /dev/tty trong khung. Enter = giữ mặc định. Không có tty → mặc định im lặng."""
     if tty is None:
         return default
     try:
-        tty.write(f"  {prompt} [{default}]: ")
-        tty.flush()
+        _w(tty, f"{_D}│{_R}\n{_C}◇{_R}  {prompt}\n")
+        if hint:
+            _w(tty, f"{_D}│{_R}  {_D}{hint}{_R}\n")
+        _w(tty, f"{_D}│{_R}  {_C}›{_R} {_D}[{default}]{_R} ")
         line = tty.readline().strip()
         return default if not line else line
     except Exception:
         return default
+
+
+def _ask_yes(prompt: str, tty, hint: str = "") -> bool:
+    """Câu Có/Không, MẶC ĐỊNH KHÔNG — Enter là thoát, không ép ai đi hết một route hỏi đáp."""
+    if tty is None:
+        return False
+    try:
+        _w(tty, f"{_D}│{_R}\n{_C}◆{_R}  {prompt}\n")
+        if hint:
+            _w(tty, f"{_D}│{_R}  {_D}{hint}{_R}\n")
+        _w(tty, f"{_D}│{_R}  {_C}›{_R} {_D}[Enter = không]{_R} ")
+        return tty.readline().strip().lower() in ("y", "yes", "c", "co", "có", "1")
+    except Exception:
+        return False
 
 
 def configure(root: Path, if_tty: bool = False) -> int:
@@ -297,28 +345,36 @@ def configure(root: Path, if_tty: bool = False) -> int:
 def configure_with(root: Path, tty) -> int:
     """Phần hỏi thuần — nhận tty đã mở, nên self-test bơm được tty giả.
 
-    Tách khỏi `configure()` vì test qua pty thật bị echo terminal làm nhiễu: đo được lần
-    trước là 6/7 câu đúng còn câu cuối đọc nhầm echo. Một cổng chỉ đúng trên máy này mà
-    không khoá được bằng test thì không phải cổng.
+    Tách khỏi `configure()` vì test qua pty thật bị echo terminal làm nhiễu: đo được lần trước
+    là 6/7 câu đúng còn câu cuối đọc nhầm echo. Cổng chỉ đúng trên một máy thì không phải cổng.
+
+    Câu ĐẦU TIÊN là Có/Không, mặc định KHÔNG: phần lớn người cài chỉ muốn xong việc; ép trả lời
+    9 câu về trần trước khi dùng được là thu phí sai chỗ. Chọn không → giữ mặc định, KHÔNG ghi
+    file (verified vẫn false), in đúng một dòng cách chỉnh sau.
     """
     cfg = load_config(root)
     b = dict(cfg.get("budgets") or {})
     obs = observed(root)
 
-    out = tty if tty else sys.stdout
-    out.write("\n  ── Trần chi phí & độ phức tạp (spec §5) ──\n")
+    _open(tty, "overstack · trần phiên & độ phức tạp")
     if obs:
-        out.write(f"  Đo được trên máy này: {obs['sessions']} phiên · nặng nhất "
-                  f"{obs['tokens']:,} token · ~${obs['usd']:.2f} · {obs['turns']} lượt\n")
-        out.write("  Gợi ý dưới đây = ~2× phiên nặng nhất (đủ chỗ thở, vẫn bắt được ca bất thường).\n")
+        _note(tty, f"Đo trên máy này: {obs['sessions']} phiên · nặng nhất {obs['tokens']:,} token "
+                   f"· {obs['turns']} lượt · ~${obs['usd']:.2f}")
+        _note(tty, "Gợi ý bên dưới = ~2× phiên nặng nhất (đủ chỗ thở, vẫn bắt được ca bất thường).")
     else:
-        out.write("  Chưa có dữ liệu đo — số dưới đây là mặc định, chỉnh lại sau khi chạy vài phiên.\n")
-    out.write("  Enter = giữ nguyên. Ctrl-C = bỏ qua, dùng mặc định.\n\n")
-    out.flush()
+        _note(tty, "Chưa có dữ liệu đo — mặc định là số ĐOÁN, chỉnh lại sau khi chạy vài phiên.")
+    _note(tty, "Vượt trần → tự bàn giao sang phiên mới (session-continue), không mất việc.")
+
+    if not _ask_yes("Tự đặt trần bây giờ?", tty,
+                    "Enter = dùng mặc định, xong luôn · y = đặt 8 thông số"):
+        _close(tty, f"{_G}✓{_R} giữ mặc định "
+                    f"{_D}(chỉnh sau: python3 harness/scripts/token-budget.py configure){_R}")
+        if tty is not None and hasattr(tty, "close"):
+            tty.close()
+        return 0
 
     # Có số đo → gợi ý bám ĐO THẬT (2×). KHÔNG lấy max() với mặc định: mặc định là số đoán,
     # kẹp sàn theo nó thì trần luôn ≥ số đoán và chẳng bao giờ cắn — đúng cái bệnh đang chữa.
-    # Chưa có số đo → mới dùng mặc định. Người dùng vẫn gõ đè được mọi giá trị.
     sug_tok = int(obs["tokens"] * 2) if obs.get("tokens") else b.get("per_session_tokens", 2_000_000)
     sug_usd = round(obs["usd"] * 2, 2) if obs.get("usd") else b.get("per_task_usd", 5.0)
     sug_call = int(obs["turns"] * 2) if obs.get("turns") else b.get("per_session_model_calls", 500)
@@ -326,31 +382,30 @@ def configure_with(root: Path, tty) -> int:
 
     try:
         b["per_session_tokens"] = int(str(_ask("max tokens / phiên", sug_tok, tty)).replace(",", "").replace("_", ""))
-        b["per_task_usd"] = float(_ask("max chi phí USD / task", sug_usd, tty))
+        b["per_task_usd"] = float(_ask("max chi phí USD / task", sug_usd, tty,
+                                       "gói subscription: số này chỉ để xem — mặc định KHÔNG kích hoạt bàn giao"))
         b["per_session_model_calls"] = int(_ask("max model calls / phiên", sug_call, tty))
         b["per_workflow_subagents"] = int(_ask("max sub-agents / workflow", b.get("per_workflow_subagents", 16), tty))
         b["max_concurrent_workers"] = int(_ask("max worker song song", b.get("max_concurrent_workers", 8), tty))
         b["per_session_graph_writes"] = int(_ask("max graph writes / phiên", b.get("per_session_graph_writes", 200), tty))
         b["per_session_tool_calls"] = int(_ask("max tool calls / phiên", sug_tool, tty))
         # SÀN dưới, không phải trần trên: 0 = tắt. Ép cổng chốt phải có N bằng chứng.
-        b["min_evidence"] = int(_ask("tối thiểu bao nhiêu bằng chứng để CHỐT (0 = tắt)",
-                                     b.get("min_evidence", 0), tty))
-        mode = str(_ask("vượt trần thì CHẶN hay chỉ cảnh báo? (block/warn)",
-                        cfg.get("mode", "warn"), tty)).strip().lower()
+        b["min_evidence"] = int(_ask("tối thiểu bao nhiêu bằng chứng để CHỐT", b.get("min_evidence", 0), tty, "0 = tắt"))
+        mode = str(_ask("vượt trần thì CHẶN hay chỉ cảnh báo?", cfg.get("mode", "warn"), tty,
+                        "block | warn — chỉ đổi hành vi lệnh `check` gõ tay; bàn giao tự động chạy độc lập")
+                   ).strip().lower()
         mode = mode if mode in ("block", "warn") else "warn"
     except (KeyboardInterrupt, EOFError, ValueError):
-        out.write("\n  bỏ qua — giữ trần mặc định (mode: warn)\n")
-        out.flush()
+        _close(tty, f"{_D}bỏ qua — giữ trần mặc định (mode: warn){_R}")
         return 0
 
-    # verified chỉ bật khi người dùng THỰC SỰ chọn block: đó là chữ ký xác nhận "tôi đã
-    # xem và chấp nhận những con số này", không phải một cờ tự bật.
+    # verified chỉ bật khi người dùng THỰC SỰ chọn block: chữ ký "tôi đã xem và chấp nhận
+    # những con số này", không phải một cờ tự bật.
     write_config(root, b, mode, verified=(mode == "block"))
-    out.write(f"\n  ✓ ghi harness/token-budget.config.yaml  (mode: {mode}"
-              + (", ĐANG CHẶN thật" if mode == "block" else ", chỉ cảnh báo") + ")\n")
-    out.write("    đổi sau: python3 harness/scripts/token-budget.py configure\n\n")
-    out.flush()
-    if tty:
+    _close(tty, f"{_G}✓{_R} ghi harness/token-budget.config.yaml  "
+                f"{_D}(mode: {mode}{', ĐANG CHẶN thật' if mode == 'block' else ', chỉ cảnh báo'}"
+                f" · đổi sau: token-budget.py configure){_R}")
+    if tty is not None and hasattr(tty, "close"):
         tty.close()
     return 0
 

@@ -255,16 +255,17 @@
     },
     "doyourmagic": {
       "files": {
-        "SKILL.md": "40f61cb79b31c9f83d1cb19c30626904b1a91395f1d77411a1bb0c9ba4195203",
-        "references/example-impeccable/01-install-and-init.md": "28b5d6af2adf1df018268896914c2805a098bc65041ae6abf4768b83f79fb0ad",
-        "references/example-impeccable/02-use-design-commands.md": "2faec5c4f29d53288a6526f3ecf24d458aa2d90f3aa323a6907d0ccdaf987518",
-        "references/example-impeccable/03-cli-anti-pattern-scan.md": "dfa8d6847eed1ee217ab0a571b503710e9639d1623705b0eeabd9ef47fab270b",
-        "references/example-impeccable/04-manage-detector-ignores.md": "02720e019855b56082ed7fc477974da92f428bca4be2539b64c6ed6dd8278dc7",
-        "references/example-impeccable/05-ci-integration.md": "ca3d6a131c66967232313bfc162e115fa75c8bfa4de04da92bc331da0044004c",
-        "references/example-impeccable/06-keep-impeccable-updated.md": "2ef7c2564805d071274491e942f1619f028d85ee036978d85225d62f6f34f985",
-        "references/example-impeccable/07-contributor-build-and-test.md": "998f833c4412da74d5c193d8837ccf499a10e005243353e68ee17e98a8a0e0e2",
-        "references/example-impeccable/index.html": "8803ab80eb0daf2eff653701b66b410f24483947515e853bff1818e40c218dc6",
-        "references/example-impeccable/workflows.md": "8e0bc56040145fb4c1188a3159e4aae73e9a1e9e756f4df4ae560ab9b649b2ca"
+        "SKILL.md": "5b6f90af16893142b71590201bc9932c9cccc597154f7e81f96123cfdc5c10a1",
+        "references/example-setup/README.md": "4e57706dd1482b4e00cbdab05733acfac804f05dbc2a9880c02e9887a439faf3",
+        "references/example-setup/flow.html": "c9ab2767f0d7d53245d4d7bd250f9c82048a7f20555b831631368afa6232c038",
+        "references/example-setup/skills/dym-setup-agent-workflow.skill.md": "eb01c642a819ae2b445b2ac8553d0c7c2e5d39d43a20fc6f1b4709ca974a01bf",
+        "references/example-setup/skills/dym-setup-ci.skill.md": "bf7eee983647dcc1c9098ce993d4526f1c72a3fdca92fe29aa6b29206e205390",
+        "references/example-setup/skills/dym-setup-contributor.skill.md": "8cd794b76e481356fd706ca55836bb84af1d00ef25f084005f5744ea126d24e3",
+        "references/example-setup/skills/dym-setup-guardrail-cli.skill.md": "b100769b445d408f3fd92a62543fc045ca3fc704044149be53bd0e37db327ba9",
+        "references/example-setup/skills/dym-setup-install.skill.md": "cbf8d591b41c7ae70800510a59fd80801af8fe5b34c71a6f8a4685b00f627f42",
+        "references/example-setup/skills/dym-setup-maintain.skill.md": "58d1e04c2be5bee86e3d36ca791d282caa707a6c2c9b7ebda1a4adf51bbed876",
+        "references/example-setup/skills/dym-setup.skill.md": "983323d222e1853657c7e0a4b27862dc56a2c009c7d9818b20a9dc10255aa28a",
+        "references/example-setup/workflows.md": "e9e1c6ae964c2b8d158683ad808de423c24ca7bd675f44d2167509fa477f632f"
       },
       "recorded": "2026-09-07",
       "source": "local-authored"

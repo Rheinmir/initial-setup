@@ -65,6 +65,7 @@
 | [010726-council-output](draft/orca/010726-council-output.md) | auto |  |
 | [adapt-modes-pick](sources/evals/adapt-modes-pick.md) | eval | Golden: adapt-modes-pick |
 | [capproof-liveness](sources/evals/capproof-liveness.md) | eval | Golden: capproof-liveness |
+| [map-not-territory](concepts/map-not-territory.md) | concept | map-not-territory — tìm unknowns trước khi prompt |
 <!-- index:auto:end -->
 | [harness-local](concepts/harness-local.md) | concept | harness-local — harness RIÊNG của dự án |
 | [ADR-011-project-local-harness](sources/adr/ADR-011-project-local-harness.md) | source | "ADR-011: project-local harness — dự án tự phát triển rule riêng (P-namespace, sandbox-safe)" |

@@ -9,7 +9,7 @@ import subprocess
 import sys
 import time
 
-from hooklib import audit, code_log, find_validators, project_dir, read_payload, resolve_tool, run_validator
+from hooklib import audit, code_log, find_validators, project_dir, read_payload, resolve_tool, run_validator, scope_config
 
 
 # file code (đa ngôn ngữ) trong git-status → trigger regen phần code-graph của wiki-graph.
@@ -62,29 +62,9 @@ def _debounced(root: str, key: str, require_ok: bool = False) -> bool:
 
 
 def _scope_config(root: str):
-    """GH#49: khai báo scope index TƯỜNG MINH qua .overstack.yaml tại root dự án — thay vì
-    ngầm-định code-root=repo-root. Parser tối giản (không thêm dep pyyaml), chỉ 2 khoá scalar:
-        wiki_dir: llmwiki/wiki        # wiki chính để dựng graph
-        code_root: src               # vùng code để index (relocate/thu hẹp được)
-    Fallback = hành vi cũ (llmwiki/wiki + '.') nếu thiếu file/khoá → KHÔNG hồi quy. Fail-open."""
-    wiki_dir, code_root = "llmwiki/wiki", "."
-    cfg = os.path.join(root, ".overstack.yaml")
-    if not os.path.isfile(cfg):
-        return wiki_dir, code_root
-    try:
-        for ln in open(cfg, encoding="utf-8"):
-            ln = ln.split("#", 1)[0].rstrip()
-            if ":" not in ln:
-                continue
-            k, v = ln.split(":", 1)
-            k, v = k.strip(), v.strip().strip("'\"")
-            if k == "wiki_dir" and v:
-                wiki_dir = v
-            elif k == "code_root" and v:
-                code_root = v
-    except Exception:
-        pass  # config hỏng → dùng mặc định, không chặn phiên
-    return wiki_dir, code_root
+    """GH#49 — MỘT nguồn: hooklib.scope_config(). Fallback = hành vi cũ (llmwiki/wiki + '.')."""
+    c = scope_config(root)
+    return c["wiki_dir"] or "llmwiki/wiki", c["code_root"] or "."
 
 
 def regen_docs(root: str) -> None:
@@ -329,9 +309,11 @@ def all_wiki_dirs(root: str):
     biết "có wiki hay không". Auto-index + R3 ở Stop thì phải soi cùng tập wiki như CI (GH#76).
     """
     out = []
-    for cand in (pathlib.Path(root) / "fdk" / "wiki", pathlib.Path(root) / "wiki",
-                 pathlib.Path(root) / "llmwiki" / "wiki"):
-        if cand.is_dir():
+    declared = scope_config(root)["wiki_dir"]          # GH#49: wiki relocate qua .overstack.yaml
+    for cand in ([pathlib.Path(root) / declared] if declared else []) + [
+            pathlib.Path(root) / "fdk" / "wiki", pathlib.Path(root) / "wiki",
+            pathlib.Path(root) / "llmwiki" / "wiki"]:
+        if cand.is_dir() and cand not in out:
             out.append(cand)
     return out
 

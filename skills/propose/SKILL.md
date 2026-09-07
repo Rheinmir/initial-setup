@@ -21,6 +21,7 @@ Lý do tách (đối chiếu `obra/superpowers`, tỷ lệ spec:plan ≈ 1:8 —
 
 ## Steps
 0. **Force-query wiki TRƯỚC khi draft** — query/đọc wiki (`concepts/`, `entities/`, `sources/adr/`, `decisions.md`) tìm concept/ADR/quyết định liên quan; tóm tắt vào `## Context` của draft + cite `[[wikilink]]`/path. KHÔNG propose "mù" (R7-f chặn draft thiếu `## Context` có nội dung).
+0b. **Tìm unknowns TRƯỚC khi draft** (map ≠ territory, GH#40 — xem `fdk/wiki/concepts/map-not-territory.md`): model càng mạnh càng lấp chỗ mơ hồ bằng câu trả lời tự tin. Trước khi viết một dòng SPEC, liệt kê ngắn "để làm đúng việc này tôi CHƯA biết gì?" — soi 5 chỗ bản đồ hay nói dối: (a) ý định ngầm của người yêu cầu, (b) quy ước tribal không có trong wiki hay `CLAUDE.md`, (c) hình dạng dữ liệu thật (schema, sample, biên), (d) môi trường chạy (version, env, quyền), (e) thứ đã đổi kể từ lần wiki được viết. Mỗi unknown đi vào đúng tầng của `## Assumptions` bên dưới: fact → tra; decision rủi ro thấp → `(default)`; cần kiểm lại → `(default, find-out-later → unknown-ledger)`; hỏng-kiến-trúc-nếu-sai → `[CẦN LÀM RÕ]`. Không có unknown nào là dấu hiệu chưa tìm, không phải dấu hiệu đã hiểu.
 1. Restate request in one sentence to confirm understanding.
 2. List every existing file, function, or module affected or must change.
 3. List every existing feature or behaviour that could break as side effect.

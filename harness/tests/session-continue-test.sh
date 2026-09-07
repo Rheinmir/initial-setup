@@ -12,19 +12,20 @@ mkdir -p "$TMP/llmwiki/wiki" "$TMP/harness/metrics" "$TMP/.claude"
 cp -R "$ROOT/llmwiki/.claude/hooks" "$TMP/.claude/hooks"; cp -R "$ROOT/harness/scripts" "$TMP/harness/scripts"
 cp "$ROOT/harness/token-budget.config.yaml" "$TMP/harness/"
 git -C "$TMP" -c init.defaultBranch=main init -q
-# phiên "s-over": 12 lượt, $6 — vượt per_task_usd 5.0 mặc định
-printf '{"s-over":{"session":"s-over","turns":12,"tokens":{"input_tokens":100,"output_tokens":100},"cost_usd":6.0},"s-ok":{"session":"s-ok","turns":2,"tokens":{"input_tokens":50,"output_tokens":50},"cost_usd":0.1}}' > "$TMP/harness/metrics/cost-by-session.json"
+# phiên "s-over": 600 lượt — vượt per_session_model_calls 500 mặc định ($6 KHÔNG đủ kích hoạt: trần $ tạm tắt)
+printf '{"s-over":{"session":"s-over","turns":600,"tokens":{"input_tokens":100,"output_tokens":100},"cost_usd":6.0},"s-usd":{"session":"s-usd","turns":12,"tokens":{"input_tokens":100,"output_tokens":100},"cost_usd":60.0},"s-ok":{"session":"s-ok","turns":2,"tokens":{"input_tokens":50,"output_tokens":50},"cost_usd":0.1}}' > "$TMP/harness/metrics/cost-by-session.json"
 printf '{"type":"user","message":{"content":"sửa nốt validator"}}\n' > "$TMP/t.jsonl"
 run_hook(){ printf '{"session_id":"%s","transcript_path":"%s","prompt":"%s","cwd":"%s"}' "$1" "$TMP/t.jsonl" "$2" "$TMP" \
   | CLAUDE_PROJECT_DIR="$TMP" OVERSTACK_HANDOVER_DRY_RUN=1 python3 "$TMP/.claude/hooks/user_prompt_submit.py" >/tmp/sc-out 2>/tmp/sc-err; echo $?; }
 rc=$(run_hook s-ok "làm việc A"); [ "$rc" = 0 ] && echo "  ✓ dưới trần → prompt đi tiếp (rc=0)" || { echo "  ✗ dưới trần bị chặn rc=$rc"; cat /tmp/sc-err; exit 1; }
+rc=$(run_hook s-usd "làm việc B"); [ "$rc" = 0 ] && echo "  ✓ chỉ vượt \$ (60 > 5) → KHÔNG chặn (trần \$ tạm tắt)" || { echo "  ✗ trần \$ vẫn chặn rc=$rc"; cat /tmp/sc-err; exit 1; }
 rc=$(run_hook s-over "prompt bị chặn X")
 [ "$rc" = 2 ] && echo "  ✓ vượt trần → chặn prompt (rc=2)" || { echo "  ✗ vượt trần nhưng rc=$rc"; cat /tmp/sc-err; exit 1; }
 grep -q '"decision": "block"' /tmp/sc-out && echo "  ✓ stdout có JSON decision:block (OpenClaude)" || { echo "  ✗ thiếu JSON block"; exit 1; }
 grep -q "session-continue" /tmp/sc-err && echo "  ✓ stderr nêu lý do + nơi bàn giao (Claude Code)" || { echo "  ✗ stderr trống"; exit 1; }
 HF=$(ls "$TMP"/llmwiki/handover/*-s-over-continue.md 2>/dev/null | head -1)
 [ -n "$HF" ] && echo "  ✓ file bàn giao: $(basename "$HF")" || { echo "  ✗ không có file bàn giao"; ls -R "$TMP/llmwiki"; exit 1; }
-for k in "prompt bị chặn X" "Chỉ dẫn cho phiên này" "dữ liệu lịch sử" "git status"; do grep -q "$k" "$HF" && echo "  ✓ bàn giao có: $k" || { echo "  ✗ bàn giao thiếu: $k"; exit 1; }; done
+for k in "Last user prompt: prompt bị chặn X" "Read the complete original session transcript" "$TMP/t.jsonl" "historical reference data" "git status" "Briefly state where the previous session stopped"; do grep -q "$k" "$HF" && echo "  ✓ bàn giao có: $k" || { echo "  ✗ bàn giao thiếu: $k"; exit 1; }; done
 rc=$(run_hook s-over "prompt thứ hai"); n=$(ls "$TMP"/llmwiki/handover/*-continue.md | wc -l | tr -d ' ')
 [ "$rc" = 2 ] && [ "$n" = 1 ] && echo "  ✓ prompt kế cùng phiên: vẫn chặn, KHÔNG mở phiên/ghi file thứ hai" || { echo "  ✗ lặp: rc=$rc files=$n"; exit 1; }
 printf '\n\033[1m═══ session-continue: \033[1;32mPASS\033[0m\033[0m\n'

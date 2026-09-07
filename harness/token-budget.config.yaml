@@ -24,6 +24,17 @@ budgets:
   per_session_tool_calls: 2000    # ASSUMPTION (not verified) — spec §5 max tool calls
   min_evidence: 0                 # SÀN dưới (spec §5): 0 = tắt; >0 ép verdict chốt phải có N bằng chứng   # ASSUMPTION (not verified) — 200 graph writes/session is a guess
 
+# "Continue in new session" TỰ ĐỘNG (harness/scripts/session-continue.py, hook UserPromptSubmit):
+# vượt HOẶC đoán sẽ vượt (current + 1 lượt trung bình ≥ cap, hay ≥ threshold) một trong
+# per_session_tokens / per_task_usd / per_session_model_calls → chặn prompt, ghi bàn giao
+# <overstack>/handover/DDMMYY-<sid>-continue.md (cấu trúc như Orca "Continue in new session"),
+# mở terminal mới cùng worktree với cùng agent qua `orca` (không có orca → in lệnh chạy tay).
+# Đây là chỗ DUY NHẤT trần được thi hành — `mode: block` phía trên chỉ ảnh hưởng lệnh `check` tay.
+auto_handover:
+  enabled: true
+  threshold: 0.85                 # ASSUMPTION (not verified) — 85% là ngưỡng "sắp vượt" đoán
+  agent: auto                     # auto | claude | openclaude
+
 # $ per 1K tokens. Provider numbers drift — treat as a guess, reconcile against real billing.
 rates:                            # ASSUMPTION (not verified) — illustrative; update from the provider price page
   default:  {input: 0.003,  output: 0.015}

@@ -13,10 +13,11 @@ Fail-open tuyệt đối: lỗi gì cũng exit 0, không bao giờ chặn prompt
 """
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
-from hooklib import audit, find_wiki_dir, project_dir, read_payload
+from hooklib import audit, find_wiki_dir, project_dir, read_payload, resolve_tool
 
 EVERY = int(os.environ.get("LLMWIKI_DOCS_GATE_EVERY", "5") or "5")
 DOCS_TOKENS = ("docs-site-macos", "orca-workflow")           # trụ TÀI LIỆU đang được duy trì?
@@ -103,6 +104,26 @@ def main() -> None:
         sys.exit(0)  # không phải project llmwiki → bỏ qua
 
     sid = payload.get("session_id") or "default"
+
+    # Trần token-budget → "continue in new session" TỰ ĐỘNG (session-continue.py). Chạy TRƯỚC docs-gate:
+    # vượt/sắp vượt trần thì prompt này bị chặn, bàn giao đã ghi + phiên mới đã mở — tiếp ở đó.
+    # Trước đây `check` của token-budget không hook nào gọi → mode:block là một chữ trong file.
+    sc = resolve_tool(str(root), "harness/scripts/session-continue.py")
+    if sc:
+        try:
+            p = subprocess.run([sys.executable, sc, "run", sid, "--root", str(root),
+                                "--transcript", payload.get("transcript_path", "") or "",
+                                "--prompt", payload.get("prompt", "") or ""],
+                               cwd=str(root), capture_output=True, text=True, timeout=150)
+            if p.returncode == 2:
+                sys.stdout.write(p.stdout)      # OpenClaude: {"decision":"block"} · Claude Code: exit 2 + stderr
+                sys.stderr.write(p.stderr)
+                sys.exit(2)
+        except SystemExit:
+            raise
+        except Exception:
+            pass                                # fail-open: cơ chế bảo vệ phiên không được phá phiên
+
     state = root / ".claude" / "audit" / ".docs-gate.json"
     state.parent.mkdir(parents=True, exist_ok=True)
 

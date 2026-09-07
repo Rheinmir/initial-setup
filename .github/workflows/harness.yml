@@ -157,6 +157,8 @@ jobs:
         run: bash harness/tests/wiki-sync-flags-failopen-test.sh .
       - name: wikigraph-single-source — wiki-graph.py và build-wiki-graph.py không được lệch cạnh
         run: bash harness/tests/wikigraph-single-source-test.sh .
+      - name: session-continue — trần token-budget → bàn giao + phiên mới tự động (hook UserPromptSubmit)
+        run: bash harness/tests/session-continue-test.sh .
       - name: scope-config — .overstack.yaml (wiki_dir + code_root) một nguồn cho mọi hook, GH#49
         run: bash harness/tests/scope-config-test.sh .
       - name: stop-hook-all-wikis — Stop auto-index + R3 soi MỌI wiki (fdk/wiki + llmwiki/wiki), GH#76

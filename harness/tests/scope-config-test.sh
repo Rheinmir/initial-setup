@@ -20,6 +20,10 @@ with tempfile.TemporaryDirectory() as t:
     # 1. thiếu file → mặc định cũ
     c = hl.scope_config(str(t)); check(c == {"wiki_dir": None, "code_root": None}, "thiếu .overstack.yaml → không khoá nào (mặc định cũ)")
     check(hl.find_wiki_dir(str(t)) == t / "llmwiki/wiki", "find_wiki_dir mặc định = llmwiki/wiki")
+    # 1b. layout dot downstream: .llmwiki/wiki phải được nhận (không có thì mọi hook global thoát sớm)
+    t2 = pathlib.Path(tempfile.mkdtemp()); (t2 / ".llmwiki/wiki").mkdir(parents=True)
+    check(hl.find_wiki_dir(str(t2)) == t2 / ".llmwiki/wiki", "find_wiki_dir nhận .llmwiki/wiki (layout dot)")
+    check(stop.all_wiki_dirs(str(t2)) == [t2 / ".llmwiki/wiki"], "stop.all_wiki_dirs nhận .llmwiki/wiki")
     # 2. khai wiki_dir + code_root → relocate
     (t / ".overstack.yaml").write_text("# scope\nwiki_dir: docs/kb   # relocate\ncode_root: 'src'\n", encoding="utf-8")
     c = hl.scope_config(str(t)); check(c == {"wiki_dir": "docs/kb", "code_root": "src"}, f"parse 2 khoá (bỏ comment, bỏ quote): {c}")

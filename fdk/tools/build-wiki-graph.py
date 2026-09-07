@@ -766,7 +766,57 @@ window.addEventListener('resize',function(){{clearTimeout(window.__t);window.__t
 </script></body></html>"""
 
 
+def _repo_rel(p: Path) -> str:
+    """Đường hiển thị ở footer: TƯƠNG ĐỐI theo repo, không phải tuyệt đối theo máy.
+
+    R16 đòi người xem biết file nằm ĐÂU — `llmwiki/html/wiki-graph.html` trả lời đủ.
+    Đường tuyệt đối trả lời thừa (máy nào) và làm artifact ĐÃ COMMIT drift theo từng
+    worktree: mỗi phiên regen ở worktree của nó lại đổi footer một dòng. Đo 2026-09-07
+    trên orca: 5 artifact mang 11 path tuyệt đối — fdk-problem-tree.html gom 6 path từ
+    6 worktree khác nhau (cộng dồn, không thay thế), overstack.html trỏ vào một
+    scratchpad đã bị xoá.
+    """
+    root = p
+    while root.parent != root and not (root / ".git").exists():
+        root = root.parent
+    if not (root / ".git").exists():
+        return p.name          # ngoài repo: relative_to("/") vẫn rò nguyên cây thư mục
+    try:
+        return p.relative_to(root).as_posix()
+    except ValueError:
+        return p.name
+
+
+def _self_test() -> int:
+    """Khoá luật: footer KHÔNG được mang đường dẫn tuyệt đối (xem _repo_rel)."""
+    import tempfile
+    ok = True
+
+    def check(name, cond):
+        nonlocal ok
+        print(f"  [{'OK ' if cond else 'FAIL'}] {name}")
+        ok = ok and cond
+
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td) / "repo"
+        (root / ".git").mkdir(parents=True)
+        (root / "llmwiki" / "html").mkdir(parents=True)
+        f = root / "llmwiki" / "html" / "wiki-graph.html"
+        f.write_text("x", encoding="utf-8")
+        check("trong repo → tương đối", _repo_rel(f) == "llmwiki/html/wiki-graph.html")
+        check("không rò đường tuyệt đối", not _repo_rel(f).startswith("/"))
+
+        outside = Path(td) / "loose.html"
+        outside.write_text("x", encoding="utf-8")
+        check("ngoài repo → fallback tên file", _repo_rel(outside) in ("loose.html", "loose.html"))
+
+    print("SELF-TEST: " + ("ALL PASS" if ok else "CÓ LỖI"))
+    return 0 if ok else 1
+
+
 def main() -> None:
+    if "--self-test" in sys.argv:      # trước parse: primary là positional bắt buộc
+        sys.exit(_self_test())
     ap = argparse.ArgumentParser()
     ap.add_argument("primary", help="wiki dir chính (mặc định sáng)")
     ap.add_argument("--also", nargs="*", default=[], help="wiki dir phụ (hiện mờ)")
@@ -814,7 +864,7 @@ def main() -> None:
     out = Path(a.out).resolve() if a.out else Path("llmwiki/html").resolve() / default_name
     out.parent.mkdir(parents=True, exist_ok=True)
     render = build_static if a.static else build_html
-    out.write_text(render(ptag, str(out), nodes, edges, ledger, stale), encoding="utf-8")
+    out.write_text(render(ptag, _repo_rel(out), nodes, edges, ledger, stale), encoding="utf-8")
     if a.json:                     # dump nodes/edges thô cho eval/scoring (cùng dữ liệu graph vừa vẽ)
         Path(a.json).resolve().write_text(
             json.dumps({"nodes": nodes, "edges": edges,

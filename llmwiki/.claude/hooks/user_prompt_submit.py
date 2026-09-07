@@ -20,6 +20,7 @@ from pathlib import Path
 from hooklib import audit, find_wiki_dir, project_dir, read_payload, resolve_tool
 
 EVERY = int(os.environ.get("LLMWIKI_DOCS_GATE_EVERY", "5") or "5")
+REPORT_EVERY = int(os.environ.get("OVERSTACK_SELF_REPORT_EVERY", "50") or "50")   # tự chấm hệ mỗi N lượt
 DOCS_TOKENS = ("docs-site-macos", "orca-workflow")           # trụ TÀI LIỆU đang được duy trì?
 EVAL_TOKENS = ("wikieval", "trace-grader", "council")        # trụ ĐÁNH GIÁ/eval có được đụng tới?
 
@@ -123,6 +124,32 @@ def main() -> None:
             raise
         except Exception:
             pass                                # fail-open: cơ chế bảo vệ phiên không được phá phiên
+
+    # ── Tự chấm hệ mỗi N lượt (mặc định 50) — self-report đọc CÁC SỔ ĐÃ CÓ, 0 token.
+    # Phần CHẤM chạy đồng bộ (local, nhanh); phần RAISE ISSUE về repo mẹ chạy NỀN (Popen tách
+    # phiên) vì nó gọi mạng qua `gh` — không được để prompt của user đứng chờ GitHub.
+    try:
+        n_rep = load_count(root / ".claude" / "audit" / ".self-report.json", sid) + 1
+        save_count(root / ".claude" / "audit" / ".self-report.json", sid, n_rep)
+        sr = resolve_tool(str(root), "harness/scripts/self-report.py")
+        if sr and REPORT_EVERY > 0 and n_rep % REPORT_EVERY == 0:
+            p = subprocess.run([sys.executable, sr, "--root", str(root), "--json"],
+                               capture_output=True, text=True, timeout=90)
+            data = json.loads(p.stdout or "{}")
+            fs = data.get("findings") or []
+            if fs:
+                head = "\n".join(f"  [{f['severity']}] {f['title']} — {f['evidence']}" for f in fs[:3])
+                emit(f"[self-report] Đã {n_rep} lượt. Hệ tự chấm từ số đo trong sổ và thấy "
+                     f"{len(fs)} vấn đề:\n{head}\n  Sửa: xem `python3 harness/scripts/self-report.py --report`. "
+                     f"Vấn đề mức high/medium sẽ được raise về repo mẹ (dedupe + cooldown 7 ngày).")
+                subprocess.Popen([sys.executable, sr, "--root", str(root), "--raise"],
+                                 cwd=str(root), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                 start_new_session=True)
+                sys.exit(0)      # đã nói phần quan trọng nhất lượt này; đừng chồng thêm docs-gate
+    except SystemExit:
+        raise
+    except Exception:
+        pass                     # fail-open: cơ chế tự chấm không được phá prompt
 
     state = root / ".claude" / "audit" / ".docs-gate.json"
     state.parent.mkdir(parents=True, exist_ok=True)

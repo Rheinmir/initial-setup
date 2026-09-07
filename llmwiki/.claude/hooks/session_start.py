@@ -169,6 +169,65 @@ def orient(root: Path) -> None:
         pass
 
 
+def recall(root: Path, sid: str = "") -> None:
+    """Đầu phiên: in CHUỖI vài phiên gần nhất (mem-rank chain) vào context.
+
+    Đây là mắt xích đã thiếu của tầng memory: Stop-hook GHI episode mỗi phiên có sửa thật, nhưng
+    trước bản này KHÔNG AI ĐỌC LẠI — `mem-rank retrieve/chain` không có caller runtime nào, nên
+    store chỉ để đó (đo 2026-09-07: memory.jsonl 0 dòng ở repo, không hook nào gọi retrieve).
+    Ghi mà không đọc thì không phải trí nhớ, chỉ là log. Ở đây đọc chuỗi mới→cũ có PARENT nên
+    agent thấy "phiên trước làm gì, tiếp phiên nào", không phải một đống episode rời.
+
+    Rẻ và tất định: đọc một file JSONL, in tối đa 3 dòng, 0 token LLM. Fail-open tuyệt đối.
+    """
+    try:
+        mr = resolve_tool(str(root), "harness/scripts/mem-rank.py")
+        if not mr:
+            return
+        out = subprocess.run([sys.executable, str(mr), "chain", "--root", str(root), "--json"],
+                             capture_output=True, text=True, timeout=10)
+        rows = json.loads(out.stdout or "[]")
+        lines = []
+        for m in rows[:3]:
+            # KHÔNG đặt tên `sid` ở đây: nó sẽ đè tham số sid (session của phiên HIỆN TẠI) và
+            # biên lai okf-scan bên dưới bị ghi nhầm sang phiên cũ. Bug thật, bắt bằng test.
+            esid = (m.get("session") or "?")[:8]
+            did = (m.get("did") or m.get("text") or "").strip().splitlines()[0][:90]
+            files = ", ".join((m.get("files") or [])[:3])
+            lines.append(f"  • {esid} ({m.get('ts', '')[:10]}) — {did}" + (f"  [{files}]" if files else ""))
+        more = f"  … còn {len(rows) - 3} phiên nữa: `mem-rank.py chain`" if len(rows) > 3 else ""
+        # Quét OKF THẬT (wiki + memory) và để lại BIÊN LAI: có bằng chứng việc quét đã chạy,
+        # và Stop-hook sẽ đối chiếu transcript xem agent có MỞ những mục này không (okf-scan
+        # verify). "Agent bảo đã đọc wiki" không phải bằng chứng; biên lai + coverage thì có.
+        scan_line = ""
+        try:
+            ok_tool = resolve_tool(str(root), "harness/scripts/okf-scan.py")
+            if ok_tool:
+                # Chưa có episode nào (dự án mới) thì vẫn quét — dùng nhánh git làm truy vấn.
+                q = " ".join((rows[0].get("did") or "").split()[:8]) if rows else ""
+                if not q:
+                    q = subprocess.run(["git", "branch", "--show-current"], cwd=str(root),
+                                       capture_output=True, text=True, timeout=5).stdout.strip().replace("-", " ") or "context"
+                sc = subprocess.run([sys.executable, str(ok_tool), "query", q, "--root", str(root),
+                                     "--session", sid, "--k", "4", "--json"],
+                                    capture_output=True, text=True, timeout=12)
+                rec = json.loads(sc.stdout or "{}")
+                if rec.get("hits"):
+                    scan_line = ("\n  Quét OKF (" + str(rec.get("scanned", 0)) + " mục, có biên lai) → nên đọc:\n    "
+                                 + "\n    ".join(f"{h['path']}  [{h['type']}]" for h in rec["hits"]))
+        except Exception:
+            scan_line = ""
+        if not lines and not scan_line:
+            return                                  # chưa có gì để nhắc → im lặng, không nhiễu
+        head = ("🧠 [recall] Chuỗi phiên gần nhất (mới → cũ, tự ghi ở Stop-hook):\n"
+                + "\n".join(lines) + (("\n" + more) if more else "")) if lines else "🧠 [recall]"
+        print(head
+              + scan_line
+              + "\n  Đây là NHẮC, không phải sự thật — file trong repo mới là nguồn đúng.")
+    except Exception:
+        pass
+
+
 def wikigraph_reminder(root: Path) -> None:
     """Cờ auto-draw BẬT mà artifact vector thiếu/cũ → nhắc 1 dòng kèm đúng lệnh vẽ.
     Diệt pain im-lặng: Stop hook chỉ regen khi git-status có diff ở wiki/ hay code — project
@@ -212,6 +271,7 @@ def main() -> None:
 
     output_style(root)  # đầu phiên: chốt KIỂU nói chuyện (chat), trước khi nói gì
     orient(root)  # đầu phiên: cho agent BIẾT project có gì + nhắc query trước (chống 'lơ ngơ')
+    recall(root, payload.get("session_id") or "")  # đầu phiên: chuỗi phiên gần nhất (episodic) — đóng vòng ghi→đọc của mem-rank
 
     # NOTE: KHÔNG auto-bơm context framework-dev (FDK) ở đây. Phần lớn phiên là dùng
     # framework để dev DỰ ÁN KHÁC, không phải dev chính framework → bơm nội-bộ-framework

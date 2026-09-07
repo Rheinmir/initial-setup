@@ -88,6 +88,13 @@ def snapshot_ledgers(root: pathlib.Path) -> None:
         if snap:
             subprocess.run([sys.executable, snap, "export", "--quiet", "--root", str(root)],
                            capture_output=True, timeout=30)
+        # Chép mốc bàn giao từ runtime Orca ra repo TRƯỚC khi phiên đóng: runtime không đi
+        # theo git, nên phiên sau (hoặc máy khác) chỉ dựng lại được chuỗi nếu ta chép ở đây.
+        # Fail-open tuyệt đối — không có Orca thì bỏ qua, không bao giờ chặn lúc đóng phiên.
+        hl = resolve_tool(str(root), "harness/scripts/handoff-log.py")
+        if hl:
+            subprocess.run([sys.executable, hl, "sync", "--root", str(root)],
+                           capture_output=True, timeout=45)
     except Exception:
         pass
 

@@ -131,6 +131,23 @@ def p_wikisummary():
     return "ok", "mọi Summary trong index.md đều là mô tả thật", ""
 
 
+def p_handoff():
+    """Sổ BÀN GIAO giữa các node có nói dối không — state đang bay, trước nay 0 probe.
+
+    Bàn giao (run · message · inbox · reply) sống trong runtime Orca, không đi theo git;
+    `handoff-log.py` chép mốc ra repo. Probe này gác chính bản chép đó: mốc nào khai
+    `files_modified` / `report_path` mà đường dẫn không tồn tại là chuỗi đang kể chuyện
+    không kiểm chứng được. Cùng nguyên lý claim-receipts — đã khai thì phải đúng."""
+    chk = ROOT / "harness/scripts/handoff-log.py"
+    if not chk.exists():
+        return "skip", "chưa có handoff-log.py", ""
+    rc, out = sh([PY, str(chk), "--check"], timeout=60)
+    tail = next((ln.strip() for ln in reversed(out.splitlines()) if ln.strip()), "")
+    if rc == 1:
+        return "fail", tail or "sổ bàn giao khai sai", "python3 harness/scripts/handoff-log.py --check"
+    return "ok", tail or "sổ bàn giao sạch", ""
+
+
 def p_prose():
     """AI-tell trong VĂN XUÔI người đọc (ADR/proposal/wiki) — chỗ p_frontend không với tới.
 
@@ -172,7 +189,7 @@ def p_frontend():
 #   phải lỗi ngữ nghĩa (string không khớp).
 PROBE_MECH_MAP = {
     "rules": None, "coverage": None, "backstop": None, "docs": None, "frontend": None,
-    "prose": None,
+    "prose": None, "handoff": None,
     "narrative": None, "foundation": None, "code": None, "eval": None, "freshinstall": None,
     "selfstate": "code-state", "capsurface": "capsurface",
     "capproof": "capproof", "provenance": "provenance-scope",
@@ -503,6 +520,7 @@ PROBES = [
     ("wikisummary", ["wikisummary", "docs", "index"], p_wikisummary),
     ("frontend", ["frontend", "docs", "html"],    p_frontend),
     ("prose",    ["prose", "docs", "ai-tell", "giọng"], p_prose),
+    ("handoff",  ["handoff", "orchestration", "state", "bàn giao", "node"], p_handoff),
     ("narrative", ["narrative", "docs", "drift"], p_narrative),
     ("foundation", ["foundation", "docs", "drift"], p_foundation),
     ("selfstate", ["selfstate", "state", "narrative"], p_selfstate),

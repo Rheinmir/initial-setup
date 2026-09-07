@@ -65,3 +65,6 @@ harness/metrics/memory.jsonl
 
 # Stop hook debounce state (p-45: build-wiki-graph 49s + medic --ci 26s fired ~mọi lượt)
 harness/metrics/.stop-debounce.json
+
+# okf-scan context receipts
+harness/metrics/context-receipts.jsonl

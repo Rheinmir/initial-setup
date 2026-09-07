@@ -150,10 +150,19 @@ def collect(stale_days=DEFAULT_STALE_DAYS, scope="current"):
     """
     if shutil.which("orca") is None:
         return False, {"reason": "orca không có trên PATH"}
-    d = _orca_json("orchestration", "task-list", "--json")
-    if not d or not d.get("ok"):
+    # `task-list` KHÔNG có --run trả `run_required` khi terminal này chưa bind Run —
+    # trước đây bị hiểu nhầm thành "runtime không phản hồi" nên cổng orchestration
+    # SKIP âm thầm suốt (đo 2026-09-05: 64 task thật, medic vẫn báo skip). Duyệt run.
+    runs = ((_orca_json("orchestration", "run-list", "--json") or {}).get("result") or {}).get("runs")
+    if runs is None:
         return False, {"reason": "runtime Orca không phản hồi"}
-    tasks = (d.get("result") or {}).get("tasks") or []
+    tasks, seen = [], set()
+    for r in runs:
+        d = _orca_json("orchestration", "task-list", "--run", r.get("id", ""), "--json")
+        for t in ((d or {}).get("result") or {}).get("tasks") or []:
+            if t.get("id") not in seen:
+                seen.add(t.get("id"))
+                tasks.append(t)
     me, roots, pmap = git_root(), known_roots(), load_map()
     groups: dict[str, list] = {}
     others: dict[str, int] = {}

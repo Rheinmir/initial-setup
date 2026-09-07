@@ -9,7 +9,9 @@ id: 070926-overstack-memory-selfreport
 
 # Bàn giao — overstack, phiên 889c2c4c (2026-09-06 → 07)
 
-Phiên này đẩy 15 PR vào `orca` (#114 → #128). Trạng thái lúc bàn giao: `orca` HEAD **`f946fbc`**, `template_version` **1.3.73** trên remote, **1.3.74** trong nhánh chưa push (xem bước 0). CI trên `orca`: **xanh cả 5 job**. Issue mở: **18**, tất cả là frontier/research.
+Phiên này đẩy 16 PR vào `orca` (#114 → #129). Trạng thái lúc bàn giao: `orca` HEAD **`f2db8f5`**, `template_version` **1.3.74** trên remote. CI trên `f2db8f5`: **xanh** (2 workflow / 4 job — `check`, `repo health`, `validate file .md đổi`, `self-test lõi 93 assertion`). Issue mở: **18**, tất cả là frontier/research.
+
+> Bước 0 bên dưới **đã xong** sau khi file này được viết lần đầu. Phiên sau bắt đầu thẳng từ **việc 1**.
 
 ## Đọc trước
 
@@ -21,18 +23,16 @@ File này chỉ nói **làm gì tiếp**; kiến trúc nằm ở ba link trên.
 
 ## Việc tiếp theo
 
-### 0. Push nhánh `fix/overstack-check-path-agnostic` — **CHẶN mọi việc dưới**
+### 0. ~~Push nhánh `fix/overstack-check-path-agnostic`~~ — **ĐÃ XONG**
 
-Nhánh local `ahead 1`, chưa push được vì `github.com:443` timeout lúc 15:5x ngày 07/09 (thử 6 lần). Commit đã sạch gate.
+Merged qua **PR #129** → `orca` `f2db8f5` (2026-09-07 09:25 UTC). Đo lại trên worktree tại
+`f2db8f5`: `fdk-gate` **21/21 pass**, `origin/orca` khớp local `0 0`. Không phải làm gì nữa.
 
-```bash
-cd <worktree>            # nhánh fix/overstack-check-path-agnostic
-git push -u origin fix/overstack-check-path-agnostic
-gh pr create --repo rheinmir/setup --base orca --head fix/overstack-check-path-agnostic \
-  --title "fix(gate): build-overstack-docs --check bỏ qua self-path"
-```
+Giữ mục này lại vì **lý do** đằng sau nó còn dùng được, và cái bẫy thì sẽ quay lại:
 
-**Hậu quả nếu bỏ qua:** `fdk-gate` trên `orca` hiện **20/21** với *bất kỳ ai clone về* — step `overstack-docs current` đỏ. Bằng chứng đo trên clone sạch `f946fbc`:
+`overstack.html` nhúng wiki-graph, mà wiki-graph in **đường dẫn tuyệt đối của chính nó** (R16).
+Đường đó khác theo máy ⇒ `--check` so nguyên văn là so **máy**, không phải so **nội dung**. Trước
+khi vá, `fdk-gate` trên `orca` đỏ **20/21** với *bất kỳ ai clone về*:
 
 ```
 fdk-gate: ✗ THIẾU 1/21 — overstack-docs current
@@ -40,9 +40,12 @@ build-overstack-docs.py --check → "overstack.html CŨ so với đĩa"
 regen xong: diff = 0 dòng          ← nội dung y hệt, chỉ 2 dòng path khác
 ```
 
-Nguyên nhân: `overstack.html` nhúng wiki-graph, wiki-graph in **đường dẫn tuyệt đối của chính nó** (R16). Đường đó khác theo máy → `--check` so nguyên văn là so máy chứ không so nội dung. Nhánh này chuẩn hoá dòng path ở cả hai vế trước khi so, và kèm `capability-stamp --update` (1.3.73 → 1.3.74; thiếu bump thì downstream so `1.3.73 == 1.3.73` rồi tưởng mình current, không bao giờ biết có `self-report`/`okf-scan`).
+Bản vá chuẩn hoá dòng path ở cả hai vế trước khi so. Kèm `capability-stamp --update`
+(1.3.73 → 1.3.74) — thiếu bump thì downstream so `1.3.73 == 1.3.73` rồi tưởng mình current,
+không bao giờ biết có `self-report`/`okf-scan`.
 
-⏱ ~10 phút (chỉ chờ mạng). Rủi ro: không.
+**Bài học giữ lại:** gate nào so **nguyên văn artifact sinh ra** đều có lớp bẫy này. Kiểm bằng
+"regen rồi diff" trước khi tin rằng artifact thật sự cũ.
 
 ### 1. Hiệu chỉnh ngưỡng `self-report` bằng dữ liệu thật
 
@@ -122,7 +125,7 @@ Gộp chung ⏱ ~30 phút, làm lúc nào cũng được:
 ## Origin
 
 - **Source:** phiên Claude Code `889c2c4c-de4c-411b-8d4e-08ad14eb5e25` (2026-09-06 → 2026-09-07), làm việc trên worktree `hoh-autonomous/isonade` + các worktree tạm trong scratchpad.
-- **Commit trong phiên:** `orca` `aadea1b`…`f946fbc` — PR #114 #115 #116 #117 #118 #119 #120 #121 #122 #123 #124 #126 #127 #128 (merged) + nhánh `fix/overstack-check-path-agnostic` (chưa push).
+- **Commit trong phiên:** `orca` `aadea1b`…`f2db8f5` — PR #114 #115 #116 #117 #118 #119 #120 #121 #122 #123 #124 #126 #127 #128 #129 (tất cả merged; #129 mang bản vá gate + chính file này).
 - **Repo phụ tạo mới:** `github.com/Rheinmir/dym` — kho bundle `/doyourmagic` đã chạy.
 - **Concept liên quan:** `fdk/wiki/concepts/map-not-territory.md` · `fdk/wiki/concepts/harness-enforcement-floor.md` · `fdk/wiki/concepts/fdk.md` (wiki RIÊNG của framework — wikilink từ `llmwiki/wiki` không trỏ sang được, dùng đường dẫn)
 - **Date:** 2026-09-07

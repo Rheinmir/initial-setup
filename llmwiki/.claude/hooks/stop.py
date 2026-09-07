@@ -312,7 +312,7 @@ def all_wiki_dirs(root: str):
     declared = scope_config(root)["wiki_dir"]          # GH#49: wiki relocate qua .overstack.yaml
     for cand in ([pathlib.Path(root) / declared] if declared else []) + [
             pathlib.Path(root) / "fdk" / "wiki", pathlib.Path(root) / "wiki",
-            pathlib.Path(root) / "llmwiki" / "wiki"]:
+            pathlib.Path(root) / ".llmwiki" / "wiki", pathlib.Path(root) / "llmwiki" / "wiki"]:
         if cand.is_dir() and cand not in out:
             out.append(cand)
     return out

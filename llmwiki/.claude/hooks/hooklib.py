@@ -109,8 +109,11 @@ def find_wiki_dir(root: str):
         if d.is_dir():
             return d
     # fdk/wiki first: in the framework repo the framework's OWN wiki lives in the kit (fdk/wiki);
-    # downstream projects have no fdk/ → fall through to their per-project llmwiki/wiki.
-    for cand in (pathlib.Path(root) / "fdk" / "wiki", pathlib.Path(root) / "wiki", pathlib.Path(root) / "llmwiki" / "wiki"):
+    # downstream projects have no fdk/ → fall through to their per-project wiki. Downstream dùng
+    # layout dot (.llmwiki/wiki — installer mặc định) — thiếu ứng viên này thì MỌI hook global
+    # (docs-gate, session-continue, session_end…) thoát sớm "không phải project llmwiki" (đo 2026-09-07).
+    for cand in (pathlib.Path(root) / "fdk" / "wiki", pathlib.Path(root) / "wiki",
+                 pathlib.Path(root) / ".llmwiki" / "wiki", pathlib.Path(root) / "llmwiki" / "wiki"):
         if cand.is_dir():
             return cand
     return None

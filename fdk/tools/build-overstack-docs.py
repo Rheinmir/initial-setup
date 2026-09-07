@@ -1114,13 +1114,28 @@ def main():
               f"fdk/tools/build-overstack-docs.py (1 lần), rồi auto-vào nhóm.", file=sys.stderr)
     if "--check" in sys.argv[1:]:
         cur = OUT.read_text(encoding="utf-8") if OUT.is_file() else ""
-        if cur.strip() != content.strip():
+        # Bỏ qua dòng self-path khi so: trang này NHÚNG wiki-graph, mà wiki-graph in đường dẫn
+        # TUYỆT ĐỐI của chính nó (luật R16 — người xem phải biết file nằm đâu). Đường đó khác
+        # nhau theo máy/worktree, nên so nguyên văn làm `--check` đỏ ở MỌI máy không phải máy
+        # sinh ra file — gate nói dối theo máy chứ không theo nội dung. Đo 2026-09-07: clone
+        # sạch của orca đỏ 1/21 chỉ vì 2 dòng path, nội dung y hệt (diff = 0 sau khi regen).
+        if _strip_selfpath(cur.strip()) != _strip_selfpath(content.strip()):
             print("[build-overstack-docs] overstack.html CŨ so với đĩa — chạy lại để cập nhật.", file=sys.stderr)
             sys.exit(2)
         print("overstack.html khớp đĩa ✓")
         sys.exit(0)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     _deliver(OUT, content)
+
+
+# Trang này nhúng wiki-graph dưới dạng HTML ĐÃ ESCAPE (class=&quot;foot&quot;), nên phải nhận
+# cả hai kiểu dấu nháy — regex chỉ khớp `class="foot"` sẽ trượt sạch (đo: 0/2 khớp).
+_FOOT_PATH = re.compile(r'(<div class=(?:"|&quot;)foot(?:"|&quot;)><code>)[^<]*(</code></div>)')
+
+
+def _strip_selfpath(text: str) -> str:
+    """Thay đường dẫn tuyệt đối trong footer bằng placeholder — chỉ dùng để SO SÁNH, không ghi."""
+    return _FOOT_PATH.sub(r"\1<SELF-PATH>\2", text)
 
 
 def _deliver(out_path, content: str) -> None:

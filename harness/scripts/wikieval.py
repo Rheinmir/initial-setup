@@ -276,7 +276,13 @@ def build_baseline(results, evals_dir):
 def diff_against_baseline(baseline, results):
     """Return (regressions, notes). A regression = a metric dropped below baseline."""
     cur = {r["id"]: r for r in results}
-    base = baseline.get("goldens", {})
+    if "goldens" not in baseline:
+        # Baseline lạ schema (vd bản engine khác ghi "per_golden") — im lặng coi như rỗng
+        # nghĩa là gate KHÔNG cắn mà vẫn báo xanh. Fail closed: mất gate phải thấy được.
+        raise SystemExit(
+            f"[wikieval] baseline thiếu khoá 'goldens' (có: {sorted(baseline)}) — "
+            f"schema {SCHEMA}. Baseline do engine khác ghi? Chạy --write-baseline lại.")
+    base = baseline["goldens"]
     regressions, notes = [], []
     for gid in sorted(base):
         b, c = base[gid], cur.get(gid)

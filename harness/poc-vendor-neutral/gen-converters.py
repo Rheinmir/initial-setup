@@ -179,6 +179,21 @@ jobs:
           files=$(git diff --name-only "$base" HEAD 2>/dev/null | grep -E '\\.md$' || true)
           [ -z "$files" ] && {{ echo "no changed .md"; exit 0; }}
           python3 "$HOME/.claude/harness/{CLI}" files $files
+      - name: wikieval — gate hồi quy eval (skip nếu dự án chưa khoá baseline)
+        # Engine từ GLOBAL (repo downstream không mang engine), nhưng golden/baseline/config
+        # PHẢI trỏ vào repo đang check: wikieval tính REPO_ROOT từ __file__, nên gọi bản
+        # global mà không truyền 3 đường dẫn này sẽ đo nhầm chính ~/.claude/harness.
+        run: |
+          [ -f harness/metrics/eval-baseline.json ] || {{ echo "no eval baseline — skip"; exit 0; }}
+          E=$(ls -d llmwiki/wiki/sources/evals fdk/wiki/sources/evals 2>/dev/null | head -1)
+          [ -n "$E" ] || {{ echo "no goldens dir — skip"; exit 0; }}
+          [ -f harness/scripts/wikieval-collect.py ] \
+            && python3 harness/scripts/wikieval-collect.py > harness/evals/wikieval-outputs.json
+          [ -f harness/evals/wikieval-outputs.json ] || {{ echo "no candidate outputs — skip"; exit 0; }}
+          python3 "$HOME/.claude/harness/harness/scripts/wikieval.py" \
+            --evals-dir "$E" --baseline harness/metrics/eval-baseline.json \
+            --config harness/wikieval.config.yaml \
+            --outputs harness/evals/wikieval-outputs.json --check
 """
     write("ci/harness.yml", ci)
 

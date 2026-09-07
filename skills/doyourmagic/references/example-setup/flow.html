@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dym-setup — luồng workflow overstack</title>
+<meta name="description" content="Sơ đồ luồng chính xác 6 workflow-skill của bundle doyourmagic/setup: skill nào chạy khi nào, sinh ra gì, skill kế tiếp nhận gì.">
+<meta name="theme-color" content="#eaf2fd">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a84ff'/%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem("dym-setup-flow-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
+<style>
+:root{--nav-pad-y:18px;--blur-1:18px;--glass-1:rgba(255,255,255,.42);--glass-2:rgba(255,255,255,.30);--border:rgba(30,90,170,.14);--t1:#0f0f12;--t2:#4a4a55;--accent:#0a84ff;
+  --c0:#30b0c7;--c1:#5856d6;--c2:#ff9500;--c3:#34c759;--c4:#ff2d55}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding-left:200px;font:13.5px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;color:var(--t1);
+  background:radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.10),transparent 60%),radial-gradient(700px 420px at 95% 15%,rgba(90,162,232,.08),transparent 55%),linear-gradient(180deg,#f7fbff 0%,#eaf2fd 100%);min-height:100vh}
+body::before{content:'';position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background:radial-gradient(640px 440px at 10% 14%,rgba(10,132,255,.22),transparent 65%),radial-gradient(380px 460px at 4% 52%,rgba(48,176,199,.18),transparent 65%),radial-gradient(540px 400px at 88% 10%,rgba(88,86,214,.13),transparent 60%),radial-gradient(720px 500px at 74% 76%,rgba(48,176,199,.13),transparent 65%),radial-gradient(480px 380px at 16% 86%,rgba(255,149,0,.12),transparent 60%);
+  animation:orbDrift 46s ease-in-out infinite alternate}
+@keyframes orbDrift{100%{transform:translate(2.2%,1.6%) scale(1.045)}}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(rgba(30,90,170,.11) 1px,transparent 1.3px);background-size:22px 22px;mask-image:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.22))}
+/* ── sidebar kính ── */
+nav{position:fixed;top:0;left:0;bottom:0;width:200px;z-index:100;display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:var(--nav-pad-y) 12px;
+  background:linear-gradient(165deg,rgba(255,255,255,.46) 0%,rgba(255,255,255,.22) 48%,rgba(240,248,255,.34) 100%);
+  backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);-webkit-backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  border-right:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 1px 0 0 rgba(255,255,255,.5),inset -1px 0 0 rgba(30,90,170,.10),4px 0 24px rgba(30,90,170,.08);transition:transform .22s}
+nav::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(220px 160px at 18% 4%,rgba(255,255,255,.55),transparent 70%),linear-gradient(115deg,rgba(255,255,255,.28) 0%,transparent 28%,transparent 72%,rgba(255,255,255,.14) 100%)}
+nav>*{position:relative}
+nav .logo{margin:0 0 12px;padding:6px 10px;font-weight:800;font-size:15px;letter-spacing:-.02em;background:linear-gradient(135deg,#0a84ff,#64b5f7);-webkit-background-clip:text;background-clip:text;color:transparent}
+nav a{display:block;padding:5px 12px;border-radius:10px;font-size:12px;color:var(--t2);text-decoration:none;position:relative;overflow:hidden}
+nav a.active,nav a:hover{color:var(--accent);background:rgba(10,132,255,.08)}nav a.active{font-weight:600}
+nav .grp{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);padding:10px 12px 3px;opacity:.75}
+.nav-toggle{display:none;position:fixed;top:10px;left:10px;z-index:120;width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--glass-1);backdrop-filter:blur(12px);cursor:pointer;overflow:hidden}
+@media(max-width:640px){body{padding-left:0}nav{transform:translateX(-100%);box-shadow:0 8px 30px rgba(0,0,0,.14)}nav.open{transform:none}.nav-toggle{display:block}}
+.theme-row{position:sticky;bottom:calc(-1 * var(--nav-pad-y));margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding:11px 4px 0;border-top:1px solid var(--border);font-size:11px;color:var(--t2)}
+.theme-switch{cursor:pointer;position:relative;overflow:hidden;border-radius:999px}
+.theme-switch .track{display:inline-block;position:relative;width:50px;height:26px;border-radius:999px;background:rgba(10,132,255,.18);border:1px solid var(--border);transition:background .2s}
+.theme-switch .track::before{content:'☀️';position:absolute;left:6px;top:4px;font-size:11px}.theme-switch .track::after{content:'🌙';position:absolute;right:6px;top:4px;font-size:11px}
+.theme-switch .knob{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .18s;z-index:1}
+.theme-switch.on .knob{left:26px}.theme-switch.on .track{background:rgba(88,86,214,.45)}
+.ripple-ink{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.70) 0%,rgba(255,255,255,.28) 38%,rgba(10,132,255,.20) 72%,transparent 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -10px 20px rgba(10,132,255,.12),0 0 14px rgba(10,132,255,.10);backdrop-filter:blur(2px) saturate(1.25);transform:scale(0);opacity:1;animation:rippleGrow .6s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes rippleGrow{55%{transform:scale(1);opacity:.75}100%{transform:scale(1.04);opacity:0}}
+/* ── content ── */
+main{max-width:1040px;margin:0 auto;padding:36px 28px 80px}
+.skip-link{position:fixed;top:8px;left:8px;z-index:200;padding:8px 14px;border-radius:10px;background:var(--glass-1);backdrop-filter:blur(var(--blur-1));border:1px solid var(--border);transform:translateY(-150%);transition:transform .2s;color:var(--t1)}
+.skip-link:focus-visible{transform:translateY(0)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}:focus:not(:focus-visible){outline:none}
+section{scroll-margin-top:24px;margin-bottom:40px}
+h1{font-size:clamp(26px,4vw,40px);line-height:1.1;letter-spacing:-.03em;margin:0 0 8px}
+h2{font-size:21px;letter-spacing:-.02em;margin:0 0 12px}
+h3{font-size:15px;margin:18px 0 6px}
+p{margin:0 0 10px}.lead{font-size:14px;color:var(--t2)}
+.card{background:var(--glass-1);backdrop-filter:blur(var(--blur-1)) saturate(1.4);-webkit-backdrop-filter:blur(var(--blur-1)) saturate(1.4);border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 28px rgba(30,90,170,.08);border-radius:16px;padding:16px 18px;margin:12px 0}
+code{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(10,132,255,.08);padding:.1em .35em;border-radius:5px}
+pre{background:rgba(15,15,18,.06);border:1px solid var(--border);border-radius:10px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px}pre code{background:none;padding:0}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 12px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--t2)}
+.tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--t2);background:rgba(255,255,255,.5)}
+.term{border-bottom:1px dotted var(--t2);cursor:help}
+/* ── sơ đồ luồng: node + connector JS ── */
+.flow{position:relative;display:grid;grid-template-columns:1fr;gap:40px;padding:8px 40px 8px 0}
+.flow-svg{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:0}
+.flow-svg path{fill:none;stroke-width:2;opacity:.7;stroke-linecap:round}
+.flow-svg .lbl{font-size:10px;fill:var(--t2);paint-order:stroke;stroke:#f3f7fd;stroke-width:4px;stroke-linejoin:round}
+.lane{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:18px;align-items:start}
+.lane-h{grid-column:1/-1;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);margin:6px 0 -8px}
+.node{position:relative;z-index:1;background:var(--glass-1);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.65);border-left:4px solid var(--c0);border-radius:14px;padding:11px 13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 6px 20px rgba(30,90,170,.08)}
+.node.c1{border-left-color:var(--c1)}.node.c2{border-left-color:var(--c2)}.node.c3{border-left-color:var(--c3)}.node.c4{border-left-color:var(--c4)}
+.node .cmd{font:12px ui-monospace,Menlo,monospace;font-weight:700;color:var(--accent)}
+.node .pur{font-size:12.5px;margin:3px 0 6px}
+.node .out{font-size:11px;color:var(--t2)}.node .out b{color:var(--t1)}
+.node .trap{font-size:11px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);color:#8a2f22}
+/* ── mind map ── */
+.mm{overflow-x:auto;padding:14px 4px 6px}.mm-canvas{position:relative;width:max-content}
+.mm-links{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;z-index:0}.mm-links path{fill:none;stroke-width:2.2;opacity:.55;stroke-linecap:round}
+.mm .tree{position:relative;z-index:1}.mm .tree,.mm .children{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.mm .row{display:flex;align-items:center;gap:48px;position:relative}.mm .children{position:relative}.mm .children.collapsed{display:none}
+.mm .mnode{position:relative;display:inline-flex;flex-direction:column;gap:1px;padding:7px 13px;border-radius:13px;cursor:default;white-space:nowrap;background:rgba(255,255,255,.55);border:1px solid var(--border);box-shadow:0 2px 10px rgba(30,90,170,.06)}
+.mm .mnode.has-children{cursor:pointer}.mm .mnode:hover{transform:translateY(-1px)}
+.mm .mnode .nm{font-size:13px;font-weight:700;letter-spacing:-.01em}.mm .mnode .ds{font-size:10.5px;color:var(--t2)}
+.mm .mnode .ct{font-size:10px;color:#fff;font-weight:700;padding:1px 7px;border-radius:999px;position:absolute;top:-8px;right:-8px;background:var(--accent)}
+.mm .mnode.has-children::after{content:'';position:absolute;right:-7px;top:50%;width:6px;height:6px;border-right:2px solid var(--t2);border-bottom:2px solid var(--t2);transform:translateY(-50%) rotate(-45deg)}
+.mm .mnode.collapsed-parent::after{transform:translateY(-50%) rotate(45deg)}
+.mm .mnode.root{background:linear-gradient(135deg,rgba(10,132,255,.16),rgba(88,86,214,.14));border-color:rgba(10,132,255,.4)}
+.mm .b-0 .nm{color:var(--c0)}.mm .b-1 .nm{color:var(--c1)}.mm .b-2 .nm{color:var(--c2)}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--t2);word-break:break-all}
+/* ── dark: một danh sách token, hai prefix ── */
+@media (prefers-color-scheme: dark){
+  html:not([data-theme=light]){--glass-1:rgba(22,26,36,.55);--glass-2:rgba(22,26,36,.4);--border:rgba(120,160,220,.18);--t1:#eceef4;--t2:#a7adbb;background:#0c0f16}
+  html:not([data-theme=light]) body{background:radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.14),transparent 60%),linear-gradient(180deg,#0c0f16 0%,#121724 100%)}
+  html:not([data-theme=light]) nav{background:linear-gradient(165deg,rgba(30,36,50,.6),rgba(20,24,34,.45));border-right-color:rgba(255,255,255,.08)}
+  html:not([data-theme=light]) .node,html:not([data-theme=light]) .mm .mnode{background:rgba(28,33,46,.7);border-color:rgba(255,255,255,.1)}
+  html:not([data-theme=light]) pre{background:rgba(255,255,255,.05)}
+  html:not([data-theme=light]) .node .trap{color:#f0a094}
+  html:not([data-theme=light]) .flow-svg .lbl{stroke:#141a26}
+}
+html[data-theme=dark]{--glass-1:rgba(22,26,36,.55);--glass-2:rgba(22,26,36,.4);--border:rgba(120,160,220,.18);--t1:#eceef4;--t2:#a7adbb;background:#0c0f16}
+html[data-theme=dark] body{background:radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.14),transparent 60%),linear-gradient(180deg,#0c0f16 0%,#121724 100%)}
+html[data-theme=dark] nav{background:linear-gradient(165deg,rgba(30,36,50,.6),rgba(20,24,34,.45));border-right-color:rgba(255,255,255,.08)}
+html[data-theme=dark] .node,html[data-theme=dark] .mm .mnode{background:rgba(28,33,46,.7);border-color:rgba(255,255,255,.1)}
+html[data-theme=dark] pre{background:rgba(255,255,255,.05)}
+html[data-theme=dark] .node .trap{color:#f0a094}
+html[data-theme=dark] .flow-svg .lbl{stroke:#141a26}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<button class="nav-toggle" aria-label="Mở menu" type="button">☰</button>
+<nav>
+  <div class="logo">dym-setup</div>
+  <a href="#tong-quan" class="active">Tổng quan</a>
+  <a href="#mind-map">Mind map</a>
+  <a href="#luong">Sơ đồ luồng</a>
+  <div class="grp">Tiêu thụ</div>
+  <a href="#install">install</a>
+  <a href="#guardrail-cli">guardrail-cli</a>
+  <a href="#agent-workflow">agent-workflow</a>
+  <a href="#ci">ci</a>
+  <a href="#maintain">maintain</a>
+  <div class="grp">Đóng góp</div>
+  <a href="#contributor">contributor</a>
+  <div class="grp">Khác</div>
+  <a href="#thuat-ngu">Thuật ngữ</a>
+</nav>
+<main id="main">
+
+<section id="tong-quan">
+  <h1>Luồng 6 workflow-skill của overstack</h1>
+  <p class="lead">Bundle sinh bởi <code>/doyourmagic github.com/rheinmir/setup</code>. Một <span class="term" title="skill trung tâm, chỉ tốn một dòng context; đọc workflow con khi được gọi">hub</span> <code>/dym-setup</code> và 6 <span class="term" title="mỗi workflow là một SKILL.md đầy đủ, copy sang repo chính là thành skill cài bằng npx">sub-skill</span>. Trang này ghi <b>chính xác</b> skill nào chạy khi nào, sinh ra gì, và skill kế nhận gì — không phải mô tả tính năng.</p>
+  <div class="card">
+    <b>Cài dùng tại chỗ (chỉ hub vào context):</b>
+    <pre><code>mkdir -p .claude/skills &amp;&amp; ln -sfn ../../doyourmagic/setup/skills/dym-setup .claude/skills/dym-setup</code></pre>
+    Gõ <code>/dym-setup</code> để xem bảng slug, <code>/dym-setup install</code> để chạy một workflow. Chế độ đặt tên: mặc định <code>dym-&lt;repo&gt;-&lt;slug&gt;</code>.
+  </div>
+  <table>
+    <tr><th>skill</th><th>gọi</th><th>nhánh</th><th>sinh ra</th></tr>
+    <tr><td><code>dym-setup-install</code></td><td><code>/dym-setup install</code></td><td>tiêu thụ</td><td><code>.harness/</code> <code>.llmwiki/</code> hook + CI + pre-commit + engine global</td></tr>
+    <tr><td><code>dym-setup-guardrail-cli</code></td><td><code>/dym-setup guardrail-cli</code></td><td>tiêu thụ · shell</td><td>không file — vi phạm ra stderr, kết luận ở mã thoát</td></tr>
+    <tr><td><code>dym-setup-agent-workflow</code></td><td><code>/dym-setup agent-workflow</code></td><td>tiêu thụ · chat</td><td>SPEC/PLAN dưới <code>.llmwiki/wiki/sources/draft/</code>, commit sạch</td></tr>
+    <tr><td><code>dym-setup-ci</code></td><td><code>/dym-setup ci</code></td><td>tiêu thụ · CI</td><td><code>.github/workflows/wiki-rules.yml</code></td></tr>
+    <tr><td><code>dym-setup-maintain</code></td><td><code>/dym-setup maintain</code></td><td>tiêu thụ</td><td>engine global mới, <code>CAPABILITIES.md</code> regen, wiki backfill</td></tr>
+    <tr><td><code>dym-setup-contributor</code></td><td><code>/dym-setup contributor</code></td><td>đóng góp</td><td>bảng ✓/✗ 21 step, <code>RELEASE-vX.Y.Z.md</code>, nhánh canary</td></tr>
+  </table>
+</section>
+
+<section id="mind-map">
+  <h2>Mind map</h2>
+  <div class="card"><div class="mm"><div class="mm-canvas"><svg class="mm-links"></svg><div class="tree"><div class="row">
+    <div class="mnode root has-children"><span class="nm">dym-setup</span><span class="ds">hub · 1 dòng context</span><span class="ct">6</span></div>
+    <div class="children">
+      <div class="row">
+        <div class="mnode b-0 cat has-children"><span class="nm">Tiêu thụ</span><span class="ds">dùng overstack trong dự án mình</span><span class="ct">5</span></div>
+        <div class="children">
+          <div class="row"><div class="mnode b-0 leaf"><span class="nm">install</span><span class="ds">bootstrap · cờ · $HOME · gỡ</span></div></div>
+          <div class="row"><div class="mnode b-0 leaf"><span class="nm">guardrail-cli</span><span class="ds">3 mode · 19 luật · rc 0/1/2</span></div></div>
+          <div class="row"><div class="mnode b-0 leaf"><span class="nm">agent-workflow</span><span class="ds">/propose → /plan → /ship</span></div></div>
+          <div class="row"><div class="mnode b-0 leaf"><span class="nm">ci</span><span class="ds">Actions tối giản · 3 bẫy xanh giả</span></div></div>
+          <div class="row"><div class="mnode b-0 leaf"><span class="nm">maintain</span><span class="ds">update · migrate · rc 0/3/4/1</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="mnode b-1 cat has-children"><span class="nm">Đóng góp</span><span class="ds">sửa chính overstack</span><span class="ct">1</span></div>
+        <div class="children">
+          <div class="row"><div class="mnode b-1 leaf"><span class="nm">contributor</span><span class="ds">fdk-gate 21 · medic 18 · UAT · ship</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="mnode b-2 cat has-children"><span class="nm">Sản phẩm phụ</span><span class="ds">không phải skill</span><span class="ct">2</span></div>
+        <div class="children">
+          <div class="row"><div class="mnode b-2 leaf"><span class="nm">workflows.md</span><span class="ds">chỉ mục + bảng kiểm chứng</span></div></div>
+          <div class="row"><div class="mnode b-2 leaf"><span class="nm">flow.html</span><span class="ds">trang này</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div></div></div></div></div>
+</section>
+
+<section id="luong">
+  <h2>Sơ đồ luồng — skill → sản phẩm → skill kế</h2>
+  <p class="lead">Mỗi cạnh ghi <b>cái gì</b> đi từ skill này sang skill kia. Đường nối do JS đo vị trí thật rồi vẽ, đổi cỡ cửa sổ thì vẽ lại.</p>
+  <div class="card">
+    <div class="flow" id="flow">
+      <svg class="flow-svg"></svg>
+      <div class="lane">
+        <div class="lane-h">Bước 1 — bắt buộc</div>
+        <div class="node" data-id="install"><div class="cmd">/dym-setup install</div><div class="pur">Cài 3 trụ bằng một dòng curl; xác nhận rào cắn thật.</div><div class="out"><b>ra:</b> <code>.harness/</code> <code>.llmwiki/</code> hook project + global, CI, pre-commit</div><div class="trap">Bẫy đo được: <code>--harness-only</code> không phải cờ của <code>install.sh</code> (rc=1); lệnh ghi cả vào <code>$HOME</code>.</div></div>
+      </div>
+      <div class="lane">
+        <div class="lane-h">Bước 2 — tự tay xác nhận luật cắn</div>
+        <div class="node c1" data-id="guardrail"><div class="cmd">/dym-setup guardrail-cli</div><div class="pur">Gọi validator từ shell trên input bẩn/sạch.</div><div class="out"><b>ra:</b> rc <b>2</b> (mode <code>path</code>/<code>claude-hook</code>) hoặc <b>1</b> (mode <code>files</code>) khi vi phạm; <b>0</b> khi sạch <i>hoặc</i> fail-open</div><div class="trap">Bẫy: file không tồn tại → rc 0; thiếu <code>pyyaml</code> → mọi luật tắt mà xanh.</div></div>
+      </div>
+      <div class="lane">
+        <div class="lane-h">Bước 3 — hai đường song song, độc lập nhau</div>
+        <div class="node c2" data-id="agent"><div class="cmd">/dym-setup agent-workflow</div><div class="pur">Vòng chat: propose → plan → verify-before-commit → ship.</div><div class="out"><b>ra:</b> SPEC/PLAN trong wiki, commit sạch; R7/R18 gác hai văn bản</div><div class="trap">Lệnh <code>/x</code> chỉ gõ trong chat — dán vào terminal là <code>command not found</code>.</div></div>
+        <div class="node c3" data-id="ci"><div class="cmd">/dym-setup ci</div><div class="pur">Workflow Actions viết mới cho dự án tiêu thụ.</div><div class="out"><b>ra:</b> <code>.github/workflows/wiki-rules.yml</code> — chặn PR khi <code>.md</code> wiki vi phạm luật tầng repo</div><div class="trap">Không bê <code>harness.yml</code> của installer (đó là CI của chính framework).</div></div>
+      </div>
+      <div class="lane">
+        <div class="lane-h">Bước 4 — khi cần nâng bản</div>
+        <div class="node c4" data-id="maintain"><div class="cmd">/dym-setup maintain</div><div class="pur">Chạy lại installer (idempotent) hoặc <code>/harness-update --self-heal</code>.</div><div class="out"><b>ra:</b> engine global mới khi <code>template_version</code> đổi (đo: 1.3.68→1.3.69), <code>CAPABILITIES.md</code> regen; rc <b>0</b>/<b>3</b>/<b>4</b>/<b>1</b></div><div class="trap">Installer chỉ cài lại global khi version đổi — sửa hook global mà không bump là user cũ không nhận.</div></div>
+      </div>
+      <div class="lane">
+        <div class="lane-h">Nhánh riêng — không phụ thuộc 1–4</div>
+        <div class="node c1" data-id="contrib"><div class="cmd">/dym-setup contributor</div><div class="pur">Clone <code>rheinmir/setup</code>, sửa, qua cổng.</div><div class="out"><b>ra:</b> <code>fdk-gate.py</code> 21 step (exit 0 / 2), <code>medic</code> 18 probe, PR vào <code>orca</code></div><div class="trap">R15 chặn commit ghi công AI; layout repo framework không dấu chấm nên không dính bẫy của <code>install</code>.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install"><h2>dym-setup-install</h2><div class="card"><span class="tag">tiêu thụ · setup</span><p>Một dòng <code>curl … | bash</code> cài cả ba trụ. Sub-skill nói rõ cờ nào tồn tại ở <code>bootstrap.sh</code> mà không tồn tại ở <code>install.sh</code>, lệnh ghi những gì vào <code>$HOME</code>, cách thử an toàn bằng <code>HOME</code> cô lập, và bản vá tay cho bản cài trước PR #114.</p><p><b>Nghiệm thu 30 giây:</b></p><pre><code>echo '{"tool_name":"Write","tool_input":{"file_path":"llmwiki/raw/x.md","content":"x"}}' \
+  | python3 .harness/poc-vendor-neutral/bin/llmwiki-validate.py claude-hook; echo "rc=$?"   # kỳ vọng 2</code></pre></div></section>
+<section id="guardrail-cli"><h2>dym-setup-guardrail-cli</h2><div class="card"><span class="tag">tiêu thụ · shell</span><p>Một binary, ba mode; bảng 19 luật đọc từ <code>policy.yaml</code>; bốn đường <span class="term" title="lỗi hạ tầng thì cho qua (exit 0) thay vì chặn — đúng triết lý harness, nhưng dễ tạo CI xanh giả">fail-open</span>. Kèm ba luật từng chết dưới layout <code>.llmwiki/</code> (R14/R16/R19, đã vá #114) và lỗ <code>check_deny_write_bash</code> (đã vá).</p></div></section>
+<section id="agent-workflow"><h2>dym-setup-agent-workflow</h2><div class="card"><span class="tag">tiêu thụ · chat</span><p>SPEC (người đọc để duyệt) tách khỏi PLAN (bơm vào agent context=0); tỷ lệ độ dài ≈ 1:8. Sự cố thì đi <code>/orca-issue</code>, không <code>/propose</code>. Không có mã thoát để đo — phần kiểm chứng là tên skill và luật gác (R7/R18).</p></div></section>
+<section id="ci"><h2>dym-setup-ci</h2><div class="card"><span class="tag">tiêu thụ · CI</span><p>Workflow tối giản tự đủ, xử sẵn ba chỗ xanh giả: thiếu <code>pyyaml</code>, file đã xoá còn trong danh sách (<code>--diff-filter=d</code>), rẽ nhánh nhầm mã thoát (mode <code>files</code> thoát 1).</p></div></section>
+<section id="maintain"><h2>dym-setup-maintain</h2><div class="card"><span class="tag">tiêu thụ · bảo trì</span><p>Update = chạy lại installer. Dự án cũ đi <code>/harness-update</code> với <code>--self-heal</code>: rc 0 sạch · 3 còn nợ tự sửa không được · 4 smoke thất bại · 1 hạ tầng. Danh sách 16 tool cố tình không có ở global (<code>harness-doctor</code>, <code>fdk-gate</code>…).</p></div></section>
+<section id="contributor"><h2>dym-setup-contributor</h2><div class="card"><span class="tag">đóng góp</span><p>Entry point thật là <code>policy.yaml</code> + <code>gen-converters.py</code>. Cổng <code>fdk-gate.py</code> 21 step; từng đỏ 5/21 trên <code>orca</code> pristine (sửa ở #116, nay 21/21). Cách chụp baseline trước/sau vẫn là thói quen đúng.</p></div></section>
+
+<section id="thuat-ngu">
+  <h2>Thuật ngữ</h2>
+  <div class="card"><table>
+    <tr><td><b>hub</b></td><td>skill trung tâm <code>/dym-setup</code>: chỉ tốn một dòng description trong context; đọc đúng một workflow con khi được gọi với slug.</td></tr>
+    <tr><td><b>sub-skill</b></td><td>thư mục <code>skills/dym-setup-&lt;slug&gt;/SKILL.md</code> — một workflow ở dạng skill đầy đủ, tự chứa, copy sang repo chính là promote được.</td></tr>
+    <tr><td><b>slug</b></td><td>tên ngắn nói việc (<code>install</code>, <code>ci</code>…), không đánh số.</td></tr>
+    <tr><td><b>fail-open</b></td><td>gặp lỗi hạ tầng (thiếu policy, file không tồn tại, mode lạ) thì cho qua (rc 0) thay vì chặn.</td></tr>
+    <tr><td><b>layout dot</b></td><td>dự án downstream đặt <code>.llmwiki/</code> + <code>.harness/</code> (ẩn) thay vì <code>llmwiki/</code> + <code>harness/</code> — lỗi dây nối theo layout này đã vá ở PR #114–#117.</td></tr>
+    <tr><td><b>promote</b></td><td>đưa một sub-skill lên repo chính (<code>rheinmir/setup</code> <code>skills/</code>) qua <code>fdk-kit.sh</code> để cài bằng <code>npx skills add</code>.</td></tr>
+  </table></div>
+</section>
+
+<footer>File này: <code id="selfpath">doyourmagic/setup/flow.html</code> · Sinh bởi skill <code>/doyourmagic</code> · chỉ mục + bảng kiểm chứng: <a href="workflows.md">workflows.md</a></footer>
+</main>
+<script>
+/* nav toggle + active + ripple */
+(function(){var nav=document.querySelector('nav'),tg=document.querySelector('.nav-toggle');tg.addEventListener('click',function(){nav.classList.toggle('open')});
+nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){nav.querySelectorAll('a').forEach(function(x){x.classList.remove('active')});a.classList.add('active');if(innerWidth<=640)nav.classList.remove('open')})});
+function attach(el){el.addEventListener('pointerdown',function(e){var r=el.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,rad=Math.hypot(Math.max(x,r.width-x),Math.max(y,r.height-y)),ink=document.createElement('span');ink.className='ripple-ink';ink.style.width=ink.style.height=rad*2+'px';ink.style.left=(x-rad)+'px';ink.style.top=(y-rad)+'px';el.appendChild(ink);ink.addEventListener('animationend',function(){ink.remove()})})}
+document.querySelectorAll('nav a,.nav-toggle').forEach(attach);window.__attachRipple=attach;
+try{var p=decodeURIComponent(location.pathname);if(location.protocol==='file:'&&p)document.getElementById('selfpath').textContent=p}catch(e){}})();
+/* theme switch — nút gạt ở footer sidebar, chống FOUC ở head */
+(function(){var K='dym-setup-flow-theme',d=document.documentElement,nav=document.querySelector('nav');if(!nav)return;
+function isDark(){var t=d.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches}
+var sw=document.createElement('div');sw.className='theme-switch';sw.setAttribute('role','switch');sw.setAttribute('tabindex','0');sw.innerHTML='<span class="track"><span class="knob"></span></span>';
+var row=document.createElement('div');row.className='theme-row';var lb=document.createElement('span');lb.className='lbl';lb.textContent='Giao diện';row.appendChild(lb);row.appendChild(sw);nav.appendChild(row);
+function paint(){var dk=isDark();sw.classList.toggle('on',dk);sw.setAttribute('aria-checked',dk?'true':'false');sw.setAttribute('aria-label',dk?'Nút gạt giao diện: đang tối — gạt sang sáng':'Nút gạt giao diện: đang sáng — gạt sang tối')}
+function flip(){var n=isDark()?'light':'dark';d.setAttribute('data-theme',n);try{localStorage.setItem(K,n)}catch(e){}paint();setTimeout(function(){window.__drawFlow&&window.__drawFlow();window.__drawMM&&window.__drawMM()},30)}
+sw.addEventListener('click',flip);sw.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}});window.__attachRipple(sw);paint()})();
+/* sơ đồ luồng: cạnh skill→skill, đo getBoundingClientRect, vẽ lại khi resize */
+(function(){var EDGES=[['install','guardrail','.harness/ + hook đã cài'],['guardrail','agent','rc=2 xác nhận rào cắn'],['guardrail','ci','cùng validator, mode files (rc 1)'],['agent','maintain','wiki + commit tích luỹ'],['ci','maintain','CI đỏ khi bản cũ'],['maintain','install','installer chạy lại (idempotent)']];
+var COL={install:'#30b0c7',guardrail:'#5856d6',agent:'#ff9500',ci:'#34c759',maintain:'#ff2d55'};var NS='http://www.w3.org/2000/svg';
+function draw(){var f=document.getElementById('flow'),svg=f.querySelector('.flow-svg');if(!f||!svg)return;var fr=f.getBoundingClientRect();svg.setAttribute('width',fr.width);svg.setAttribute('height',fr.height);svg.setAttribute('viewBox','0 0 '+fr.width+' '+fr.height);while(svg.firstChild)svg.removeChild(svg.firstChild);
+EDGES.forEach(function(e){var a=f.querySelector('[data-id="'+e[0]+'"]'),b=f.querySelector('[data-id="'+e[1]+'"]');if(!a||!b)return;var ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();var back=rb.top<ra.top;
+var x1=ra.left-fr.left+ra.width/2,y1=(back?ra.top:ra.bottom)-fr.top,x2=rb.left-fr.left+rb.width/2,y2=(back?rb.bottom:rb.top)-fr.top;
+if(back){x1=ra.right-fr.left;y1=ra.top-fr.top+ra.height/2;x2=rb.right-fr.left;y2=rb.top-fr.top+rb.height/2}
+var p=document.createElementNS(NS,'path');var c=Math.abs(y2-y1)/2;var rx=fr.width-8;var dd=back?('M'+x1+','+y1+' C'+rx+','+y1+' '+rx+','+y2+' '+x2+','+y2):('M'+x1+','+y1+' C'+x1+','+(y1+c)+' '+x2+','+(y2-c)+' '+x2+','+y2);
+p.setAttribute('d',dd);p.setAttribute('stroke',COL[e[0]]||'#0a84ff');if(back)p.setAttribute('stroke-dasharray','5 5');svg.appendChild(p);
+var t=document.createElementNS(NS,'text');t.setAttribute('class','lbl');t.setAttribute('x',back?(rx-4):((x1+x2)/2+8));t.setAttribute('y',back?((y1+y2)/2):((y1+y2)/2+4));if(back)t.setAttribute('text-anchor','end');t.textContent=e[2];svg.appendChild(t)})}
+window.__drawFlow=draw;draw();addEventListener('load',function(){setTimeout(draw,60)});addEventListener('resize',function(){clearTimeout(window.__ft);window.__ft=setTimeout(draw,120)},{passive:true})})();
+/* mind map: bezier theo nhánh, nhánh .cat đóng mặc định, click toggle */
+(function(){var mm=document.querySelector('.mm');if(!mm)return;var NS='http://www.w3.org/2000/svg';
+function colorOf(n){return n.classList.contains('b-0')?'#30b0c7':n.classList.contains('b-1')?'#5856d6':n.classList.contains('b-2')?'#ff9500':'#0a84ff'}
+function draw(){var canvas=mm.querySelector('.mm-canvas'),svg=mm.querySelector('.mm-links');if(!canvas||!svg)return;var cr=canvas.getBoundingClientRect();svg.setAttribute('width',canvas.offsetWidth);svg.setAttribute('height',canvas.offsetHeight);while(svg.firstChild)svg.removeChild(svg.firstChild);
+mm.querySelectorAll('.mnode.has-children').forEach(function(n){var row=n.parentElement,kids=null;for(var i=0;i<row.children.length;i++){if(row.children[i].classList.contains('children'))kids=row.children[i]}if(!kids||kids.classList.contains('collapsed'))return;var a=n.getBoundingClientRect();
+kids.querySelectorAll(':scope > .row > .mnode').forEach(function(k){var b=k.getBoundingClientRect();var x1=a.right-cr.left,y1=a.top-cr.top+a.height/2,x2=b.left-cr.left,y2=b.top-cr.top+b.height/2,mx=(x1+x2)/2;var p=document.createElementNS(NS,'path');p.setAttribute('d','M'+x1+','+y1+' C'+mx+','+y1+' '+mx+','+y2+' '+x2+','+y2);p.setAttribute('stroke',colorOf(k));svg.appendChild(p)})})}
+mm.querySelectorAll('.mnode.cat.has-children').forEach(function(n){var row=n.parentElement;for(var i=0;i<row.children.length;i++){if(row.children[i].classList.contains('children')){row.children[i].classList.add('collapsed');n.classList.add('collapsed-parent')}}});
+mm.querySelectorAll('.mnode.has-children').forEach(function(n){n.addEventListener('click',function(){var row=n.parentElement;for(var i=0;i<row.children.length;i++){if(row.children[i].classList.contains('children')){row.children[i].classList.toggle('collapsed');n.classList.toggle('collapsed-parent')}}draw()})});
+window.__drawMM=draw;draw();addEventListener('load',function(){setTimeout(draw,60)});addEventListener('resize',function(){clearTimeout(window.__mmt);window.__mmt=setTimeout(draw,120)},{passive:true})})();
+</script>
+</body>
+</html>

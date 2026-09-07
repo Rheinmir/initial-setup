@@ -1,43 +1,94 @@
 ---
 name: doyourmagic
-description: Given a freshly-cloned external repo/tool, run clone->explore->analysis->write-workflows to produce a runnable /doyourmagic/<repo-name>/workflows.md doc bundle plus a companion index.html explaining what each workflow file does, run order, and output. Trigger on 'kéo repo mới về', 'clone tool này làm workflow', 'doyourmagic', 'onboard external tool/repo', 'generate workflow docs for this repo', or /doyourmagic.
+proof: skills/doyourmagic/references/example-setup/workflows.md
+description: "Given a freshly-cloned external repo/tool, run clone→explore→verify→write to produce a bundle of RUNNABLE workflow skills under doyourmagic/<repo>/skills/ — one hub skill /dym-<repo> (1 dòng context, chỉ nạp workflow con khi được gọi) + N sub-skills dạng SKILL.md promote thẳng lên repo chính (npx skills add) — plus workflows.md (index + bảng kiểm chứng) and flow.html (docs-site-macos, sơ đồ luồng skill→sản phẩm→skill kế). Trigger on 'kéo repo mới về', 'clone tool này làm workflow', 'doyourmagic', 'onboard external tool/repo', 'generate workflow docs/skills for this repo', or /doyourmagic. Options: --name <prefix> · --humanize."
 ---
 
 # Skill: doyourmagic
 
 ## When to use
-- User just cloned or installed a new external repo/CLI/tool and wants a runnable "how do I actually use this thing" doc bundle instead of re-reading the README from scratch each time.
+- User just cloned/installed an external repo/CLI/tool and wants "how do I actually use this thing" as something **gõ được**, not a README to re-read each time.
 - User says "kéo repo mới về", "doyourmagic <repo>", "làm workflow cho tool này", "generate workflow docs for this repo", "viết hộ cách dùng runnable cho repo này".
-- Before folding an external tool into project conventions/CI — produce the doc bundle first so the integration decision is grounded in verified commands, not README paraphrase.
+- Before folding an external tool into project conventions/CI — produce the bundle first so the integration decision is grounded in verified commands, not README paraphrase.
+
+## Output shape (what a finished run leaves behind)
+```
+doyourmagic/<repo>/
+  workflows.md                  # chỉ mục + thứ tự chạy + bảng "kiểm chứng thế nào" (thứ không thuộc về một skill nào)
+  flow.html                     # docs-site-macos: sidebar · mind map · SƠ ĐỒ LUỒNG skill→sản phẩm→skill kế · toggle sáng/tối
+  skills/
+    <hub>/SKILL.md              # /<hub> <slug> — 1 dòng description, disable-model-invocation, đọc ĐÚNG file con được gọi
+    <hub>-<slug-1>/SKILL.md     # mỗi workflow = một skill đầy đủ (frontmatter + When/Steps/Rules), tự chứa, promote được
+    <hub>-<slug-2>/SKILL.md
+```
+- **Hub** là thứ duy nhất được symlink vào `.claude/skills/` → context chỉ tốn **một** dòng description; thân workflow con chỉ được đọc khi user gõ `/<hub> <slug>`. Đây là "hub 1-tên, mô tả phạm vi" của `/fdk`, không phải N skill rải trong context.
+- Sub-skill là **SKILL.md thật** (không phải doc): copy nguyên thư mục sang `skills/` của repo chính là thành skill cài bằng `npx skills add`.
+- Không còn `NN-*.md`: nội dung runnable nằm trong Steps của sub-skill — một nguồn, không có bản doc song song để drift.
+
+## Naming — 3 chế độ, ghi chế độ đã dùng vào `workflows.md`
+| Chế độ | Hub | Sub-skill | Khi nào |
+|---|---|---|---|
+| **mặc định** | `dym-<repo>` | `dym-<repo>-<slug>` | user không nói gì. Không bao giờ trùng, nhìn tên biết nguồn; đổi tên lúc promote |
+| `--name <prefix>` | `<prefix>` | `<prefix>-<slug>` | user tự đặt |
+| `--humanize` | agent đặt tên ngắn gõ được bằng cơ bắp (vd `overstack`) | `<hub>-<slug>` | phải `ls ~/.claude/skills .claude/skills` kiểm trùng TRƯỚC khi chốt; trùng → rơi về mặc định và nói rõ |
+`<repo>` = tên repo (segment cuối của URL, bỏ `.git`), chữ thường, `-` thay ký tự lạ. `<slug>` = 1–2 từ nói việc (`install`, `ci`, `contributor`), không đánh số.
 
 ## Steps
-1. Clone (if not already local) the target repo into a scratch/sandbox location — never do the exploration phase in place inside the user's project tree.
-2. Locate the primary manifest/entry file (`package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` / etc.) FIRST, before reading prose docs — it gives the real install command, entry point(s)/bin, and the full list of available scripts.
-3. Grep top-level docs (README, README.\<variant\>.md, AGENTS.md/CLAUDE.md if present, `docs/`) for a Quick Start / Usage / Installation section, but treat it as a hypothesis, not ground truth.
-4. Verify every documented command against the actual source — the CLI's argument parser/subcommand files, and exit codes via the literal `process.exit(...)`/`sys.exit(...)` calls — docs drift from code.
-5. Split findings into distinct workflow files by AUDIENCE, not by feature: consumer/end-user workflows (how someone uses this tool in their own project) vs. contributor workflows (how someone modifies the tool itself). Never merge these — conflating them produces workflows that either overreach (asking a consumer to run the tool's own internal test suite) or underreach (omitting the build/test loop a contributor actually needs).
-6. If the repo has its own CI config, read it to learn what it gates on, but write a fresh, minimal example for the consumer's CI use case — never copy the tool's own internal CI pipeline as "how you'd integrate this."
-7. If a real, independent integration of the tool already exists on the host machine (e.g. a config directory already committed in some other project), read that too — it beats the clone's own bundled fixtures for "what correct real-world usage looks like."
-8. Write the output bundle to `doyourmagic/<repo-name>/`:
-   - `workflows.md` — an index table (file, one-line purpose, run order/track), a "suggested run order" section, and a short "how this was verified, not just paraphrased" section listing exactly which source files backed each claim.
-   - One `NN-<workflow-name>.md` file per distinct workflow, each immediately runnable: concrete copy-pasteable commands, exact paths, expected output/exit behavior, a one-line "why you'd use this", and a one-line "what it produces". Don't force a fixed file count — a single-script tool may only need `workflows.md` + `01-usage.md`.
-   - `index.html` — a single self-contained file (inline CSS, no CDN/external assets, no build step, must render correctly opened via `file://`) listing every workflow in run order with a 2-3 sentence explainer and a relative link to its `.md` file.
-9. **Close at the adapt-modes gate — a bundle is not the finish line.** A doc bundle only records what the tool does; it decides nothing. Before handing back, put ONE explicit verdict to the user, naming the mode from `[[adapt-modes]]`:
-   - **HÒA TAN (dissolve)** — distill the essence and rewrite it as *our* code/concept (validator, internal skill, ADR). Pick when the essence is small, must be a deterministic gate, and we want zero external dependency. Cost: we maintain it, no upstream updates.
-   - **KÉO NGOÀI (external-pull)** — keep only a pointer + pin (mirror `SKILL.md` + `fdk/skills.provenance.json` with source/commit/sha); the engine lives outside. Pick when the tool is large, fast-moving, and an external dependency is acceptable.
-   - **NHÚNG-SỞ-HỮU (vendor)** — copy the bytes in and own the fork. Pick when we need hard ownership, offline, and no runtime dep; accept the bloat.
-   - **KHÔNG LẤY (skip)** — say what we already own that covers it, by file path. A legitimate and common verdict.
-   Before claiming overlap, OPEN our counterpart and compare on the axis that decides cost — agent calls per use and whether code can generate it without an LLM — not on file size or feature count. Measured example (2026-09-04): diagram-design produces prettier, dependency-free SVG, but its own docs say every diagram costs one agent turn; our Mermaid path costs 610KB once and a script can emit it with zero LLM. Comparing bytes alone reversed the verdict.
-   If the verdict is HÒA TAN or NHÚNG, hand off to the `new-skill`/`fdk` authoring flow — never silently start scaffolding without asking first.
+1. **Clone vào sandbox** (scratch dir) — không khám phá tại chỗ trong cây dự án của user. Exploration là **read-only** với clone.
+2. **Manifest trước, prose sau**: tìm `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` / installer script TRƯỚC khi đọc README — nó cho lệnh cài thật, entry point/bin, danh sách script.
+3. **README/AGENTS.md/docs là giả thuyết**, không phải sự thật. Mỗi lệnh định viết ra phải đối chiếu với argument parser / `--help` chạy thật / literal `process.exit(...)` `sys.exit(...)` — đọc mã thoát thật, đừng giả định 0/1.
+4. **Chạy thật những gì chạy được** trong sandbox với scope pin chặt (`HOME` cô lập, `--scope=project`, `--no-verify`…): installer, validator trên input bẩn/sạch, mode lạ, file thiếu. Ghi rc từng ca — bảng kiểm chứng của `workflows.md` lấy từ đây.
+5. **Nếu máy đã có một bản tích hợp thật** (config đã commit ở dự án khác) → đọc nó; nó thắng fixture trong clone về "dùng đúng ngoài đời trông thế nào". Tái hiện lỗi trên bản thật là bằng chứng mạnh nhất.
+6. **Chia workflow theo ĐỐI TƯỢNG, không theo tính năng**: tiêu thụ (dùng tool trong dự án của mình) vs đóng góp (sửa chính tool). Lệnh chat (`/x`) và lệnh shell tách skill riêng — trộn là copy-paste gãy.
+7. **Chốt tên** theo bảng Naming (kiểm trùng nếu `--humanize`).
+8. **Viết mỗi workflow thành một sub-skill** `doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md`:
+   - frontmatter `name: <hub>-<slug>`, `description` = một câu nói KHI NÀO gọi + từ khoá trigger (router dùng dòng này).
+   - `## When to use` — tình huống + "tại sao chạy / sinh ra gì".
+   - `## Steps` — lệnh copy-paste được, đường dẫn chính xác, output/mã thoát kỳ vọng. Lệnh nào đã chạy thật thì ghi rc đo được.
+   - `## Rules` — bẫy đã ĐO (không phải đoán), kèm cách né; carve-out "không được làm".
+   - Self-contained: không trỏ tới file chỉ có trong clone; cần thì "nếu file X có mặt thì…".
+9. **Viết hub** `doyourmagic/<repo>/skills/<hub>/SKILL.md`:
+   ```
+   ---
+   name: <hub>
+   disable-model-invocation: true
+   description: "<một dòng: tool gì · gõ /<hub> <slug> · slugs: a · b · c>"
+   ---
+   ## Steps
+   1. Đọc ARGUMENTS → <slug>. Không có slug → in bảng slug + một dòng mục đích, dừng.
+   2. Đọc ĐÚNG MỘT file `doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md` (đường tương đối từ gốc dự án) rồi làm theo Steps của nó. Không đọc các file con khác.
+   ```
+10. **`workflows.md`**: bảng (skill · mục đích · nhánh · lệnh gọi), "thứ tự chạy đề xuất", "bẫy đắt nhất", bảng **"kiểm chứng thế nào"** (khẳng định → file:dòng / ca chạy thật / rc), chế độ đặt tên đã dùng, và **lệnh symlink 1 dòng** (mục Install bên dưới).
+11. **`flow.html`** — sinh theo skill `docs-site-macos` (BẮT BUỘC: sidebar kính, background orbs, mind map collapsible, nút gạt sáng/tối ở footer sidebar + chống FOUC, cỡ chữ compact 13″, skip-link/focus ring, footer hiện **đường dẫn tuyệt đối** của chính file). Nội dung = **luồng chính xác các skill thực hiện**: mỗi skill một node, cạnh `skill → sản phẩm → skill kế` (connector do JS vẽ từ `getBoundingClientRect`, vẽ lại khi resize — không hardcode toạ độ), thứ tự chạy theo nhánh, mỗi node ghi lệnh gọi + sản phẩm + bẫy 1 dòng. Thuật ngữ có giải nghĩa trong ngoặc. **Mở thật bằng trình duyệt** (hoặc `/playwright-verify`) trước khi giao — đọc code không đủ.
+12. **Gate adapt-modes** — bundle không phải đích đến. Đưa MỘT verdict cho user: **HÒA TAN** (rewrite thành code/skill của ta) · **KÉO NGOÀI** (pointer + pin) · **NHÚNG-SỞ-HỮU** (vendor) · **KHÔNG LẤY** (đã có gì phủ, ghi path). So trên trục quyết định chi phí — số lượt agent/lần dùng, code sinh được không cần LLM — không so byte. Verdict HÒA TAN/NHÚNG → hỏi trước khi scaffold.
+
+## Install (dùng tại chỗ) — một lệnh, chỉ nạp khi cần
+```bash
+mkdir -p .claude/skills && ln -sfn ../../doyourmagic/<repo>/skills/<hub> .claude/skills/<hub>
+```
+Chỉ hub vào context. Gõ `/<hub>` để xem bảng slug, `/<hub> <slug>` để chạy một workflow. Muốn gọi thẳng `/<hub>-<slug>` thì symlink thêm đúng thư mục đó — mỗi symlink thêm là thêm một dòng context, cân nhắc.
+
+## Promote lên repo chính (skill cài bằng npx)
+Đường `/fdk` có sẵn, không đẻ tool:
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Rheinmir/setup/orca/fdk/tools/fdk-kit.sh) pull   # lần đầu
+cp -R doyourmagic/<repo>/skills/<hub>-<slug> .overstack-kit/skills/<tên-mới>          # đổi tên nếu bỏ tiền tố dym-
+cd .overstack-kit && python3 fdk/tools/new-skill.py <tên-mới> --dry-run                # in checklist register
+# register: LOOP_MAP (sync-skills.py) · LOOP_GROUPS · marketplace.json · bảng AGENT.md+CLAUDE.md · provenance
+bash fdk/tools/fdk-kit.sh check && bash fdk/tools/fdk-kit.sh submit skill/<tên-mới> "<mô tả>"
+```
+Sửa `name:` trong frontmatter cho khớp tên mới; giữ `description` trigger. Hub KHÔNG promote (nó chỉ có nghĩa cạnh bundle).
 
 ## Rules
-- Never paraphrase a README's command list straight into "runnable" docs — check each command exists in the manifest's scripts / the CLI's `--help` output / the argument parser first.
-- Never assume exit-code conventions are 0/1 by default — read the literal exit calls; tools sometimes use specific codes (e.g. 2 = "findings present") that callers must branch on deliberately.
-- Never copy a tool's own `.github/workflows/*.yml` into a "how to add this to your CI" doc for the consumer — always write a minimal, purpose-built example instead.
-- Keep chat-only/slash commands and real shell CLI commands in separate workflow files — mixing them produces copy-paste failures when a reader tries a chat command in a terminal or vice versa.
-- **Never run the target tool's own installer without pinning scope.** Measured failure (2026-09-04): `npx impeccable install --help` does not print help on the published build — it runs a real install, and with no TTY the prompt takes its default and writes into `$HOME` across 13 provider directories. Explore in a sandbox, and when an install is genuinely needed pass explicit scope flags (`-y --scope=project`) so nothing escapes the sandbox.
-- The exploration/clone phase is read-only against the target repo — never modify files inside the cloned tool itself; only write new files under the `doyourmagic/<repo-name>/` output path.
-- `index.html` must be self-contained and readable in both light and dark viewing — no external CDN, no absolute local paths.
+- Không paraphrase README thành "runnable" — mỗi lệnh phải có trong manifest scripts / `--help` thật / argument parser.
+- Không giả định mã thoát 0/1 — đọc literal exit; tool có thể dùng 2 = "có finding" hay fail-open 0 khi thiếu file, người gọi phải rẽ nhánh đúng.
+- Không bê `.github/workflows/*.yml` của tool vào skill CI cho người tiêu thụ — viết ví dụ tối giản riêng.
+- Lệnh chat và lệnh shell không chung một skill.
+- **Không chạy installer của tool mà không pin scope** (đo 2026-09-04: `npx impeccable install --help` cài thật vào `$HOME` 13 thư mục). Sandbox + `HOME` cô lập + cờ scope tường minh.
+- Read-only với clone; chỉ ghi vào `doyourmagic/<repo>/`.
+- Mỗi sub-skill tự chứa; hub chỉ đọc đúng file được gọi — không nhồi cả bundle vào context.
+- `flow.html` tự chứa (không CDN, không path tuyệt đối cục bộ), đọc được cả sáng/tối, mở qua `file://`.
+- Ưu tiên bằng chứng chạy thật hơn trích dẫn; cái gì chưa chạy được thì ghi "chưa kiểm chứng" ngay tại chỗ.
 
 ## Reference example
-`references/example-impeccable/` — a full worked run of this skill against `pbakaus/impeccable` (a CLI + multi-agent design-QA skill pack), including the split consumer/contributor tracks and the verification notes. Use it as the concrete shape to match.
+`references/example-setup/` — một lượt chạy thật của skill này trên `rheinmir/setup` (overstack: bootstrap + 19 luật + 87 skill): hub `dym-setup` + 6 sub-skill (file con lưu dạng `<tên>.skill.md` để không bị loader quét nhầm thành skill), `workflows.md` với bảng kiểm chứng 30 dòng, `flow.html`. Lượt đó tìm ra 5 lỗi thật (đã vá ở PR #114–#117) — đó là mức "kiểm chứng" cần khớp.

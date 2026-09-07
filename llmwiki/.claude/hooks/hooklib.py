@@ -73,7 +73,41 @@ def run_validator(name: str, event: dict, validators_dir: pathlib.Path):
     return proc.returncode, proc.stderr.strip()
 
 
+def scope_config(root: str) -> dict:
+    """GH#49: scope index KHAI TƯỜNG MINH qua .overstack.yaml tại root dự án.
+
+    Parser tối giản (hook chạy bằng python hệ thống, không thêm dep pyyaml) — 2 khoá scalar:
+        wiki_dir: llmwiki/wiki     # wiki chính (relocate được — hook + graph cùng đọc)
+        code_root: src             # vùng code để index (thu hẹp/relocate, tách mẹ/con)
+    Thiếu file/khoá → mặc định cũ → KHÔNG hồi quy. Config hỏng → mặc định, không chặn phiên.
+    Một nguồn: stop.py (regen wiki-graph) và find_wiki_dir() (mọi hook) đọc cùng hàm này —
+    trước đây chỉ regen đọc config nên "relocate wiki" chỉ đúng với graph, sai với R3/orient.
+    """
+    cfg = {"wiki_dir": None, "code_root": None}
+    f = pathlib.Path(root) / ".overstack.yaml"
+    if not f.is_file():
+        return cfg
+    try:
+        for ln in f.read_text(encoding="utf-8").splitlines():
+            ln = ln.split("#", 1)[0].rstrip()
+            if ":" not in ln:
+                continue
+            k, v = ln.split(":", 1)
+            k, v = k.strip(), v.strip().strip("'\"")
+            if k in cfg and v:
+                cfg[k] = v
+    except Exception:
+        pass
+    return cfg
+
+
 def find_wiki_dir(root: str):
+    # GH#49: wiki_dir khai trong .overstack.yaml thắng mọi ứng viên ngầm định (relocate được).
+    declared = scope_config(root)["wiki_dir"]
+    if declared:
+        d = pathlib.Path(root) / declared
+        if d.is_dir():
+            return d
     # fdk/wiki first: in the framework repo the framework's OWN wiki lives in the kit (fdk/wiki);
     # downstream projects have no fdk/ → fall through to their per-project llmwiki/wiki.
     for cand in (pathlib.Path(root) / "fdk" / "wiki", pathlib.Path(root) / "wiki", pathlib.Path(root) / "llmwiki" / "wiki"):

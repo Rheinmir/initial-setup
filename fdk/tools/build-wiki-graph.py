@@ -231,6 +231,7 @@ def _layout(nodes, adj, W=1680, H=1080, iters=340):
 
 def build_static(primary: str, out_abs: str, nodes, edges, ledger, stale):
     """Bản HTML/CSS THUẦN — 0 <script>. Vị trí bake sẵn; hover + lọc bằng CSS :has()."""
+    out_abs = _repo_rel(Path(out_abs))   # footer luôn tương đối, kể cả khi caller đưa đường tuyệt đối
     import html as _h
     ids = {n["id"] for n in nodes}
     # khử trùng id, đánh index
@@ -437,6 +438,7 @@ def impact_reverse(target, edges, rel="imports", cap=1):
 
 
 def build_html(primary: str, out_abs: str, nodes, edges, ledger, stale):
+    out_abs = _repo_rel(Path(out_abs))   # footer luôn tương đối, kể cả khi caller đưa đường tuyệt đối
     # chỉ giữ cạnh nối 2 node THẬT (bỏ touches→code path, và target không phải node)
     ids = {n["id"] for n in nodes}
     real_edges = [e for e in edges if e["from"] in ids and e["to"] in ids and e["from"] != e["to"]]
@@ -864,7 +866,7 @@ def main() -> None:
     out = Path(a.out).resolve() if a.out else Path("llmwiki/html").resolve() / default_name
     out.parent.mkdir(parents=True, exist_ok=True)
     render = build_static if a.static else build_html
-    out.write_text(render(ptag, _repo_rel(out), nodes, edges, ledger, stale), encoding="utf-8")
+    out.write_text(render(ptag, str(out), nodes, edges, ledger, stale), encoding="utf-8")
     if a.json:                     # dump nodes/edges thô cho eval/scoring (cùng dữ liệu graph vừa vẽ)
         Path(a.json).resolve().write_text(
             json.dumps({"nodes": nodes, "edges": edges,

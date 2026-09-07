@@ -71,6 +71,7 @@ STEPS = [
         "python3 harness/scripts/trace-grader.py --self-test >/dev/null && "
         "python3 harness/scripts/loop-runner.py selftest >/dev/null && "
         "python3 harness/scripts/wikieval.py --self-test >/dev/null && "
+        "python3 harness/scripts/handoff-log.py --self-test >/dev/null && "
         "python3 harness/scripts/failure-flywheel.py --root . --report >/dev/null && "
         "python3 harness/scripts/success-flywheel.py --self-test >/dev/null && "
         "python3 harness/scripts/egress-guard.py --self-test >/dev/null && "

@@ -43,9 +43,18 @@ try:
     mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
     n = lambda: len(json.loads(re.search(r'id="tree-data">(.*?)</script>',
                     tree.read_text(encoding="utf-8"), re.S).group(1)))
-    mod.flush_problem_tree(tmp, "dba79064-aaaa"); a = n()
-    mod.flush_problem_tree(tmp, "dba79064-aaaa"); b = n()
-    mod.flush_problem_tree(tmp, "72190e1c-bbbb"); c = n()
+    def dirty(i):   # để lại một file framework CHƯA commit -> hook mới có cớ xả sổ
+        (tmp / "harness" / f"t{i}.py").write_text("# chạm framework\n")
+    def commit():   # dọn sổ về sạch -> lần bắn sau, chốt session là thứ DUY NHẤT chặn được
+        subprocess.run(["git", "add", "-A"], cwd=tmp, capture_output=True)
+        subprocess.run(["git", "-c", "user.name=u", "-c", "user.email=u@u",
+                        "commit", "-q", "-m", "x"], cwd=tmp, capture_output=True)
+    # Phải commit sổ giữa các lần bắn: hook CỐ Ý bỏ qua khi chính file sổ đang bẩn.
+    # Không commit thì lần bắn thứ ba bị chặn vì lý do đó, và assertion "phiên khác
+    # vẫn ghi được" đỗ mà không hề chạm tới chốt session — đỗ vì lý do sai.
+    dirty(1); mod.flush_problem_tree(tmp, "dba79064-aaaa"); a = n(); commit()
+    dirty(2); mod.flush_problem_tree(tmp, "dba79064-aaaa"); b = n(); commit()
+    dirty(3); mod.flush_problem_tree(tmp, "72190e1c-bbbb"); c = n(); commit()
     print(f'{a} {b} {c} {int(chr(10) + " {" + chr(10) + chr(32)+chr(32) + chr(34) + "id" + chr(34) in tree.read_text(encoding="utf-8"))}')
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
@@ -69,9 +78,17 @@ try:
                        capture_output=True, timeout=30)
     n = lambda: len(json.loads(re.search(r'id="tree-data">(.*?)</script>',
                     tree.read_text(encoding="utf-8"), re.S).group(1)))
-    fire("dba79064-aaaa"); a = n()
-    fire("dba79064-aaaa"); b = n()
-    fire("72190e1c-bbbb"); c = n()
+    def dirty(i):
+        (tmp / "harness" / f"t{i}.py").write_text("# chạm framework\n")
+    def commit():
+        subprocess.run(["git", "add", "-A"], cwd=str(tmp), capture_output=True)
+        subprocess.run(["git", "-c", "user.name=u", "-c", "user.email=u@u",
+                        "commit", "-q", "-m", "x"], cwd=str(tmp), capture_output=True)
+    # xem chú thích ở bản A: bẩn -> bắn -> commit. Không dọn sổ giữa các lần thì
+    # assertion 3 đỗ vì hook bỏ qua do sổ đang bẩn, chứ không hề chạm chốt session.
+    dirty(1); fire("dba79064-aaaa"); a = n(); commit()
+    dirty(2); fire("dba79064-aaaa"); b = n(); commit()
+    dirty(3); fire("72190e1c-bbbb"); c = n(); commit()
     print(f'{a} {b} {c} {int(chr(10) + " {" + chr(10) + chr(32)+chr(32) + chr(34) + "id" + chr(34) in tree.read_text(encoding="utf-8"))}')
 finally:
     shutil.rmtree(tmp, ignore_errors=True)

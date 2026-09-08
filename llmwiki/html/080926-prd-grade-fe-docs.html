@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>prd-grade-fe: một cửa ra frontend production</title>
+<meta name="description" content="Skill hub năm pha: hallmark giữ hệ thiết kế, impeccable gác 61 luật tất định, một file design.md gánh cả hai, cổng fe-gate trước khi giao.">
+<meta name="theme-color" content="#eaf2fd">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a84ff'/%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem("prd-grade-fe-docs-theme");
+if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
+<style>
+:root{
+  --font-text:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue','Roboto','Segoe UI',sans-serif;
+  --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Roboto','Segoe UI',sans-serif;
+  --font-mono:'SF Mono',ui-monospace,'SFMono-Regular',Menlo,'Roboto Mono',Consolas,monospace;
+  --glass-1:rgba(255,255,255,.55);--glass-2:rgba(255,255,255,.7);--glass-3:rgba(255,255,255,.88);
+  --blur-1:24px;--blur-2:8px;--blur-3:4px;
+  --edge-hi:inset 0 1px 0 rgba(255,255,255,.85);
+  --border:rgba(30,90,170,.14);
+  --ink:#0f0f12;--ink2:#4a4a55;
+  --nav-pad-y:18px;--navw:200px;
+  --mm-bg:#f7fbff;--mm-fg:#0f0f12;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#e9f0fb;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:transparent transparent}
+html.scrolling{scrollbar-color:rgba(10,132,255,.32) transparent}
+body{font-family:var(--font-text);font-size:13px;line-height:1.62;color:var(--ink);padding-left:200px;
+  transition:padding-left .28s cubic-bezier(.4,0,.2,1);
+  background:
+    radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.10),transparent 60%),
+    radial-gradient(700px 420px at 95% 15%,rgba(90,162,232,.08),transparent 55%),
+    linear-gradient(180deg,#f7fbff 0%,#eaf2fd 100%);
+  background-attachment:fixed}
+body::before{content:'';position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(640px 440px at 10% 14%,rgba(10,132,255,.22),transparent 65%),
+    radial-gradient(380px 460px at 4% 52%,rgba(48,176,199,.18),transparent 65%),
+    radial-gradient(540px 400px at 88% 10%,rgba(88,86,214,.13),transparent 60%),
+    radial-gradient(720px 500px at 74% 76%,rgba(48,176,199,.13),transparent 65%),
+    radial-gradient(480px 380px at 16% 86%,rgba(255,149,0,.12),transparent 60%);
+  animation:orbDrift 46s ease-in-out infinite alternate}
+@keyframes orbDrift{100%{transform:translate(2.2%,1.6%) scale(1.045)}}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(rgba(30,90,170,.11) 1px,transparent 1.3px);
+  background-size:22px 22px;
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.22));
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.22))}
+
+::-webkit-scrollbar{width:11px;height:11px;background:transparent}
+::-webkit-scrollbar-track,::-webkit-scrollbar-track-piece,::-webkit-scrollbar-corner,::-webkit-scrollbar-button{background:transparent;border:0;box-shadow:none}
+::-webkit-scrollbar-thumb{background:transparent;border-radius:8px;border:3px solid transparent;background-clip:content-box;transition:background-color .25s ease}
+html.scrolling::-webkit-scrollbar-thumb,nav.scrolling::-webkit-scrollbar-thumb,::-webkit-scrollbar-thumb:hover{background-color:rgba(10,132,255,.32)}
+::-webkit-scrollbar-thumb:active{background-color:rgba(10,132,255,.6)}
+
+a{color:#0a84ff;text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--font-mono);font-size:.92em;background:rgba(10,132,255,.07);
+  padding:1px 5px;border-radius:5px;border:1px solid rgba(30,90,170,.10)}
+:focus-visible{outline:2px solid #0a84ff;outline-offset:2px;border-radius:8px}
+:focus:not(:focus-visible){outline:none}
+
+.skip-link{position:fixed;top:8px;left:8px;z-index:200;padding:8px 14px;border-radius:10px;
+  background:var(--glass-1);backdrop-filter:blur(var(--blur-1));border:1px solid var(--border);
+  transform:translateY(-150%);transition:transform .2s}
+.skip-link:focus-visible{transform:translateY(0)}
+
+nav{position:fixed;top:0;left:0;bottom:0;width:200px;z-index:100;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:var(--nav-pad-y) 12px;
+  scrollbar-width:none;-ms-overflow-style:none;
+  background:linear-gradient(165deg,rgba(255,255,255,.46) 0%,rgba(255,255,255,.22) 48%,rgba(240,248,255,.34) 100%);
+  backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  -webkit-backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  border-right:1px solid rgba(255,255,255,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 1px 0 0 rgba(255,255,255,.5),
+    inset -1px 0 0 rgba(30,90,170,.10),4px 0 24px rgba(30,90,170,.08);
+  transition:transform .28s cubic-bezier(.4,0,.2,1)}
+nav::-webkit-scrollbar{width:0;height:0;display:none}
+nav::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(220px 160px at 18% 4%,rgba(255,255,255,.55),transparent 70%),
+    linear-gradient(115deg,rgba(255,255,255,.28) 0%,transparent 28%,transparent 72%,rgba(255,255,255,.14) 100%)}
+nav>*{position:relative;flex-shrink:0}
+nav .logo{margin:0 0 12px;padding:6px 10px;font-family:var(--font-display);font-size:14px;font-weight:800;
+  letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+nav .logo .txt{background:linear-gradient(135deg,#0a84ff,#64b5f7);-webkit-background-clip:text;background-clip:text;color:transparent}
+nav a{padding:6px 11px;border-radius:10px;font-size:12px;color:var(--ink2);position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:9px;line-height:1.35}
+nav a:hover{color:var(--ink);text-decoration:none;background:rgba(10,132,255,.05)}
+nav a.active{color:#0a84ff;background:rgba(10,132,255,.08);font-weight:600}
+nav a .ic{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;flex-shrink:0}
+nav a .ic svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.nav-close{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink2);cursor:pointer;
+  background:rgba(0,0,0,.04);border:none;overflow:hidden}
+.nav-close:hover{color:#0a84ff;background:rgba(10,132,255,.10)}
+.nav-toggle{position:fixed;top:12px;left:12px;z-index:120;width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink2);cursor:pointer;
+  background:linear-gradient(165deg,rgba(255,255,255,.5),rgba(255,255,255,.24));
+  backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  -webkit-backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  border:1px solid transparent;overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 0 0 1px rgba(30,90,170,.08),0 2px 10px rgba(30,90,170,.12);
+  transition:opacity .2s,transform .28s cubic-bezier(.4,0,.2,1)}
+.nav-toggle:hover{color:#0a84ff}
+body:not(.nav-collapsed) .nav-toggle{opacity:0;pointer-events:none;transform:translateX(-6px)}
+body.nav-collapsed nav{transform:translateX(-100%)}
+body.nav-collapsed{padding-left:0;--navw:0px}
+
+.theme-row{position:sticky;bottom:calc(-1 * var(--nav-pad-y));margin-top:auto;display:flex;align-items:center;
+  justify-content:space-between;padding:11px 14px;margin-left:-12px;margin-right:-12px;
+  border-top:1px solid rgba(30,90,170,.14);
+  background:linear-gradient(165deg,rgba(255,255,255,.5),rgba(255,255,255,.3));
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.theme-row .lbl{font-size:11.5px;color:var(--ink2)}
+.theme-switch{cursor:pointer}
+.theme-switch .track{display:inline-block;position:relative;width:50px;height:26px;border-radius:999px;
+  background:rgba(30,90,170,.16);transition:background .2s}
+.theme-switch .track::before{content:'☀️';position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:10px}
+.theme-switch .track::after{content:'🌙';position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px}
+.theme-switch .knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 4px rgba(20,40,90,.28);transition:left .18s;z-index:2}
+.theme-switch.on .knob{left:26px}
+.theme-switch.on .track{background:rgba(10,132,255,.55)}
+
+.ripple-ink{position:absolute;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.70) 0%,rgba(255,255,255,.28) 38%,rgba(10,132,255,.20) 72%,transparent 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -10px 20px rgba(10,132,255,.12),0 0 14px rgba(10,132,255,.10);
+  backdrop-filter:blur(2px) saturate(1.25);-webkit-backdrop-filter:blur(2px) saturate(1.25);
+  transform:scale(0);opacity:1;animation:rippleGrow .6s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes rippleGrow{55%{transform:scale(1);opacity:.75}100%{transform:scale(1.04);opacity:0}}
+
+hero,.hero{display:block;max-width:1100px;margin:0 auto;padding:76px 24px 26px}
+.hero h1{font-family:var(--font-display);font-size:clamp(26px,4vw,40px);line-height:1.14;letter-spacing:-.03em;
+  text-wrap:balance;background:linear-gradient(135deg,#0a84ff,#5aa2e8,#cfe3fb);
+  -webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.08em}
+.hero .lead{font-size:14px;color:var(--ink2);margin-top:12px;max-width:74ch;text-wrap:pretty}
+.hero .meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.hero .meta span{font-size:10.5px;padding:3px 10px;border-radius:999px;background:var(--glass-2);
+  border:1px solid var(--border);box-shadow:var(--edge-hi);color:var(--ink2)}
+
+section{position:relative;max-width:1100px;margin:0 auto;padding:56px 24px 62px}
+.section-bg{position:relative;overflow:visible}
+/* full-bleed: 100vw đo cả viewport, tâm section lệch nửa sidebar nên trừ ra (đo bằng Playwright: 100px) */
+.section-bg::before{content:'';position:absolute;top:0;bottom:0;left:50%;
+  width:calc(100vw - var(--navw));transform:translateX(-50%);pointer-events:none;z-index:-1}
+.section-header{margin-bottom:22px}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.02em}
+.section-header h2{font-family:var(--font-display);font-size:21px;letter-spacing:-.02em;margin:10px 0 8px;
+  color:#1d1d1f;text-wrap:balance}
+.section-header p{font-size:13px;color:var(--ink2);max-width:78ch;text-wrap:pretty}
+
+.card{background:var(--glass-2);backdrop-filter:blur(var(--blur-2)) saturate(1.1);
+  -webkit-backdrop-filter:blur(var(--blur-2)) saturate(1.1);
+  border:1px solid var(--border);border-radius:16px;
+  box-shadow:var(--edge-hi),0 4px 20px rgba(20,40,90,.08);padding:18px 20px}
+.card h4{font-size:13px;margin-bottom:9px;letter-spacing:-.01em}
+.card p{font-size:12.8px;color:var(--ink2);text-wrap:pretty}
+.card p+p{margin-top:9px}
+.card ul{list-style:none;display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.card li{font-size:12.5px;color:var(--ink2);padding-left:15px;position:relative;text-wrap:pretty}
+.card li::before{content:'›';position:absolute;left:2px;font-weight:700}
+.content-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.content-grid>*{min-width:0}
+code{overflow-wrap:anywhere}
+.prose{font-size:13px;color:var(--ink2);max-width:80ch;text-wrap:pretty}
+.prose+.prose{margin-top:11px}
+.prose strong{color:var(--ink)}
+
+.table-wrap{overflow-x:auto;margin-top:18px;border-radius:14px;border:1px solid var(--border);
+  box-shadow:var(--edge-hi),0 4px 20px rgba(20,40,90,.08)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;
+  background:var(--glass-3);backdrop-filter:blur(var(--blur-3));-webkit-backdrop-filter:blur(var(--blur-3))}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid rgba(30,90,170,.09)}
+th{font-weight:700;font-size:11.5px;color:var(--ink);background:rgba(255,255,255,.4)}
+tr:last-child td{border-bottom:none}
+td code{font-size:11.5px}
+
+pre.code-block{background:#0f1729;color:#cbd5e1;border-radius:12px;padding:14px 16px;overflow-x:auto;
+  font-family:var(--font-mono);font-size:11.8px;line-height:1.62;margin-top:14px;
+  box-shadow:0 4px 20px rgba(20,40,90,.16)}
+.code-wrap{position:relative}
+.code-copy{position:absolute;top:7px;right:7px;z-index:2;width:28px;height:26px;display:inline-flex;
+  align-items:center;justify-content:center;background:rgba(255,255,255,.1);color:#cbd5e1;
+  border:1px solid rgba(255,255,255,.15);border-radius:7px;cursor:pointer;opacity:0;
+  transition:opacity .15s,background .15s,color .15s}
+.code-copy svg{width:14px;height:14px;display:block}
+.code-wrap:hover .code-copy{opacity:1}
+.code-copy:hover{background:rgba(255,255,255,.2);color:#fff}
+.code-copy.copied{background:rgba(16,185,129,.25);color:#6ee7b7;border-color:rgba(16,185,129,.45);opacity:1}
+
+.diagram-box{background:var(--glass-2);backdrop-filter:blur(var(--blur-2)) saturate(1.1);
+  -webkit-backdrop-filter:blur(var(--blur-2)) saturate(1.1);
+  border:1px solid var(--border);border-radius:16px;box-shadow:var(--edge-hi),0 4px 20px rgba(20,40,90,.08);
+  padding:22px;margin:20px 0;position:relative;overflow:hidden;display:flex;flex-direction:column;
+  resize:vertical;min-height:170px;transition:box-shadow .2s ease}
+.diagram-box:hover{box-shadow:var(--edge-hi),0 6px 28px rgba(20,40,90,.14)}
+.diagram-viewport{position:relative;flex:1 1 auto;width:100%;overflow:hidden;cursor:grab;touch-action:none}
+.diagram-viewport.grabbing{cursor:grabbing}
+.diagram-viewport svg{width:100%;height:auto;display:block;overflow:visible;transform-origin:0 0;
+  will-change:transform;user-select:none;-webkit-user-select:none}
+.dnode{cursor:move}
+.dnode:hover>rect:first-of-type{filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))}
+.diagram-hint{position:absolute;top:8px;right:12px;z-index:5;font-size:10px;color:var(--ink2);
+  background:rgba(255,255,255,.75);border:1px solid rgba(0,0,0,.05);border-radius:20px;
+  padding:3px 10px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.diagram-box:hover .diagram-hint{opacity:.9}
+.diagram-reset{position:absolute;bottom:8px;right:10px;z-index:5;font-size:11px;
+  background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.08);border-radius:8px;
+  padding:3px 9px;cursor:pointer;color:var(--ink2);opacity:0;transition:opacity .2s;overflow:hidden}
+.diagram-box:hover .diagram-reset{opacity:1}
+.diagram-box::after{content:'';position:absolute;right:5px;bottom:5px;width:16px;height:16px;
+  pointer-events:none;opacity:0;transition:opacity .25s ease;clip-path:polygon(100% 0,100% 100%,0 100%);
+  background:repeating-linear-gradient(135deg,transparent 0 3.5px,rgba(10,132,255,.45) 3.5px 5px)}
+.diagram-box:hover::after{opacity:.85}
+.diagram-box::-webkit-resizer{display:none}
+.diagram-box text{font-family:var(--font-text);font-variant-numeric:tabular-nums}
+
+.mm{overflow-x:auto;padding:14px 4px 6px}
+.mm-canvas{position:relative;width:max-content}
+.mm-links{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;z-index:0}
+.mm-links path{fill:none;stroke-width:2.2;opacity:.55;stroke-linecap:round}
+.mm .tree{position:relative;z-index:1}
+.mm .tree,.mm .children{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.mm .row{display:flex;align-items:center;gap:48px;position:relative}
+.mm .children{position:relative}
+.mm .children.collapsed{display:none}
+.mm .node{position:relative;display:inline-flex;flex-direction:column;gap:1px;padding:7px 13px;border-radius:13px;
+  cursor:default;white-space:nowrap;background:rgba(255,255,255,.72);backdrop-filter:blur(7px) saturate(1.1);
+  -webkit-backdrop-filter:blur(7px) saturate(1.1);border:1px solid var(--border);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 3px 14px rgba(20,40,90,.07);transition:transform .12s}
+.mm .node.has-children{cursor:pointer}
+.mm .node:hover{transform:translateY(-1px)}
+.mm .node .nm{font-size:13px;font-weight:700;letter-spacing:-.01em}
+.mm .node .ds{font-size:10.5px;color:var(--ink2)}
+.mm .node .ct{font-size:10px;color:#fff;font-weight:700;padding:1px 7px;border-radius:999px;
+  position:absolute;top:-8px;right:-8px;background:#0a84ff;font-variant-numeric:tabular-nums}
+.mm .node.has-children::after{content:'';position:absolute;right:-7px;top:50%;width:6px;height:6px;
+  border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);
+  transform:translateY(-50%) rotate(-45deg);opacity:.5}
+.mm .node.collapsed-parent::after{transform:translateY(-50%) rotate(45deg)}
+.mm .node.root{background:linear-gradient(135deg,rgba(10,132,255,.16),rgba(88,86,214,.14));border-color:rgba(10,132,255,.4)}
+.mm .node.b-0 .nm{color:#30b0c7}.mm .node.b-0{border-color:rgba(48,176,199,.35)}.mm .node.b-0 .ct{background:#30b0c7}
+.mm .node.b-1 .nm{color:#5856d6}.mm .node.b-1{border-color:rgba(88,86,214,.35)}.mm .node.b-1 .ct{background:#5856d6}
+.mm .node.b-2 .nm{color:#f08c00}.mm .node.b-2{border-color:rgba(255,149,0,.35)}.mm .node.b-2 .ct{background:#ff9500}
+.mm .node.b-3 .nm{color:#28a745}.mm .node.b-3{border-color:rgba(52,199,89,.35)}.mm .node.b-3 .ct{background:#34c759}
+.mm .node.b-4 .nm{color:#e0264b}.mm .node.b-4{border-color:rgba(255,45,85,.35)}.mm .node.b-4 .ct{background:#ff2d55}
+
+.callout{margin-top:18px;padding:14px 17px;border-radius:14px;border:1px solid var(--border);
+  background:var(--glass-2);backdrop-filter:blur(var(--blur-2));-webkit-backdrop-filter:blur(var(--blur-2));
+  box-shadow:var(--edge-hi),0 4px 20px rgba(20,40,90,.08);font-size:12.8px;color:var(--ink2);text-wrap:pretty}
+.callout b{color:var(--ink)}
+.callout.warn{border-left:3px solid #ff9500}
+.callout.good{border-left:3px solid #34c759}
+
+.collapse-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-size:12.5px;
+  font-weight:600;color:var(--ink);background:var(--glass-2);border:1px solid var(--border);
+  border-radius:11px;padding:7px 14px;cursor:pointer;position:relative;overflow:hidden;
+  backdrop-filter:blur(var(--blur-2));-webkit-backdrop-filter:blur(var(--blur-2));box-shadow:var(--edge-hi)}
+.collapse-toggle .arrow{transition:transform .25s cubic-bezier(.4,0,.2,1);font-size:10px}
+.collapse-toggle .arrow.open{transform:rotate(90deg)}
+.collapse-body{max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s ease}
+.collapse-body.open{opacity:1}
+.collapse-body-inner{padding-top:14px}
+
+footer{max-width:1100px;margin:0 auto;padding:36px 24px 60px;font-size:11.5px;color:var(--ink2);
+  border-top:1px solid var(--border);margin-top:20px}
+
+#sec-0 .tag{background:rgba(10,132,255,.10);color:#0a84ff}
+#sec-0 .card h4{color:#0a84ff}#sec-0 .card li::before{color:#0a84ff}
+.s-bg0::before{background:linear-gradient(180deg,rgba(10,132,255,.05) 0%,transparent 60%)}
+#sec-1 .tag{background:rgba(48,176,199,.12);color:#30b0c7}
+#sec-1 .card h4{color:#30b0c7}#sec-1 .card li::before{color:#30b0c7}
+.s-bg1::before{background:linear-gradient(180deg,rgba(48,176,199,.05) 0%,transparent 60%)}
+#sec-2 .tag{background:rgba(88,86,214,.12);color:#5856d6}
+#sec-2 .card h4{color:#5856d6}#sec-2 .card li::before{color:#5856d6}
+.s-bg2::before{background:linear-gradient(180deg,rgba(88,86,214,.05) 0%,transparent 60%)}
+#sec-3 .tag{background:rgba(52,199,89,.12);color:#28a745}
+#sec-3 .card h4{color:#28a745}#sec-3 .card li::before{color:#28a745}
+.s-bg3::before{background:linear-gradient(180deg,rgba(52,199,89,.05) 0%,transparent 60%)}
+#sec-4 .tag{background:rgba(255,149,0,.12);color:#f08c00}
+#sec-4 .card h4{color:#f08c00}#sec-4 .card li::before{color:#f08c00}
+.s-bg4::before{background:linear-gradient(180deg,rgba(255,149,0,.06) 0%,transparent 60%)}
+#sec-5 .tag{background:rgba(255,45,85,.12);color:#e0264b}
+#sec-5 .card h4{color:#e0264b}#sec-5 .card li::before{color:#e0264b}
+.s-bg5::before{background:linear-gradient(180deg,rgba(255,45,85,.05) 0%,transparent 60%)}
+#sec-6 .tag{background:rgba(10,132,255,.10);color:#0a84ff}
+#sec-6 .card h4{color:#0a84ff}#sec-6 .card li::before{color:#0a84ff}
+.s-bg6::before{background:linear-gradient(180deg,rgba(10,132,255,.05) 0%,transparent 60%)}
+
+#sec-7 .tag{background:rgba(48,176,199,.12);color:#30b0c7}
+#sec-7 .card h4{color:#30b0c7}#sec-7 .card li::before{color:#30b0c7}
+.s-bg7::before{background:linear-gradient(180deg,rgba(48,176,199,.05) 0%,transparent 60%)}
+#sec-8 .tag{background:rgba(88,86,214,.12);color:#5856d6}
+#sec-8 .card h4{color:#5856d6}#sec-8 .card li::before{color:#5856d6}
+.s-bg8::before{background:linear-gradient(180deg,rgba(88,86,214,.05) 0%,transparent 60%)}
+
+@media (prefers-color-scheme:dark){
+  html:not([data-theme=light]){--glass-1:rgba(28,40,62,.55);--glass-2:rgba(26,38,58,.68);--glass-3:rgba(22,33,52,.86);
+    --border:rgba(120,160,220,.20);--ink:#e8f0fb;--ink2:#9fb4d1;
+    --edge-hi:inset 0 1px 0 rgba(255,255,255,.10);--mm-bg:#0d1a2c;--mm-fg:#e8f0fb;background:#0a1220}
+  html:not([data-theme=light]) body{color:var(--ink);
+    background:
+      radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.14),transparent 60%),
+      radial-gradient(700px 420px at 95% 15%,rgba(88,86,214,.12),transparent 55%),
+      linear-gradient(180deg,#0d1626 0%,#0a1220 100%);background-attachment:fixed}
+  html:not([data-theme=light]) nav{background:linear-gradient(165deg,rgba(30,46,72,.62) 0%,rgba(20,32,52,.38) 48%,rgba(26,42,66,.5) 100%);
+    border-right:1px solid rgba(120,160,220,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 1px 0 0 rgba(255,255,255,.06),4px 0 24px rgba(0,0,0,.3)}
+  html:not([data-theme=light]) th{background:rgba(30,46,72,.5)}
+  html:not([data-theme=light]) .section-header h2{color:#f2f6fc}
+  html:not([data-theme=light]) code{background:rgba(120,160,220,.12);border-color:rgba(120,160,220,.18)}
+  html:not([data-theme=light]) .mm .node{background:rgba(26,38,58,.75)}
+  html:not([data-theme=light]) .diagram-box text{fill:#dbe6f5}
+  html:not([data-theme=light]) .diagram-box rect[fill^="rgba(255"]{fill:rgba(30,46,72,.75)}
+  html:not([data-theme=light]) .nav-close{background:rgba(255,255,255,.06)}
+}
+html[data-theme=dark]{--glass-1:rgba(28,40,62,.55);--glass-2:rgba(26,38,58,.68);--glass-3:rgba(22,33,52,.86);
+  --border:rgba(120,160,220,.20);--ink:#e8f0fb;--ink2:#9fb4d1;
+  --edge-hi:inset 0 1px 0 rgba(255,255,255,.10);--mm-bg:#0d1a2c;--mm-fg:#e8f0fb;background:#0a1220}
+html[data-theme=dark] body{color:var(--ink);
+  background:
+    radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.14),transparent 60%),
+    radial-gradient(700px 420px at 95% 15%,rgba(88,86,214,.12),transparent 55%),
+    linear-gradient(180deg,#0d1626 0%,#0a1220 100%);background-attachment:fixed}
+html[data-theme=dark] nav{background:linear-gradient(165deg,rgba(30,46,72,.62) 0%,rgba(20,32,52,.38) 48%,rgba(26,42,66,.5) 100%);
+  border-right:1px solid rgba(120,160,220,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 1px 0 0 rgba(255,255,255,.06),4px 0 24px rgba(0,0,0,.3)}
+html[data-theme=dark] th{background:rgba(30,46,72,.5)}
+html[data-theme=dark] .section-header h2{color:#f2f6fc}
+html[data-theme=dark] code{background:rgba(120,160,220,.12);border-color:rgba(120,160,220,.18)}
+html[data-theme=dark] .mm .node{background:rgba(26,38,58,.75)}
+html[data-theme=dark] .diagram-box text{fill:#dbe6f5}
+html[data-theme=dark] .diagram-box rect[fill^="rgba(255"]{fill:rgba(30,46,72,.75)}
+html[data-theme=dark] .nav-close{background:rgba(255,255,255,.06)}
+
+section[id]{scroll-margin-top:24px}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:900px){.grid-3{grid-template-columns:1fr}}
+@media(max-width:760px){.content-grid{grid-template-columns:1fr}}
+@media(max-width:640px){body{padding-left:0;--navw:0px}nav{box-shadow:0 8px 30px rgba(0,0,0,.14)}.code-copy{opacity:1}}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Bỏ qua điều hướng</a>
+
+<nav>
+  <div class="logo">
+    <span class="ic" style="background:linear-gradient(135deg,#0a84ff,#64b5f7)" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg>
+    </span>
+    <span class="txt">prd-grade-fe</span>
+  </div>
+  <a href="#sec-0"><span class="ic" style="background:#0a84ff" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg></span>Vì sao có skill này</a>
+  <a href="#sec-1"><span class="ic" style="background:#30b0c7" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6M9 13h6M9 17h6"/></svg></span>Một file, hai công cụ</a>
+  <a href="#sec-2"><span class="ic" style="background:#5856d6" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h5l2-4 3 8 2-4h4"/></svg></span>Năm pha</a>
+  <a href="#sec-3"><span class="ic" style="background:#34c759" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 11l7-4M8.5 13l7 4"/></svg></span>Ba nguồn theme</a>
+  <a href="#sec-4"><span class="ic" style="background:#ff9500" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span>Preset và bằng chứng</a>
+  <a href="#sec-5"><span class="ic" style="background:#ff2d55" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></span>Cổng fe-gate</a>
+  <a href="#sec-6"><span class="ic" style="background:#0a84ff" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8"/></svg></span>ci-local.py</a>
+  <a href="#sec-7"><span class="ic" style="background:#30b0c7" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9z"/></svg></span>Cách dùng nhanh</a>
+  <a href="#sec-8"><span class="ic" style="background:#5856d6" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.6 17a2 2 0 001.7 3h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></span>Giới hạn thật</a>
+</nav>
+
+<main id="main">
+
+<div class="hero">
+  <h1>prd-grade-fe: một cửa ra frontend chuẩn production</h1>
+  <p class="lead">Một skill hub (điểm điều phối, không tự sở hữu luật) nối hai năng lực đã có sẵn nhưng đứng rời: <b>hallmark</b> giữ hệ thiết kế xuyên màn hình, <b>impeccable</b> kiểm 61 luật tất định (deterministic: cùng đầu vào luôn cho cùng kết quả). Điểm nối là MỘT file <code>design.md</code> mà cả hai cùng đọc, và một cổng máy gác trước khi giao.</p>
+  <div class="meta">
+    <span>2026-09-08</span><span>impeccable@3.6.1 pin cứng</span>
+    <span>preset macOS glass: 4 → 1 → 0 finding</span><span>UAT canary + main-URL: gate rc 0</span>
+  </div>
+</div>
+
+<div class="mm" aria-label="Sơ đồ tư duy tóm tắt trang">
+  <div class="mm-canvas"><svg class="mm-links"></svg><div class="tree"><div class="row">
+    <div class="node root has-children"><span class="nm">prd-grade-fe</span><span class="ds">hub 5 pha có cổng máy gác</span><span class="ct">9</span></div>
+    <div class="children">
+      <div class="row">
+        <div class="node b-0 cat has-children"><span class="nm">Vì sao</span><span class="ds">hai công cụ đứng rời</span><span class="ct">3</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-0 leaf"><span class="nm">hallmark</span><span class="ds">sàn design, không có gate máy</span></div></div>
+          <div class="row"><div class="node b-0 leaf"><span class="nm">impeccable</span><span class="ds">61 luật detect, chưa từng chạy ở repo</span></div></div>
+          <div class="row"><div class="node b-0 leaf"><span class="nm">khoảng trống</span><span class="ds">mỗi phiên ghép tay, mỗi màn một kiểu</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-1 cat has-children"><span class="nm">design.md</span><span class="ds">một file gánh hai công cụ</span><span class="ct">3</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-1 leaf"><span class="nm">frontmatter YAML</span><span class="ds">impeccable đọc</span></div></div>
+          <div class="row"><div class="node b-1 leaf"><span class="nm">block :root{}</span><span class="ds">hallmark đọc, là nguồn chân lý</span></div></div>
+          <div class="row"><div class="node b-1 leaf"><span class="nm">design-sync.py</span><span class="ds">sinh frontmatter + tokens.css, --check rc 1</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-2 cat has-children"><span class="nm">Năm pha</span><span class="ds">pre-flight → gate → giao</span><span class="ct">5</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-2 leaf"><span class="nm">Pha 0-1</span><span class="ds">không hỏi thứ máy tự thấy; hỏi 1 tin nhắn</span></div></div>
+          <div class="row"><div class="node b-2 leaf"><span class="nm">Pha 2</span><span class="ds">khoá biến vào design.md, sync rc 0</span></div></div>
+          <div class="row"><div class="node b-2 leaf"><span class="nm">Pha 3</span><span class="ds">build theo hallmark, chỉ dùng var(--…)</span></div></div>
+          <div class="row"><div class="node b-2 leaf"><span class="nm">Pha 4</span><span class="ds">fe-gate rc 0/1/2/3/4, tối đa 3 vòng</span></div></div>
+          <div class="row"><div class="node b-2 leaf"><span class="nm">Pha 5</span><span class="ds">report 8 mục, chỉ nói "production" khi 0</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-3 cat has-children"><span class="nm">Ba nguồn theme</span><span class="ds">A preset · B tài liệu · C URL</span><span class="ct">3</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-3 leaf"><span class="nm">A</span><span class="ds">cp preset macOS glass, đổi tên</span></div></div>
+          <div class="row"><div class="node b-3 leaf"><span class="nm">B</span><span class="ds">bảng schema có nguồn file:dòng, hỏi bù 1 lần</span></div></div>
+          <div class="row"><div class="node b-3 leaf"><span class="nm">C</span><span class="ds">hallmark study URL, attestation, lock DNA</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-4 cat has-children"><span class="nm">Preset + bằng chứng</span><span class="ds">3 vòng detect</span><span class="ct">3</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-4 leaf"><span class="nm">Vòng 1</span><span class="ds">4 finding, rc 2</span></div></div>
+          <div class="row"><div class="node b-4 leaf"><span class="nm">Vòng 2</span><span class="ds">1 finding tight-leading, rc 2</span></div></div>
+          <div class="row"><div class="node b-4 leaf"><span class="nm">Vòng 3</span><span class="ds">0 finding, rc 0, 4 viewport xanh</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-0 cat has-children"><span class="nm">fe-gate</span><span class="ds">5 mã thoát + 3 bẫy đã đo</span><span class="ct">4</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-0 leaf"><span class="nm">rc 0 · 1 · 2 · 3 · 4</span><span class="ds">xanh · lỗi vận hành · finding · skipped · thiếu target</span></div></div>
+          <div class="row"><div class="node b-0 leaf"><span class="nm">rc 0 giả</span><span class="ds">target thiếu, impeccable vẫn báo sạch</span></div></div>
+          <div class="row"><div class="node b-0 leaf"><span class="nm">npx gộp stderr</span><span class="ds">chỉ tin --json ở stdout</span></div></div>
+          <div class="row"><div class="node b-0 leaf"><span class="nm">--scope=type</span><span class="ds">viết rời thì nuốt mất target</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-1 cat has-children"><span class="nm">ci-local.py</span><span class="ds">L4 chạy tại local</span><span class="ct">3</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-1 leaf"><span class="nm">medic là L2</span><span class="ds">xanh mà CI vẫn đỏ 2 job</span></div></div>
+          <div class="row"><div class="node b-1 leaf"><span class="nm">61 step</span><span class="ds">~4 phút, exit 1 nếu có ✗</span></div></div>
+          <div class="row"><div class="node b-1 leaf"><span class="nm">nối vào /ship, /fdk</span><span class="ds">bước 1 trước push</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-2 cat has-children"><span class="nm">Cách dùng</span><span class="ds">3 lệnh ví dụ</span><span class="ct">3</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-2 leaf"><span class="nm">mặc định theme</span><span class="ds">trang danh sách đơn hàng</span></div></div>
+          <div class="row"><div class="node b-2 leaf"><span class="nm">theme từ folder</span><span class="ds">docs/brand/</span></div></div>
+          <div class="row"><div class="node b-2 leaf"><span class="nm">theme từ URL</span><span class="ds">làm giống example.com</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="node b-3 cat has-children"><span class="nm">Giới hạn</span><span class="ds">nói thật, không tô hồng</span><span class="ct">3</span></div>
+        <div class="children">
+          <div class="row"><div class="node b-3 leaf"><span class="nm">viewport</span><span class="ds">cần Playwright trong project</span></div></div>
+          <div class="row"><div class="node b-3 leaf"><span class="nm">npx lần đầu</span><span class="ds">cần mạng để tải impeccable</span></div></div>
+          <div class="row"><div class="node b-3 leaf"><span class="nm">R7 archify</span><span class="ds">chỉ áp ở repo framework</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div></div></div>
+</div>
+
+<!-- ===================== 1 ===================== -->
+<section id="sec-0" class="section-bg s-bg0">
+  <div class="section-header">
+    <span class="tag">01 · Vì sao</span>
+    <h2>Hai năng lực đã có, nhưng đứng rời nhau</h2>
+    <p>Trước ngày 2026-09-08, repo này đã có đủ đồ nghề để dựng một giao diện tử tế. Cái thiếu không phải công cụ, mà là một cửa duy nhất đi qua cả hai.</p>
+  </div>
+
+  <p class="prose"><b>hallmark</b> là sàn thiết kế mặc định của overstack (skill chống "AI slop", tức giao diện trông như máy sinh hàng loạt). Nó có gate ba câu hỏi (Audience, Use case, Tone), catalog 20 theme, lệnh <code>study &lt;URL&gt;</code> để trích "DNA" thiết kế từ một trang thật, và cơ chế <code>design.md</code> khoá hệ xuyên màn hình: khi file này tồn tại, luật đảo chiều, mọi màn hình sau phải chung một hệ. Nhưng hallmark là rubric cho mô hình ngôn ngữ đọc, không có cổng máy chạy tất định.</p>
+
+  <p class="prose"><b>impeccable</b> (bundle <code>doyourmagic/impeccable/</code>, kiểm chứng trên bản <code>impeccable@3.6.1</code>) là chiều ngược lại: 61 luật tất định chạy bằng lệnh <code>npx impeccable detect</code>, trả mã thoát (exit code, số nguyên tiến trình trả về khi kết thúc) 0 sạch, 1 lỗi vận hành, 2 có finding (phát hiện vi phạm). Nó đọc <code>design.md</code> để biết token (biến thiết kế được đặt tên, ví dụ <code>--color-accent</code>) nào là hợp lệ. Lúc soạn SPEC, CLI này chưa được cài trên máy và chưa từng chạy trong repo.</p>
+
+  <div class="callout warn"><b>Khoảng trống user chỉ ra:</b> không có MỘT cửa để (1) chọn nguồn thông số, (2) đổ cùng một bộ thông số vào cả hai công cụ mà không lệch (drift), (3) bắt buộc đi vòng audit trước khi giao. Mỗi phiên tự ghép tay nên mỗi màn một kiểu, và bộ detect tất định chưa bao giờ được bật.</div>
+
+  <div class="content-grid">
+    <div class="card">
+      <h4>hallmark cho gì</h4>
+      <ul>
+        <li>Thẩm mỹ, macrostructure (bố cục lớn của trang), giọng CTA (nút kêu gọi hành động)</li>
+        <li>Slop-test 58 cổng đọc bằng mắt mô hình</li>
+        <li><code>design.md</code> khoá hệ, no-overwrite (không ghi đè, chỉ thêm Variants)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>impeccable cho gì</h4>
+      <ul>
+        <li>61 luật máy đo: contrast, leading, padding, viền mỏng bóng rộng...</li>
+        <li>JSON ra stdout (luồng xuất chuẩn) cho máy đọc</li>
+        <li>Rubric audit / harden / polish, distill từ repo GitHub sha <code>2bc2879</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="prose" style="margin-top:16px">Skill này vì thế được thiết kế là <b>hub mỏng</b>: không chép luật thiết kế từ hallmark, không vendor (đóng gói kèm) bytes của impeccable. Nó chỉ sở hữu <em>thứ tự</em> các pha và <em>hợp đồng</em> giữa các pha, cộng hai script có <code>--self-test</code>. Theo bảng phân loại adapt-modes của repo: detect CLI là <b>KÉO NGOÀI</b> (pin phiên bản, chạy qua <code>npx -y</code>), rubric là <b>HÒA TAN</b> (distill vào <code>references/</code>), hallmark đã có sẵn nên chỉ gọi.</p>
+</section>
+
+<!-- ===================== 2 ===================== -->
+<section id="sec-1" class="section-bg s-bg1">
+  <div class="section-header">
+    <span class="tag">02 · design.md</span>
+    <h2>Một file design.md gánh hai công cụ</h2>
+    <p>Phát hiện quyết định cả kiến trúc: impeccable và hallmark đọc <em>cùng một file</em>, chỉ khác phần nào trong file.</p>
+  </div>
+
+  <p class="prose">Lúc soi tarball (gói nén npm) <code>impeccable@3.6.1</code>, file <code>cli/engine/design-system.mjs</code> cho thấy impeccable đọc <code>DESIGN.md</code> hoặc <code>design.md</code> ở <b>gốc project</b>, đúng vị trí hallmark dùng để khoá hệ. Nhưng impeccable chỉ dùng <b>frontmatter YAML</b> (khối metadata nằm giữa hai dòng <code>---</code> đầu file): <code>colors:{}</code>, <code>typography:{role:{fontFamily,fontSize}, scale:{}}</code>, <code>rounded:{}</code>, và parse được cả màu OKLCH (hệ màu cảm nhận đều, thay cho hex). Sidecar <code>.impeccable/design.json</code> chỉ là tuỳ chọn.</p>
+
+  <p class="prose">hallmark thì đọc phần <b>thân markdown</b> và block <code>```css :root{}```</code> của cùng file. Vậy một file gánh cả hai: frontmatter cho impeccable, thân + block token cho hallmark. Việc còn lại là không để hai phần lệch nhau.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>design.md ở giữa: block :root là nguồn; design-sync.py sinh frontmatter YAML và tokens.css; impeccable đọc frontmatter, hallmark đọc thân markdown và block, trang HTML chỉ dùng var() từ tokens.css</title>
+      <defs>
+        <marker id="ar2" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 9 3.5, 0 7" fill="#30b0c7"/></marker>
+        <style>
+          @keyframes flowArrow{0%{stroke-dashoffset:20}100%{stroke-dashoffset:0}}
+          .flow{stroke-dasharray:6 4;animation:flowArrow 1.6s linear infinite}
+          @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+          .pulse{animation:pulse 2.4s ease-in-out infinite}
+          @media(prefers-reduced-motion:reduce){.flow,.pulse{animation:none}}
+        </style>
+      </defs>
+
+      <rect x="330" y="30" width="240" height="120" rx="10" fill="rgba(255,255,255,.7)" stroke="#30b0c7" stroke-width="1.8" class="pulse"/>
+      <text x="450" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="#0f0f12">design.md (gốc project)</text>
+      <text x="450" y="76" text-anchor="middle" font-size="9.5" fill="#4a4a55">--- frontmatter YAML --- (SINH)</text>
+      <text x="450" y="96" text-anchor="middle" font-size="9.5" fill="#4a4a55">thân markdown: System · CTA · Motion</text>
+      <text x="450" y="116" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f0f12">```css :root{ --color-… } ``` (NGUỒN)</text>
+      <text x="450" y="136" text-anchor="middle" font-size="9" fill="#4a4a55">§ Provenance · § Evidence</text>
+
+      <rect x="40" y="52" width="180" height="76" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="130" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">impeccable detect</text>
+      <text x="130" y="96" text-anchor="middle" font-size="9" fill="#4a4a55">chỉ đọc frontmatter</text>
+      <text x="130" y="112" text-anchor="middle" font-size="9" fill="#4a4a55">61 luật tất định</text>
+
+      <rect x="680" y="52" width="180" height="76" rx="8" fill="rgba(255,255,255,.7)" stroke="#ff9500" stroke-width="1.5"/>
+      <text x="770" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">hallmark</text>
+      <text x="770" y="96" text-anchor="middle" font-size="9" fill="#4a4a55">đọc thân + block :root</text>
+      <text x="770" y="112" text-anchor="middle" font-size="9" fill="#4a4a55">khoá hệ xuyên màn hình</text>
+
+      <rect x="330" y="200" width="240" height="64" rx="8" fill="rgba(255,255,255,.7)" stroke="#34c759" stroke-width="1.5"/>
+      <text x="450" y="224" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">design-sync.py</text>
+      <text x="450" y="242" text-anchor="middle" font-size="9" fill="#4a4a55">:root → frontmatter + tokens.css · --check rc 1 khi lệch</text>
+
+      <rect x="680" y="200" width="180" height="64" rx="8" fill="rgba(255,255,255,.7)" stroke="#34c759" stroke-width="1.5"/>
+      <text x="770" y="224" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">tokens.css</text>
+      <text x="770" y="242" text-anchor="middle" font-size="9" fill="#4a4a55">trang HTML chỉ dùng var(--…)</text>
+
+      <rect x="40" y="200" width="180" height="64" rx="8" fill="rgba(255,255,255,.7)" stroke="rgba(30,90,170,.35)" stroke-width="1.2"/>
+      <text x="130" y="224" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">output.html</text>
+      <text x="130" y="242" text-anchor="middle" font-size="9" fill="#4a4a55">không hex/oklch inline</text>
+
+      <line x1="326" y1="90" x2="224" y2="90" stroke="#30b0c7" stroke-width="2" marker-end="url(#ar2)" class="flow"/>
+      <line x1="574" y1="90" x2="676" y2="90" stroke="#30b0c7" stroke-width="2" marker-end="url(#ar2)" class="flow"/>
+      <line x1="450" y1="154" x2="450" y2="196" stroke="#30b0c7" stroke-width="2" marker-end="url(#ar2)" class="flow"/>
+      <line x1="574" y1="232" x2="676" y2="232" stroke="#30b0c7" stroke-width="2" marker-end="url(#ar2)" class="flow"/>
+      <line x1="676" y1="248" x2="224" y2="248" stroke="#30b0c7" stroke-width="2" marker-end="url(#ar2)" class="flow"/>
+      <line x1="130" y1="132" x2="130" y2="196" stroke="rgba(30,90,170,.4)" stroke-width="1.6" stroke-dasharray="4 4"/>
+      <text x="150" y="168" font-size="8.5" fill="#4a4a55">detect soi</text>
+    </svg>
+  </div>
+
+  <p class="prose">Script <code>scripts/design-sync.py</code> nối hai đầu. Docstring (phần chú thích đầu file mô tả mục đích) của nó nói thẳng nguyên tắc: <em>block <code>:root</code> là nguồn, frontmatter và <code>tokens.css</code> là bản sinh</em>. Script yêu cầu tối thiểu sáu token bắt buộc: <code>color-paper</code>, <code>color-ink</code>, <code>color-accent</code>, <code>font-display</code>, <code>font-body</code>, <code>font-mono</code>. Ba mã thoát:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>rc</th><th>Nghĩa</th><th>Khi nào gặp</th></tr></thead>
+      <tbody>
+        <tr><td><code>0</code></td><td>Sạch hoặc đã ghi</td><td>Chạy không tham số: ghi frontmatter + tokens.css. Chạy <code>--check</code>: bản sinh khớp nguồn.</td></tr>
+        <tr><td><code>1</code></td><td>Drift (lệch)</td><td>Chỉ với <code>--check</code>: ai đó sửa tay frontmatter hoặc tokens.css thay vì sửa block <code>:root</code>.</td></tr>
+        <tr><td><code>2</code></td><td>Thiếu token bắt buộc hoặc thiếu block</td><td>design.md không có <code>```css :root{}```</code>, hoặc thiếu một trong sáu token trên.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout good" style="margin-top:16px"><b>Hệ quả thiết kế:</b> sửa tay phần sinh là drift, và <code>--check</code> đỏ. Muốn thêm màu mới cho một màn hình thì thêm vào block <code>:root</code> của <code>design.md</code> rồi chạy lại script, không bao giờ chèn hex thẳng vào HTML. Đây chính là discipline 3 của hallmark, giờ có máy canh.</div>
+</section>
+
+<!-- ===================== 3 ===================== -->
+<section id="sec-2" class="section-bg s-bg2">
+  <div class="section-header">
+    <span class="tag">03 · Năm pha</span>
+    <h2>Từ pre-flight tới giao hàng, có nhánh theo mã thoát</h2>
+    <p>Hub chỉ giữ thứ tự và hợp đồng giữa các pha. Pha 4 là nơi máy gác; đường đi sau đó rẽ theo rc.</p>
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>Luồng năm pha: Pha 0 pre-flight, Pha 1 interview một tin nhắn, Pha 2 khoá biến vào design.md, Pha 3 build theo hallmark, Pha 4 fe-gate với nhánh rc 0 đi tiếp, rc 2 sửa và quay lại tối đa 3 vòng, rc 1/3/4 dừng; Pha 5 deliver và report</title>
+      <defs>
+        <marker id="ar3" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 9 3.5, 0 7" fill="#5856d6"/></marker>
+        <marker id="ar3g" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 9 3.5, 0 7" fill="#34c759"/></marker>
+        <marker id="ar3o" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 9 3.5, 0 7" fill="#ff9500"/></marker>
+        <marker id="ar3r" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 9 3.5, 0 7" fill="#ff2d55"/></marker>
+        <style>
+          @keyframes flowArrow{0%{stroke-dashoffset:20}100%{stroke-dashoffset:0}}
+          .flow{stroke-dasharray:6 4;animation:flowArrow 1.6s linear infinite}
+          @media(prefers-reduced-motion:reduce){.flow{animation:none}}
+        </style>
+      </defs>
+
+      <rect x="20" y="40" width="140" height="60" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="90" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">Pha 0 · Pre-flight</text>
+      <text x="90" y="80" text-anchor="middle" font-size="8.5" fill="#4a4a55">ls design.md · node? · sync --check</text>
+
+      <rect x="200" y="40" width="140" height="60" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="270" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">Pha 1 · Interview</text>
+      <text x="270" y="80" text-anchor="middle" font-size="8.5" fill="#4a4a55">1 tin nhắn, 4 câu, "go ahead"</text>
+
+      <rect x="380" y="40" width="140" height="60" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="450" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">Pha 2 · Khoá biến</text>
+      <text x="450" y="80" text-anchor="middle" font-size="8.5" fill="#4a4a55">A/B/C → design.md → sync rc 0</text>
+
+      <rect x="560" y="40" width="140" height="60" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="630" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">Pha 3 · Build</text>
+      <text x="630" y="80" text-anchor="middle" font-size="8.5" fill="#4a4a55">hallmark, chỉ var(--…)</text>
+
+      <rect x="740" y="40" width="140" height="60" rx="8" fill="rgba(255,255,255,.7)" stroke="#ff9500" stroke-width="1.8"/>
+      <text x="810" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">Pha 4 · fe-gate.sh</text>
+      <text x="810" y="80" text-anchor="middle" font-size="8.5" fill="#4a4a55">detect --json + 4 viewport</text>
+
+      <line x1="162" y1="70" x2="196" y2="70" stroke="#5856d6" stroke-width="2" marker-end="url(#ar3)" class="flow"/>
+      <line x1="342" y1="70" x2="376" y2="70" stroke="#5856d6" stroke-width="2" marker-end="url(#ar3)" class="flow"/>
+      <line x1="522" y1="70" x2="556" y2="70" stroke="#5856d6" stroke-width="2" marker-end="url(#ar3)" class="flow"/>
+      <line x1="702" y1="70" x2="736" y2="70" stroke="#5856d6" stroke-width="2" marker-end="url(#ar3)" class="flow"/>
+
+      <rect x="740" y="160" width="140" height="56" rx="8" fill="rgba(255,255,255,.7)" stroke="#34c759" stroke-width="1.5"/>
+      <text x="810" y="182" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">rc 0 · XANH</text>
+      <text x="810" y="199" text-anchor="middle" font-size="8.5" fill="#4a4a55">audit /20, P0 = 0, slop-test</text>
+
+      <rect x="740" y="250" width="140" height="56" rx="8" fill="rgba(255,255,255,.7)" stroke="#34c759" stroke-width="1.5"/>
+      <text x="810" y="272" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">Pha 5 · Deliver</text>
+      <text x="810" y="289" text-anchor="middle" font-size="8.5" fill="#4a4a55">report 8 mục, path tương đối</text>
+
+      <line x1="810" y1="102" x2="810" y2="156" stroke="#34c759" stroke-width="2" marker-end="url(#ar3g)" class="flow"/>
+      <line x1="810" y1="218" x2="810" y2="246" stroke="#34c759" stroke-width="2" marker-end="url(#ar3g)" class="flow"/>
+
+      <rect x="500" y="160" width="180" height="56" rx="8" fill="rgba(255,255,255,.7)" stroke="#ff9500" stroke-width="1.5"/>
+      <text x="590" y="182" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">rc 2 · có finding</text>
+      <text x="590" y="199" text-anchor="middle" font-size="8.5" fill="#4a4a55">sửa token / markup, tối đa 3 vòng</text>
+
+      <line x1="736" y1="120" x2="640" y2="156" stroke="#ff9500" stroke-width="2" marker-end="url(#ar3o)" class="flow"/>
+      <line x1="590" y1="156" x2="640" y2="104" stroke="#ff9500" stroke-width="2" marker-end="url(#ar3o)" class="flow"/>
+      <text x="516" y="141" text-anchor="middle" font-size="8.5" fill="#f08c00">quay lại Pha 3/4</text>
+
+      <rect x="260" y="160" width="200" height="56" rx="8" fill="rgba(255,255,255,.7)" stroke="#ff2d55" stroke-width="1.5"/>
+      <text x="360" y="182" text-anchor="middle" font-size="11" font-weight="700" fill="#0f0f12">rc 1 / 3 / 4 · DỪNG</text>
+      <text x="360" y="199" text-anchor="middle" font-size="8.5" fill="#4a4a55">lỗi vận hành / skipped / target thiếu</text>
+
+      <line x1="736" y1="96" x2="464" y2="170" stroke="#ff2d55" stroke-width="1.8" marker-end="url(#ar3r)" class="flow"/>
+
+      <rect x="260" y="250" width="420" height="56" rx="8" fill="rgba(255,255,255,.7)" stroke="rgba(30,90,170,.35)" stroke-width="1.2"/>
+      <text x="470" y="272" text-anchor="middle" font-size="10" font-weight="700" fill="#0f0f12">Không có đường nào từ rc 1/3/4 tới "sạch"</text>
+      <text x="470" y="289" text-anchor="middle" font-size="8.5" fill="#4a4a55">report ghi nguyên nhân hoặc "skipped: …"; câu "sẵn sàng production" bị cấm</text>
+      <line x1="360" y1="218" x2="360" y2="246" stroke="rgba(30,90,170,.4)" stroke-width="1.6" stroke-dasharray="4 4"/>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="card">
+      <h4>Pha 0 và 1: không hỏi thứ máy tự thấy</h4>
+      <p>Pre-flight chạy <code>ls design.md tokens.css</code>, kiểm <code>node</code>, rồi <code>design-sync.py --check</code>. Có <code>design.md</code> và rc 0 thì nói "hệ đã khoá, dùng lại" và nhảy thẳng Pha 3. Không có <code>node</code> thì vẫn làm Pha 1 tới 3, nhưng Pha 4 sẽ ghi <code>skipped</code> và report không được nói sạch.</p>
+      <p>Interview gộp thành MỘT tin nhắn với bốn câu: nguồn theme (A/B/C), audience, use case, tone. User nói "go ahead" thì chọn A, suy luận ba câu còn lại từ brief và công bố suy luận ở đầu reply. Không có ngoại lệ "brief đã đủ rõ": vẫn hỏi, user vẫy qua trong hai giây.</p>
+    </div>
+    <div class="card">
+      <h4>Pha 2 và 3: khoá rồi mới dựng</h4>
+      <p>Pha 2 đổ nguồn theme về <code>design.md</code> theo route tương ứng, rồi chạy <code>design-sync.py</code> và <code>--check</code>; rc 0 mới đi tiếp. Công bố Genre, Macrostructure, Theme ra lời (hallmark Step 2.5).</p>
+      <p>Pha 3 chạy flow mặc định của hallmark với <code>design.md</code> đã khoá, nên diversification (đa dạng hoá giữa các màn) đảo chiều: màn hình phải CHUNG hệ. Mọi màu, font, radius, motion đi qua <code>var(--…)</code> từ <code>tokens.css</code>. Đầu file có stamp <code>&lt;!-- design: macrostructure=… theme=… --&gt;</code> và dòng critique sáu trục; trục nào dưới 3 thì sửa trước khi sang Pha 4.</p>
+    </div>
+    <div class="card">
+      <h4>Pha 4: máy trước, người sau</h4>
+      <p>Bước 1 chạy <code>fe-gate.sh &lt;output.html&gt;</code>, đọc bảng <code>antipattern | file:line | snippet</code> và file <code>fe-gate.report.json</code>. rc 2 thì sửa đúng finding, chạy lại, tối đa ba vòng và ghi số finding từng vòng. rc 1/3/4 thì dừng, ghi nguyên nhân.</p>
+      <p>Bước 2 nạp rubric <code>impeccable-audit.md</code>: chấm 5 trục thang /20, gắn ưu tiên P0 tới P3, làm checklist Harden rồi Polish. P0 (chặn hoàn thành tác vụ) phải bằng 0. Bước 3 chạy slop-test của hallmark. Bước 4 chạy lại <code>fe-gate.sh</code> lần cuối vì sửa harden/polish có thể tái sinh finding.</p>
+    </div>
+    <div class="card">
+      <h4>Pha 5: report tám mục, đúng thứ tự</h4>
+      <ul>
+        <li>Suy luận hoặc đáp án Pha 1</li>
+        <li>Genre / Macrostructure / Theme + nguồn theme</li>
+        <li>Sáu điểm critique</li>
+        <li>Bảng finding vòng 1..n và rc cuối</li>
+        <li>Điểm audit /20 + số P0</li>
+        <li>Bốn viewport (khung nhìn) 320/375/414/768</li>
+        <li>Path output tương đối</li>
+        <li><code>skipped</code> nếu có</li>
+      </ul>
+      <p>Câu "sẵn sàng production" chỉ được viết khi fe-gate exit 0 và P0 = 0.</p>
+    </div>
+  </div>
+
+  <p class="prose" style="margin-top:16px">Rubric audit ở Pha 4 (phần A của <code>references/impeccable-audit.md</code>) chấm năm trục, mỗi trục từ mốc 0 tới mốc 4: <b>Accessibility</b> (contrast dưới 4.5:1, thiếu ARIA, bàn phím, semantic HTML, alt text, form), <b>Performance</b> (layout thrash, animation đắt, lạm dụng <code>will-change</code>), <b>Theming</b> (màu hard-code, dark mode gãy, token dùng sai), <b>Responsive</b> (width cứng, touch target dưới 44px, scroll ngang), và <b>Implementation Integrity</b> (chạy detector rồi kiểm từng finding trong ngữ cảnh, tách finding tất định khỏi nhận định thị giác, gọi tên false positive). Tổng điểm 18 tới 20 là Excellent, 14 tới 17 Good, 10 tới 13 Acceptable, 6 tới 9 Poor, 0 tới 5 Critical. Rubric distill từ <code>pbakaus/impeccable@2bc2879</code>, giấy phép Apache 2.0, không cần cài skill impeccable.</p>
+</section>
+
+<!-- ===================== 4 ===================== -->
+<section id="sec-3" class="section-bg s-bg3">
+  <div class="section-header">
+    <span class="tag">04 · Intake</span>
+    <h2>Ba nguồn theme, một đích đến</h2>
+    <p>Dù user đưa theme dưới dạng nào, đầu ra của cả ba route đều là <code>design.md</code> ở gốc project theo format hallmark, kèm mục Provenance (nguồn gốc dữ liệu).</p>
+  </div>
+
+  <p class="prose">Block <code>:root</code> phải có tối thiểu sáu token bắt buộc của <code>design-sync.py</code>. Sau khi ghi, luôn chạy script rồi <code>--check</code> rc 0. Khác biệt giữa ba route nằm ở cách điền bảng thông số và ở lớp kiểm trước khi tin nguồn.</p>
+
+  <div class="content-grid grid-3">
+    <div class="card">
+      <h4>Route A · preset macOS glass (mặc định)</h4>
+      <ul>
+        <li><code>cp $SKILL/references/presets/macos-glass.design.md ./design.md</code></li>
+        <li>Đổi dòng <code># Design — &lt;Project name&gt;</code> theo tên project; giữ nguyên token</li>
+        <li>Token đã qua detect rc 0, bằng chứng ở <code>macos-glass.evidence.md</code></li>
+        <li><code>design-sync.py</code> sinh frontmatter + <code>tokens.css</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Route B · tài liệu thiết kế (file hoặc folder)</h4>
+      <ul>
+        <li><code>find</code> tới độ sâu 2 các file md/css/scss/json/pdf/png/fig; PDF và ảnh đọc trực tiếp, <code>.fig</code> không đọc được thì xin export PNG</li>
+        <li>Điền bảng schema 17 hàng (paper, ink, rule, accent, focus, ba font, ba radius, ease/dur, giọng CTA, motion stance); mỗi hàng ghi <code>giá trị | nguồn file:dòng | độ tin (chắc/suy)</code></li>
+        <li>Màu hex/rgb chép nguyên, không tự đổi sang OKLCH</li>
+        <li>Hàng trống gom thành MỘT câu hỏi bù, kèm đề xuất mặc định từ preset để user chỉ cần "ok"</li>
+        <li>§ Provenance liệt kê file nguồn và hàng nào là "suy"</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Route C · URL trang đích</h4>
+      <ul>
+        <li>Gọi hallmark <code>study &lt;URL&gt;</code>; lớp từ chối chạy TRƯỚC WebFetch: refuse list (themeforest, template framer/webflow, gumroad UI-kit, dribbble, behance) và không nhận URL nội bộ/local</li>
+        <li>SPA shell, auth-wall, non-2xx, body dưới 1 KB thì xin screenshot, không suy giảm lặng lẽ</li>
+        <li>Sau diagnosis nói "lock the DNA", hỏi attestation (xác nhận quyền) đúng một lần: (a) trang của chính user, (b) tham chiếu công khai cho brand của user, (c) khác. Chọn (c) thì không emit design.md</li>
+        <li>§ Notes ghi "rhythm: không đọc được từ HTML" và danh sách anti-pattern của trang nguồn KHÔNG mang theo</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:16px"><b>Khi project đã có <code>design.md</code>:</b> pre-flight thấy file thì không chạy route nào, báo "hệ đã khoá" và đi thẳng Pha 3. Chỉ mở lại intake khi user nói rõ muốn đổi theme; khi đó AMEND mục <code>## Variants</code> thay vì ghi đè, theo no-overwrite policy của hallmark.</div>
+</section>
+
+<!-- ===================== 5 ===================== -->
+<section id="sec-4" class="section-bg s-bg4">
+  <div class="section-header">
+    <span class="tag">05 · Preset</span>
+    <h2>Preset macOS glass và bằng chứng ba vòng</h2>
+    <p>Kính mờ (glassmorphism: bề mặt trong suốt có blur) rất dễ dính finding <code>low-contrast</code>. Preset mặc định vì thế phải được audit trước khi đem cho ai dùng, và bảng dưới là số đo thật.</p>
+  </div>
+
+  <p class="prose">File <code>references/presets/macos-glass.design.md</code> khai hệ: Genre modern-minimal, Theme custom với vibe "macOS liquid glass, light-blue field, white glass", axes light-paper / sans-display / blue-accent. Block <code>:root</code> gồm tám màu OKLCH, ba font (SF Pro Display, SF Pro Text, SF Mono có fallback hệ), kính ba tầng (<code>--glass-1/2/3</code> với alpha .55/.72/.88 và blur 24/8/4px), thang cách 4pt từ 2px tới 96px, thang chữ tỉ lệ 1.25 gốc 14px, ease-out và ba duration 180/240/320ms, ba radius card/pill/input. CTA primary nền accent chữ accent-ink, min-height 44px; motion lặng, một primitive reveal, reduced-motion thì chỉ crossfade.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Vòng</th><th>Finding</th><th>rc</th><th>Đã sửa gì</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>4 (2 low-contrast, 1 tight-leading, 1 cramped-padding)</td><td><code>2</code></td><td>Accent <code>oklch(58% 0.19 255)</code> thành <code>oklch(50% 0.19 255)</code> (focus theo accent) rồi sync lại; line-height heading 1.15 thành 1.3; <code>.table-wrap</code> thêm padding <code>var(--space-xs)</code></td></tr>
+        <tr><td>2</td><td>1 (tight-leading)</td><td><code>2</code></td><td>Finding không phải heading (luật bỏ qua h1 tới h6). Truy trong <code>rules/checks.mjs</code>: jsdom kế thừa line-height của body theo px (1.5 × 14 = 21px), đoạn hero cỡ 17.5px nên tỉ lệ 21/17.5 = 1.20. Khai <code>line-height: 1.5</code> trực tiếp trên <code>.hero p</code></td></tr>
+        <tr><td>3</td><td>0</td><td><code>0</code></td><td><code>fe-gate: XANH (detect rc 0)</code>. Sau khi cài Playwright vào <code>scratchpad/probe</code>: 320/375/414/768 đều scrollWidth = innerWidth, <code>XANH (detect rc 0 + 4 viewport)</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="prose" style="margin-top:14px">Vòng 1 dòng nguyên văn từ fe-gate (đã rút path về tương đối):</p>
+  <pre class="code-block">low-contrast	scratchpad/probe/index.html:0	4.2:1 (need 4.5:1) — text #fcfcfc on #0278e7
+low-contrast	scratchpad/probe/index.html:0	4.2:1 (need 4.5:1) — text #fcfcfc on #0278e7
+tight-leading	scratchpad/probe/index.html:0	line-height 1.20x (need >=1.3)
+cramped-padding	scratchpad/probe/index.html:0	&lt;div&gt; "table-wrap": children flush against border+bg on all sides (no inset)</pre>
+
+  <div class="callout good" style="margin-top:16px"><b>Điểm đáng nhớ ở vòng 2:</b> finding <code>tight-leading</code> còn lại không nằm ở heading nào, và cách sửa đúng chỉ tìm ra khi đọc mã nguồn luật của impeccable thay vì đoán. jsdom (bản DOM giả lập chạy trong Node) tính line-height kế thừa theo pixel tuyệt đối, nên một đoạn chữ to hơn body sẽ "thừa hưởng" tỉ lệ nhỏ hơn 1.3 dù CSS gốc ghi 1.5. Đây là loại bẫy chỉ có cổng máy mới bắt được, mắt người nhìn trang thấy bình thường.</div>
+
+  <p class="prose" style="margin-top:14px">Mục "Còn dư" của file evidence ghi: <b>Không.</b> <code>design-sync --check</code> rc 0, frontmatter và <code>tokens.css</code> khớp block <code>:root</code>.</p>
+</section>
+
+<!-- ===================== 6 ===================== -->
+<section id="sec-5" class="section-bg s-bg5">
+  <div class="section-header">
+    <span class="tag">06 · fe-gate</span>
+    <h2>Cổng fe-gate: năm mã thoát và ba bẫy đã đo</h2>
+    <p>Cổng chỉ có giá trị khi mã thoát của nó nói đúng sự thật. Ba dòng đầu của <code>fe-gate.sh</code> ghi lại chính những chỗ impeccable có thể nói dối.</p>
+  </div>
+
+  <p class="prose">Thứ tự trong cổng: assert (kiểm và dừng ngay nếu sai) mọi target tồn tại, kiểm có <code>node</code>, chạy <code>npx -y impeccable@3.6.1 detect --json --no-advisory</code>, parse JSON (chỉ lấy từ ký tự <code>[</code> đầu tiên để bỏ rác phía trước), in bảng tab-separated, ghi <code>fe-gate.report.json</code>, rồi nếu không có <code>--no-viewport</code> thì gọi <code>viewport-check.mjs</code>.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>rc</th><th>Nghĩa</th><th>Nguồn quyết định</th><th>Report ghi gì</th></tr></thead>
+      <tbody>
+        <tr><td><code>0</code></td><td>Xanh</td><td>detect rc 0 và (nếu bật) 4 viewport không scroll ngang</td><td><code>{"detect_rc":0,"findings":[]}</code>, dòng <code>fe-gate: XANH</code></td></tr>
+        <tr><td><code>1</code></td><td>impeccable lỗi vận hành</td><td>detect trả 1, hoặc JSON không parse được</td><td><code>skipped: ["impeccable không chạy"]</code>, không phải sạch</td></tr>
+        <tr><td><code>2</code></td><td>Có finding, hoặc viewport đỏ</td><td>detect trả 2; hoặc viewport-check exit 1</td><td>bảng <code>antipattern | file:line | snippet</code> + mảng findings</td></tr>
+        <tr><td><code>3</code></td><td>Skipped (bỏ qua, chưa kiểm)</td><td>không có <code>node</code>; hoặc npx không tải được (stdout rỗng, rc khác 1)</td><td><code>skipped: ["node không có"]</code>, không phải sạch</td></tr>
+        <tr><td><code>4</code></td><td>Target thiếu</td><td>một trong các path không tồn tại</td><td><code>{"detect_rc":4,"missing":"…"}</code>, chặn trước khi gọi impeccable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="prose" style="margin-top:16px">Ba bẫy đã đo trên <code>impeccable@3.6.1</code>, chép từ SPEC và từ chú thích đầu script:</p>
+
+  <div class="content-grid grid-3">
+    <div class="card">
+      <h4>rc 0 giả khi thiếu path</h4>
+      <p>Đưa cho impeccable một file không tồn tại, nó in <code>Warning: cannot access</code> rồi trả <b>rc 0</b>. Một cổng tin vào rc đó sẽ báo "sạch" trong khi chưa kiểm gì. fe-gate vì thế assert <code>[ -e "$t" ]</code> cho từng target trước, thiếu thì trả 4 và ghi tên file thiếu vào report.</p>
+    </div>
+    <div class="card">
+      <h4>npx gộp stderr vào stdout</h4>
+      <p><code>npx</code> (lệnh chạy gói npm không cần cài trước) trộn luồng lỗi (stderr) vào luồng xuất (stdout), nên không thể tách bằng <code>2&gt;</code>. Cách duy nhất máy đọc được là <code>--json</code>: đầu ra là một mảng phẳng <code>{antipattern,name,severity,file,line,snippet}</code>, và script cắt từ dấu <code>[</code> đầu tiên để bỏ mọi dòng warning đứng trước.</p>
+    </div>
+    <div class="card">
+      <h4><code>--scope</code> phải viết dính</h4>
+      <p>Viết <code>--scope type</code> có dấu cách, impeccable nuốt luôn target kế tiếp làm giá trị của scope. Luôn viết <code>--scope=type</code>. Cùng họ với bẫy này: <code>npx impeccable install --help</code> không có nhánh help, nó <b>cài thật</b> vào <code>$HOME</code>, nên skill không bao giờ gọi <code>install</code>.</p>
+    </div>
+  </div>
+
+  <p class="prose" style="margin-top:16px"><code>viewport-check.mjs</code> nhỏ hơn nhiều: mở từng file HTML ở bốn chiều rộng 320/375/414/768 (sàn mobile của hallmark), đo <code>document.documentElement.scrollWidth</code>, in JSON và exit 1 nếu bất kỳ viewport nào scrollWidth lớn hơn chiều rộng. Nó tìm Playwright (thư viện điều khiển trình duyệt tự động) ở <code>package.json</code> của thư mục đang chạy trước, rồi mới tới cạnh script, vì skill cài ở <code>~/.claude</code> không có <code>node_modules</code> riêng; không thấy thì exit 3.</p>
+
+  <p class="prose"><code>fe-gate.sh --self-test</code> tự dựng ba file trong thư mục tạm: một trang sạch (Georgia, chữ #111 trên nền trắng), một trang bẩn (Inter, chữ #808080, nền gradient tím), và một path không tồn tại; kỳ vọng <code>clean=0 dirty=2 missing=4</code>. UAT ngày 2026-09-08 ghi self-test 4/4 cho design-sync và 3/3 cho fe-gate ở cả canary (nhánh thử) lẫn main-URL.</p>
+</section>
+
+<!-- ===================== 7 ===================== -->
+<section id="sec-6" class="section-bg s-bg6">
+  <div class="section-header">
+    <span class="tag">07 · ci-local</span>
+    <h2>ci-local.py: vì sao medic không đủ</h2>
+    <p>Cùng ngày skill ra đời, một sự cố nhỏ dạy một bài lớn hơn: cổng local xanh, push, CI đỏ hai job.</p>
+  </div>
+
+  <p class="prose">Repo có nhiều tầng cổng. <b>L2</b> là pre-commit và <code>medic --ci</code> chạy trên máy dev. <b>L4</b> là CI (tích hợp liên tục, chạy trên máy chủ GitHub từ một bản clone mới tinh). Vấn đề là vài gate CHỈ tồn tại ở L4: <code>search-index</code>, <code>skill-provenance</code>, <code>retrieval-eval</code>. Commit <code>619c78c</code> đưa <code>/prd-grade-fe</code> lên: medic xanh, push, CI đỏ hai job (<code>ge-reachability</code> vì <code>fdk/skills.search.json</code> lệch <code>skills/</code>, và <code>skill-provenance</code>).</p>
+
+  <p class="prose">Docstring của <code>fdk/tools/ci-local.py</code> nói thẳng: dặn "nhớ chạy trọn job repo-health" là bậc đòn bẩy thấp nhất; script này biến lời dặn thành lệnh. Nó parse mọi <code>.github/workflows/*.yml</code>, lấy từng step <code>run:</code>, chạy bằng <code>bash -lc</code> ở gốc repo với <code>RUNNER_TEMP</code> và <code>CI=true</code> được set, in ✓/✗ từng step, và exit 1 nếu có bất kỳ ✗. Step cài đặt hay đẩy (<code>pip</code>, <code>npm ci</code>, <code>npx skills</code>, <code>git push/config/commit</code>, <code>gh</code>, <code>actions/*</code>) được bỏ qua vì đó là việc của runner, không phải gate.</p>
+
+  <pre class="code-block">python3 fdk/tools/ci-local.py            # chạy hết, in ✓/✗ từng step, exit 1 nếu có ✗
+python3 fdk/tools/ci-local.py --list     # chỉ liệt kê step sẽ chạy
+python3 fdk/tools/ci-local.py --job repo-health --workflow harness.yml
+python3 fdk/tools/ci-local.py --self-test</pre>
+
+  <div class="content-grid">
+    <div class="card">
+      <h4>Số đo</h4>
+      <ul>
+        <li><b>61 step</b> qua mọi workflow, đo lại lúc viết trang này bằng <code>--list</code></li>
+        <li>Khoảng <b>4 phút</b> cho một lượt chạy trọn (commit <code>2387e40</code>)</li>
+        <li><code>--self-test</code> 4/4; lần chạy đầu tự bắt được <code>CAPABILITIES.md</code> cũ</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Đã nối vào đâu</h4>
+      <ul>
+        <li><code>skills/ship/SKILL.md</code> bước 1: sau <code>medic --ci</code> thì chạy <code>ci-local.py</code>; đỏ thì không push</li>
+        <li><code>skills/fdk/SKILL.md</code> rule "TRƯỚC KHI ship push/PR": xanh hết mới push, rồi <code>/fdk-uat</code> trước khi báo xong</li>
+        <li>Stamp phiên bản 1.3.76 lên 1.3.77</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn" style="margin-top:16px"><b>Vì sao không chỉ thêm gate vào medic:</b> hai gate kia được thiết kế cho fresh-clone, và cũng có gate auto-fix ở Stop-hook nên commit-rồi-push-ngay lọt L2 mà CI vẫn đỏ (đã cháy R3 index-sync tháng 07, rồi search-index + skill-provenance ngày 08/09). Chạy đúng các step mà CI sẽ chạy, tại local, là cách duy nhất không phải giữ hai danh sách gate song song.</div>
+</section>
+
+<!-- ===================== 8 ===================== -->
+<section id="sec-7" class="section-bg s-bg7">
+  <div class="section-header">
+    <span class="tag">08 · Dùng nhanh</span>
+    <h2>Cách dùng nhanh: ba lệnh ví dụ</h2>
+    <p>User chỉ mô tả phạm vi và nguồn theme. Skill tự hỏi bốn câu trong một tin nhắn, rồi chạy năm pha.</p>
+  </div>
+
+  <pre class="code-block">/prd-grade-fe dựng trang danh sách đơn hàng cho app quản lý kho, mặc định theme
+/prd-grade-fe trang pricing, theme lấy từ docs/brand/ (folder)
+/prd-grade-fe landing cho sản phẩm X, làm giống https://example.com</pre>
+
+  <p class="prose" style="margin-top:14px">Lệnh thứ nhất đi route A: copy preset macOS glass, đổi tên project, sync. Lệnh thứ hai đi route B: quét folder, điền bảng schema, hỏi bù một lần. Lệnh thứ ba đi route C: hallmark study URL, lớp từ chối, attestation, lock DNA.</p>
+
+  <p class="prose">Nếu bạn muốn chạy tay từng mảnh mà không qua hub, ba lệnh dưới là xương sống của Pha 2 và Pha 4 (thay <code>$SKILL</code> bằng <code>skills/prd-grade-fe</code> trong repo framework, hoặc thư mục skill đã cài):</p>
+
+  <pre class="code-block">cp $SKILL/references/presets/macos-glass.design.md ./design.md
+python3 $SKILL/scripts/design-sync.py && python3 $SKILL/scripts/design-sync.py --check
+bash $SKILL/scripts/fe-gate.sh index.html; echo rc=$?</pre>
+
+  <button class="collapse-toggle" id="tg1"><span class="arrow" id="ar-1">▶</span> Self-check khi sửa chính skill</button>
+  <div class="collapse-body" id="bd1"><div class="collapse-body-inner">
+    <pre class="code-block" style="margin-top:0">python3 $SKILL/scripts/design-sync.py --self-test && bash $SKILL/scripts/fe-gate.sh --self-test
+bash fdk/tools/sync-skill.sh prd-grade-fe</pre>
+    <p class="prose" style="margin-top:12px"><code>sync-skill.sh</code> rsync scripts, references và assets từ bản canonical trong repo sang bản đã cài, để ba bản (canonical, mirror llmwiki, bản cài) không lệch nhau. Sau đó theo rule của <code>/fdk</code>: <code>python3 fdk/tools/ci-local.py</code> xanh hết mới push.</p>
+  </div></div>
+</section>
+
+<!-- ===================== 9 ===================== -->
+<section id="sec-8" class="section-bg s-bg8">
+  <div class="section-header">
+    <span class="tag">09 · Giới hạn</span>
+    <h2>Giới hạn thật, nói trước để không ai bất ngờ</h2>
+    <p>Skill không hứa nhiều hơn những gì máy đo được. Ba giới hạn dưới là có thật ở thời điểm 2026-09-08.</p>
+  </div>
+
+  <div class="content-grid grid-3">
+    <div class="card">
+      <h4>Kiểm viewport cần Playwright trong project</h4>
+      <p><code>viewport-check.mjs</code> tìm gói <code>playwright</code> ở <code>package.json</code> của thư mục đang chạy, rồi tới cạnh script; không thấy thì exit 3 và in hướng dẫn <code>npm i -D playwright &amp;&amp; npx playwright install chromium</code>. Project chưa cài thì fe-gate chỉ có thể chạy <code>--no-viewport</code>, và report phải ghi rõ bốn viewport chưa được đo.</p>
+    </div>
+    <div class="card">
+      <h4>npx lần đầu cần mạng</h4>
+      <p><code>npx -y impeccable@3.6.1</code> tải gói về cache lần đầu. Không có mạng thì stdout rỗng, fe-gate trả 3 (skipped) và <code>--self-test</code> tự ghi chú "cần mạng cho npx lần đầu". Theo rule của skill: thiếu node hay mạng thì report ghi <code>skipped: &lt;lý do&gt;</code>, exit gate khác 0, không có ngoại lệ "chắc cũng ổn".</p>
+    </div>
+    <div class="card">
+      <h4>R7 archify chỉ áp ở repo framework</h4>
+      <p>Cùng đợt này, validator R7 (<code>proposal_complete.py</code>) nhận artifact archify (sơ đồ SVG sinh bằng skill archify) thay cho diagram-box. Nhưng log UAT ghi rõ: R7 archify chỉ áp ở repo framework; dự án downstream (dự án cài overstack về dùng) đi theo policy khai báo của chính nó. Đừng mong gate này bật sẵn ở project của bạn.</p>
+    </div>
+  </div>
+
+  <p class="prose" style="margin-top:16px">Ngoài ba điểm trên, còn hai ràng buộc từ chính rule của hub: vòng sửa quá ba mà còn finding thì giao kèm bảng dư và nói thẳng, hoặc dùng waiver (miễn trừ có lý do) trong <code>.impeccable/config.json</code> dạng <code>{"ignores":[...]}</code> và nêu trong report, không ignore lén; và <code>design.md</code> đã tồn tại thì không ghi đè, đổi hệ chỉ được AMEND mục Variants.</p>
+
+  <div class="callout"><b>Kiểm chứng đã làm cho bản này:</b> UAT ngày 2026-09-08 cho commit <code>619c78c</code>. Pha 1 canary <code>uat/260908-1512</code>: ba trụ ✓, test-broad 80/80, skill tới tay đủ 7 file (SKILL + 3 script + 3 reference), self-test 4/4 và 3/3, e2e preset → sync → fe-gate rc 0, worktree Orca <code>uat-260908-1514</code> assert ✓. Pha 2 main-URL smoke không override biến nào: ba trụ ✓, 80/80, skill reachable, gate rc 0. Canary đã xoá.</div>
+</section>
+
+</main>
+
+<footer>
+  <p>Nguồn: <code>skills/prd-grade-fe/SKILL.md</code>, <code>references/intake.md</code>, <code>references/impeccable-audit.md</code> (phần A), <code>references/presets/macos-glass.design.md</code> và <code>.evidence.md</code>, <code>scripts/design-sync.py</code>, <code>scripts/fe-gate.sh</code>, <code>scripts/viewport-check.mjs</code>, <code>fdk/tools/ci-local.py</code>, <code>skills/ship/SKILL.md</code>, <code>skills/fdk/SKILL.md</code>, SPEC <code>llmwiki/wiki/sources/draft/080926-prd-grade-fe.md</code>, <code>llmwiki/wiki/log.md</code> ngày 2026-09-08. Mọi con số là số đo thật tại thời điểm đó.</p>
+  <p style="margin-top:8px">File này: <code>llmwiki/html/080926-prd-grade-fe-docs.html</code> (đường dẫn tương đối theo gốc repo)</p>
+</footer>
+
+<script>
+(function(){
+  const nav=document.querySelector('nav'); if(!nav) return;
+  const btn=document.createElement('button'); btn.className='nav-toggle'; btn.textContent='☰';
+  btn.setAttribute('aria-label','Mở thanh điều hướng'); document.body.appendChild(btn);
+  const close=document.createElement('button'); close.className='nav-close'; close.textContent='✕';
+  close.setAttribute('aria-label','Đóng thanh điều hướng'); nav.appendChild(close);
+  const apply=c=>{document.body.classList.toggle('nav-collapsed',c);
+    try{localStorage.setItem('navCollapsed',c?'1':'0')}catch(e){}};
+  btn.addEventListener('click',()=>apply(false));
+  close.addEventListener('click',()=>apply(true));
+  try{const s=localStorage.getItem('navCollapsed');
+    if(s==='1'||(s!=='0'&&matchMedia('(max-width:640px)').matches)) apply(true);
+  }catch(e){}
+})();
+
+(function(){
+  var K='prd-grade-fe-docs-theme',d=document.documentElement,nav=document.querySelector('nav');if(!nav)return;
+  function isDark(){var t=d.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches}
+  var sw=document.createElement('div');sw.className='theme-switch';sw.setAttribute('role','switch');sw.setAttribute('tabindex','0');
+  sw.innerHTML='<span class="track"><span class="knob"></span></span>';
+  var row=document.createElement('div');row.className='theme-row';
+  var lb=document.createElement('span');lb.className='lbl';lb.textContent='Giao diện';
+  row.appendChild(lb);row.appendChild(sw);nav.appendChild(row);
+  function paint(){var dk=isDark();sw.classList.toggle('on',dk);sw.setAttribute('aria-checked',dk?'true':'false');
+    sw.setAttribute('aria-label',dk?'Nút gạt giao diện: đang tối, gạt sang sáng':'Nút gạt giao diện: đang sáng, gạt sang tối')}
+  function flip(){var n=isDark()?'light':'dark';d.setAttribute('data-theme',n);try{localStorage.setItem(K,n)}catch(e){}paint()}
+  sw.addEventListener('click',flip);
+  sw.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}});
+  paint()
+})();
+
+(function(){
+  function attach(el){
+    el.addEventListener('pointerdown',function(e){
+      const r=el.getBoundingClientRect();
+      const x=e.clientX-r.left,y=e.clientY-r.top;
+      const rad=Math.hypot(Math.max(x,r.width-x),Math.max(y,r.height-y));
+      const ink=document.createElement('span'); ink.className='ripple-ink';
+      ink.style.width=ink.style.height=rad*2+'px';
+      ink.style.left=(x-rad)+'px'; ink.style.top=(y-rad)+'px';
+      el.appendChild(ink);
+      ink.addEventListener('animationend',()=>ink.remove());
+    });
+  }
+  document.querySelectorAll('nav a, .nav-toggle, .nav-close, .collapse-toggle, .diagram-reset').forEach(attach);
+})();
+
+(function(){
+  const flash=(el)=>{let t;return()=>{el.classList.add('scrolling');clearTimeout(t);
+    t=setTimeout(()=>el.classList.remove('scrolling'),900);};};
+  const root=document.documentElement;
+  window.addEventListener('scroll',flash(root),{passive:true});
+  const nav=document.querySelector('nav');
+  if(nav) nav.addEventListener('scroll',flash(nav),{passive:true});
+})();
+
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const sections=[...document.querySelectorAll('section[id]')];
+  const observer=new IntersectionObserver(entries=>{
+    let active='';
+    for(const entry of entries){ if(entry.isIntersecting) active=entry.target.id; }
+    if(active) links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+active));
+  },{rootMargin:'-40% 0px -55% 0px'});
+  sections.forEach(s=>observer.observe(s));
+})();
+
+function toggleC(n){
+  const body=document.getElementById('bd'+n);
+  const open=body.classList.toggle('open');
+  document.getElementById('ar-'+n).classList.toggle('open');
+  body.style.maxHeight=open?body.scrollHeight+'px':'0';
+}
+document.getElementById('tg1').addEventListener('click',()=>toggleC(1));
+addEventListener('resize',()=>document.querySelectorAll('.collapse-body.open')
+  .forEach(b=>{b.style.maxHeight=b.scrollHeight+'px';}));
+
+(function(){
+  const COPY='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  document.querySelectorAll('pre.code-block').forEach(pre=>{
+    if(pre.dataset.copy) return; pre.dataset.copy='1';
+    const code=pre.textContent;
+    const wrap=document.createElement('div'); wrap.className='code-wrap';
+    pre.parentNode.insertBefore(wrap,pre); wrap.appendChild(pre);
+    const btn=document.createElement('button'); btn.className='code-copy';
+    btn.setAttribute('aria-label','Sao chép'); btn.title='Sao chép'; btn.innerHTML=COPY;
+    wrap.appendChild(btn);
+    btn.addEventListener('click',async()=>{
+      try{ await navigator.clipboard.writeText(code); }
+      catch{ const ta=document.createElement('textarea'); ta.value=code;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+      btn.innerHTML=CHECK; btn.classList.add('copied');
+      setTimeout(()=>{btn.innerHTML=COPY;btn.classList.remove('copied');},1500);
+    });
+  });
+})();
+
+(function(){
+  var mm=document.querySelector('.mm');if(!mm)return;var NS='http://www.w3.org/2000/svg';
+  function colorOf(n){return n.classList.contains('b-0')?'#30b0c7':n.classList.contains('b-1')?'#5856d6':n.classList.contains('b-2')?'#ff9500':n.classList.contains('b-3')?'#34c759':n.classList.contains('b-4')?'#ff2d55':'#9aa4b2';}
+  function draw(){var canvas=mm.querySelector('.mm-canvas'),svg=mm.querySelector('.mm-links');if(!canvas||!svg)return;
+    var w=canvas.offsetWidth,h=canvas.offsetHeight;svg.setAttribute('width',w);svg.setAttribute('height',h);
+    svg.setAttribute('viewBox','0 0 '+w+' '+h);while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var cR=canvas.getBoundingClientRect();
+    [].slice.call(canvas.querySelectorAll('.node.has-children')).forEach(function(p){
+      var row=p.parentElement,kids=null,ch=row.children;
+      for(var i=0;i<ch.length;i++){if(ch[i].classList.contains('children'))kids=ch[i];}
+      if(!kids||kids.classList.contains('collapsed'))return;
+      var pr=p.getBoundingClientRect(),px=pr.right-cR.left,py=pr.top+pr.height/2-cR.top;
+      [].slice.call(kids.children).forEach(function(crow){
+        var cn=crow.querySelector(':scope > .node');if(!cn)return;
+        var rr=cn.getBoundingClientRect(),cx=rr.left-cR.left,cy=rr.top+rr.height/2-cR.top,dx=Math.max(22,(cx-px)*0.55);
+        var pa=document.createElementNS(NS,'path');
+        pa.setAttribute('d','M'+px+' '+py+' C'+(px+dx)+' '+py+' '+(cx-dx)+' '+cy+' '+cx+' '+cy);
+        pa.setAttribute('stroke',colorOf(cn));svg.appendChild(pa);});});}
+  [].slice.call(mm.querySelectorAll('.node.has-children')).forEach(function(n){
+    var row=n.parentElement,kids=null,c=row.children;
+    for(var i=0;i<c.length;i++){if(c[i].classList.contains('children'))kids=c[i];}
+    if(!kids)return;
+    if(n.classList.contains('cat')){kids.classList.add('collapsed');n.classList.add('collapsed-parent');}
+    n.addEventListener('click',function(e){e.stopPropagation();
+      var open=kids.classList.toggle('collapsed');n.classList.toggle('collapsed-parent',open);draw();});});
+  draw();addEventListener('load',function(){setTimeout(draw,60);});
+  addEventListener('resize',function(){clearTimeout(window.__mmt);window.__mmt=setTimeout(draw,120);},{passive:true});
+})();
+
+function initDraggableDiagrams(){
+  const NS='http://www.w3.org/2000/svg';
+  const nearest=(nodes,x,y)=>{
+    let best=null,bd=1e9;
+    nodes.forEach(n=>{
+      const cx=Math.max(n.x,Math.min(x,n.x+n.w)),cy=Math.max(n.y,Math.min(y,n.y+n.h));
+      const d=Math.hypot(x-cx,y-cy);
+      if(d<bd){bd=d;best=n;}
+    });
+    return bd<=42?best:null;
+  };
+  document.querySelectorAll('.diagram-box').forEach(box=>{
+    const svg=box.querySelector('svg');
+    if(!svg||box.dataset.draggable) return;
+    box.dataset.draggable='1';
+    const vp=document.createElement('div'); vp.className='diagram-viewport';
+    box.insertBefore(vp,svg); vp.appendChild(svg);
+    const hint=document.createElement('div'); hint.className='diagram-hint';
+    hint.textContent='✥ kéo từng ô · kéo nền để pan · cuộn để zoom · kéo mép dưới để mở rộng';
+    box.appendChild(hint);
+    const reset=document.createElement('button'); reset.className='diagram-reset'; reset.textContent='⟲ reset';
+    box.appendChild(reset);
+    const allRects=[...svg.querySelectorAll('rect')];
+    const nodes=allRects.filter(r=>(+r.getAttribute('width'))>=70&&(+r.getAttribute('height'))>=30)
+      .map(r=>({rect:r,x:+r.getAttribute('x'),y:+r.getAttribute('y'),
+        w:+r.getAttribute('width'),h:+r.getAttribute('height'),els:[r],tx:0,ty:0}));
+    const inNode=(px,py)=>nodes.find(n=>px>=n.x-1&&px<=n.x+n.w+1&&py>=n.y-1&&py<=n.y+n.h+1);
+    [...svg.querySelectorAll('text')].forEach(t=>{
+      const x=parseFloat(t.getAttribute('x')),y=parseFloat(t.getAttribute('y'));
+      if(isNaN(x)||isNaN(y))return; const n=inNode(x,y); if(n) n.els.push(t);
+    });
+    allRects.forEach(r=>{ if(nodes.some(n=>n.rect===r))return;
+      const x=+r.getAttribute('x'),y=+r.getAttribute('y'),w=+r.getAttribute('width')||0,h=+r.getAttribute('height')||0;
+      const n=inNode(x+w/2,y+h/2); if(n) n.els.push(r); });
+    nodes.forEach(n=>{const g=document.createElementNS(NS,'g'); g.setAttribute('class','dnode');
+      n.rect.parentNode.insertBefore(g,n.rect); n.els.forEach(el=>g.appendChild(el)); n.g=g;});
+    const links=[...svg.querySelectorAll('line')].filter(l=>l.hasAttribute('x1')&&l.hasAttribute('x2'));
+    links.forEach(l=>{l._x1=+l.getAttribute('x1');l._y1=+l.getAttribute('y1');
+      l._x2=+l.getAttribute('x2');l._y2=+l.getAttribute('y2');
+      l._n1=nearest(nodes,l._x1,l._y1); l._n2=nearest(nodes,l._x2,l._y2);});
+    const reroute=()=>links.forEach(l=>{
+      if(l._n1){l.setAttribute('x1',l._x1+l._n1.tx);l.setAttribute('y1',l._y1+l._n1.ty);}
+      if(l._n2){l.setAttribute('x2',l._x2+l._n2.tx);l.setAttribute('y2',l._y2+l._n2.ty);}});
+    const vbBase=(svg.getAttribute('viewBox')||'0 0 900 200').split(/\s+/).map(Number);
+    const fitViewBox=()=>{
+      const pad=16;
+      let minX=vbBase[0],minY=vbBase[1],maxX=vbBase[0]+vbBase[2],maxY=vbBase[1]+vbBase[3];
+      nodes.forEach(n=>{minX=Math.min(minX,n.x+n.tx-pad);minY=Math.min(minY,n.y+n.ty-pad);
+        maxX=Math.max(maxX,n.x+n.w+n.tx+pad);maxY=Math.max(maxY,n.y+n.h+n.ty+pad);});
+      svg.setAttribute('viewBox',`${minX} ${minY} ${maxX-minX} ${maxY-minY}`);
+    };
+    let ptx=0,pty=0,scale=1;
+    const applyCanvas=()=>{svg.style.transform=`translate(${ptx}px,${pty}px) scale(${scale})`;};
+    const toSvg=(cx,cy)=>{const p=svg.createSVGPoint();p.x=cx;p.y=cy;return p.matrixTransform(svg.getScreenCTM().inverse());};
+    let mode=null,node=null,start=null,t0=null,p0=null;
+    vp.addEventListener('pointerdown',e=>{vp.setPointerCapture(e.pointerId);
+      const g=e.target.closest&&e.target.closest('g.dnode');
+      if(g){mode='node';node=nodes.find(n=>n.g===g);start=toSvg(e.clientX,e.clientY);t0={x:node.tx,y:node.ty};}
+      else{mode='pan';p0={x:e.clientX-ptx,y:e.clientY-pty};vp.classList.add('grabbing');}});
+    vp.addEventListener('pointermove',e=>{
+      if(mode==='node'){const c=toSvg(e.clientX,e.clientY);node.tx=t0.x+(c.x-start.x);node.ty=t0.y+(c.y-start.y);
+        node.g.setAttribute('transform',`translate(${node.tx},${node.ty})`);reroute();}
+      else if(mode==='pan'){ptx=e.clientX-p0.x;pty=e.clientY-p0.y;applyCanvas();}});
+    const end=()=>{if(mode==='node')fitViewBox();mode=null;node=null;vp.classList.remove('grabbing');};
+    vp.addEventListener('pointerup',end); vp.addEventListener('pointercancel',end);
+    vp.addEventListener('wheel',e=>{e.preventDefault();
+      const r=vp.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+      const ns=Math.min(4,Math.max(0.5,scale*(e.deltaY<0?1.1:0.9)));
+      ptx=mx-(mx-ptx)*(ns/scale);pty=my-(my-pty)*(ns/scale);scale=ns;applyCanvas();},{passive:false});
+    const doReset=()=>{ptx=0;pty=0;scale=1;svg.style.transition='transform .3s cubic-bezier(.4,0,.2,1)';applyCanvas();
+      setTimeout(()=>{svg.style.transition='';},320);
+      nodes.forEach(n=>{n.tx=0;n.ty=0;n.g.setAttribute('transform','translate(0,0)');});reroute();fitViewBox();};
+    reset.addEventListener('click',doReset); vp.addEventListener('dblclick',doReset);
+  });
+}
+initDraggableDiagrams();
+</script>
+</body>
+</html>

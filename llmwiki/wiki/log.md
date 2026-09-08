@@ -52,3 +52,4 @@
 | 2026-09-08 14:57:39 | `file.write` | skills/prd-grade-fe/references/impeccable-audit.md · tool=Write · session=9143b025 · actor=agent · prev=089bfd7c6766d7f2 |
 
 <!-- log:auto:end -->
+- 2026-09-08 · docs-gate R10: trang tài liệu `html/080926-prd-grade-fe-docs.html` (docs-site-macos, 9 mục, Playwright audit pass) + 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21.

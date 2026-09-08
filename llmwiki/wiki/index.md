@@ -129,6 +129,9 @@
 | [080926-session-provenance](sources/080926-session-provenance.md) | source | session-provenance a01cd2b7 — auto-distill |
 | [080926-prd-grade-fe](sources/draft/080926-prd-grade-fe.md) | draft | 080926-prd-grade-fe |
 | [080926-prd-grade-fe-PLAN](sources/draft/080926-prd-grade-fe-PLAN.md) | draft | /prd-grade-fe — PLAN thi hành |
+| [prd-grade-fe-production](sources/evals/skill-resolve/prd-grade-fe-production.md) | eval | skill-resolve golden: prd-grade-fe-production |
+| [prd-grade-fe-theme-docs](sources/evals/skill-resolve/prd-grade-fe-theme-docs.md) | eval | skill-resolve golden: prd-grade-fe-theme-docs |
+| [prd-grade-fe-url](sources/evals/skill-resolve/prd-grade-fe-url.md) | eval | skill-resolve golden: prd-grade-fe-url |
 <!-- index:auto:end -->
 | [140726-propose-plan-split-superpowers](sources/draft/140726-propose-plan-split-superpowers.md) | draft | Tách vòng đời đề xuất thành SPEC (/propose, người duyệt) và PLAN (/plan mới, agent mù thi hành), mở rộng R7 cắn cả hai |
 | [110726-shipped-vs-documented-parity](sources/draft/110726-shipped-vs-documented-parity.md) | draft | Issue: tài liệu hứa 74 skill nhưng npx chỉ giao 67 trong im lặng — cần cổng so hứa với giao ở fresh-install-smoke --remote |

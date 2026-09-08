@@ -22,9 +22,19 @@ r=$(ref); [ "$r" = "orca" ] && ok "mặc định = orca (người cài bình th�
                             || bad "mặc định phải là orca, ra '$r'"
 
 # 2. REPO_RAW trỏ canary → ref ĐI THEO canary. Đây là ca đã cháy.
+r=$(ref REPO_RAW="https://raw.githubusercontent.com/Rheinmir/setup/uat-260717-2105")
+[ "$r" = "uat-260717-2105" ] && ok "REPO_RAW canary → ref đi theo" \
+                             || bad "canary ref sai: kỳ vọng 'uat-260717-2105', ra '$r'"
+
+# 2b. Ref CÓ dấu "/" vẫn được trích đúng (không cắt cụt) — NHƯNG đó chỉ là chuyện
+#     truyền biến. Đo được 2026-09-08: `npx skills add <owner>/<repo>#<ref-có-/>` resolve
+#     đúng ref rồi CHẾT IM LẶNG ở bước discovery (curl: (3) URL rejected), cài 0 skill,
+#     trong khi install.sh vẫn báo "3 trụ ✓" → bài UAT canary thành ảo giác.
+#     Nên test này chỉ được kết luận "ref đi theo", TUYỆT ĐỐI không được đọc thành
+#     "ref có / dùng được". Đặt tên canary không dấu / — xem skills/fdk-uat/SKILL.md.
 r=$(ref REPO_RAW="https://raw.githubusercontent.com/Rheinmir/setup/uat/260717-2105")
-[ "$r" = "uat/260717-2105" ] && ok "REPO_RAW canary → ref đi theo (giữ nguyên ref có dấu /)" \
-                             || bad "canary ref sai: kỳ vọng 'uat/260717-2105', ra '$r'"
+[ "$r" = "uat/260717-2105" ] && ok "ref có dấu / được trích nguyên vẹn (CHỈ là truyền biến, KHÔNG chứng minh cài được skill)" \
+                             || bad "ref có / bị cắt: ra '$r'"
 
 # 3. HARNESS_REF ép tay thắng suy diễn.
 r=$(env HARNESS_REF=my-branch bash "$IH" --print-ref 2>/dev/null)

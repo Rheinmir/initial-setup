@@ -14,7 +14,7 @@ terminal MỚI cùng worktree với cùng agent. Khác Orca ở một điểm: k
   spawn --prompt-file F [--root R] [--agent auto|claude|openclaude] [--dry-run]
                                                 mở phiên mới qua `orca terminal create/send`; không có orca → in lệnh để chạy tay
   run SESSION       [--root R] [--transcript P] [--prompt "…"] [--agent …] [--dry-run]
-                                                near → handover → spawn; đánh dấu .done-<sid> để không lặp; exit 2 khi đã bàn giao
+                                                near → handover → spawn → ĐÓNG terminal cũ; đánh dấu .done-<sid> để không lặp; exit 2 khi đã bàn giao
   --self-test
 
 Cấu hình (token-budget.config.yaml):
@@ -22,6 +22,7 @@ Cấu hình (token-budget.config.yaml):
     enabled: true        # false = chỉ báo, không mở phiên
     threshold: 0.85      # "sắp vượt" = tỉ lệ ≥ threshold HOẶC current + 1 lượt trung bình ≥ cap
     agent: auto          # auto = đoán từ đường transcript (.openclaude/ → openclaude), còn lại claude
+    close_old: true      # sau khi phiên mới đã nhận prompt → đóng tab terminal cũ (ORCA_TERMINAL_HANDLE); false = để lại
 
 Fail-open: lỗi hạ tầng → exit 0, không bao giờ phá phiên vì chính cơ chế bảo vệ phiên.
 """
@@ -75,6 +76,7 @@ def load_cfg(root: Path) -> dict:
         # token, $ chỉ là số quy đổi từ đơn giá minh hoạ — bàn giao vì "hết $5" là cắt phiên vô cớ.
         # Vẫn ghi sổ + hiện ở --report; ai trả theo token thì thêm 'per_task_usd' vào triggers.
         "triggers": list(trig) if isinstance(trig, list) and trig else DEFAULT_TRIGGERS,
+        "close_old": str(ah.get("close_old", True)).lower() not in ("0", "false", "no", "off"),
     }
     return cfg
 
@@ -243,6 +245,27 @@ def spawn(root: Path, agent: str, prompt_file: Path, dry_run: bool = False) -> d
     return plan
 
 
+def close_old_terminal(root: Path, plan: dict, dry_run: bool = False) -> str:
+    """Đóng tab terminal của phiên CŨ sau khi phiên mới đã nhận prompt. Trả handle đã đóng hoặc "skipped".
+
+    Chỉ đóng khi: phiên mới mở được qua orca, biết handle cũ (ORCA_TERMINAL_HANDLE — Orca đặt cho
+    mọi tiến trình trong terminal), và handle cũ ≠ handle mới. Hook này chạy BÊN TRONG terminal cũ:
+    đóng ngay là giết chính mình trước khi kịp trả exit 2 → tách tiến trình, chờ 3s rồi mới đóng.
+    """
+    old = os.environ.get("ORCA_TERMINAL_HANDLE", "")
+    new = plan.get("terminal", "")
+    orca = shutil.which("orca") or shutil.which("orca-ide")
+    if dry_run or plan.get("via") != "orca" or not old or old == new or not orca:
+        return "skipped"
+    try:
+        subprocess.Popen(["/bin/sh", "-c", f'sleep 3; "{orca}" terminal close --terminal "{old}" --tab --json >/dev/null 2>&1'],
+                         cwd=root, start_new_session=True, stdin=subprocess.DEVNULL,
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return old
+    except Exception:                            # không đóng được thì để tab cũ lại — không phá bàn giao
+        return "skipped"
+
+
 # ── run (đường hook) ──────────────────────────────────────────────────────────────────────
 def run(root: Path, sid: str, transcript: str, prompt: str, agent_opt: str, dry_run: bool) -> int:
     dry_run = dry_run or os.environ.get("OVERSTACK_HANDOVER_DRY_RUN") == "1"   # test/CI: không mở terminal thật
@@ -263,7 +286,10 @@ def run(root: Path, sid: str, transcript: str, prompt: str, agent_opt: str, dry_
     plan = spawn(root, agent, hf, dry_run)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(f"{hf.name} via {plan['via']} {plan.get('terminal', '')}".strip(), encoding="utf-8")
+    closed = close_old_terminal(root, plan, dry_run) if cfg["_auto"]["close_old"] else "skipped"
     where = f"terminal Orca {plan['terminal']}" if plan.get("terminal") else plan.get("hint", plan["via"])
+    if closed != "skipped":
+        where += f"; tab cũ {closed} sẽ tự đóng sau 3s"
     reason = (f"[session-continue] {'VƯỢT' if ev['status'] == 'over' else 'SẮP VƯỢT'} trần: "
               f"{'; '.join(ev['over'] + ev['near'])}. Đã ghi bàn giao {hf} và mở phiên mới ({where}). "
               f"Prompt vừa gõ đã nằm trong file bàn giao — tiếp tục ở phiên mới.")
@@ -314,6 +340,13 @@ def self_test() -> int:
         rc2 = run(root, "s1abcdef0000", str(tr), "y", "claude", True); ok &= rc2 == 2
         n = len(list((root / ".llmwiki" / "handover").glob("*-continue.md"))); ok &= n == 1
         print(("  ✓ " if n == 1 else "  ✗ ") + "run lần 2 cùng phiên: không mở phiên thứ hai, không ghi file thứ hai")
+        os.environ["ORCA_TERMINAL_HANDLE"] = "term_old"
+        c1 = close_old_terminal(root, {"via": "manual"}); c2 = close_old_terminal(root, {"via": "orca", "terminal": "term_old"})
+        c3 = close_old_terminal(root, {"via": "orca", "terminal": "term_new"}, dry_run=True)
+        os.environ.pop("ORCA_TERMINAL_HANDLE", None)
+        c4 = close_old_terminal(root, {"via": "orca", "terminal": "term_new"})
+        ok &= (c1, c2, c3, c4) == ("skipped",) * 4
+        print(("  ✓ " if (c1, c2, c3, c4) == ("skipped",) * 4 else "  ✗ ") + "close_old: manual / cùng handle / dry-run / không biết handle cũ → skipped")
         (root / "harness" / "token-budget.config.yaml").write_text("budgets:\n  per_task_usd: 5.0\nauto_handover:\n  enabled: false\n", encoding="utf-8")
         ok &= run(root, "s2", "", "", "claude", True) == 0; print("  ✓ enabled:false → im lặng exit 0")
     print("self-test:", "PASS" if ok else "FAIL")

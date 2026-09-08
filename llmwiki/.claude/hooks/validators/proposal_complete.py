@@ -17,6 +17,9 @@ Nhánh SPEC:
       CHỈ quét trong khối <style> — trước đây quét cả trang nên cắn nhầm văn xuôi nào
       nhắc tới chính chuỗi CSS bị cấm (dính lúc soạn draft 140726).
   (e) html có ≥1 prose 'class="desc"' mỗi diagram (đọc hiểu không cần animation)
+  (c)(d)(e) MIỄN khi html là artifact archify (chữ ký `archify <ver>` + ≥1 <svg>):
+      archify đã gác hình học tất định (9 check + visual-check) mạnh hơn đếm diagram-box —
+      luật này gác NỘI DUNG, không gác định dạng vẽ tay (bài học 080926).
   (f) '## Context' có nội dung — force-query grounding (ADR-009)
   (g) không còn placeholder ('TBD', 'xử lý lỗi phù hợp', 'tương tự Task N'…)
   (h) '## Global constraints' có nội dung — ràng buộc bao trùm, mỗi task ngầm mang theo
@@ -48,6 +51,11 @@ HIDDEN_MSG_RE = re.compile(r"\.msg\b[^{}]*\{[^}]*opacity:\s*0\s*[;}]")
 DESC_STATIC_RE = re.compile(r'class="desc"')          # prose tĩnh <p class="desc">
 DESC_DATA_RE = re.compile(r"\bdesc\s*:\s*['\"`]")     # prose trong data JS: desc:'...'
 STYLE_BLOCK_RE = re.compile(r"<style\b[^>]*>(.*?)</style>", re.IGNORECASE | re.DOTALL)
+ARCHIFY_RE = re.compile(r"\barchify \d+\.\d+")  # chữ ký viewer archify nhúng trong html
+
+
+def is_archify_artifact(html_text):
+    return bool(ARCHIFY_RE.search(html_text)) and "<svg" in html_text
 
 # --- nhánh PLAN ---
 PLAN_FILE_SUFFIX = "-PLAN.md"
@@ -225,6 +233,9 @@ def check(path):
             problems.append(f"(b) seq html khong ton tai: {mlink.group(1)}")
         else:
             html_text = html_path.read_text(encoding="utf-8", errors="replace")
+            if is_archify_artifact(html_text):
+                n_tasks = 0  # archify: hình học đã được gác bằng máy — miễn (c)(d)(e)
+                html_text = ""
             n_diagrams = len(DIAGRAM_RE.findall(html_text))
             if n_tasks and n_diagrams < n_tasks:
                 problems.append(
@@ -328,8 +339,20 @@ def check_plan(path, text):
         sys.exit(2)
 
 
+def self_test():
+    """Ca đã cháy thật 080926: seq html do archify sinh không có diagram-box → (c) cắn nhầm."""
+    assert is_archify_artifact("<html>archify 2.17.0-dev.1 <svg></svg></html>")
+    assert not is_archify_artifact("<html>archify 2.17.0 no svg</html>")
+    assert not is_archify_artifact('<div class="diagram-box"><svg></svg></div>')
+    assert is_archify_artifact("x archify 3.0 y <svg viewBox='0 0 1 1'/>")
+    print("proposal_complete --self-test: 4/4 ok")
+
+
 def main():
     args = sys.argv[1:]
+    if args == ["--self-test"]:
+        self_test()
+        sys.exit(0)
     if args:
         for p in args:
             check(p)

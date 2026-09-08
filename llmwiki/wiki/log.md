@@ -48,3 +48,4 @@
 | 2026-09-07 18:15:52 | `file.write` | llmwiki/wiki/sources/draft/070926-installer-update-idempotent.md · tool=Write · session=75be06f9 · actor=agent · prev=c9 |
 
 <!-- log:auto:end -->
+- 2026-09-08 · propose+plan+implement `/prd-grade-fe` — SPEC `sources/draft/080926-prd-grade-fe.md` (+ sơ đồ archify `html/080926-prd-grade-fe-seq.html`), PLAN `080926-prd-grade-fe-PLAN.md`. Skill mới `skills/prd-grade-fe/` (design-sync.py, fe-gate.sh, viewport-check.mjs, preset macOS glass, intake, rubric impeccable distill @2bc2879). R7 `proposal_complete.py` nhận artifact archify thay diagram-box (+ --self-test). `sync-skill.sh` rsync scripts/references/assets vào bản cài. Problem-tree p-50.

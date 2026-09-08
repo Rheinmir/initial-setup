@@ -24,6 +24,10 @@ for name in "$@"; do
   inst="$HOME/.claude/skills/$name/SKILL.md"
   mkdir -p "$(dirname "$inst")"
   cp "$src" "$inst" && echo "✓ $name → $inst"
+  # skill có scripts/ references/ assets/ → bản cài phải mang theo, không thì SKILL.md trỏ vào hư không (prd-grade-fe 080926)
+  for sub in scripts references assets; do
+    [ -d "skills/$name/$sub" ] && rsync -a --delete "skills/$name/$sub/" "$HOME/.claude/skills/$name/$sub/" && echo "✓ $name/$sub → ~/.claude/skills/$name/$sub"
+  done
 
   # verify parity — sync mà không kiểm là vòng phản hồi cụt
   [ -z "$mirror" ] || diff -q "$src" "$mirror" >/dev/null

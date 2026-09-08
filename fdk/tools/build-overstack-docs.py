@@ -142,7 +142,7 @@ LOOP_GROUPS = {
         {"docs-site-macos": "docs", "extract-site": "docs", "md-to-html": "docs",
          "web-crawl": "docs", "web-clone": "docs",
          "tour-guide": "taste", "tour-guide-supademo": "taste",
-         "brandkit": "taste", "hallmark": "taste", "design-taste-frontend": "taste", "design-taste-frontend-v1": "taste",
+         "brandkit": "taste", "hallmark": "taste", "prd-grade-fe": "taste", "design-taste-frontend": "taste", "design-taste-frontend-v1": "taste",
          "gpt-taste": "taste", "high-end-visual-design": "taste", "stitch-design-taste": "taste",
          "minimalist-ui": "taste", "industrial-brutalist-ui": "taste", "redesign-existing-projects": "taste",
          "cursor-animated-sites": "docs", "diagram": "docs",

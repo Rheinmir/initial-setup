@@ -54,7 +54,7 @@ LOOP_MAP = {
     "orca-cli": "orchestrate", "orchestration": "orchestrate", "jenkins-agent-l3-deploy": "orchestrate",
     "brandkit": "utils", "check-approve": "utils", "computer-use": "utils",
     "design-taste-frontend": "utils", "design-taste-frontend-v1": "utils", "docs-site-macos": "utils",
-    "web-crawl": "utils", "web-clone": "utils", "hallmark": "utils", "diagram": "utils",
+    "web-crawl": "utils", "web-clone": "utils", "hallmark": "utils", "prd-grade-fe": "utils", "diagram": "utils",
     "find-skills": "utils", "full-output-enforcement": "utils", "gpt-taste": "utils",
     "high-end-visual-design": "utils", "image-to-code": "utils", "imagegen-frontend-mobile": "utils",
     "imagegen-frontend-web": "utils", "industrial-brutalist-ui": "utils", "join-project": "utils",

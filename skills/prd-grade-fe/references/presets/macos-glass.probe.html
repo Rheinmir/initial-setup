@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probe macOS Glass</title>
+<script>
+  try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+</script>
+<!-- tokens.css sinh từ design.md (skills/prd-grade-fe/scripts/design-sync.py); đặt cạnh file này khi dùng -->
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html[data-theme="dark"] {
+    --color-paper:      oklch(20% 0.02 250);
+    --color-paper-2:    oklch(26% 0.03 250);
+    --color-ink:        oklch(96% 0.01 240);
+    --color-ink-2:      oklch(78% 0.02 240);
+    --color-rule:       oklch(60% 0.03 250 / 0.35);
+    --color-accent:     oklch(72% 0.16 255);
+    --color-accent-ink: oklch(15% 0.03 250);
+    --color-focus:      oklch(72% 0.16 255);
+    --glass-1: rgba(255,255,255,.06);
+    --glass-2: rgba(255,255,255,.10);
+    --glass-3: rgba(255,255,255,.14);
+    --edge-hi: inset 0 1px 0 rgba(255,255,255,.18);
+    --shadow-card: 0 4px 20px rgba(0,0,0,.35);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    color: var(--color-ink);
+    background: linear-gradient(160deg, var(--color-paper), var(--color-paper-2));
+    min-height: 100vh;
+  }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.3; margin: 0 0 var(--space-sm); letter-spacing: -0.01em; }
+  h1 { font-size: var(--text-display); }
+  h2 { font-size: var(--text-xl); }
+  h3 { font-size: var(--text-md); }
+  p { margin: 0 0 var(--space-md); }
+  .muted { color: var(--color-ink-2); }
+  code { font-family: var(--font-mono); font-size: var(--text-sm); }
+
+  header, main, footer { max-width: 960px; margin: 0 auto; padding: var(--space-lg) var(--space-md); }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); }
+  .brand { font-family: var(--font-display); font-weight: 600; }
+  section { margin-bottom: var(--space-2xl); }
+
+  .hero { padding: var(--space-2xl) 0 var(--space-xl); }
+  .hero p { max-width: 56ch; font-size: var(--text-md); line-height: 1.5; }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill); border: 1px solid transparent;
+    font: inherit; font-weight: 600; cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .btn-primary { background: var(--color-accent); color: var(--color-accent-ink); }
+  .btn-secondary { background: var(--glass-2); color: var(--color-ink); border-color: var(--color-rule); box-shadow: var(--edge-hi); }
+  .btn:focus-visible, input:focus-visible, select:focus-visible, .switch:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-md); }
+  .card {
+    background: var(--glass-2);
+    backdrop-filter: blur(var(--blur-2));
+    -webkit-backdrop-filter: blur(var(--blur-2));
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-card);
+    box-shadow: var(--edge-hi), var(--shadow-card);
+    padding: var(--space-lg);
+    animation: reveal var(--dur-base) var(--ease-out) both;
+  }
+  @keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .table-wrap {
+    background: var(--glass-3);
+    backdrop-filter: blur(var(--blur-3));
+    -webkit-backdrop-filter: blur(var(--blur-3));
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-card);
+    box-shadow: var(--edge-hi);
+    padding: var(--space-xs);
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: var(--space-sm) var(--space-md); border-bottom: 1px solid var(--color-rule); }
+  th { font-weight: 600; color: var(--color-ink-2); font-size: var(--text-sm); }
+  td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+
+  form { display: grid; gap: var(--space-md); max-width: 480px; }
+  label { display: grid; gap: var(--space-2xs); font-weight: 500; }
+  input, select {
+    font: inherit; color: var(--color-ink);
+    background: var(--glass-3);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-input);
+    padding: var(--space-sm) var(--space-md);
+    min-height: 44px;
+  }
+
+  .switch {
+    display: inline-flex; align-items: center; gap: var(--space-xs);
+    min-height: 44px; padding: var(--space-2xs) var(--space-sm);
+    border-radius: var(--radius-pill); border: 1px solid var(--color-rule);
+    background: var(--glass-2); color: var(--color-ink); font: inherit; cursor: pointer;
+  }
+  .switch .knob {
+    width: 34px; height: 20px; border-radius: var(--radius-pill);
+    background: var(--color-rule); position: relative;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .switch .knob::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    border-radius: var(--radius-pill); background: var(--color-accent-ink);
+    box-shadow: var(--edge-hi);
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .switch[aria-checked="true"] .knob { background: var(--color-accent); }
+  .switch[aria-checked="true"] .knob::after { transform: translateX(14px); }
+
+  footer { color: var(--color-ink-2); font-size: var(--text-sm); border-top: 1px solid var(--color-rule); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation: fade 150ms linear both; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    .btn, .switch .knob, .switch .knob::after { transition: opacity 150ms linear; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">Glass Probe</span>
+  <button class="switch" type="button" role="switch" aria-checked="false" id="theme-toggle">
+    <span class="knob" aria-hidden="true"></span>
+    <span>Chế độ tối</span>
+  </button>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Bề mặt kính cho ứng dụng nội bộ</h1>
+    <p class="muted">Một hệ token duy nhất cho nền, chữ, kính ba tầng và chuyển động. Trang này là mẫu thử để cổng kiểm tra có chỗ cắn.</p>
+    <div class="actions">
+      <button class="btn btn-primary" type="button">Bắt đầu dùng</button>
+      <button class="btn btn-secondary" type="button">Xem tài liệu</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ba tầng kính</h2>
+    <div class="cards">
+      <article class="card">
+        <h3>Tầng 1, nền rộng</h3>
+        <p class="muted">Mờ 24px, độ đặc 55%. Dùng cho thanh bên và vùng nền lớn.</p>
+      </article>
+      <article class="card">
+        <h3>Tầng 2, thẻ</h3>
+        <p class="muted">Mờ 8px, độ đặc 72%. Dùng cho thẻ nội dung và nút phụ.</p>
+      </article>
+      <article class="card">
+        <h3>Tầng 3, khối đặc</h3>
+        <p class="muted">Mờ 4px, độ đặc 88%. Dùng cho bảng, ô nhập và menu.</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bảng số liệu</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Tầng</th><th scope="col">Độ mờ</th><th scope="col">Độ đặc</th><th scope="col">Số phần tử</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tầng 1</td><td><code>24px</code></td><td>55%</td><td class="num">3</td></tr>
+          <tr><td>Tầng 2</td><td><code>8px</code></td><td>72%</td><td class="num">12</td></tr>
+          <tr><td>Tầng 3</td><td><code>4px</code></td><td>88%</td><td class="num">27</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tạo dự án</h2>
+    <form action="#" method="post">
+      <label>Tên dự án
+        <input type="text" name="name" placeholder="Ví dụ: Kho hàng Q4" required>
+      </label>
+      <label>Tầng kính mặc định
+        <select name="tier">
+          <option value="1">Tầng 1</option>
+          <option value="2" selected>Tầng 2</option>
+          <option value="3">Tầng 3</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Tạo dự án</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <p>Mẫu thử preset macOS glass. Token sinh từ design.md.</p>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    function apply(dark) {
+      if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
+      btn.setAttribute('aria-checked', String(dark));
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+    }
+    btn.setAttribute('aria-checked', String(root.getAttribute('data-theme') === 'dark'));
+    btn.addEventListener('click', function () { apply(root.getAttribute('data-theme') !== 'dark'); });
+  })();
+</script>
+</body>
+</html>

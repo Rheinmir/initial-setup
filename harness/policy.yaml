@@ -49,7 +49,7 @@ rules:
   - id: R7
     name: proposal-complete
     validator: proposal_complete.py
-    statement: "Bộ ba của một feature phải đủ chất: SPEC chờ duyệt khai ai/CLI làm task nào + sequence diagram TỪNG task + ràng buộc bao trùm; PLAN thi hành khai đường dẫn file chính xác + Interfaces + code từng bước. Không bên nào được còn placeholder."
+    statement: "Bộ ba của một feature phải đủ chất: SPEC chờ duyệt khai ai/CLI làm task nào + sequence diagram TỪNG task (hoặc MỘT artifact archify đã qua cổng hình học) + ràng buộc bao trùm; PLAN thi hành khai đường dẫn file chính xác + Interfaces + code từng bước. Không bên nào được còn placeholder."
     enforce_at: [session, repo]
     applies_to: [write]
     scope: "wiki draft .md CÓ '## Plan' và Status còn 'proposed' (output-report và draft đã implemented tự miễn). Tên file kết thúc '-PLAN.md' → nhánh PLAN (miễn diagram: PLAN là thứ MÁY đọc, HTML gắn với SPEC cho NGƯỜI xem lúc duyệt)."

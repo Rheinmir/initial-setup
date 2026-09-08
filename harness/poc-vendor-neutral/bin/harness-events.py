@@ -199,6 +199,12 @@ def m_session_end():
         if not m:
             return 0
         nodes = json.loads(m.group(2))
+        sid = (_stdin().get("session_id") or "unknown")[:8]
+        # Một phiên chỉ được một thẻ. SessionEnd bắn nhiều lần cho cùng một phiên
+        # (resume, thoát lại) → không chốt thì ra thẻ trùng khít; đã dính thật ở repo
+        # framework: p-auto-21 ≡ p-auto-22, cùng phiên dba79064, 14/08/26.
+        if any(x.get("session") == sid and x.get("pending") for x in nodes):
+            return 0
         n = sum(1 for x in nodes if str(x.get("id", "")).startswith("p-auto-")) + 1
         nodes.append({
             "id": f"p-auto-{n:02d}", "parent": None,
@@ -207,9 +213,9 @@ def m_session_end():
                     + ". Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát).",
             "status": "open", "scope": [],
             "date": datetime.date.today().strftime("%d/%m/%y"),
-            "session": (_stdin().get("session_id") or "unknown")[:8], "pending": True,
+            "session": sid, "pending": True,
         })
-        out = html[:m.start(2)] + json.dumps(nodes, ensure_ascii=False, indent=2) + html[m.end(2):]
+        out = html[:m.start(2)] + json.dumps(nodes, ensure_ascii=False, indent=1) + html[m.end(2):]
         open(tree, "w", encoding="utf-8").write(out)
     except Exception:
         pass

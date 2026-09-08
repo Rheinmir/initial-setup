@@ -37,6 +37,11 @@ def sh(args, timeout=120):
 
 # ── PROBES ─────────────────────────────────────────────────────────────────────────────────
 # Mỗi probe trả (state, detail, fix): state ∈ 'ok'|'fail'|'warn'|'skip'.
+# Thẻ pending quá ngưỡng này thì medic kêu. Đặt 14 vì hai lô đã trôi 19 và 25
+# ngày mới có người thấy. Nâng lên 'fail' khi backlog đã về 0 và giữ được.
+STALE_CARD_DAYS = 14
+
+
 def p_rules():
     """Luật có CẮN không — harness-doctor fire-drill (BAD phải bị chặn)."""
     doc = ROOT / "harness/scripts/harness-doctor.py"
@@ -194,6 +199,7 @@ PROBE_MECH_MAP = {
     "selfstate": "code-state", "capsurface": "capsurface",
     "capproof": "capproof", "provenance": "provenance-scope",
     "orchestration": None, "deps": None, "wikisummary": None,
+    "problemtree": None,
 }
 
 
@@ -511,6 +517,52 @@ def p_deps():
                   + (f" ({', '.join(d['name'] for d in ok)})" if ok else "")), ""
 
 
+def p_problemtree():
+    """Vế GHI của problem-tree đã tự động (hook R17 xả sổ), vế DỌN thì trông vào
+    người nhớ — nên thẻ pending tồn hàng tuần mà không ai thấy. Đây là vòng phản
+    hồi cho vế dọn: đếm thẻ còn pending và tuổi thẻ già nhất.
+    Bằng chứng vì sao cần: lô 02–20/07 tồn 19 ngày, lô 14–18/08 tồn 25 ngày,
+    cả hai chỉ lộ ra khi có người tình cờ đọc sổ."""
+    import datetime as _dt
+    root = ROOT
+    tree = next((root / rel for rel in ("llmwiki/html/fdk-problem-tree.html",
+                                        "llmwiki/html/problem-tree.html")
+                 if (root / rel).is_file()), None)
+    if tree is None:
+        return "skip", "chưa có sổ cây vấn đề", ""
+    try:
+        m = re.search(r'id="tree-data">\s*(\[.*?\])\s*</script>',
+                      tree.read_text(encoding="utf-8"), re.S)
+        nodes = json.loads(m.group(1)) if m else []
+    except Exception as exc:
+        return "warn", f"không đọc được sổ cây vấn đề: {exc}", f"kiểm {tree}"
+    # id trùng thì mọi thứ trỏ theo id đều mơ hồ (parent, solvedBy, link ngoài). Đã dính:
+    # hai vấn đề khác nhau cùng mang p-07 (02/07 policy-chưa-drive, 08/07 wiki-graph
+    # split-brain) — không cổng nào thấy cho tới khi có người đọc tay 2026-09-08.
+    _ids = [n.get("id") for n in nodes]
+    _dup = sorted({i for i in _ids if _ids.count(i) > 1})
+    if _dup:
+        return "fail", f"cây vấn đề có id TRÙNG: {', '.join(map(str, _dup))}", \
+               "đổi id node mới hơn sang số còn trống, ghi lý do vào desc"
+
+    pending = [n for n in nodes if n.get("pending") and n.get("status") == "open"]
+    if not pending:
+        return "ok", f"cây vấn đề sạch — {len(nodes)} node, 0 thẻ pending chờ chưng lọc", ""
+    today = _dt.date.today()
+    ages = []
+    for n in pending:
+        try:
+            ages.append((today - _dt.datetime.strptime(n["date"], "%d/%m/%y").date()).days)
+        except Exception:
+            ages.append(0)
+    oldest = max(ages) if ages else 0
+    ids = ", ".join(str(n.get("id")) for n in pending[:4])
+    msg = f"{len(pending)} thẻ pending chưa chưng lọc ({ids}) · già nhất {oldest} ngày"
+    fix = "mở /fdk — rà thẻ p-auto, gộp về nhánh đúng rồi đổi status"
+    return ("warn" if oldest >= STALE_CARD_DAYS else "ok", msg, fix if oldest >= STALE_CARD_DAYS else "")
+
+
+
 PROBES = [
     ("rules",    ["rules", "luật", "bite"],      p_rules),
     ("coverage", ["rules", "coverage", "luật"],  p_coverage),
@@ -532,6 +584,7 @@ PROBES = [
     ("provenance", ["provenance", "supply-chain", "external-pull", "tamper"], p_provenance),
     ("orchestration", ["orchestration", "orca", "dispatch", "task", "treo"], p_orchestration),
     ("deps", ["deps", "dependency", "code-graph", "orca", "mcp", "ngoài"], p_deps),
+    ("problemtree", ["problemtree", "problem-tree", "cây", "pending", "distill", "thẻ"], p_problemtree),
 ]
 # bỏ 'drift' probe trùng — drift đã báo trong rules:
 PROBES = [p for p in PROBES if p[0] != "drift"]

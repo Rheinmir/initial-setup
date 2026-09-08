@@ -50,9 +50,20 @@ Không khai được thành lệnh thì **không tính là năng lực** — đ�
 Đường remote chỉ tồn tại sau khi push — nhưng **không nhất thiết phải push lên nhánh chính**. Một nhánh tạm cũng có raw URL, và `curl` không quan tâm nhánh nào.
 
 ```bash
-CANARY="uat/$(date +%y%m%d-%H%M)"
+CANARY="uat-$(date +%y%m%d-%H%M)"   # KHÔNG dùng dấu "/" — xem cảnh báo ngay dưới
 git push origin HEAD:"$CANARY"
 ```
+
+> **Tên nhánh canary KHÔNG được chứa dấu `/`.** CLI `skills` resolve đúng ref rồi **chết im lặng**
+> ở bước discovery: `curl: (3) URL rejected: Malformed input to a URL function`, không có dòng
+> `Found N skills`, và **không cài skill nào** — trong khi `install.sh` vẫn chạy tiếp và báo
+> "3 trụ ✓". Đo được 2026-09-08: `Rheinmir/setup#uat/260908-1420` → 0 skill; đổi thành
+> `Rheinmir/setup#uat-260908-1511` → `Found 88 skills`, `.skill-lock.json` ghi đúng
+> `ref=uat-260908-1511`. Đây là **cùng lớp ảo giác với GH#79** nhưng nguyên nhân khác: #79 là
+> hardcode ref (đã vá, override được); cái này là ref hợp lệ mà CLI không nuốt nổi.
+> `harness/tests/install-ref-override-test.sh` chỉ kiểm ref **được truyền qua**, không kiểm nó
+> **cài được skill** — nên cổng đó xanh mà bài UAT vẫn mù.
+
 
 Dựng dự án **trống**, cài từ raw của **chính nhánh canary** — phải trỏ **cả ba** biến, không thì nó lặng lẽ kéo nội dung của nhánh chính:
 

@@ -36,7 +36,21 @@ Không chắc? Hỏi: *"cái tôi vẽ có TRỤC SỐ không?"* Có → biểu 
 ## Nhánh SƠ ĐỒ — qua `archify`
 
 Engine ngoài, KÉO NGOÀI theo `[[adapt-modes]]`: ta **không** viết lại, chỉ ghim + gọi.
-Cài: `npx skills add tt-a1i/archify -g` (đích thật là `~/.agents/skills/archify`).
+Cài: `npx skills add Rheinmir/archify -g -s archify` (đích thật là `~/.agents/skills/archify`).
+Đây là **fork** của `tt-a1i/archify`: thêm preset thứ 5 `macos` (liquid glass + Roboto) và đặt
+làm **mặc định** — bỏ trống `meta.visual_preset` là ra đúng theme của nhà, không phải áp thêm
+bước nào. Nhánh vá `macos-roboto` là nhánh MẶC ĐỊNH của fork, nên không cần ghim ref.
+
+Hai cái bẫy đã trả giá, đừng lặp lại:
+
+- **Không có cờ `--ref`.** Và `owner/repo@nhánh` KHÔNG ghim được nhánh lúc cài: CLI in ra
+  `Source: …git @macos-roboto` nhưng vẫn cài nhánh mặc định, đồng thời hiểu phần sau `@` là
+  TÊN SKILL nên báo `No matching skills found`. Đó là lý do pin bằng default-branch, không
+  bằng cú pháp.
+- **`-l` không thay được cài thật.** `add … -l` báo `Found 1 skill` xanh trong khi lệnh cài
+  thật vẫn hỏng. Kiểm đường cài phải cài thật rồi vẽ một sơ đồ, xem `data-preset` ra gì.
+
+Upstream ra bản mới thì rebase nhánh, đừng cài đè bằng `tt-a1i/archify`.
 
 Gọi bằng ngôn ngữ tự nhiên trong chat — **không có prefix lệnh**:
 
@@ -127,7 +141,8 @@ không bằng chuỗi trong file.
 
 ## Origin
 
-- Nhánh sơ đồ: `tt-a1i/archify` (KÉO NGOÀI — engine sống ngoài, ta ghim + gọi).
+- Nhánh sơ đồ: `Rheinmir/archify` @ `macos-roboto` (KÉO NGOÀI — fork của `tt-a1i/archify`;
+  engine sống ngoài, ta ghim + gọi). Xem `sources/draft/080926-archify-fork-pin.md`.
 - Kỷ luật biểu đồ: `larashero3-dotcom/lieflat-charts` (HÒA TAN — chỉ lấy luật, không lấy bộ vẽ).
 - Cổng hình học + giao nguyên tử: hấp thụ từ archify vào `fdk/tools/frontend-antipattern.py`
   và `fdk/tools/build-overstack-docs.py`, xem `wiki/sources/draft/040926-absorb-round.md`.

@@ -26,6 +26,16 @@ import re
 import sys
 from pathlib import Path
 
+# Cổng tất định đọc GIT, không đọc ĐĨA: file bị .gitignore / chưa add không phải
+# việc của gate này. Đo 2026-09-08: 13 file local trong draft/archive/ (bị ignore) trỏ
+# task đã xoá → đỏ 1/21 ở clone chính, xanh trên clone sạch. Fail-open nếu thiếu module.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+try:
+    from overstack_paths import is_tracked  # noqa: E402
+except Exception:                          # pragma: no cover
+    def is_tracked(root, path):            # type: ignore[misc]
+        return True
+
 ORDER = ["proposed", "approved", "dispatched", "done"]
 IDX = {s: i for i, s in enumerate(ORDER)}
 
@@ -74,6 +84,8 @@ def _check_refs(root: Path, tasks: dict) -> list:
     if not wiki.is_dir():
         return errs
     for md in wiki.rglob("*.md"):
+        if not is_tracked(root, md):
+            continue                       # local-only: không phải đầu vào của cổng
         try:
             text = md.read_text(encoding="utf-8")
         except Exception:

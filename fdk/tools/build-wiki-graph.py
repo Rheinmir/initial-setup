@@ -34,6 +34,30 @@ except Exception:
 # 164. Mỗi bên sai một kiểu: bên kia không bỏ code-fence (đếm cả [[...]] trong ví dụ
 # code), bên này bỏ code-fence đúng nhưng bỏ sót [[trang#anchor]]. Không bên nào là tập
 # cha của bên kia. Nay một nguồn chân lý: wikilink_targets() ở wiki-graph.py.
+# Cổng tất định đọc GIT, không đọc ĐĨA. Đo 2026-09-08: clone chính 394 node, clone sạch
+# 311 — chênh 83 đúng bằng số file wiki chưa track. Artifact được COMMIT mà index cả file
+# local thì lệch theo máy y như path tuyệt đối (#131/#133), chỉ khác trục. Mặc định chỉ
+# index file git track (gồm file vừa `git add`); --untracked để xem bản nháp local.
+_op = None
+for _cand in (Path(__file__).resolve().parents[2] / "harness/scripts/overstack_paths.py",
+              Path.home() / ".claude/harness/harness/scripts/overstack_paths.py"):
+    if _cand.is_file():
+        try:
+            _s = importlib.util.spec_from_file_location("_overstack_paths", _cand)
+            _op = importlib.util.module_from_spec(_s)
+            _s.loader.exec_module(_op)
+            break
+        except Exception:
+            _op = None   # fail-open: quét đĩa như cũ
+INCLUDE_UNTRACKED = False
+
+
+def _in_git(root, path) -> bool:
+    if INCLUDE_UNTRACKED or _op is None or root is None:
+        return True
+    return _op.is_tracked(root, path)
+
+
 _wg = None
 for _cand in (Path(__file__).resolve().parents[2] / "harness/scripts/wiki-graph.py",
               Path.home() / ".claude/harness/harness/scripts/wiki-graph.py"):
@@ -125,6 +149,8 @@ def scan(wiki: Path, tag: str, nodes, edges, ledger, stale, repo_root=None):
         for p in sorted(base.rglob("*.md")):
             if p.name in {"README.md", "_template.md"}:
                 continue
+            if not _in_git(repo_root, p):
+                continue
             try:
                 text = p.read_text(encoding="utf-8", errors="ignore")
             except OSError:
@@ -154,6 +180,11 @@ def scan(wiki: Path, tag: str, nodes, edges, ledger, stale, repo_root=None):
             # Frontmatter vẫn thắng: path đã khai tay thì không nhân đôi.
             if _wg is not None and repo_root:
                 for cp in _wg.touches_targets(raw_body, repo_root):
+                    # touches_targets chỉ hỏi "file có trên ĐĨA không" — file bị .gitignore
+                    # (llmwiki/html/*.html, scratchpad/) vẫn thành node. Đo 2026-09-08: 8 node
+                    # lệch giữa clone chính và clone sạch đều đi qua lối này.
+                    if not _in_git(repo_root, Path(repo_root) / cp):
+                        continue
                     if cp not in typed_to:
                         typed_to.add(cp)
                         edges.append({"from": pid, "rel": "touches", "to": cp, "kind": "path"})
@@ -380,6 +411,8 @@ def enrich_code(nodes, edges, repo_root):
     for p in root.rglob("*.py"):
         rel = p.relative_to(root).as_posix()
         if any(seg in rel for seg in (".git/", "node_modules/", ".overstack-kit/", "workspaces/")):
+            continue
+        if not _in_git(root, p):
             continue
         modindex.setdefault(p.stem, rel)                       # basename: from store import
         modindex.setdefault(rel[:-3].replace("/", "."), rel)   # dotted-from-root: app.core → app/core.py
@@ -826,7 +859,11 @@ def main() -> None:
     ap.add_argument("--code-root", help="seed node code từ thư mục này → dựng import-graph đầy đủ (opt-in)")
     ap.add_argument("--json", help="dump nodes/edges/cycles ra JSON (cho eval/scoring)")
     ap.add_argument("-o", "--out")
+    ap.add_argument("--untracked", action="store_true",
+                    help="index cả file chưa git track (xem nháp local; artifact sinh ra KHÔNG tất định)")
     a = ap.parse_args()
+    global INCLUDE_UNTRACKED
+    INCLUDE_UNTRACKED = a.untracked
     t0 = time.perf_counter()
     prim = Path(a.primary).resolve()
     if not prim.is_dir():

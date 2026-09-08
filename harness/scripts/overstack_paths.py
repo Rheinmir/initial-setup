@@ -79,6 +79,46 @@ def needs_migration(root) -> list:
     return out
 
 
+# ── Cổng tất định phải đọc GIT, không đọc ĐĨA ─────────────────────────────────────
+# Đo 2026-09-08: ba cổng cho kết quả khác nhau tuỳ máy đang có file local nào —
+# build-overstack-docs --check (docs "cũ" vì wiki có 24 file chưa track), wiki-graph
+# (394 node ở clone chính, 311 ở clone sạch), task_lifecycle (đỏ vì 13 file trong
+# draft/archive/ bị .gitignore trỏ task đã xoá). Cùng một gốc: quét đĩa bằng rglob.
+# Một hàm, ba nơi hỏi. Không có git → None, caller quét đĩa như cũ (fail-open).
+_TRACKED_CACHE: dict = {}
+
+
+def tracked_set(root) -> "set[str] | None":
+    """Đường dẫn (posix, tương đối root) mà git đang track — gồm cả file mới `git add`.
+
+    None khi không phải repo git / thiếu git: caller phải coi như "mọi file đều hợp lệ"
+    chứ không được coi là "không file nào hợp lệ"."""
+    import subprocess
+    key = str(pathlib.Path(root).resolve())
+    if key in _TRACKED_CACHE:
+        return _TRACKED_CACHE[key]
+    try:
+        out = subprocess.run(["git", "ls-files", "-z"], cwd=key, capture_output=True,
+                             text=True, timeout=15)
+        val = set(x for x in out.stdout.split("\0") if x) if out.returncode == 0 else None
+    except Exception:
+        val = None
+    _TRACKED_CACHE[key] = val
+    return val
+
+
+def is_tracked(root, path) -> bool:
+    """True nếu git track `path` — hoặc nếu không có git để hỏi (fail-open)."""
+    ts = tracked_set(root)
+    if ts is None:
+        return True
+    try:
+        rel = pathlib.Path(path).resolve().relative_to(pathlib.Path(root).resolve()).as_posix()
+    except ValueError:
+        return False
+    return rel in ts
+
+
 def self_test() -> int:
     import shutil
     import tempfile
@@ -119,6 +159,27 @@ def self_test() -> int:
         (fw / "llmwiki" / "wiki").mkdir(parents=True)
         ck("repo framework → fdk/wiki thắng", wiki_dir(fw) == fw / "fdk" / "wiki")
         ck("repo framework → KHÔNG BAO GIỜ migrate chính nó", needs_migration(fw) == [])
+
+        # 5. tracked_set: cổng đọc GIT chứ không đọc ĐĨA
+        import subprocess
+        g = tmp / "g"; g.mkdir()
+        run = lambda *a: subprocess.run(["git", "-C", str(g), *a], capture_output=True, text=True)
+        run("init", "-q"); run("config", "user.email", "t@t"); run("config", "user.name", "t")
+        (g / "a.md").write_text("a"); (g / "ign.md").write_text("i"); (g / "new.md").write_text("n")
+        (g / ".gitignore").write_text("ign.md\n")
+        run("add", "a.md", ".gitignore"); run("commit", "-q", "-m", "init")
+        (g / "staged.md").write_text("s"); run("add", "staged.md")
+        _TRACKED_CACHE.clear()
+        ck("file đã commit → tracked", is_tracked(g, g / "a.md"))
+        ck("file vừa git add (chưa commit) → tracked (người viết draft chỉ cần add)",
+           is_tracked(g, g / "staged.md"))
+        ck("file untracked → KHÔNG", not is_tracked(g, g / "new.md"))
+        ck("file bị .gitignore → KHÔNG (đúng ca task_lifecycle đỏ 13 file archive)",
+           not is_tracked(g, g / "ign.md"))
+        ck("ngoài root → KHÔNG", not is_tracked(g, tmp / "old" / "x.md"))
+        nog = tmp / "nogit"; nog.mkdir(); (nog / "x.md").write_text("x")
+        ck("không có git → None, is_tracked fail-open = True",
+           tracked_set(nog) is None and is_tracked(nog, nog / "x.md"))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print("self-test: PASS" if ok else "self-test: FAIL")

@@ -97,4 +97,5 @@ lúc đọc mới lộ ra lỗi ghi trùng.
 - **Raise + fix bởi:** phiên vẽ sơ đồ `hoh` 2026-09-07/08, lượt `/fdk` rà cây trước khi kết lượt.
 - **Bằng chứng:** `git show 1474a88` · `git show 41ed323` · `medic problemtree` trước (3 thẻ,
   già nhất 25 ngày) và sau (sạch) · `flush-idempotent-test.sh` 4/4.
+- **Tracker:** [GH#139](https://github.com/Rheinmir/setup/issues/139) — đã đóng 2026-09-08
 - **Nền:** `[[p-10]]` — "cơ chế flush p-auto phải kèm distill", nêu 21/07, dựng 08/09.

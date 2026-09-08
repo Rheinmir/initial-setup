@@ -22,6 +22,8 @@ sys.exit(0 if has_ext and has_local else 1)
   || bad "--json thiếu 1 trong 2 loại — không thể scope đúng"
 
 # 2. Sandbox: tamper 1 skill GIẢ external-pull → probe phải ĐỎ, không đụng repo thật
+# GH#136: chụp trạng thái skills/ TRƯỚC — so HIỆU SỐ, không so tuyệt đối (working tree bẩn sẵn ≠ test làm bẩn)
+SKILLS_BEFORE="$(git -C "$ROOT" status --porcelain -- skills/ 2>/dev/null)"
 SB="$(mktemp -d)"
 mkdir -p "$SB/skills/fake-ext" "$SB/skills/fake-local" "$SB/harness/metrics" "$SB/fdk"
 printf -- '---\nname: fake-ext\ndescription: x\n---\nbody v1\n' > "$SB/skills/fake-ext/SKILL.md"
@@ -62,8 +64,9 @@ rm -f /tmp/_tamper_local
 rm -rf "$SB"
 
 # 3. Repo thật không bị đụng (probe chỉ đọc, self-test không side-effect)
-git -C "$ROOT" status --porcelain -- skills/ 2>/dev/null | grep -q . \
-  && bad "test làm bẩn skills/ của repo thật!" || ok "repo thật (skills/) nguyên vẹn sau test"
+SKILLS_AFTER="$(git -C "$ROOT" status --porcelain -- skills/ 2>/dev/null)"
+[ "$SKILLS_BEFORE" = "$SKILLS_AFTER" ] && ok "repo thật (skills/) nguyên vẹn sau test (đo hiệu số, GH#136)" \
+  || bad "test làm bẩn skills/ của repo thật!"
 
 [ "$fail" -eq 0 ] && { printf '\n\033[1m═══ skill-provenance-scope: \033[1;32mPASS\033[0m\033[0m\n'; exit 0; }
 printf '\n\033[1m═══ skill-provenance-scope: \033[1;31m%d VI PHẠM\033[0m\033[0m\n' "$fail"; exit 1

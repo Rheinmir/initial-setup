@@ -31,6 +31,9 @@ while [ $# -gt 0 ]; do
   esac
 done
 ROOT="$(cd "$ROOT" && pwd)"
+# GH#142: chụp git-status TRƯỚC khi ghi — cuối install liệt kê file TRACKED bị installer ghi đè,
+# để cây bẩn "từ bên ngoài" không bị nhầm là sửa của người dùng.
+PRE_STATUS="$(git -C "$ROOT" status --porcelain 2>/dev/null || true)"
 log(){ printf '\033[1;32m[install]\033[0m %s\n' "$*"; }
 warn(){ printf '\033[1;33m[install]\033[0m %s\n' "$*"; }
 has(){ case ",$VENDORS," in *",$1,"*) return 0;; *) return 1;; esac; }
@@ -402,6 +405,15 @@ if [ -f "$TB" ]; then
   python3 "$TB" configure --if-tty --root "$ROOT" </dev/null 2>/dev/null || true
 fi
 
+# GH#142: file tracked mà installer vừa ghi đè (có trong status SAU, không có TRƯỚC)
+if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+  TOUCHED="$(comm -13 <(printf '%s\n' "$PRE_STATUS" | sort) <(git -C "$ROOT" status --porcelain 2>/dev/null | sort) | grep '^ *M' | sed 's/^ *M *//' || true)"
+  if [ -n "$TOUCHED" ]; then
+    warn "installer đã GHI ĐÈ $(printf '%s\n' "$TOUCHED" | wc -l | tr -d ' ') file tracked (cập nhật framework, KHÔNG phải sửa của bạn):"
+    printf '%s\n' "$TOUCHED" | sed 's/^/           /'
+    warn "  → xem: git diff -- <file> · commit riêng: git commit -am 'chore(harness): update v${TV:-?}'"
+  fi
+fi
 log    "═══════════ TRẠNG THÁI 3 TRỤ ═══════════"
 log    "  1. Harness  ✓ cài/cập nhật   (per-project: hook validate + CI + R1–R10)"
 if [ "$WITH_SKILLS" = 1 ]; then

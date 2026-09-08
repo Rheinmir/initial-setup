@@ -15,8 +15,8 @@ verified: false                   # token-overlap default is deterministic + tes
 relevance:
   scorer: token-overlap           # 'token-overlap' (Jaccard, offline default) | 'embedding' (semantic, needs embedder_cmd below)
   # embedder_cmd: reads text on STDIN, prints a JSON float array on STDOUT. Any backend works:
-  #   Ollama : 'python3 harness/scripts/embed-ollama.py'   (nomic-embed-text, offline, no key)
-  #   Voyage : 'python3 harness/scripts/embed-voyage.py'   (needs VOYAGE_API_KEY, network)
+  #   (2026-09-08: bỏ embed-ollama.py/embed-voyage.py — chưa ai bật; cần thì viết script ~20 dòng
+  #    đọc stdin → in JSON float array, vd gọi Ollama /api/embeddings hay Voyage.)
   # Set scorer: embedding AND embedder_cmd to turn on semantic recall; unreachable => auto-fallback.
   embedder_cmd: null              # null => token-overlap (semantic path off)
   min_score: 0.25                 # embedding only: cosine floor for NOOP (cosine>0 even for unrelated)

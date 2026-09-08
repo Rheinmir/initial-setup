@@ -68,8 +68,6 @@
     "harness/scripts/mem-rank.py",
     "harness/scripts/bnal_config.py",
     "harness/mem-rank.config.yaml",
-    "harness/scripts/embed-ollama.py",
-    "harness/scripts/embed-voyage.py",
     "fdk/tools/skill-usage.py",
     "harness/scripts/health-check.py",
     "harness/scripts/okf-check.py",

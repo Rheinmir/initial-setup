@@ -12,9 +12,6 @@
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-09-04 16:09:22 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=086b120594f3a4c9171efd1cf5f0674519de |
-| 2026-09-04 16:09:22 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=4c0b28b261b4f2893b25ecab413b683a2bfa |
-| 2026-09-04 16:09:30 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=476ed098f0c9f543321ca7a693e1515ac31f |
 | 2026-09-04 16:09:30 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=48b67915556c50482dc3f1237e836be5c184 |
 | 2026-09-04 16:10:04 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Write · session=3e970e77 · actor=agent · prev=e7c7012531b028dfd18e721 |
 | 2026-09-04 16:10:04 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Write · session=3e970e77 · actor=agent · prev=b07879ac08062aed2563b07 |
@@ -52,6 +49,9 @@
 | 2026-09-08 16:51:59 | `file.write` | harness/scripts/dym-sync.py · tool=Write · session=f38daa12 · actor=agent · prev=84e0db93f8c85ff22513a5cf7e95c23f9440542 |
 | 2026-09-08 16:51:59 | `file.write` | harness/scripts/dym-sync.py · tool=Write · session=f38daa12 · actor=agent · prev=beb571268cba58198fa7769900a64bbfe69bf0f |
 | 2026-09-08 17:01:12 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/sources/evals/skill-resolve/prd-grade-fe-production.md',  |
+| 2026-09-08 17:25:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/version.json', 'fdk/CAPABILITIES.md', 'harness/metrics/.stop-d |
+| 2026-09-08 17:25:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/tests/engines-smoke-test.sh', 'skills/doyourmagic/SKILL.md', ' |
+| 2026-09-08 17:25:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/stale.json', 'harness/scripts/dym- |
 
 <!-- log:auto:end -->
 - 2026-09-08 · docs-gate R10: trang tài liệu `html/080926-prd-grade-fe-docs.html` (docs-site-macos, 9 mục, Playwright audit pass) + 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21.

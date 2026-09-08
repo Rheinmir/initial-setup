@@ -3,7 +3,7 @@
 # mỗi cái execute với input thật trong sandbox/read-only, assert exit-code + output thật.
 # KHÔNG phải danh sách tên cho resolver ăn: tên chỉ xuất hiện vì lệnh thật được chạy ở đây.
 # Phủ: mech:harness-lint, mech:medic-mirror, skill:docs-curate, skill:ovs-notes,
-#      script: adapt-registry.py arch-scan.py dispatch-verify.py embed-ollama.py embed-voyage.py
+#      script: adapt-registry.py arch-scan.py dispatch-verify.py
 #              harness-lint.py ovs-notes.py query-log.py query-proxy.py skill-health.py
 #              skill-registry.py sync-skills.py sync-template.py wiki-health.py dym-sync.py
 #      tool:   artifacts.py build-cheatsheet.py build-docs-index.py build-health-dashboard.py
@@ -67,16 +67,6 @@ mkdir -p "$SB/dv/.git"
 out=$(python3 "$ROOT/harness/scripts/dispatch-verify.py" --root "$SB/dv" --scan 2>&1); rc=$?
 [ $rc -eq 0 ] && echo "$out" | grep -q "khong co draft" \
   && ok "dispatch-verify.py --scan báo đúng 'không có draft' (rc=0)" || bad "dispatch-verify.py rc=$rc: $(echo "$out" | head -3)"
-
-# ── 8. embed-voyage.py: fail-path là HỢP ĐỒNG mem-rank dựa vào — key vắng → stderr + rc≠0 ──
-out=$(env -u VOYAGE_API_KEY python3 "$ROOT/harness/scripts/embed-voyage.py" "text" 2>&1); rc=$?
-[ $rc -ne 0 ] && echo "$out" | grep -q "VOYAGE_API_KEY unset" \
-  && ok "embed-voyage.py fail-loud đúng hợp đồng khi key vắng" || bad "embed-voyage.py rc=$rc out=$out"
-
-# ── 9. embed-ollama.py: host chết → rc≠0, stdout im lặng (mem-rank fallback dựa vào) ──
-out=$(OLLAMA_HOST="http://127.0.0.1:9" python3 "$ROOT/harness/scripts/embed-ollama.py" "text" 2>/dev/null); rc=$?
-[ $rc -ne 0 ] && [ -z "$out" ] && ok "embed-ollama.py fail im lặng + rc≠0 khi host chết" \
-  || bad "embed-ollama.py rc=$rc stdout='$out'"
 
 # ── 10. sync-template.py: remote URL rác → thông báo + rc 2 (fail-path tất định, 0 network) ──
 mkdir -p "$SB/st"
@@ -197,5 +187,5 @@ out=$(python3 "$ROOT/harness/scripts/sync-template.py" --selftest 2>&1); rc=$?
 [ $rc -eq 0 ] && ok "sync-template.py --selftest (migrate_paths) xanh" || bad "sync-template.py --selftest rc=$rc: $out"
 
 echo
-if [ $fail -eq 0 ]; then echo "engines-smoke-test: PASS (25 nhóm assert)"; else
+if [ $fail -eq 0 ]; then echo "engines-smoke-test: PASS (23 nhóm assert)"; else
   echo "engines-smoke-test: FAIL ($fail assert đỏ)"; exit 1; fi

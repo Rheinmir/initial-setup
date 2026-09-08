@@ -300,9 +300,9 @@
     },
     "fdk": {
       "files": {
-        "SKILL.md": "c5497f54efcc580b6b4d426687e1e94b8862fc48795adffebf43c8da553770db"
+        "SKILL.md": "606a2505666e4ebe3ca6b6db9542077e79759d6f560fe00ee830fc6a8e2509c9"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-09-08",
       "source": "local-authored"
     },
     "fdk-uat": {
@@ -913,9 +913,9 @@
     },
     "ship": {
       "files": {
-        "SKILL.md": "87f3def234c3c94ab30004d5080dcf2b2fb43d7fdff1e3879ae36e21abaf6037"
+        "SKILL.md": "9c62ee9797a6a3cc314eabcad237dfa11a6004094ac6f7c5425f3afbcb51846e"
       },
-      "recorded": "2026-07-18",
+      "recorded": "2026-09-08",
       "source": "local-authored"
     },
     "skill-provenance": {

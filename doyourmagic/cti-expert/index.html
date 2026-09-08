@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="vi" data-theme="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTI Expert — bộ workflow chạy được</title>
+<script>
+  // chống FOUC: đặt theme trước khi paint
+  (function () {
+    try {
+      var t = localStorage.getItem('cti-doc-theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      else document.documentElement.removeAttribute('data-theme');
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --border: #dfe3e8;
+    --text: #1e232b;
+    --muted: #626b78;
+    --accent: #1f5f8b;
+    --accent-soft: #e6eff6;
+    --code-bg: #eef1f4;
+    --consumer: #1f6f4a;
+    --consumer-bg: #e4f1ea;
+    --contrib: #6b4a9c;
+    --contrib-bg: #ece5f6;
+    --warn: #9a5b12;
+    --warn-bg: #fbf0e0;
+    --shadow: 0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c;
+      --card: #1c2027;
+      --border: #2c323b;
+      --text: #e7eaee;
+      --muted: #98a2b1;
+      --accent: #7fb6dd;
+      --accent-soft: #1d2b36;
+      --code-bg: #23282f;
+      --consumer: #7fd1a8;
+      --consumer-bg: #1a2b23;
+      --contrib: #bda8e8;
+      --contrib-bg: #262038;
+      --warn: #e0a45c;
+      --warn-bg: #2e2417;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171c;
+    --card: #1c2027;
+    --border: #2c323b;
+    --text: #e7eaee;
+    --muted: #98a2b1;
+    --accent: #7fb6dd;
+    --accent-soft: #1d2b36;
+    --code-bg: #23282f;
+    --consumer: #7fd1a8;
+    --consumer-bg: #1a2b23;
+    --contrib: #bda8e8;
+    --contrib-bg: #262038;
+    --warn: #e0a45c;
+    --warn-bg: #2e2417;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 20px 96px; }
+
+  header { margin-bottom: 34px; }
+  .toprow { display: flex; align-items: flex-start; gap: 16px; justify-content: space-between; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -.02em; }
+  .sub { color: var(--muted); margin: 0; font-size: 15px; }
+  .meta { margin-top: 14px; font-size: 13.5px; color: var(--muted); }
+  .meta code { font-size: 12.5px; }
+
+  button.theme {
+    flex: none;
+    background: var(--card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 7px 14px; font-size: 13px; cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  button.theme:hover { border-color: var(--accent); color: var(--accent); }
+
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); margin: 40px 0 14px; font-weight: 700;
+  }
+
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    transition: border-color .12s ease, transform .12s ease;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .num {
+    font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
+    color: var(--accent); background: var(--accent-soft);
+    border-radius: 6px; padding: 2px 8px;
+  }
+  .title { font-weight: 650; font-size: 17px; }
+  .tag {
+    margin-left: auto; font-size: 11.5px; font-weight: 650;
+    border-radius: 999px; padding: 3px 10px; white-space: nowrap;
+  }
+  .tag.consumer { color: var(--consumer); background: var(--consumer-bg); }
+  .tag.contrib  { color: var(--contrib);  background: var(--contrib-bg); }
+  .desc { color: var(--muted); font-size: 14.5px; margin: 0; }
+  .desc strong { color: var(--text); font-weight: 600; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--code-bg); border-radius: 4px; padding: 1px 5px; font-size: 13px;
+  }
+
+  .note {
+    border-left: 3px solid var(--warn); background: var(--warn-bg);
+    border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 14.5px; margin: 18px 0 0;
+  }
+  .order { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+           padding: 16px 20px; box-shadow: var(--shadow); font-size: 14.5px; }
+  .order p { margin: 8px 0; }
+  .order .lbl { font-weight: 650; }
+  footer { margin-top: 44px; font-size: 13.5px; color: var(--muted); }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="toprow">
+    <div>
+      <h1>CTI Expert — bộ workflow chạy được</h1>
+      <p class="sub">Bộ tài liệu chạy-được-ngay cho <code>7onez/cti-expert</code>, chia theo đối tượng người dùng.</p>
+    </div>
+    <button class="theme" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">Giao diện: hệ thống</button>
+  </div>
+  <p class="meta">
+    Sinh từ khảo sát read-only tại commit <code>08bed57</code> (2026-08-28, plugin <code>2.8.0</code>),
+    chạy thật trên macOS: 121 op CLI, 78 <code>@tool</code> MCP, 10/10 test repo-root xanh,
+    <code>audit.sh</code> sạch, generator HTML/IOC chạy được không cần cài gì.
+  </p>
+</header>
+
+<h2>Nhánh tiêu thụ — bạn dùng cti-expert để điều tra</h2>
+
+<a class="card" href="01-install-and-register.md">
+  <div class="head"><span class="num">01</span><span class="title">Cài đặt &amp; đăng ký</span><span class="tag consumer">Cài đặt</span></div>
+  <p class="desc">Clone, chạy <code>install.sh</code> (chỉ có 3 cờ: <code>--headless</code>, <code>--go</code>, <code>--all</code>), rồi chọn giữa hai đường đăng ký. <strong>Khác biệt quan trọng:</strong> <code>register.sh</code> chỉ symlink skill + 8 lệnh + MCP, còn <code>/plugin install</code> mang theo cả 3 hook an toàn — nếu bạn định điều tra thật thì chọn đường plugin. Kết thúc bằng bước verify <code>backend.py status</code> với output thật để đối chiếu.</p>
+</a>
+
+<a class="card" href="02-api-keys-and-capabilities.md">
+  <div class="head"><span class="num">02</span><span class="title">API key, keyless &amp; sổ chi phí</span><span class="tag consumer">Cấu hình</span></div>
+  <p class="desc">Chạy <code>capabilities</code> để biết <em>thiếu key thì mất gì</em> trước khi mua key — dòng <code>LOST:</code> chính là thứ báo cáo phải khai khi bạn kết luận "không tìm thấy liên kết". Liệt kê 23 biến trong <code>.env.example</code>, bẫy WhoisXML DRS trả 403, và luật tách hai sổ chi phí: model Anthropic (<code>/cost</code>) hoàn toàn không bao gồm credit API bên thứ ba (<code>api-usage</code>).</p>
+</a>
+
+<a class="card" href="03-investigate-in-claude-code.md">
+  <div class="head"><span class="num">03</span><span class="title">Điều tra bằng lệnh chat</span><span class="tag consumer">Dùng hằng ngày · CHAT</span></div>
+  <p class="desc"><strong>Chỉ lệnh chat</strong> — đúng 8 lệnh <code>/cti*</code> được đăng ký, kèm ánh xạ sang op T2 và tool T1. Mọi <code>/lệnh</code> khác trong SKILL.md chỉ là quy ước, gõ ở prompt nguội thì không có gì xảy ra. Giải thích ba marker <code>T1/T2</code> · <code>[model]</code> · <code>[unimplemented]</code> — cơ chế chống agent kể chuyện đã gọi tool — và vòng đời AEAD với lý do vì sao <code>/cti-recall</code> và <code>/cti-check</code> phải chạy trước.</p>
+</a>
+
+<a class="card" href="04-cli-dispatcher.md">
+  <div class="head"><span class="num">04</span><span class="title">Dispatcher CLI <code>intel.py</code></span><span class="tag consumer">Dùng hằng ngày · SHELL</span></div>
+  <p class="desc"><strong>Chỉ lệnh shell</strong> — một điểm vào cho 121 op, với <code>--dry-run</code> để xem lệnh thật trước khi tiêu credit. Bảng mã thoát đọc từ các lệnh <code>return</code> literal: <code>2</code> op lạ · <code>3</code> không thấy backend · <code>4</code> thiếu script · <code>5</code> interpreter hỏng — đừng giả định 0/1. Kèm nhóm op thuần chạy được ngay sau khi clone, không mạng không key.</p>
+</a>
+
+<a class="card" href="05-case-pipeline-and-kb.md">
+  <div class="head"><span class="num">05</span><span class="title">Chạy một case: pipeline &amp; KB</span><span class="tag consumer">Điều tra</span></div>
+  <p class="desc">Đường tất định không-LLM: mở case, <code>frontier</code> (còn gì làm được miễn phí), <code>clusters</code> (đơn vị phán xét là cụm, không phải case), rồi truy vấn KB. Mở đầu bằng luật một-case-store vì hỏng ở đây <strong>im lặng</strong> — ghi sai đường dẫn thì tương quan chạy trên tập rỗng và báo "no shared indicators" thay vì báo lỗi. Giải thích cờ <code>--strong</code> và vì sao nó nên là mặc định khi kết luận.</p>
+</a>
+
+<a class="card" href="06-reports-and-iocs.md">
+  <div class="head"><span class="num">06</span><span class="title">Báo cáo, IOC/STIX, bản đã che</span><span class="tag consumer">Bàn giao</span></div>
+  <p class="desc">Một report JSON nuôi mọi generator. HTML offline một file và bundle IOC/STIX chạy bằng <code>python3</code> thuần — không venv, không mạng (đã chạy thật với file mẫu). Phần <code>redact.py</code> nêu ba điều dễ sai: dùng chung một <code>--map</code>, không bao giờ gửi file map, và mặc định <em>không</em> che hạ tầng vì trong báo cáo CTI hạ tầng chính là phần phân tích.</p>
+</a>
+
+<a class="card" href="07-safety-gates.md">
+  <div class="head"><span class="num">07</span><span class="title">Rào an toàn: chặn, hỏi, im lặng</span><span class="tag consumer">Vận hành an toàn</span></div>
+  <p class="desc">Danh sách đầy đủ 7 MCP tool + 11 pattern bash bị gate, đọc thẳng từ <code>outbound_actions.json</code>. Giải thích vì sao gate được nhân đôi (bản trong code sống ở cây vendored, một lần sync có thể revert mà không đỏ test nào), vì sao cả hai hook <strong>fail-open</strong>, và vì sao dấu cách cuối trong <code>intel.py engage&nbsp;</code> là có tải trọng. <strong>Đọc trước khi chạm bất cứ thứ gì outbound.</strong></p>
+</a>
+
+<a class="card" href="08-ci-monitoring.md">
+  <div class="head"><span class="num">08</span><span class="title">CI theo dõi thương hiệu</span><span class="tag consumer">Tự động hoá</span></div>
+  <p class="desc">Ví dụ GitHub Actions <strong>viết mới cho dự án của bạn</strong> — không phải bản chép CI của cti-expert (hai workflow đó gate việc phát triển chính công cụ và vô dụng với bạn). Sweep typosquat + CT-monitor, cả hai keyless, với file state được commit lại để chỉ báo cái mới. Kèm cảnh báo: <code>actionguard.py</code> <em>không</em> chạy trong CI, nên đừng đưa op outbound vào cron.</p>
+</a>
+
+<h2>Nhánh đóng góp — bạn sửa chính công cụ</h2>
+
+<a class="card" href="09-contributor-develop-and-gate.md">
+  <div class="head"><span class="num">09</span><span class="title">Phát triển &amp; cổng chất lượng</span><span class="tag contrib">Đóng góp</span></div>
+  <p class="desc">Cổng duy nhất là <code>scripts/audit.sh</code> (9 mục). Đầy đủ RULE 1–6 kèm cái giá khi phá từng luật, quy trình bốn-bước để thêm một tool đúng RULE 3, và phần đồng bộ engine vendored — <strong>là merge ba chiều, không phải copy</strong>: hơn chục file đã vá có chủ đích, ghi đè chúng hỏng im lặng (collector vẫn chạy, chỉ thôi tìm thấy gì).</p>
+</a>
+
+<h2>Thứ tự chạy đề xuất</h2>
+<div class="order">
+  <p><span class="lbl">Analyst lần đầu:</span> 01 → 02 (dừng ở keyless được, không bắt buộc có key) → 03 <em>hoặc</em> 04 tuỳ bạn làm việc trong chat hay terminal → 05 khi có case thật → 06 khi cần bàn giao → 07 đọc <strong>trước</strong> khi chạm outbound → 08 khi muốn theo dõi liên tục.</p>
+  <p><span class="lbl">Người đóng góp:</span> nhảy thẳng 09; nó không phụ thuộc 01–08, nhưng 04 giúp hiểu bảng <code>DISPATCH</code> mà 09 bắt bạn cập nhật.</p>
+  <div class="note">
+    <strong>Ranh giới quan trọng:</strong> 03 là lệnh <strong>chat</strong> — gõ vào terminal sẽ không chạy.
+    04–06, 08, 09 là lệnh <strong>shell</strong> — dán vào chat thì chỉ là văn bản. Hai file tách riêng chính vì lỗi này.
+  </div>
+</div>
+
+<h2>Ba chỗ chưa kiểm chứng được</h2>
+<div class="order">
+  <p>Lần khảo sát này không cài <code>.venv</code> và không chạy outbound, nên ba nhóm sau chỉ được đọc từ mã nguồn, không chạy thật — và được đánh dấu <strong>CHƯA CHẠY THẬT</strong> ngay trong file tương ứng:</p>
+  <p>① đường LLM <code>harness</code> (cần <code>claude-agent-sdk</code>) · ② render <code>graph</code>/<code>network</code>/<code>report</code> (cần matplotlib/graphviz/pandoc) · ③ mọi thứ có <code>--submit</code> hoặc <code>engage</code>.</p>
+</div>
+
+<footer>
+  Chi tiết kiểm chứng từng khẳng định: <a href="workflows.md">workflows.md</a> → mục “Bundle này được kiểm chứng ra sao”.
+</footer>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    var order = ['system', 'light', 'dark'];
+    var label = { system: 'Giao diện: hệ thống', light: 'Giao diện: sáng', dark: 'Giao diện: tối' };
+
+    function current() {
+      try {
+        var t = localStorage.getItem('cti-doc-theme');
+        return (t === 'light' || t === 'dark') ? t : 'system';
+      } catch (e) { return 'system'; }
+    }
+    function apply(mode) {
+      if (mode === 'system') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', mode);
+      btn.textContent = label[mode];
+      try {
+        if (mode === 'system') localStorage.removeItem('cti-doc-theme');
+        else localStorage.setItem('cti-doc-theme', mode);
+      } catch (e) {}
+    }
+    apply(current());
+    btn.addEventListener('click', function () {
+      apply(order[(order.indexOf(current()) + 1) % order.length]);
+    });
+  })();
+</script>
+</body>
+</html>

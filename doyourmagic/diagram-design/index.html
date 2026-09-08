@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagram Design — bộ workflow chạy được</title>
+<script>
+  // chống FOUC: đặt theme trước khi trang vẽ
+  (function () {
+    try {
+      var saved = localStorage.getItem('dym-theme');
+      var t = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { /* private mode: giữ light */ }
+  })();
+</script>
+<style>
+  :root {
+    --paper:   #f7f7f5;
+    --paper-2: #ffffff;
+    --ink:     #23262f;
+    --muted:   #6b7280;
+    --line:    #dcdcd6;
+    --accent:  #b5523a;
+    --accent-soft: #f3e3de;
+    --code-bg: #efefe9;
+    --shadow:  0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05);
+  }
+  :root[data-theme="dark"] {
+    --paper:   #16181d;
+    --paper-2: #1e2128;
+    --ink:     #e8e8e3;
+    --muted:   #9aa1ad;
+    --line:    #31353e;
+    --accent:  #e8825f;
+    --accent-soft: #33231e;
+    --code-bg: #24272e;
+    --shadow:  0 1px 2px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.65 ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 32px; }
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  h1 { font-size: 27px; line-height: 1.25; margin: 0 0 6px; letter-spacing: -.02em; }
+  .sub { color: var(--muted); margin: 0; font-size: 14px; }
+  .meta { margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+  .meta code { font-size: 12px; }
+
+  button#theme {
+    flex: none;
+    background: var(--paper-2);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button#theme:hover { border-color: var(--accent); color: var(--accent); }
+
+  h2 { font-size: 18px; margin: 40px 0 14px; letter-spacing: -.01em; }
+  h2:first-of-type { margin-top: 0; }
+
+  .facts { list-style: none; padding: 0; margin: 0 0 8px; }
+  .facts li {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  ol.cards { list-style: none; padding: 0; margin: 0; counter-reset: wf; }
+  ol.cards > li {
+    counter-increment: wf;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px 18px 60px;
+    margin-bottom: 14px;
+    position: relative;
+    box-shadow: var(--shadow);
+  }
+  ol.cards > li::before {
+    content: counter(wf, decimal-leading-zero);
+    position: absolute;
+    left: 18px; top: 18px;
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding: 2px 7px;
+  }
+  ol.cards h3 { margin: 0 0 4px; font-size: 16px; }
+  ol.cards h3 a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--accent); }
+  ol.cards h3 a:hover { color: var(--accent); }
+  ol.cards p { margin: 0 0 10px; font-size: 14px; color: var(--ink); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11.5px;
+    letter-spacing: .02em;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px 9px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tag.consumer { border-color: var(--accent); color: var(--accent); }
+  .tag.contrib  { border-color: var(--muted); }
+
+  .order { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 4px 20px 16px; }
+  .order p { font-size: 14px; }
+  .order strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+  }
+  .note { color: var(--muted); font-size: 13px; margin-top: 28px; border-top: 1px solid var(--line); padding-top: 16px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="topbar">
+    <div>
+      <h1>Diagram Design — bộ workflow chạy được</h1>
+      <p class="sub">Bảy workflow, tách theo đối tượng dùng và theo bề mặt gõ lệnh (chat vs terminal).</p>
+    </div>
+    <button id="theme" type="button" aria-live="polite">🌙 Tối</button>
+  </div>
+  <p class="meta">
+    Nguồn: <code>cathrynlavery/diagram-design</code> · commit <code>4451ead</code> (2026-09-02) · plugin <code>v2.6.12</code>.
+    Khám phá read-only; mọi lệnh đã đối chiếu mã nguồn và phần lớn đã chạy thật.
+    Chỉ mục đầy đủ: <a href="workflows.md">workflows.md</a>.
+  </p>
+</header>
+
+<h2>Bốn điều cần biết trước</h2>
+<ul class="facts">
+  <li><strong>Không có CLI để vẽ sơ đồ.</strong> Việc vẽ diễn ra hoàn toàn trong chat. Trong skill chỉ có <em>ba</em> script Python stdlib thuần: hai extractor import và một self-check. Không build, không dependency runtime.</li>
+  <li><strong>Hai quy ước mã thoát khác nhau trong cùng repo.</strong> Extractor dùng <code>0/2</code> — và <code>2</code> gộp chung file hỏng, định dạng không hỗ trợ, <em>và</em> lỗi cách dùng. <code>self_check.py</code> dùng <code>0/1</code>.</li>
+  <li><strong><code>/doctor</code> báo Playwright “không có” dù đã cài.</strong> False negative tái hiện được: probe dùng <code>playwright.__version__</code>, thuộc tính mà package không có → <code>AttributeError</code> bị hiểu thành “chưa cài”.</li>
+  <li><strong><code>SKILL.md</code> còn đúng 4 byte trước trần cứng 40.000.</strong> Người đóng góp thêm một từ vào file đó là gãy CI.</li>
+</ul>
+
+<h2>Bảy workflow</h2>
+<ol class="cards">
+
+  <li>
+    <h3><a href="01-install-and-verify.md">Cài đặt và chứng minh nó chạy</a></h3>
+    <p>Diagram Design là plugin/agent-skill, không phải package — cài sai đường thì skill không bao giờ được nạp. File này đi qua bảy host (Claude Code, Codex, Factory Droid, Pi, Kiro, OpenCode, Cowork) cộng đường editable-install bằng symlink khi bạn muốn tự sửa style guide. Kết thúc bằng ba bằng chứng chạy thật và hai bẫy môi trường đã đo trên máy: macOS mặc định Python 3.9 khiến doctor báo FAIL, và cảnh báo Playwright sai.</p>
+    <div class="tags"><span class="tag consumer">Người dùng</span><span class="tag">Cài đặt</span><span class="tag">Chat + shell, có nhãn</span></div>
+  </li>
+
+  <li>
+    <h3><a href="02-brand-onboarding-and-profiles.md">Onboard brand và profile khách hàng</a></h3>
+    <p>Sơ đồ đầu tiên trong một dự án mới sẽ bị <em>chặn</em> bởi cổng style-guide — skill từ chối xuất sơ đồ màu mặc định vào dự án có brand. Không biết cổng này thì bạn tưởng agent treo. File này chỉ cách onboard brand từ URL (kèm bảng ánh xạ token và kiểm tương phản WCAG tự động), rồi dựng thư viện profile ở <code>~/.diagram-design/profiles/</code> với marker <code>.diagram-design</code> để nhiều khách hàng chạy song song mà không đè lên nhau.</p>
+    <div class="tags"><span class="tag consumer">Người dùng</span><span class="tag">Chat</span><span class="tag">Làm trước khi vẽ</span></div>
+  </li>
+
+  <li>
+    <h3><a href="03-authoring-in-chat.md">Vẽ sơ đồ bằng chat</a></h3>
+    <p>Công dụng chính của tool. Bảng đầy đủ 39 loại sơ đồ, sắp theo <em>thứ bạn đang thể hiện</em> chứ không theo tên loại, cộng bảy semantic pattern chọn hành vi trước hình dạng. Kèm bốn mode motion (mặc định tắt, <code>reveal</code> là autoplay duy nhất được phép), bốn núm chỉnh format/size/detail/audience, và bảng chín preset <code>viewBox</code> thật.</p>
+    <div class="tags"><span class="tag consumer">Người dùng</span><span class="tag">Chat</span><span class="tag">Dùng hằng ngày</span></div>
+  </li>
+
+  <li>
+    <h3><a href="04-import-extractors-shell.md">Hai extractor chạy trong terminal</a></h3>
+    <p>Nửa tất định của luồng import: <code>drawio_extract.py</code> giải mã mọi thứ draw.io từng ghi (XML thô, payload deflate+base64, PNG/SVG có nhúng <code>mxfile</code>), <code>mermaid_extract.py</code> parse bốn ngữ pháp Mermaid sau một ranh giới tin cậy chặt — không eval, không fetch, không theo click target. Kèm digest thật chạy trên fixture của repo, cách đọc dòng <code>budget:</code>, và mã thoát <code>0/2</code> đã đo.</p>
+    <div class="tags"><span class="tag consumer">Người dùng</span><span class="tag">Shell</span><span class="tag">Nâng cao</span></div>
+  </li>
+
+  <li>
+    <h3><a href="05-import-export-slash-commands.md">Slash command: import và export</a></h3>
+    <p>Bề mặt dùng hằng ngày — năm slash command, mỗi cái là wrapper mỏng ủy quyền cho một file reference làm nguồn chân lý. Cờ đầy đủ cho <code>/import-drawio</code> và <code>/import-mermaid</code>, cộng <code>/export-diagram</code> với bốn trường hợp nó <em>từ chối</em> làm. Điểm hay bất ngờ: export là diagram-only — vỏ editorial và summary card bị bỏ có chủ đích, và PNG luôn nền trong suốt.</p>
+    <div class="tags"><span class="tag consumer">Người dùng</span><span class="tag">Chat</span><span class="tag">Dùng hằng ngày</span></div>
+  </li>
+
+  <li>
+    <h3><a href="06-selfcheck-and-your-ci.md">Tự kiểm output và khoá bằng CI của bạn</a></h3>
+    <p>Sơ đồ do agent sinh là HTML tự do, không compiler nào bắt lỗi. <code>self_check.py</code> là cổng tất định 0-token ship <em>bên trong</em> skill, kiểm hợp đồng SVG accessible, luật an toàn một-file, và hợp đồng motion. File này có cả đường xanh lẫn đường đỏ chạy thật, rồi một GitHub Actions workflow <em>viết mới, tối thiểu</em> cho repo bạn — không phải bản sao CI ~50 gate của chính Diagram Design.</p>
+    <div class="tags"><span class="tag consumer">Người dùng</span><span class="tag">Shell</span><span class="tag">CI</span></div>
+  </li>
+
+  <li>
+    <h3><a href="07-contributor-gates.md">Nhánh người đóng góp: cổng kiểm và luật release</a></h3>
+    <p>Chỉ đọc khi bạn sửa chính Diagram Design. Chuỗi ~48 cổng chạy trước khi push, luật phản trực giác <em>cấm bump version trong PR</em> (versions bump tự động trên <code>main</code> sau merge, ADR 0009), trần 40.000 byte của <code>SKILL.md</code>, bảng đọc từng cổng đỏ, và luật cấm thêm file vào baseline để lách linter. Kèm rc đo thật của mười cổng.</p>
+    <div class="tags"><span class="tag contrib">Người đóng góp</span><span class="tag">Shell</span><span class="tag">Độc lập 01–06</span></div>
+  </li>
+
+</ol>
+
+<h2>Thứ tự chạy gợi ý</h2>
+<div class="order">
+  <p><strong>Người mới:</strong> <code>01</code> → <code>02</code> (đừng bỏ qua — sơ đồ đầu tiên sẽ bị cổng style-guide chặn và bạn sẽ tưởng agent treo) → <code>03</code> để vẽ sơ đồ đầu tiên → <code>06</code> để khoá chất lượng.</p>
+  <p><strong>Đã có sơ đồ draw.io/Mermaid cần chuyển:</strong> <code>01</code> → <code>02</code> → <code>05</code> là đủ. Chỉ xuống <code>04</code> khi muốn <em>nhìn</em> nguồn có gì trước khi vẽ lại, hoặc cần cắm extractor vào script.</p>
+  <p><strong>Chỉ cần xuất PNG/SVG từ file có sẵn:</strong> thẳng <code>05</code> §4. Nhớ cài Playwright trước; <code>--svg-only</code> thì không cần.</p>
+  <p><strong>Người đóng góp:</strong> nhảy thẳng <code>07</code>. Nhưng đọc <code>04</code> trước, vì hợp đồng mã thoát của extractor là thứ <code>07</code> cấm bạn phá.</p>
+</div>
+
+<p class="note">
+  Trang này tự chứa — không CDN, không asset ngoài, mở được bằng <code>file://</code>. Nút chuyển sáng/tối lưu lựa chọn vào <code>localStorage</code>; chưa chọn thì theo thiết lập hệ thống.
+  Phần “bộ này được kiểm chứng thế nào” — liệt kê chính xác file và dòng nào chống lưng cho từng khẳng định — nằm cuối <a href="workflows.md">workflows.md</a>.
+</p>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('theme');
+    function paint() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      btn.textContent = dark ? '☀️ Sáng' : '🌙 Tối';
+      btn.setAttribute('aria-label', dark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối');
+    }
+    btn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('dym-theme', next); } catch (e) {}
+      paint();
+    });
+    paint();
+  })();
+</script>
+</body>
+</html>

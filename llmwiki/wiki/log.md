@@ -1,43 +1,11 @@
 
 
-## 2026-09-04 — absorb — 9 năng lực từ 8 repo ngoài
-
-8 lượt `/doyourmagic` cùng ngày đẻ ra 8 bundle tài liệu và 0 thay đổi framework. Đóng vòng: 9 absorb, mỗi cái một phán quyết `[[adapt-modes]]` có tên và một bite-test. 8 HÒA TAN + 1 KÉO NGOÀI (impeccable, pin `@3.6.1`, opt-in vì nó kéo npm+puppeteer vào một medic vốn stdlib-only).
-
-Số đo quyết định, không phải cảm tính: loại luật em-dash (khớp 96/266 trang) và bold (113/266) khỏi cổng văn xuôi vì trong tài liệu kỹ thuật tiếng Việt chúng là dấu câu bình thường, không phải AI-tell — đó là tell của văn marketing tiếng Anh. `ui-detect` báo 342 finding trên overstack.html trong khi cổng nhà 9 luật báo sạch: đó đúng là khoảng 61-trừ-9 ta không nhìn thấy.
-
-Bài học đắt nhất ghi thẳng vào step 9 của `/doyourmagic`: lượt đầu tôi kết luận diagram-design rẻ hơn Mermaid vì so DUNG LƯỢNG. Trục đúng là số lượt agent mỗi sơ đồ và code có tự sinh được không — trên trục đó diagram-design tốn một lượt agent mãi mãi, còn generator Python của ta tốn 0. Đo thêm mới lộ: hai generator chính không dùng mermaid lần nào, dựng SVG thẳng ở 37 chỗ.
-
-Một khuôn lặp ba lần trong đợt: BỎ QUA ≠ SẠCH. Bản nháp đầu của `ui-detect` in "✓ sạch theo 61 luật" trong khi chưa quét nổi. Quy ước rc=2-là-skipped mượn của archify.
-
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-08-20 16:51:03 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=86219564e5016e70436f872b88e3065c285c |
-| 2026-08-20 16:52:41 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=69bd47f08ef961c5a2c8b000edfaba003d66 |
-| 2026-08-20 16:52:41 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=975ce6988d22b8f1b1c3621ce28988518e77 |
-| 2026-08-20 16:54:14 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=eeb667ae76a3850a867bfd2400f7a676853d |
-| 2026-08-20 16:54:14 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=72190e1c · actor=agent · prev=a20acaeee733ab4535b7a9aef47735673ead |
-| 2026-08-20 16:55:42 | `commit.reconcile` |  · actor=system · agent_n=1 · human_n=2 · human=['llmwiki/skills/utils/docs-site-macos.md', 'llmwiki/wiki/log.md'] · pre |
-| 2026-08-25 16:42:01 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=dba79064 · actor=agent · prev=9d362ca0ce329e89707e841212e8b27eafc0 |
-| 2026-08-25 16:42:01 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=dba79064 · actor=agent · prev=6a1c107e3bf8fb4ff782902f9c25da3c7f4b |
-| 2026-08-25 16:42:15 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=dba79064 · actor=agent · prev=edf5b193ac2a43a8b35cd754c491d61bb61f |
-| 2026-08-25 16:42:15 | `file.write` | skills/docs-site-macos/SKILL.md · tool=Edit · session=dba79064 · actor=agent · prev=78c5e8d0375375dc10af170c80cef6c92fc9 |
-| 2026-08-25 16:42:33 | `file.write` | skills/docs-site-macos/vendor/README.md · tool=Edit · session=dba79064 · actor=agent · prev=a10b05672245277682f2f521703f |
-| 2026-08-25 16:42:33 | `file.write` | skills/docs-site-macos/vendor/README.md · tool=Edit · session=dba79064 · actor=agent · prev=e0e12c389be97732aa470b3d340d |
-| 2026-08-25 16:44:33 | `commit.reconcile` |  · actor=system · agent_n=2 · human_n=1 · human=['llmwiki/skills/utils/docs-site-macos.md'] · prev=a90e42b1c8c934ab010ea |
-| 2026-09-02 22:23:18 | `task.new` |  · task=T-260902-01 · title=SessionStart episodic recall nudge · state=proposed · actor=agent · prev=b4fbfdc098a5e1db2cd |
-| 2026-09-02 22:25:01 | `file.write` | llmwiki/wiki/sources/draft/020926-sessionstart-episodic-recall.md · tool=Write · session=dba79064 · actor=agent · prev=1 |
-| 2026-09-02 22:25:01 | `file.write` | llmwiki/wiki/sources/draft/020926-sessionstart-episodic-recall.md · tool=Write · session=dba79064 · actor=agent · prev=2 |
-| 2026-09-02 22:25:09 | `file.write` | llmwiki/wiki/sources/draft/020926-sessionstart-episodic-recall.md · tool=Edit · session=dba79064 · actor=agent · prev=aa |
-| 2026-09-02 22:25:09 | `file.write` | llmwiki/wiki/sources/draft/020926-sessionstart-episodic-recall.md · tool=Edit · session=dba79064 · actor=agent · prev=4a |
-| 2026-09-02 22:25:13 | `file.write` | llmwiki/wiki/sources/draft/020926-sessionstart-episodic-recall.md · tool=Edit · session=dba79064 · actor=agent · prev=ee |
-| 2026-09-02 22:25:13 | `file.write` | llmwiki/wiki/sources/draft/020926-sessionstart-episodic-recall.md · tool=Edit · session=dba79064 · actor=agent · prev=bc |
-| 2026-09-02 22:26:15 | `file.write` | llmwiki/html/020926-sessionstart-episodic-recall-seq.html · tool=Write · session=dba79064 · actor=agent · prev=4a08f8b28 |
-| 2026-09-02 22:26:15 | `file.write` | llmwiki/html/020926-sessionstart-episodic-recall-seq.html · tool=Write · session=dba79064 · actor=agent · prev=54fa86bbb |
 | 2026-09-02 22:26:31 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=dba79064 · actor=agent · prev=c4422a6186a7bcc87d8810238fb8c2bb85f924e9329974 |
 | 2026-09-02 22:26:31 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=dba79064 · actor=agent · prev=ff038a986a0e63e9595a01ad865570f8ce539b17c7c1d9 |
 | 2026-09-02 22:26:49 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=d32daf24fa115e707af8c2d38061c8cfb1b5c3057f338c1a |
@@ -56,7 +24,27 @@ Một khuôn lặp ba lần trong đợt: BỎ QUA ≠ SẠCH. Bản nháp đầ
 | 2026-09-04 10:28:45 | `file.write` | harness/scripts/dep-health.py · tool=Edit · session=3e970e77 · actor=agent · prev=8a73f81581c475b25ef0b1e525719ec15085b9 |
 | 2026-09-04 12:36:57 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=d212f056da6b29711d8dcd37ff6c5d25ef |
 | 2026-09-04 12:36:57 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=fc0ada65565a22840c18c2bf3ce84f5280 |
+| 2026-09-04 16:09:10 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=e3f11c2c0885e5954776ded99e57be5bf66e |
+| 2026-09-04 16:09:10 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=6aceff317091ca679a297dbde7331c7484b7 |
+| 2026-09-04 16:09:22 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=086b120594f3a4c9171efd1cf5f0674519de |
+| 2026-09-04 16:09:22 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=4c0b28b261b4f2893b25ecab413b683a2bfa |
+| 2026-09-04 16:09:30 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=476ed098f0c9f543321ca7a693e1515ac31f |
+| 2026-09-04 16:09:30 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=48b67915556c50482dc3f1237e836be5c184 |
+| 2026-09-04 16:10:04 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Write · session=3e970e77 · actor=agent · prev=e7c7012531b028dfd18e721 |
+| 2026-09-04 16:10:04 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Write · session=3e970e77 · actor=agent · prev=b07879ac08062aed2563b07 |
+| 2026-09-04 16:10:17 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Edit · session=3e970e77 · actor=agent · prev=d05be9101371412e0c5ddf5c |
+| 2026-09-04 16:10:17 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Edit · session=3e970e77 · actor=agent · prev=22b5f885129b99552b12b69a |
+| 2026-09-04 19:46:21 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=ef4e8ef335dde177bce43c25573bcbfc57 |
+| 2026-09-04 19:46:21 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=dc62c050e1608ae931fbd35891b8086954 |
+| 2026-09-04 19:47:29 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3e970e77 · actor=agent · prev=54556eae805fce8f926783d062c36c146f |
+| 2026-09-04 19:47:29 | `file.write` | fdk/tools/build-overstack-docs.py · tool=Edit · session=3e970e77 · actor=agent · prev=272ab4feba33a635e6ea4c47a4843d37a4 |
+| 2026-09-04 20:06:33 | `file.write` | skills/diagram/SKILL.md · tool=Write · session=3e970e77 · actor=agent · prev=d8a552b08a6f3add75b6fb93a4654406850e3af73da |
+| 2026-09-04 20:06:33 | `file.write` | skills/diagram/SKILL.md · tool=Write · session=3e970e77 · actor=agent · prev=33a22569f931c40dd78ad5ca4e556a74f378f7d4b86 |
+| 2026-09-05 09:46:26 | `file.write` | harness/scripts/handoff-log.py · tool=Write · session=3e970e77 · actor=agent · prev=f4c131a4244d5f132964ff2dd98f869d6909 |
+| 2026-09-05 09:46:26 | `file.write` | harness/scripts/handoff-log.py · tool=Write · session=3e970e77 · actor=agent · prev=7254083f155ab50f91464537bf7be8df5612 |
+| 2026-09-05 09:46:40 | `file.write` | harness/scripts/handoff-log.py · tool=Edit · session=3e970e77 · actor=agent · prev=9ecfaeda57893524f129b10e9efcd9c2f5339 |
+| 2026-09-05 09:46:40 | `file.write` | harness/scripts/handoff-log.py · tool=Edit · session=3e970e77 · actor=agent · prev=f176c02b7b31a4f8318741b82641d94c76229 |
+| 2026-09-07 18:15:52 | `file.write` | llmwiki/wiki/sources/draft/070926-installer-update-idempotent.md · tool=Write · session=75be06f9 · actor=agent · prev=50 |
+| 2026-09-07 18:15:52 | `file.write` | llmwiki/wiki/sources/draft/070926-installer-update-idempotent.md · tool=Write · session=75be06f9 · actor=agent · prev=c9 |
 
 <!-- log:auto:end -->
-
-## 2026-09-07 — handover phiên 889c2c4c (doyourmagic bundle-skill, dym, session-continue, memory chain, self-report)

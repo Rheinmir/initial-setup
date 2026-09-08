@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archify — bộ workflow chạy được</title>
+<script>
+  // Chống FOUC: đặt theme trước khi trang vẽ.
+  (function () {
+    try {
+      var saved = localStorage.getItem('archify-doc-theme');
+      var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) { /* localStorage bị chặn — giữ mặc định light */ }
+  })();
+</script>
+<style>
+  :root {
+    --bg: #fbfbfa;
+    --surface: #ffffff;
+    --surface-2: #f4f4f2;
+    --text: #1c1c1a;
+    --text-dim: #5f5f59;
+    --border: #e2e2dd;
+    --accent: #9a5b2c;
+    --accent-soft: #f0e4d8;
+    --code-bg: #f2f1ee;
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.04);
+  }
+  :root[data-theme="dark"] {
+    --bg: #16161a;
+    --surface: #1e1e23;
+    --surface-2: #26262c;
+    --text: #ecece8;
+    --text-dim: #a3a39c;
+    --border: #33333a;
+    --accent: #e0a06a;
+    --accent-soft: #35291e;
+    --code-bg: #26262c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; }
+  html[data-theme="dark"] { color-scheme: dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 96px; }
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 8px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; }
+  .sub { color: var(--text-dim); margin: 0 0 28px; font-size: 15px; }
+  .toggle {
+    flex: none; cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-family: inherit;
+    box-shadow: var(--shadow); transition: background .15s ease, border-color .15s ease;
+  }
+  .toggle:hover { background: var(--surface-2); border-color: var(--accent); }
+  .facts {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 22px; margin: 0 0 34px; box-shadow: var(--shadow);
+  }
+  .facts h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim); margin: 0 0 10px; }
+  .facts ol { margin: 0; padding-left: 20px; }
+  .facts li { margin-bottom: 8px; font-size: 15px; }
+  .facts li:last-child { margin-bottom: 0; }
+  h2.track {
+    font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--text-dim); margin: 38px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 22px; margin-bottom: 14px; box-shadow: var(--shadow);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .num {
+    flex: none; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
+    color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 8px;
+  }
+  .card-title { font-size: 17px; font-weight: 640; letter-spacing: -.01em; }
+  .card p { margin: 0 0 10px; color: var(--text-dim); font-size: 15px; }
+  .card p:last-child { margin-bottom: 0; }
+  .file { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; color: var(--text-dim); }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .88em; background: var(--code-bg); border-radius: 5px; padding: 1px 5px;
+  }
+  .order { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; margin-top: 14px; }
+  .order p { margin: 0 0 10px; font-size: 15px; }
+  .order p:last-child { margin: 0; }
+  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 14px; }
+  footer a { color: var(--accent); }
+  @media (max-width: 560px) {
+    .wrap { padding: 28px 16px 64px; }
+    h1 { font-size: 24px; }
+    header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Archify — bộ workflow chạy được</h1>
+      <p class="sub">
+        Sinh từ một lượt khám phá read-only repo <code>tt-a1i/archify</code> (commit <code>06dd052</code>,
+        package <code>archify/package.json</code> v<code>2.17.0-dev.1</code>). Archify là một agent skill kèm
+        CLI Node zero-dependency, sinh sơ đồ HTML tự chứa từ JSON IR có schema.
+      </p>
+    </div>
+    <button class="toggle" id="theme-toggle" type="button" aria-label="Đổi chế độ sáng/tối">◐ Sáng / Tối</button>
+  </header>
+
+  <section class="facts">
+    <h2>Ba điều biết trước sẽ đỡ mất một buổi</h2>
+    <ol>
+      <li>Package đặt <code>"private": true</code> và <strong>không có trên npm</strong> — <code>npx archify</code> không chạy. Mọi lệnh là <code>node &lt;skill&gt;/bin/archify.mjs …</code>.</li>
+      <li>CLI chạy được khi <code>node_modules</code> <strong>không tồn tại</strong>. Không cần <code>npm install</code> để dùng; devDependencies chỉ phục vụ test và build của chính Archify.</li>
+      <li>Mã thoát không theo quy ước 0/1: <code>2</code> là lỗi cách dùng <em>và</em> là trạng thái “visual-check bị bỏ qua vì không có Chrome”. Cổng CI coi <code>!= 1</code> là xanh sẽ âm thầm bỏ qua toàn bộ bằng chứng trình duyệt.</li>
+    </ol>
+  </section>
+
+  <h2 class="track">Nhánh người dùng — bạn dùng Archify để vẽ sơ đồ</h2>
+
+  <a class="card" href="01-install-and-verify.md">
+    <div class="card-head"><span class="num">01</span><span class="card-title">Cài đặt và chứng minh nó chạy</span></div>
+    <p>Ba đường cài — CLI <code>skills</code>, copy thủ công, ZIP — kèm bảng đường dẫn theo từng harness (Claude Code, Codex, opencode, Raven, Claude.ai). Chỉ ra cái bẫy hay gặp nhất: copy nhầm repo root thay vì thư mục con <code>archify/</code>, khiến harness không thấy skill.</p>
+    <p>Kết thúc bằng <code>doctor</code> (15 dòng <code>[ok]</code>, đã chạy thật) và <code>demo</code> sinh một file HTML mở được ngay.</p>
+    <p class="file">01-install-and-verify.md</p>
+  </a>
+
+  <a class="card" href="02-agent-chat-authoring.md">
+    <div class="card-head"><span class="num">02</span><span class="card-title">Soạn sơ đồ từ khung chat của agent</span></div>
+    <p>Đường dùng chính: bạn mô tả hệ thống, agent chọn loại, viết JSON theo schema, chạy validate/deliver, trả về đường dẫn HTML. Gồm bảng router 5 loại sơ đồ, prompt tinh chỉnh từng vòng, và cách dán Mermaid vào.</p>
+    <p>Phần quan trọng nhất ở cuối: ba dấu hiệu agent đang nói quá về kết quả — trong đó có việc gọi một biên lai 4-check là “showcase” khi ngưỡng thật là 9 check, 0 lỗi, 0 cảnh báo. <strong>Chỉ chứa lệnh chat, không có lệnh shell.</strong></p>
+    <p class="file">02-agent-chat-authoring.md</p>
+  </a>
+
+  <a class="card" href="03-cli-authoring-loop.md">
+    <div class="card-head"><span class="num">03</span><span class="card-title">Vòng lặp soạn sơ đồ bằng CLI</span></div>
+    <p>Đường terminal thuần: <code>guide</code> chọn loại → đọc schema + ví dụ → viết JSON → <code>validate --json</code> → <code>deliver --json</code> → <code>check</code>. Kèm ba cái bẫy schema architecture tôi tự vấp phải khi soạn spec thật, với đúng thông điệp lỗi và <code>supportedFixes</code> mà CLI trả về.</p>
+    <p>Có bảng mã thoát đầy đủ và cách đọc <code>diagnostics[]</code>. Đây là file nền cho mọi thứ tự động hoá. <strong>Chỉ chứa lệnh shell.</strong></p>
+    <p class="file">03-cli-authoring-loop.md</p>
+  </a>
+
+  <a class="card" href="04-repository-evidence.md">
+    <div class="card-head"><span class="num">04</span><span class="card-title">Sơ đồ gắn bằng chứng mã nguồn thật</span></div>
+    <p>Khi sơ đồ kiến trúc phải chứng minh được nó phản ánh mã thật: <code>sources[]</code> trên component, <code>meta.repository</code> ghim SHA 40 ký tự, và <code>--repo-root</code> trỏ vào checkout có origin khớp. Cổng này fail-closed.</p>
+    <p>Gồm một spec tối thiểu đã chạy xanh thật trên chính repo archify, cộng hai đường thất bại đã kiểm chứng — thiếu <code>--repo-root</code> trả <code>1</code> (spec sai), dùng sai loại sơ đồ trả <code>2</code> (dòng lệnh sai).</p>
+    <p class="file">04-repository-evidence.md</p>
+  </a>
+
+  <a class="card" href="05-visual-check-and-preview.md">
+    <div class="card-head"><span class="num">05</span><span class="card-title">Bằng chứng trình duyệt và vòng preview</span></div>
+    <p><code>deliver</code> chứng minh artifact qua kiểm tất định; nó không chứng minh trang hành xử đúng trong trình duyệt thật. <code>visual-check</code> làm việc đó và để lại biên lai JSON, contact sheet, cùng 4 ảnh PNG ở hai kích thước × hai chế độ màu.</p>
+    <p>Chỗ cần đọc kỹ: <code>2</code> nghĩa là <em>skipped</em>, không phải pass. Cộng vòng preview loopback (<code>127.0.0.1</code>, cổng ngẫu nhiên, giữ bản tốt cuối khi lưu file hỏng) và bốn cách nguỵ tạo một lần pass mà skill contract cấm thẳng.</p>
+    <p class="file">05-visual-check-and-preview.md</p>
+  </a>
+
+  <a class="card" href="06-compare-architecture-delta.md">
+    <div class="card-head"><span class="num">06</span><span class="card-title">So sánh hai bản architecture (Delta)</span></div>
+    <p>So hai nguồn architecture đã validate, ra một trang Before / Delta / After kèm sidecar <code>*.receipt.json</code>. Đã chạy thật trên cặp ví dụ đóng gói sẵn, với biên lai và <code>summary</code> nguyên văn.</p>
+    <p>Điều quyết định tính hữu dụng: khối <code>identity</code> nói rõ cái gì được coi là “cùng một thứ”. Đổi <code>id</code> của một component thì delta đọc thành xoá-rồi-thêm, không phải đổi tên. Và biên lai tự tuyên bố giới hạn — nó không suy ra tác động, rủi ro, hay độ an toàn khi merge.</p>
+    <p class="file">06-compare-architecture-delta.md</p>
+  </a>
+
+  <a class="card" href="07-migrate-workflow-v2.md">
+    <div class="card-head"><span class="num">07</span><span class="card-title">Nâng workflow từ schema v1 lên v2</span></div>
+    <p>Chỉ chạm tới khi bạn còn nguồn workflow v1 cũ. Cú pháp nghiêm ngặt, không ghi đè tại chỗ, không có cờ <code>--quality</code>.</p>
+    <p>Cả đường xanh lẫn đường đỏ đều đã chạy thật: một fixture chuyển sạch, một fixture khác trả <code>workflow/route-preset-conflict</code> và đòi sửa tay. Kèm bảng phân biệt ba mảng chẩn đoán — sửa file v1, sửa dòng lệnh, hay sửa hình học v2 là ba việc khác nhau.</p>
+    <p class="file">07-migrate-workflow-v2.md</p>
+  </a>
+
+  <a class="card" href="08-ci-diagram-gate.md">
+    <div class="card-head"><span class="num">08</span><span class="card-title">Chốt cổng CI cho dự án của bạn</span></div>
+    <p>Một script bash và một workflow GitHub Actions <strong>viết mới, tối thiểu</strong> — không phải bản sao CI của chính Archify (file đó build và test <em>Archify</em>, không liên quan tới việc bạn dùng Archify).</p>
+    <p>Script đã được chạy thật với ba file (hai hợp lệ, một cố tình hỏng) và chặn đúng, in ra mã chẩn đoán ổn định. Kèm hai cạm bẫy CI: phân biệt <code>rc 2</code> với <code>rc 1</code>, và biến “visual-check skipped” thành lỗi tường minh thay vì để nó trôi qua như xanh.</p>
+    <p class="file">08-ci-diagram-gate.md</p>
+  </a>
+
+  <h2 class="track">Nhánh người đóng góp — bạn sửa chính công cụ</h2>
+
+  <a class="card" href="09-contributor-build-and-test.md">
+    <div class="card-head"><span class="num">09</span><span class="card-title">Build, test, và luật của repo</span></div>
+    <p>Bố cục repo (chú ý: <code>package.json</code> nằm ở <code>archify/</code>, không ở gốc), vòng lặp <code>npm ci</code> + <code>npm test</code> và đúng năm bước mà nó chạy nối tiếp, 93 file test, ma trận CI Node 18/20/22/24.</p>
+    <p>Cộng các luật mà repo này thi hành nghiêm: hai check “generate --check” hay bắt lỗi bạn trước, bằng chứng bắt buộc theo từng loại thay đổi, kỷ luật với artifact sinh ra, và quy tắc bất biến của version đã publish.</p>
+    <p class="file">09-contributor-build-and-test.md</p>
+  </a>
+
+  <div class="order">
+    <p><strong>Thứ tự chạy gợi ý — người mới:</strong> <code>01</code> → chọn <code>02</code> (để agent soạn) <em>hoặc</em> <code>03</code> (tự viết JSON); hai nhánh độc lập → <code>05</code> khi cần nghiệm thu trước khi giao → <code>04</code> khi sơ đồ phải bám mã thật → <code>06</code> khi bắt đầu review thay đổi kiến trúc → <code>08</code> khi muốn khoá cổng CI → <code>07</code> chỉ khi còn nguồn workflow v1.</p>
+    <p><strong>Người đóng góp:</strong> nhảy thẳng <code>09</code>. Nhưng đọc <code>03</code> trước, vì hợp đồng CLI là thứ <code>09</code> cấm bạn phá.</p>
+  </div>
+
+  <footer>
+    Chi tiết đầy đủ về cách bộ này được kiểm chứng — file nguồn nào chống lưng cho tuyên bố nào, và chỗ nào tôi
+    nói rõ là chưa kiểm chứng được — nằm ở <a href="workflows.md">workflows.md</a>.
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('theme-toggle');
+    btn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('archify-doc-theme', next); } catch (e) { /* bỏ qua */ }
+    });
+  })();
+</script>
+</body>
+</html>

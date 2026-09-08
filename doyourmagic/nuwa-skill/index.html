@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nüwa — bộ workflow chạy được</title>
+<script>
+  // Chống FOUC: đặt theme trước khi trang vẽ.
+  (function () {
+    try {
+      var t = localStorage.getItem('nuwa-doc-theme');
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root{
+    --bg:#fbfaf8; --panel:#fff; --ink:#1b1a18; --muted:#5f5b55; --line:#e6e1d9;
+    --accent:#9a3412; --accent-soft:#fdf1e7; --chip:#f3efe9; --code:#f5f2ec;
+  }
+  :root[data-theme="dark"]{
+    --bg:#131211; --panel:#1b1a18; --ink:#eae6df; --muted:#a49e95; --line:#2e2b27;
+    --accent:#f0a06a; --accent-soft:#2a1c14; --chip:#26231f; --code:#211f1c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:48px 24px 96px}
+  header{display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:8px}
+  h1{font-size:30px; line-height:1.2; margin:0 0 6px; letter-spacing:-.02em}
+  h1 .zh{color:var(--muted); font-weight:500}
+  .sub{color:var(--muted); margin:0 0 28px; max-width:66ch}
+  .toggle{
+    flex:none; background:var(--panel); color:var(--ink); border:1px solid var(--line);
+    border-radius:999px; padding:8px 14px; font-size:13px; cursor:pointer; font-family:inherit;
+  }
+  .toggle:hover{border-color:var(--accent); color:var(--accent)}
+  .note{
+    background:var(--accent-soft); border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:8px; padding:14px 18px; margin:0 0 34px; font-size:14.5px; color:var(--ink);
+  }
+  h2{font-size:13px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted);
+     margin:40px 0 14px; font-weight:600}
+  ol{list-style:none; margin:0; padding:0}
+  li.card{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; margin-bottom:12px;
+  }
+  li.card:hover{border-color:var(--accent)}
+  .head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+  .num{
+    font-variant-numeric:tabular-nums; font-size:12px; color:var(--accent);
+    background:var(--accent-soft); border-radius:6px; padding:2px 8px; font-weight:600;
+  }
+  .head a{color:var(--ink); text-decoration:none; font-weight:600; font-size:17px}
+  .head a:hover{color:var(--accent); text-decoration:underline}
+  .chip{
+    font-size:11.5px; color:var(--muted); background:var(--chip); border:1px solid var(--line);
+    border-radius:999px; padding:2px 9px; white-space:nowrap;
+  }
+  .card p{margin:0; color:var(--muted); font-size:14.5px}
+  .card p b{color:var(--ink); font-weight:600}
+  code{background:var(--code); border:1px solid var(--line); border-radius:4px;
+       padding:1px 5px; font-size:13px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .order{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+  .order p{margin:0 0 10px; font-size:14.5px}
+  .order p:last-child{margin:0}
+  footer{margin-top:44px; padding-top:18px; border-top:1px solid var(--line);
+         color:var(--muted); font-size:13px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>nüwa <span class="zh">· 女娲 · Skill造人术</span></h1>
+  </div>
+  <button class="toggle" id="themeToggle" type="button" aria-label="Đổi giao diện sáng/tối">🌗 Sáng / Tối</button>
+</header>
+
+<p class="sub">
+  Bộ workflow chạy được, chắt lọc từ một lượt khảo sát chỉ-đọc repo
+  <code>alchaincyf/nuwa-skill</code>. Đây không phải package npm hay pip — repo
+  không có manifest nào; entry point là <code>SKILL.md</code> ở gốc. Bạn đưa một
+  cái tên, nó chạy khảo cứu 6 agent song song rồi sinh ra một <i>persona skill</i>
+  có nguồn truy vết và ranh giới trung thực.
+</p>
+
+<div class="note">
+  <b>Tách chat và terminal là có chủ đích.</b> Các file 02, 03, 04, 06 là lệnh gõ vào
+  <i>hội thoại agent</i>; các file 01, 05, 07, 08 là lệnh gõ vào <i>terminal</i>. Trộn hai
+  loại vào một trang là cách nhanh nhất để ai đó dán lệnh chat vào shell.
+</div>
+
+<h2>Tám workflow, theo thứ tự chạy</h2>
+
+<ol>
+  <li class="card">
+    <div class="head"><span class="num">01</span><a href="01-install.md">Cài nüwa vào runtime</a><span class="chip">người dùng · shell</span></div>
+    <p>Ba đường cài: <code>npx skills add alchaincyf/nuwa-skill</code>, clone tay vào thư mục skills của từng runtime, hoặc dán thẳng <code>SKILL.md</code> vào hội thoại. Kèm cách kiểm chứng đã nạp và ba cạm bẫy: tên frontmatter <code>huashu-nuwa</code> lệch tên thư mục, repo không định nghĩa slash command nào, và trigger phần lớn là tiếng Trung.</p>
+  </li>
+  <li class="card">
+    <div class="head"><span class="num">02</span><a href="02-distill-a-person.md">Chắt lọc một nhân vật đã biết tên</a><span class="chip">người dùng · chat</span></div>
+    <p>Luồng chính. Ba mức chi phí (nhanh / chuẩn / sâu — repo tự cảnh báo một lượt đầy đủ có thể tốn hàng chục USD), sáu chiều khảo cứu song song, bốn chốt bạn phải duyệt, và sáu tiêu chí nghiệm thu ở Phase 4. Có mẫu câu trả lời gọn để agent chạy thẳng, không hỏi vòng vo.</p>
+  </li>
+  <li class="card">
+    <div class="head"><span class="num">03</span><a href="03-diagnose-then-distill.md">Chưa biết chắt lọc ai</a><span class="chip">người dùng · chat</span></div>
+    <p>Đường chẩn đoán: bạn mô tả vấn đề, agent ánh xạ vào một trong mười chiều nhu cầu rồi đề cử 2–3 ứng viên trong tối đa hai vòng hỏi. Kèm danh sách 15 skill chính chủ đã hạng A — cài thẳng bằng một dòng, khỏi tốn tiền chắt lọc lại.</p>
+  </li>
+  <li class="card">
+    <div class="head"><span class="num">04</span><a href="04-use-and-update-persona.md">Dùng và cập nhật persona</a><span class="chip">người dùng · chat</span></div>
+    <p>Cách gọi persona ra làm việc và hợp đồng hành vi của nó: xưng «tôi», miễn trừ chỉ nói một lần, gặp chủ đề chưa từng bày tỏ thì phải khai là suy luận. Kèm Agentic Protocol (vì sao persona đôi khi đi tìm dữ kiện trước) và luồng cập nhật tăng dần chỉ dùng ba agent.</p>
+  </li>
+  <li class="card">
+    <div class="head"><span class="num">05</span><a href="05-helper-scripts-cli.md">Bốn script phụ trợ</a><span class="chip">người dùng · shell</span></div>
+    <p>Phần duy nhất chạy ngoài chat: tải phụ đề YouTube, làm sạch SRT/VTT, tổng hợp bảng khảo cứu, tự chấm sáu tiêu chí. Có output thật đã chạy, mã thoát chính xác (<code>quality_check.py</code> thoát 1 ngay cả khi 5/6 và in «cơ bản đạt») và ba điểm mù của bộ kiểm.</p>
+  </li>
+  <li class="card">
+    <div class="head"><span class="num">06</span><a href="06-fidelity-scorecard.md">Chấm bảo chân</a><span class="chip">người dùng · chat</span></div>
+    <p>Kiểm định xuất xưởng: năm chiều trên thang 100, chấm bằng hai agent tách rời (agent trả bài bị cấm truy mạng và không biết mình bị đo gì). Lý do tồn tại: LLM tự chấm skill của chính nó chỉ đúng 46.4%. Ngưỡng vào chỉ mục cộng đồng là hạng B, tức 70 điểm.</p>
+  </li>
+  <li class="card">
+    <div class="head"><span class="num">07</span><a href="07-publish-and-get-listed.md">Phát hành và xin thu vào chỉ mục</a><span class="chip">người dùng · shell + GitHub</span></div>
+    <p>Repo nüwa không nhận persona skill vào <code>examples/</code> — bạn tự host, star về bạn. File này liệt kê bốn thứ máy kiểm sẽ đòi, cách chạy chính máy kiểm đó tại máy trước khi mở PR, một cổng CI tối thiểu viết mới cho repo của bạn, và lằn ranh đạo đức không được vượt.</p>
+  </li>
+  <li class="card">
+    <div class="head"><span class="num">08</span><a href="08-contributor-repo-itself.md">Đóng góp vào chính nüwa</a><span class="chip">người đóng góp · shell</span></div>
+    <p>Luật số một: <code>SKILL.md</code> không nhận PR từ bên ngoài — tìm ra lỗi phương pháp luận thì mở issue. Repo không có test suite, nên file này ghi rõ vòng kiểm chứng thực tế trên các ví dụ có sẵn, và ba lỗi đang bỏ ngỏ đủ nhỏ để làm một PR gọn.</p>
+  </li>
+</ol>
+
+<h2>Thứ tự gợi ý</h2>
+<div class="order">
+  <p><b>Lần đầu dùng:</b> 01 → (02 nếu đã biết muốn ai, 03 nếu chưa) → 04. Ghé 05 khi cần nạp tư liệu gốc hoặc tự chấm ở chốt Phase 4.</p>
+  <p><b>Định phát hành:</b> 06 → 07. Đừng đảo — 07 đòi một <code>FIDELITY.md</code> có điểm thật, và máy kiểm loại thẳng mọi giá trị điền tạm.</p>
+  <p><b>Người đóng góp:</b> đọc thẳng 08, không phụ thuộc 01–07.</p>
+</div>
+
+<h2>Kiểm chứng</h2>
+<div class="order">
+  <p>Mỗi lệnh trong bộ này được đối chiếu mã nguồn hoặc chạy thật, không lấy từ văn xuôi README: cả bốn script đều được chạy trên các ví dụ chính chủ để lấy output và mã thoát; các pha, chốt duyệt và tiêu chí lấy từ <code>SKILL.md</code>, <code>references/skill-template.md</code>, <code>references/fidelity-scorecard.md</code>; cổng thu nhận lấy từ <code>.github/scripts/community_check.py</code>. Danh sách đầy đủ nằm trong mục cuối của <a href="workflows.md">workflows.md</a>.</p>
+</div>
+
+<footer>
+  Nguồn: <a href="https://github.com/alchaincyf/nuwa-skill">github.com/alchaincyf/nuwa-skill</a> · khảo sát chỉ-đọc, không sửa file nào trong repo đích · sinh bởi <code>/doyourmagic</code>.
+</footer>
+
+</div>
+<script>
+  var btn = document.getElementById('themeToggle');
+  btn.addEventListener('click', function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('nuwa-doc-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

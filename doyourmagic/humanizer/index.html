@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humanizer — bộ workflow chạy được</title>
+<script>
+  // Chống FOUC: đặt theme trước khi trang vẽ.
+  (function () {
+    try {
+      var saved = localStorage.getItem('dym-theme');
+      var t = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface-2: #f0eeea;
+    --ink: #23201c;
+    --ink-2: #5c564e;
+    --ink-3: #6b645b;
+    --line: #ddd8d0;
+    --accent: #7a4f1d;
+    --accent-soft: #f3e6d4;
+    --warn-bg: #fdf3e3;
+    --warn-line: #e6c98f;
+    --warn-ink: #6b4a12;
+    --track-a: #2f5d50;
+    --track-b: #5a3c6b;
+    --code-bg: #efece6;
+    --tag-bg: #ebe7e0;
+    --shadow: none;
+  }
+  :root[data-theme="dark"] {
+    --bg: #161513;
+    --surface: #1f1e1b;
+    --surface-2: #262421;
+    --ink: #ece7df;
+    --ink-2: #b3aaa0;
+    --ink-3: #857d73;
+    --line: #34312c;
+    --accent: #d9a765;
+    --accent-soft: #382d1c;
+    --warn-bg: #2e2513;
+    --warn-line: #6b5526;
+    --warn-ink: #e9c98a;
+    --track-a: #7fc3ae;
+    --track-b: #c0a0d4;
+    --code-bg: #14130f;
+    --tag-bg: #2b2925;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.65 ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre, .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 40px 24px 96px; }
+
+  header.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; }
+  .sub { color: var(--ink-2); margin: 0; max-width: 62ch; }
+  .meta { color: var(--ink-3); font-size: 13px; margin-top: 14px; }
+  .meta code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+  button.theme {
+    flex: none; cursor: pointer; border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink-2); border-radius: 999px; padding: 7px 14px; font-size: 13px;
+    box-shadow: var(--shadow); transition: color .15s, border-color .15s;
+  }
+  button.theme:hover { color: var(--ink); border-color: var(--ink-3); }
+
+  .callout {
+    margin: 28px 0 0; padding: 16px 18px; border-radius: 10px;
+    background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink);
+  }
+  .callout h2 { font-size: 14px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .07em; }
+  .callout ol { margin: 0; padding-left: 20px; }
+  .callout li + li { margin-top: 6px; }
+  .callout code { background: rgba(0,0,0,.07); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  :root[data-theme="dark"] .callout code { background: rgba(255,255,255,.08); }
+
+  h2.track { font-size: 13px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3);
+             margin: 44px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+
+  ol.cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .card.consumer .num { color: var(--track-a); }
+  .card.contributor .num { color: var(--track-b); }
+  .card h3 { margin: 0 0 6px; font-size: 17px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .card h3 a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--accent); }
+  .card h3 a:hover { color: var(--accent); }
+  .num { display: inline-block; min-width: 26px; color: var(--ink-3); font-size: 13px; }
+  .where {
+    font-size: 11px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600;
+    background: var(--tag-bg); color: var(--ink-3); border-radius: 999px; padding: 3px 9px;
+    position: relative; top: -1px;
+  }
+  .card p { margin: 0 0 10px; color: var(--ink-2); }
+  .card p:last-child { margin-bottom: 0; }
+  .out { font-size: 13px; color: var(--ink-3); }
+  .out b { color: var(--ink-2); font-weight: 600; }
+  .file { font-size: 12px; color: var(--ink-3); }
+
+  .order { margin: 44px 0 0; padding: 18px 20px; border: 1px dashed var(--line); border-radius: 12px; background: var(--surface-2); }
+  .order h2 { margin: 0 0 10px; font-size: 15px; }
+  .order p { margin: 0 0 8px; color: var(--ink-2); }
+  .order p:last-child { margin-bottom: 0; }
+  .chain code { background: var(--accent-soft); color: var(--accent); padding: 2px 7px; border-radius: 5px; font-size: 13px; }
+
+  footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13px; }
+  footer a { color: var(--accent); }
+  @media (max-width: 560px) {
+    .wrap { padding: 28px 16px 64px; }
+    header.top { flex-direction: column-reverse; align-items: stretch; }
+    button.theme { align-self: flex-end; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Humanizer — bộ workflow chạy được</h1>
+      <p class="sub">
+        Sáu workflow rời, mỗi cái copy-paste là chạy, sinh từ một lượt khảo sát read-only
+        <code class="mono">blader/humanizer</code>. Humanizer không phải thư viện hay CLI: nó là
+        <b>một file prompt Markdown</b> mà agent nạp vào. Vì thế bộ này chia theo hai trục —
+        <b>ai dùng</b>, và <b>gõ lệnh ở đâu</b>.
+      </p>
+      <p class="meta">
+        Commit <code>e2e92e7</code> · gói <code>v2.11.2</code> · <code>SKILL.md</code> 456 dòng ·
+        35 pattern · 0 dependency · 0 build step
+      </p>
+    </div>
+    <button class="theme" id="themeBtn" type="button" aria-live="polite">Chế độ tối</button>
+  </header>
+
+  <div class="callout">
+    <h2>Bốn cái bẫy đã kiểm chứng — đọc trước khi gõ lệnh</h2>
+    <ol>
+      <li><b>Lệnh chat và lệnh shell không thay thế nhau.</b> <code>/humanizer</code> và <code>/plugin install</code> chỉ chạy trong khung chat của agent; <code>npx skills add</code> chỉ chạy trong terminal. Gõ nhầm chỗ là <code>command not found</code>.</li>
+      <li><code>skills remove humanizer --agent '*'</code> <b>không gỡ gì cả</b>, dù <code>--help</code> bảo dùng được <code>'*'</code>. Nó in <code>■ Invalid agents: *</code> rồi thoát <b>0</b>. Phải nêu đích danh: <code>--agent claude-code</code>.</li>
+      <li>Skills CLI <b>copy nguyên repo</b> vào thư mục skill, không chỉ <code>SKILL.md</code> — kéo theo cả <code>scripts/</code> và <code>.github/</code>. Muốn gọn thì <code>curl</code> một file.</li>
+      <li>Đừng cài <b>cả hai</b> đường (Skills CLI và plugin Claude Code). Hai bản prompt trùng nhau cùng nạp, cập nhật một bên là lệch.</li>
+    </ol>
+  </div>
+
+  <h2 class="track">Nhánh người dùng — dùng Humanizer để chữa văn của bạn</h2>
+  <ol class="cards">
+    <li class="card consumer">
+      <h3><span class="num">01</span><a href="01-install-shell.md">Cài bằng shell</a> <span class="where">Terminal</span></h3>
+      <p>Đường cài dùng được cho mọi agent hỗ trợ skill. Toàn bộ cờ của Skills CLI đã đối chiếu với <code>--help</code> thật, đường dẫn cài đã quan sát thật sau một lượt cài vào dự án git rỗng, cộng cách <code>curl</code> một file khi bạn không muốn commit rác vào repo. Kèm bảng chọn cách cài theo tình huống, và hai cái bẫy của lệnh gỡ.</p>
+      <p class="out"><b>Sinh ra:</b> <code>.claude/skills/humanizer/</code> · <code>skills-lock.json</code> · <span class="file">01-install-shell.md</span></p>
+    </li>
+    <li class="card consumer">
+      <h3><span class="num">02</span><a href="02-install-claude-plugin.md">Cài làm plugin</a> <span class="where">Chat</span></h3>
+      <p>Đường thay thế của <code>01</code>, chỉ chạy trên Claude Code từ bản <code>2.1.142</code>. Hai lệnh slash, không đụng terminal, không đẻ file nào trong repo dự án. Giải thích vì sao cú pháp là <code>humanizer@humanizer</code>, cách kiểm manifest bằng <code>claude plugin validate</code>, và vì sao chỉ nên chọn một trong <code>01</code> hoặc <code>02</code>.</p>
+      <p class="out"><b>Sinh ra:</b> marketplace + plugin trong cấu hình Claude Code, lệnh <code>/humanizer:humanizer</code> · <span class="file">02-install-claude-plugin.md</span></p>
+    </li>
+    <li class="card consumer">
+      <h3><span class="num">03</span><a href="03-humanize-pasted-text.md">Chữa văn bản dán</a> <span class="where">Chat</span></h3>
+      <p>Đường dùng chính. Chế độ mặc định trả về <b>ba phần</b> — nháp, phần soi các pattern còn sót, bản cuối — thấy đủ ba là skill đã chạy đúng quy trình. Kèm quy trình 4 bước bên trong, cách đưa mẫu văn để khớp giọng (mẫu văn <b>đè lên</b> cả luật gạch ngang §14), ranh giới cứng "không bịa fact", và bảng 35 pattern theo nhóm để nhắm số hiệu cụ thể.</p>
+      <p class="out"><b>Sinh ra:</b> bản viết lại trong chat, nội dung giữ nguyên · <span class="file">03-humanize-pasted-text.md</span></p>
+    </li>
+    <li class="card consumer">
+      <h3><span class="num">04</span><a href="04-humanize-files-and-embedded.md">Chữa file, và nhúng</a> <span class="where">Chat</span></h3>
+      <p>Chế độ file ghi đè tại chỗ và <b>chỉ đụng văn xuôi</b> — code block, YAML frontmatter, dữ liệu và đích link phải nguyên vẹn. File này nêu rõ bảng được-sửa / giữ-nguyên, quy trình soi <code>git diff</code> sau khi chạy, chế độ embedded cho PR body và commit message, cách chạy nhiều file, và lý do <b>không</b> có cổng CI cho phía người dùng.</p>
+      <p class="out"><b>Sinh ra:</b> file được ghi đè phần văn xuôi + tóm tắt ngắn trong chat · <span class="file">04-humanize-files-and-embedded.md</span></p>
+    </li>
+    <li class="card consumer">
+      <h3><span class="num">05</span><a href="05-tune-false-positives.md">Chặn sửa quá tay</a> <span class="where">Chat</span></h3>
+      <p>Rủi ro lớn nhất không phải sửa thiếu mà là bào mất giọng thật, gỡ mất disclaimer, hay viết lại một câu trích dẫn. Đây là hai hàng rào sẵn có trong <code>SKILL.md</code> — danh sách "không được gắn cờ" và "chi tiết người cần giữ" — cộng câu chat mẫu để gọi thẳng chúng ra, cách khoá phạm vi ngay từ lần chạy đầu, và cách kiểm bằng <code>git diff --word-diff</code> xem có claim nào biến mất.</p>
+      <p class="out"><b>Sinh ra:</b> một lượt chạy hẹp hơn, giữ được thứ đáng giữ · <span class="file">05-tune-false-positives.md</span></p>
+    </li>
+  </ol>
+
+  <h2 class="track">Nhánh đóng góp — sửa chính Humanizer</h2>
+  <ol class="cards">
+    <li class="card contributor">
+      <h3><span class="num">06</span><a href="06-contributor-validate-and-release.md">Kiểm và phát hành</a> <span class="where">Terminal</span></h3>
+      <p>Repo không có build step, không có test runner, không có <code>package.json</code> — chỉ một validator Python và hai lệnh kiểm bên ngoài, đúng ba lệnh CI chạy. File này liệt kê <b>chín cửa</b> của validator đọc thẳng từ mã nguồn, exit code thật đã tái hiện bằng cách làm lệch version (mọi lỗi đều là <code>1</code>, fail-fast một dòng), bốn chỗ phải sửa khi thêm một pattern, luật đồng bộ version ba nơi, và trần 500 dòng đang còn 44 dòng dư địa.</p>
+      <p class="out"><b>Sinh ra:</b> cây làm việc qua đúng bộ cửa CI trước khi push · <span class="file">06-contributor-validate-and-release.md</span></p>
+    </li>
+  </ol>
+
+  <div class="order">
+    <h2>Thứ tự chạy đề xuất</h2>
+    <p class="chain"><b>Người mới dùng:</b> chọn <b>một</b> trong <code>01</code> hoặc <code>02</code> → <code>03</code> → <code>04</code> khi cần chữa file trong repo → <code>05</code> ngay lần đầu thấy nó bào mất giọng của bạn.</p>
+    <p class="chain"><b>Người đóng góp:</b> vào thẳng <code>06</code>, không phụ thuộc <code>01</code>–<code>05</code>.</p>
+  </div>
+
+  <footer>
+    Xem <a href="workflows.md">workflows.md</a> để có bảng index đầy đủ và mục
+    “bộ này được kiểm chứng thế nào, không chỉ chép lại README” — liệt kê đúng file nguồn
+    và lệnh đã chạy chống lưng cho từng khẳng định.
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeBtn');
+    function label() { btn.textContent = root.getAttribute('data-theme') === 'dark' ? 'Chế độ sáng' : 'Chế độ tối'; }
+    label();
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('dym-theme', next); } catch (e) {}
+      label();
+    });
+  })();
+</script>
+</body>
+</html>

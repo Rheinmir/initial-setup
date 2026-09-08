@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scientific Agent Skills — bộ workflow</title>
+<script>
+  // Chống FOUC: đặt theme trước khi CSS vẽ.
+  (function () {
+    try {
+      var t = localStorage.getItem('sas-theme');
+      if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f6f7f5;
+    --card: #ffffff;
+    --border: #dfe3dc;
+    --text: #1f2420;
+    --muted: #626b62;
+    --accent: #1f6b4a;
+    --accent-bg: #e4f0e9;
+    --consumer: #1f6b4a;
+    --consumer-bg: #e4f0e9;
+    --contrib: #5b4a8f;
+    --contrib-bg: #ece7f6;
+    --warn: #8a4b1c;
+    --warn-bg: #f7ead9;
+    --code-bg: #eff1ed;
+    --shadow: 0 1px 2px rgba(20, 30, 24, .06), 0 8px 24px rgba(20, 30, 24, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141715;
+      --card: #1d211e;
+      --border: #313731;
+      --text: #e6eae5;
+      --muted: #9aa39a;
+      --accent: #6fc79b;
+      --accent-bg: #1c3129;
+      --consumer: #6fc79b;
+      --consumer-bg: #1c3129;
+      --contrib: #b3a4e8;
+      --contrib-bg: #262040;
+      --warn: #e0a570;
+      --warn-bg: #38281a;
+      --code-bg: #262b27;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141715;
+    --card: #1d211e;
+    --border: #313731;
+    --text: #e6eae5;
+    --muted: #9aa39a;
+    --accent: #6fc79b;
+    --accent-bg: #1c3129;
+    --consumer: #6fc79b;
+    --consumer-bg: #1c3129;
+    --contrib: #b3a4e8;
+    --contrib-bg: #262040;
+    --warn: #e0a570;
+    --warn-bg: #38281a;
+    --code-bg: #262b27;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f7f5;
+    --card: #ffffff;
+    --border: #dfe3dc;
+    --text: #1f2420;
+    --muted: #626b62;
+    --accent: #1f6b4a;
+    --accent-bg: #e4f0e9;
+    --consumer: #1f6b4a;
+    --consumer-bg: #e4f0e9;
+    --contrib: #5b4a8f;
+    --contrib-bg: #ece7f6;
+    --warn: #8a4b1c;
+    --warn-bg: #f7ead9;
+    --code-bg: #eff1ed;
+    --shadow: 0 1px 2px rgba(20, 30, 24, .06), 0 8px 24px rgba(20, 30, 24, .05);
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 22px 80px; }
+
+  header { margin-bottom: 34px; }
+  .topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 10px; letter-spacing: -.02em; }
+  .sub { color: var(--muted); margin: 0 0 14px; max-width: 66ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    font-size: 12.5px; padding: 3px 10px; border-radius: 999px;
+    background: var(--accent-bg); color: var(--accent); border: 1px solid var(--border);
+    font-weight: 600; white-space: nowrap;
+  }
+  #theme {
+    flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600;
+    padding: 7px 13px; border-radius: 999px;
+    background: var(--card); color: var(--muted); border: 1px solid var(--border);
+  }
+  #theme:hover { color: var(--text); border-color: var(--accent); }
+
+  .note {
+    background: var(--warn-bg); border: 1px solid var(--border); border-left: 3px solid var(--warn);
+    border-radius: 8px; padding: 13px 16px; margin: 26px 0; color: var(--text); font-size: 14.5px;
+  }
+  .note strong { color: var(--warn); }
+
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); margin: 40px 0 4px; font-weight: 700;
+  }
+  h2 + p.lede { color: var(--muted); margin: 0 0 18px; font-size: 14.5px; max-width: 70ch; }
+
+  a.card {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--card); border: 1px solid var(--border); border-radius: 11px;
+    padding: 18px 20px; margin-bottom: 13px; box-shadow: var(--shadow);
+    transition: border-color .13s ease, transform .13s ease;
+  }
+  a.card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card-head { display: flex; align-items: baseline; gap: 11px; flex-wrap: wrap; margin-bottom: 7px; }
+  .num {
+    font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
+    color: var(--accent); background: var(--accent-bg);
+    border-radius: 6px; padding: 2px 8px;
+  }
+  .card-title { font-weight: 650; font-size: 17px; letter-spacing: -.01em; }
+  .tag {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 5px; margin-left: auto;
+  }
+  .tag.consumer { color: var(--consumer); background: var(--consumer-bg); }
+  .tag.contrib { color: var(--contrib); background: var(--contrib-bg); }
+  .card p { margin: 0 0 9px; font-size: 14.6px; color: var(--text); }
+  .out { font-size: 13.4px; color: var(--muted); margin: 0; }
+  .out b { color: var(--text); font-weight: 620; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .89em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px;
+  }
+
+  .order { background: var(--card); border: 1px solid var(--border); border-radius: 11px; padding: 18px 22px; box-shadow: var(--shadow); }
+  .order p { margin: 0 0 10px; font-size: 14.6px; }
+  .order p:last-child { margin-bottom: 0; }
+  .order b { color: var(--accent); }
+
+  footer { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13.4px; }
+  footer p { margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="topline">
+    <div>
+      <h1>Scientific Agent Skills — bộ workflow</h1>
+      <p class="sub">
+        Hướng dẫn chạy được cho <code>K-Dense-AI/scientific-agent-skills</code>: một thư viện
+        <strong>163 Agent Skills</strong> khoa học/nghiên cứu, đồng thời là một Agent Plugins package.
+        Đây không phải một CLI — nên bộ tài liệu này chia theo <em>đối tượng</em>: người cài skill vào
+        agent của mình, và người sửa chính repo skill.
+      </p>
+    </div>
+    <button id="theme" type="button" aria-label="Đổi giao diện sáng/tối">◐ Theme</button>
+  </div>
+  <div class="meta">
+    <span class="chip">v2.66.0 · commit 1e5eeff</span>
+    <span class="chip">163 skill · 105 có scripts/</span>
+    <span class="chip">Agent Plugins 1.0.0</span>
+    <span class="chip">Python 3.13+</span>
+  </div>
+</header>
+
+<div class="note">
+  <strong>Đọc 02 trước khi cài bất cứ thứ gì.</strong> Skill là chỉ dẫn mà agent của bạn sẽ tuân theo —
+  nó chạy được code, cài package, gọi mạng. Chính repo khuyến cáo không cài cả bộ, và
+  16/163 skill hiện mang finding CRITICAL/HIGH trong báo cáo quét tuần của họ.
+</div>
+
+<h2>Track người dùng</h2>
+<p class="lede">Bạn muốn dùng các skill này trong dự án của mình.</p>
+
+<a class="card" href="01-cai-dat-skills.md">
+  <div class="card-head"><span class="num">01</span><span class="card-title">Cài Scientific Agent Skills</span><span class="tag consumer">Người dùng</span></div>
+  <p>Ba đường cài đã kiểm chứng bằng cách chạy thật: <code>npx skills add</code> (có <code>--list</code> và <code>--skill</code> để chọn subset), <code>gh skill install</code> (có provenance, ghim version), và clone tay dạng Agent Plugins. Kèm vị trí file thật quan sát được — <code>--agent claude-code</code> đặt vào <code>.claude/skills/</code>, <code>--agent cursor</code> vào <code>.agents/skills/</code> dùng chung.</p>
+  <p class="out"><b>Sinh ra:</b> thư mục skill trong host của bạn, kèm metadata truy vết trong frontmatter. Có ghi rõ ba chỗ README lệch với hành vi thật của CLI.</p>
+</a>
+
+<a class="card" href="02-tham-dinh-truoc-khi-cai.md">
+  <div class="card-head"><span class="num">02</span><span class="card-title">Thẩm định trước khi cài</span><span class="tag consumer">Người dùng · làm trước 01</span></div>
+  <p>Đọc <code>SKILL.md</code> mà không cài (<code>gh skill preview</code>), tra <code>docs/security-report.json</code>, và bảng đầy đủ 16 skill đang mang finding CRITICAL/HIGH — trích từ trường <code>max_severity</code> chứ không phải từ bảng tóm tắt. Kèm danh sách false positive hệ thống mà chính repo thừa nhận, để bạn dùng báo cáo đúng cách: chọn skill cần đọc kỹ, không phải kết tội.</p>
+  <p class="out"><b>Sinh ra:</b> quyết định cài/không cài cho từng skill. Cảnh báo quan trọng: scanner <b>fail open</b> — thiếu API key nó trả exit 0, không phải lỗi.</p>
+</a>
+
+<a class="card" href="03-dung-skill-trong-agent.md">
+  <div class="card-head"><span class="num">03</span><span class="card-title">Dùng skill trong agent (chỉ prompt)</span><span class="tag consumer">Người dùng · hằng ngày</span></div>
+  <p>Mọi thứ trong file này gõ vào <em>ô chat</em>, không phải terminal. Cách gọi trúng skill khi hai skill phủ nhau, khung prompt 5 phần lấy từ <code>docs/examples.md</code> của repo, và bảng 25 skill cần credential kèm tên biến môi trường chính xác.</p>
+  <p class="out"><b>Sinh ra:</b> artifact do skill định nghĩa. Bẫy lớn nhất: gate credential thất bại sẽ <b>ẩn</b> skill khỏi agent — nó biến mất chứ không báo lỗi.</p>
+</a>
+
+<a class="card" href="04-chay-script-bundled-tu-shell.md">
+  <div class="card-head"><span class="num">04</span><span class="card-title">Chạy script bundled từ shell</span><span class="tag consumer">Người dùng · hằng ngày</span></div>
+  <p>Mọi thứ trong file này gõ vào <em>terminal</em>. 90 skill ship CLI <code>argparse</code> chạy tất định, không tốn token — dùng được trong Makefile, cron, CI. Ba ví dụ đã chạy thật, một trong đó hoàn toàn offline thuần thư viện chuẩn.</p>
+  <p class="out"><b>Sinh ra:</b> JSON/TSV và một exit code bạn <b>bắt buộc</b> phải branch — <code>3</code> = arXiv error feed đội lốt HTTP 200, <code>4</code> = phân trang thiếu hụt, và ở ba skill khác <code>1</code> nghĩa là "có finding" chứ không phải "crash".</p>
+</a>
+
+<a class="card" href="05-pin-va-cap-nhat.md">
+  <div class="card-head"><span class="num">05</span><span class="card-title">Ghim version, cập nhật, gỡ bỏ</span><span class="tag consumer">Người dùng · bảo trì</span></div>
+  <p>Ghim theo tag hoặc SHA, phân biệt <code>metadata.version</code> (của riêng skill) với <code>github-tree-sha</code> (của collection — cái mà công cụ update thật sự dùng), và một quy trình nâng cấp có bước diff. Diff một <code>SKILL.md</code> chính là diff hành vi agent.</p>
+  <p class="out"><b>Sinh ra:</b> skill đã ghim và một đường nâng cấp có chủ đích. Lưu ý <code>gh skill update --all</code> <b>bỏ qua</b> skill đã ghim — nó không có nghĩa là mọi thứ đã mới nhất.</p>
+</a>
+
+<a class="card" href="06-gate-trong-ci-cua-ban.md">
+  <div class="card-head"><span class="num">06</span><span class="card-title">Gate trong CI của dự án bạn</span><span class="tag consumer">Người dùng · CI</span></div>
+  <p>Một workflow <strong>viết mới, tối thiểu</strong> — không phải bản sao pipeline nội bộ của repo skill. Gồm script phát hiện drift so upstream (đã chạy thật cả ca xanh lẫn ca đỏ) và bước validate spec chạy trên bản bạn đã commit.</p>
+  <p class="out"><b>Sinh ra:</b> CI đỏ khi upstream sửa một skill bạn đã thẩm định, hoặc khi một skill không còn hợp lệ theo spec.</p>
+</a>
+
+<h2>Track đóng góp</h2>
+<p class="lede">Bạn clone chính repo skill để thêm hoặc sửa một skill.</p>
+
+<a class="card" href="07-dong-gop-them-sua-skill.md">
+  <div class="card-head"><span class="num">07</span><span class="card-title">Thêm hoặc sửa một skill</span><span class="tag contrib">Đóng góp</span></div>
+  <p>Cái gì thuộc phạm vi repo (và bốn loại bị từ chối như thường lệ), layout thư mục, đúng 6 field frontmatter hợp lệ, và ba cái bẫy YAML khiến skill "biến mất" — nổi bật là flow style JSON làm <code>strictyaml</code> từ chối cả document, kéo <code>name</code> và <code>description</code> chết chung.</p>
+  <p class="out"><b>Sinh ra:</b> một <code>skills/&lt;name&gt;/</code> hợp lệ, suite test ở đúng chỗ, và checklist trước PR. Có ghi lại một chỗ tài liệu lệch code: <code>scripts/generate_skill_image.py</code> mà <code>AGENTS.md</code> hướng dẫn <b>không tồn tại</b> trong repo.</p>
+</a>
+
+<a class="card" href="08-dong-gop-validate-test-scan.md">
+  <div class="card-head"><span class="num">08</span><span class="card-title">Validate, test, scan</span><span class="tag contrib">Đóng góp</span></div>
+  <p>Các cổng CI thật, kèm kết quả đã chạy: <code>skills-ref validate</code> trên cả 163 skill (0 lỗi), <code>pytest tests/_meta</code> (10 passed, 1213 subtests, 1.82s), và <code>tests/run_all.py</code>. Giải thích luật một-skill-một-process — 32 skill cùng ship <code>scripts/_common.py</code>, gom chung process là âm thầm test nhầm file.</p>
+  <p class="out"><b>Sinh ra:</b> pass/fail cục bộ khớp với CI. Kèm trình tự chạy trước khi push, và cái nào chạy được mà <b>không cần</b> <code>uv</code>.</p>
+</a>
+
+<h2>Thứ tự chạy</h2>
+<div class="order">
+  <p><b>Người mới dùng:</b> 02 → 01 → (03 hoặc 04, tuỳ bạn làm qua agent hay qua shell) → 05 → 06.
+  Đặt 02 trước 01 là cố ý: quyết định cài gì phải đến trước hành động cài.</p>
+  <p><b>Người đóng góp:</b> 07 → 08. Hai file này không phụ thuộc 01–06.</p>
+  <p><b>Đã cài rồi, chỉ muốn dùng ngay:</b> 03 nếu bạn làm việc trong agent; 04 nếu bạn cần đầu ra tất định
+  cho script hay CI.</p>
+</div>
+
+<footer>
+  <p>Chỉ mục dạng markdown: <a href="workflows.md">workflows.md</a> — có bảng kiểm chứng đầy đủ ánh xạ từng khẳng định về đúng file nguồn hoặc lệnh đã chạy.</p>
+  <p>Sinh từ một lượt khám phá read-only tại commit <code>1e5eeff</code> (tag <code>v2.66.0</code>). Mọi lệnh đều đối chiếu source hoặc chạy thật; các chỗ tài liệu lệch code được ghi rõ thay vì chép lại.</p>
+</footer>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('theme');
+    var root = document.documentElement;
+    function current() {
+      var set = root.getAttribute('data-theme');
+      if (set) return set;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function label() {
+      btn.textContent = current() === 'dark' ? '☀ Sáng' : '☾ Tối';
+    }
+    btn.addEventListener('click', function () {
+      var next = current() === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('sas-theme', next); } catch (e) {}
+      label();
+    });
+    label();
+  })();
+</script>
+</body>
+</html>

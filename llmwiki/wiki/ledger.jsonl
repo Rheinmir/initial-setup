@@ -341,3 +341,5 @@
 {"ts": "2026-09-02T22:25:13", "session": "dba79064", "action": "modify", "target": "sources/draft/020926-sessionstart-episodic-recall.md", "tool": "Edit"}
 {"ts": "2026-09-02T22:25:13", "session": "dba79064", "action": "modify", "target": "sources/draft/020926-sessionstart-episodic-recall.md", "tool": "Edit"}
 {"ts": "2026-09-07T16:17:26", "session": "889c2c4c", "action": "add", "target": "sources/handover/070926-overstack-memory-selfreport.md", "tool": "Write"}
+{"ts": "2026-09-07T18:15:52", "session": "75be06f9", "action": "add", "target": "sources/draft/070926-installer-update-idempotent.md", "tool": "Write"}
+{"ts": "2026-09-07T18:15:52", "session": "75be06f9", "action": "add", "target": "sources/draft/070926-installer-update-idempotent.md", "tool": "Write"}

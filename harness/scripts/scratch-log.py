@@ -87,6 +87,32 @@ def show(args):
     return 0
 
 
+def _porcelain_paths(dirty: str):
+    """Tách đường dẫn từ `git status --porcelain`, bền với chuỗi đã bị strip."""
+    return [parts[1] for ln in dirty.splitlines()
+            if len(parts := ln.split(maxsplit=1)) > 1]
+
+
+def _self_test() -> int:
+    ok = True
+    def check(name, cond):
+        nonlocal ok
+        print(f"  [{'OK ' if cond else 'FAIL'}] {name}")
+        ok = ok and cond
+    raw = " M harness/metrics/a.json\n?? doyourmagic/x/\n M fdk/wiki/log.md"
+    check("porcelain thô → path nguyên vẹn",
+          _porcelain_paths(raw) == ["harness/metrics/a.json", "doyourmagic/x/", "fdk/wiki/log.md"])
+    # _git() strip toàn chuỗi ⇒ dòng đầu mất cột trạng thái. Đây là ca đã hỏng thật
+    # (28/63 entry ghi "arness/…"), nên nó phải nằm trong test chứ không chỉ trong comment.
+    check("porcelain đã strip → vẫn nguyên vẹn",
+          _porcelain_paths(raw.strip()) == ["harness/metrics/a.json", "doyourmagic/x/", "fdk/wiki/log.md"])
+    check("dòng rỗng / cụt bị bỏ", _porcelain_paths(" M\n\n?? ok/x") == ["ok/x"])
+    check("tên file có khoảng trắng giữ nguyên",
+          _porcelain_paths(" M a b/c d.md") == ["a b/c d.md"])
+    print("SELF-TEST: " + ("ALL PASS" if ok else "CÓ LỖI"))
+    return 0 if ok else 1
+
+
 def _git(root, *argv):
     """Chạy git, trả stdout đã strip (rỗng nếu lỗi/thiếu git). Fail-open."""
     try:
@@ -111,7 +137,11 @@ def auto(args):
     root = args.root or str(ROOT)
     dirty = _git(root, "status", "--porcelain")
     subject = _git(root, "log", "-1", "--format=%s")
-    changed = [ln[3:] for ln in dirty.splitlines() if len(ln) > 3]
+    # KHÔNG dùng ln[3:]: _git() strip toàn chuỗi nên dòng ĐẦU của porcelain mất ký tự
+    # trạng thái cột 1 (" M path" → "M path"), cắt cứng 3 sẽ lẹm vào tên file — đo
+    # 2026-09-07: 28/63 entry trong sổ ghi "arness/…", "dk/…", "lmwiki/…". Tách theo
+    # khoảng trắng đầu tiên thì đúng với cả dòng đã strip lẫn chưa strip.
+    changed = _porcelain_paths(dirty)
     if not dirty and not subject:
         return 0  # không mutation, không lịch sử → không bịa why
     top = changed[0] if changed else ""
@@ -170,6 +200,8 @@ def distill(args):
 
 def main():
     ap = argparse.ArgumentParser()
+    if "--self-test" in sys.argv:      # trước parse: cmd là subparser bắt buộc
+        sys.exit(_self_test())
     sub = ap.add_subparsers(dest="cmd", required=True)
     n = sub.add_parser("note")
     n.add_argument("why")

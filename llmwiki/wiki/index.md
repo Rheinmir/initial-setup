@@ -125,6 +125,7 @@
 | [050726-map-not-territory-fable5-unknowns](sources/draft/archive/analysis/050726-map-not-territory-fable5-unknowns.md) | issue | Issue: Map-is-not-Territory — tìm unknowns đối chiếu & vá overstack (GH#40) |
 | [060726-wiki-sync-openwiki-distill](sources/draft/archive/analysis/060726-wiki-sync-openwiki-distill.md) | draft | 060726-wiki-sync-openwiki-distill |
 | [070926-overstack-memory-selfreport](sources/handover/070926-overstack-memory-selfreport.md) | source | Bàn giao — overstack, phiên 889c2c4c (2026-09-06 → 07) |
+| [070926-installer-update-idempotent](sources/draft/070926-installer-update-idempotent.md) | source | Installer update đè lên dự án cũ — kịch bản sửa |
 <!-- index:auto:end -->
 | [140726-propose-plan-split-superpowers](sources/draft/140726-propose-plan-split-superpowers.md) | draft | Tách vòng đời đề xuất thành SPEC (/propose, người duyệt) và PLAN (/plan mới, agent mù thi hành), mở rộng R7 cắn cả hai |
 | [110726-shipped-vs-documented-parity](sources/draft/110726-shipped-vs-documented-parity.md) | draft | Issue: tài liệu hứa 74 skill nhưng npx chỉ giao 67 trong im lặng — cần cổng so hứa với giao ở fresh-install-smoke --remote |

@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AREX-Skill / DisCo — bộ workflow</title>
+<script>
+  // Chống FOUC: quyết định theme TRƯỚC khi paint.
+  (function () {
+    try {
+      var t = localStorage.getItem('arex-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --border: #e0e4ea;
+    --text: #1e2430;
+    --muted: #626c7e;
+    --accent: #0e6f6f;
+    --accent-soft: #e2f1f0;
+    --code-bg: #eef1f5;
+    --shell: #2f5d9e;
+    --shell-bg: #e6edf8;
+    --chat: #8a4d1f;
+    --chat-bg: #f6eade;
+    --user: #2f6b4f;
+    --user-bg: #e5f0ea;
+    --contrib: #5a4a92;
+    --contrib-bg: #ebe7f6;
+    --warn-bg: #fdf3e3;
+    --warn-border: #e6c68a;
+    --warn-text: #6b4a15;
+  }
+  html[data-theme="dark"] {
+    --bg: #14171c;
+    --card: #1c2027;
+    --border: #2e343e;
+    --text: #e6e9ee;
+    --muted: #99a3b2;
+    --accent: #4fb8b3;
+    --accent-soft: #16332f;
+    --code-bg: #232831;
+    --shell: #8ab4f0;
+    --shell-bg: #1b2735;
+    --chat: #e0a06a;
+    --chat-bg: #33261a;
+    --user: #7cc2a0;
+    --user-bg: #1a2c24;
+    --contrib: #a99ae0;
+    --contrib-bg: #262138;
+    --warn-bg: #33290f;
+    --warn-border: #6b5620;
+    --warn-text: #e8cf9a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0 1.25rem 4rem;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.65 ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 60rem; margin: 0 auto; }
+  header { padding: 2.5rem 0 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  h1 { font-size: 1.85rem; margin: 0 0 .4rem; letter-spacing: -.02em; }
+  .sub { color: var(--muted); margin: 0; max-width: 46rem; }
+  .sub code { font-size: .88em; }
+  code, kbd {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--code-bg);
+    padding: .12em .38em;
+    border-radius: 4px;
+    font-size: .86em;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .82rem;
+    line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  #themeBtn {
+    flex: none;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: .45rem .9rem;
+    font: inherit;
+    font-size: .82rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #themeBtn:hover { border-color: var(--accent); color: var(--accent); }
+  h2 {
+    font-size: 1.15rem;
+    margin: 2.5rem 0 1rem;
+    padding-bottom: .4rem;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -.01em;
+  }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .75rem; margin: 1.5rem 0 0; }
+  .fact { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: .7rem .85rem; }
+  .fact b { display: block; font-size: 1.25rem; line-height: 1.2; color: var(--accent); }
+  .fact span { font-size: .78rem; color: var(--muted); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.05rem 1.2rem;
+    margin-bottom: .85rem;
+  }
+  .card h3 { margin: 0 0 .3rem; font-size: 1.02rem; }
+  .card h3 a { color: var(--text); text-decoration: none; }
+  .card h3 a:hover { color: var(--accent); text-decoration: underline; }
+  .num {
+    display: inline-block;
+    min-width: 1.6rem;
+    margin-right: .45rem;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .tags { margin: .55rem 0 .6rem; display: flex; flex-wrap: wrap; gap: .35rem; }
+  .tag { font-size: .71rem; padding: .18rem .55rem; border-radius: 999px; font-weight: 600; letter-spacing: .01em; }
+  .t-user { background: var(--user-bg); color: var(--user); }
+  .t-contrib { background: var(--contrib-bg); color: var(--contrib); }
+  .t-shell { background: var(--shell-bg); color: var(--shell); }
+  .t-chat { background: var(--chat-bg); color: var(--chat); }
+  .card p { margin: .35rem 0; color: var(--muted); font-size: .9rem; }
+  .card p.out { color: var(--text); font-size: .85rem; }
+  .card p.out b { color: var(--accent); font-weight: 600; }
+  .note {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    color: var(--warn-text);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    font-size: .88rem;
+    margin: 1rem 0;
+  }
+  .note b { font-weight: 700; }
+  ol.order { padding-left: 1.2rem; }
+  ol.order li { margin-bottom: .5rem; color: var(--muted); }
+  ol.order li b { color: var(--text); }
+  ul.plain { padding-left: 1.2rem; color: var(--muted); font-size: .9rem; }
+  ul.plain li { margin-bottom: .35rem; }
+  ul.plain code { color: var(--text); }
+  footer { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .82rem; }
+  @media (max-width: 34rem) {
+    .topbar { flex-direction: column; }
+    h1 { font-size: 1.45rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="topbar">
+    <div>
+      <h1>AREX-Skill / DisCo — bộ workflow chạy được</h1>
+      <p class="sub">
+        Sinh từ một lượt khảo sát <b>chỉ đọc</b> repo <code>VectorSpaceLab/AREX-Skill</code>
+        (clone <code>--depth 1</code>, không sửa file nào trong repo đích).
+        Mọi lệnh đều đối chiếu với parser, script và literal exit call — không chép lại README.
+      </p>
+    </div>
+    <button id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">🌗 Sáng / Tối</button>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><b>1 000</b><span>repo skill trong thư viện</span></div>
+    <div class="fact"><b>2 209</b><span>area–family assignment</span></div>
+    <div class="fact"><b>15</b><span>meta skill cho Creator</span></div>
+    <div class="fact"><b>24</b><span>lệnh chat built-in</span></div>
+  </div>
+</header>
+
+<p class="sub">
+  Repo này là <b>hai thứ đóng chung một chỗ</b>: <code>disco</code> — CLI/TUI agent nghiên cứu
+  (npm <code>@arex-skill/disco</code> v0.2.1, bin <code>dist/cli.js</code>, cần Node ≥ 22.19.0,
+  manifest duy nhất là <code>cli/package.json</code>) — và <b>AREX-Skill Library</b>, bộ 1.000 repo skill
+  cùng một router, nằm ở <code>skills/repositories/</code> và cài bằng <code>disco repo-skills install</code>.
+</p>
+
+<div class="note">
+  <b>Hai loại lệnh, đừng trộn.</b> Lệnh <b>shell</b> bắt đầu bằng <code>disco …</code> và gõ ở terminal.
+  Lệnh <b>chat</b> như <code>/login</code>, <code>/creator</code>, <code>/export</code> chỉ gõ ở dấu nhắc trong TUI —
+  dán vào terminal là <code>command not found</code>. Riêng <code>/skill:&lt;tên&gt;</code> đi được cả hai chỗ
+  vì <code>disco -p "…"</code> truyền nguyên chuỗi cho agent. File <b>08</b> giữ trọn phần lệnh chat.
+</div>
+
+<h2>Track người dùng — cài đặt</h2>
+
+<div class="card">
+  <h3><span class="num">01</span><a href="01-cai-dat-disco.md">01-cai-dat-disco.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-shell">shell</span></div>
+  <p>Ba đường cài <code>disco</code>: managed installer curl/PowerShell (tự chuẩn bị runtime Node khi máy thiếu), package manager (npm/pnpm/bun/yarn), hoặc build từ nguồn qua <code>scripts/build-from-source-link.sh</code>. Có sẵn phần kiểm điều kiện tiên quyết — Node phải ≥ 22.19.0 và <code>git</code> phải có, vì bước sau cần clone. Kèm 5 nhánh <code>exit 1</code> của script build và cách gỡ từng loại.</p>
+  <p class="out"><b>Sinh ra:</b> lệnh <code>disco</code> global, thư mục <code>~/.disco/agent/</code>, ít nhất một provider model đã cấu hình.</p>
+</div>
+
+<div class="card">
+  <h3><span class="num">02</span><a href="02-cai-thu-vien-skill.md">02-cai-thu-vien-skill.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-shell">shell</span></div>
+  <p>Cài và bảo trì bộ 1.000 skill: <code>install</code> (clone shallow <code>--depth 1 --filter=blob:none</code>), <code>status</code> (hoàn toàn local, không gọi GitHub), <code>update</code> và <code>--force</code> có backup, bật/tắt router. Phần quan trọng nhất là bảng exit code đọc từ mã: <b>1</b> = có drift, <b>2</b> = sai cú pháp — hai mã mang nghĩa khác nhau nên đừng nuốt bằng <code>|| true</code>.</p>
+  <p class="out"><b>Sinh ra:</b> <code>~/.disco/agent/skills/repositories/{repo-skills,repo-skills-router}/</code> kèm commit nguồn để về sau đối chiếu drift.</p>
+</div>
+
+<h2>Track người dùng — dùng hằng ngày</h2>
+
+<div class="card">
+  <h3><span class="num">03</span><a href="03-chay-viec-researcher.md">03-chay-viec-researcher.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-shell">shell</span></div>
+  <p>Đường dùng chính: giao một mục tiêu nghiên cứu cụ thể và để router chọn skill. Bao gồm chế độ tương tác, chế độ một-phát <code>-p</code>, gọi thẳng <code>/skill:vllm</code> khi đã biết cần gì, các cờ hay dùng (<code>--mode json</code>, chế độ chỉ đọc, session, <code>--thinking</code>), và mô tả cách router thật sự tiêu context để bạn đọc log cho đúng.</p>
+  <p class="out"><b>Sinh ra:</b> session file, sản phẩm thật trong thư mục làm việc, output theo <code>--mode</code>. <b>Cảnh báo đã kiểm:</b> <code>exit 0</code> chỉ nói phiên agent kết thúc không lỗi, không nói nhiệm vụ đã đúng.</p>
+</div>
+
+<div class="card">
+  <h3><span class="num">08</span><a href="08-lenh-chat-trong-tui.md">08-lenh-chat-trong-tui.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-chat">chat / TUI</span></div>
+  <p>Toàn bộ 24 lệnh chat built-in, đọc thẳng từ <code>BUILTIN_SLASH_COMMANDS</code> chứ không đoán từ docs, nhóm theo provider &amp; model / mode &amp; session / vào-ra / khác. Kèm quy ước <code>/skill:&lt;tên&gt;</code> với 7 entry point Creator hay dùng, và cảnh báo <code>/creator</code> với <code>/researcher</code> <b>mở session mới với context sạch</b> chứ không đổi mode tại chỗ.</p>
+  <p class="out"><b>Sinh ra:</b> không sinh file — đây là bảng tra, đọc song song với 01 và 03.</p>
+</div>
+
+<h2>Track người dùng — tích hợp &amp; chế tạo</h2>
+
+<div class="card">
+  <h3><span class="num">04</span><a href="04-xuat-skill-sang-agent-khac.md">04-xuat-skill-sang-agent-khac.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-shell">shell</span></div>
+  <p>Mượn vài repo skill cho Claude Code hoặc Codex mà không phải đổi sang DisCo. Có cả đường ngắn (nhờ Creator) lẫn đường chính xác: gọi thẳng helper <code>export_repo_skills_to_agent.mjs</code> với bảng cờ đầy đủ, 9 bước transaction, luật không-bao-giờ-đè-ngầm, và cách <code>--resume</code> đúng thư mục transaction khi bị đứt.</p>
+  <p class="out"><b>Sinh ra:</b> <code>&lt;target-skills-root&gt;/repositories/</code> ở agent đích, với index và router được <b>sinh lại</b> cho đúng tập đã chọn. Exit <b>0</b> hoặc <b>2</b>, không có mã nào khác.</p>
+</div>
+
+<div class="card">
+  <h3><span class="num">05</span><a href="05-creator-tao-repo-skill.md">05-creator-tao-repo-skill.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-shell">shell</span></div>
+  <p>Creator mode: tạo, verify, refresh và extend một repo skill từ bằng chứng nguồn. Phân biệt rõ <b>refresh</b> (nội dung đã lệch upstream) với <b>extend</b> (nội dung đúng nhưng thiếu vùng workflow). Kèm bảng ranh giới Researcher/Creator, luật chọn deployment scope, và danh mục 15 meta skill tách thành nhóm gọi tay với nhóm được workflow tự nạp.</p>
+  <p class="out"><b>Sinh ra:</b> một graph skill tự chứa đã verify, artifact review nằm <b>ngoài</b> cây runtime.</p>
+</div>
+
+<div class="card">
+  <h3><span class="num">06</span><a href="06-creator-paper-to-skills.md">06-creator-paper-to-skills.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-shell">shell</span></div>
+  <p>Đường paper → skill tái lập được qua Distiller. Chỉ ra <b>hai</b> file TOML cùng schema trong repo và nên copy cái nào, ba trường bắt buộc phải sửa, và bảng knob với mặc định thật — đáng chú ý là <code>recovery_mode = "hard"</code> khiến các lần chạy proxy/toy chỉ được ghi làm chẩn đoán chứ không tính là recovery thành công.</p>
+  <p class="out"><b>Sinh ra:</b> <code>&lt;workspace_root&gt;/&lt;paper_slug&gt;/skills/</code> (còn là staging cho tới khi duyệt import) và <code>…/distillation/reports/final/</code>.</p>
+</div>
+
+<div class="card">
+  <h3><span class="num">07</span><a href="07-tich-hop-ci.md">07-tich-hop-ci.md</a></h3>
+  <div class="tags"><span class="tag t-user">Người dùng</span><span class="tag t-shell">shell</span></div>
+  <p>Ghim commit thư viện và gác drift trong CI của <b>dự án bạn</b>. Có script bash chạy được cả local lẫn CI, phân biệt đúng ba mã thoát của <code>repo-skills status</code>, và một job GitHub Actions tối thiểu. Kèm phần chạy chính DisCo trong CI kèm ba cảnh báo thật về offline, exit code, và chi phí.</p>
+  <p class="out"><b>Sinh ra:</b> một job CI fail khi commit thư viện lệch khỏi giá trị đã ghim. <b>Lưu ý:</b> repo AREX-Skill không có CI nào — đây là ví dụ viết mới, không phải bản sao pipeline nội bộ.</p>
+</div>
+
+<h2>Track contributor</h2>
+
+<div class="card">
+  <h3><span class="num">09</span><a href="09-contributor-phat-trien-cli.md">09-contributor-phat-trien-cli.md</a></h3>
+  <div class="tags"><span class="tag t-contrib">Contributor</span><span class="tag t-shell">shell</span></div>
+  <p>Dành cho người sửa chính công cụ. Có bản đồ code chú thích từng file quan trọng, vòng lặp dev, bảy cổng của <code>npm run prepublishOnly</code> giải thích từng cái gác gì, luật provenance dễ vỡ nhất trong repo, và quy trình chuẩn bị release asset của installer. Đóng lại bằng một chỗ <b>docs lệch code đã đối chiếu được</b>: cờ <code>--for</code> được tài liệu hoá ở hai nơi nhưng không tồn tại trong parser.</p>
+  <p class="out"><b>Sinh ra:</b> <code>cli/dist/</code> đã build, lệnh <code>disco</code> link từ checkout, một cây gate đã chạy xanh.</p>
+</div>
+
+<div class="card">
+  <h3><span class="num">10</span><a href="10-contributor-dong-gop-skill.md">10-contributor-dong-gop-skill.md</a></h3>
+  <div class="tags"><span class="tag t-contrib">Contributor</span><span class="tag t-shell">shell</span></div>
+  <p>Dành cho người đóng góp <b>skill</b> chứ không phải code. Liệt kê file bắt buộc của một skill mới, cách rebuild router bằng <code>update_repo_skills_router.mjs</code> với bảng cờ và ba mã thoát, bốn nhóm phải đồng bộ khi refresh, các lệnh kiểm nhanh tại chỗ, và toàn bộ yêu cầu khai báo của PR — trong đó có model, provider và mức reasoning đã dùng.</p>
+  <p class="out"><b>Sinh ra:</b> cây skill runtime dưới <code>skills/repositories/repo-skills/&lt;skill-id&gt;/</code>, router đã sinh lại, catalog đã cập nhật, PR khai đủ nguồn gốc.</p>
+</div>
+
+<h2>Thứ tự chạy đề xuất</h2>
+
+<ol class="order">
+  <li><b>Người mới dùng để nghiên cứu:</b> 01 → 02 → 03. Đó là đường tối thiểu để có kết quả; đọc 08 song song ngay từ đầu vì <code>/login</code> nằm ở đó.</li>
+  <li><b>Muốn dùng skill trong Claude Code / Codex mà không đổi agent:</b> 01 → 02 → 04, bỏ qua 03.</li>
+  <li><b>Muốn tự tạo skill:</b> 01 → 02 → 05 (nguồn là repo) hoặc 06 (nguồn là paper). 05 và 06 độc lập nhau.</li>
+  <li><b>Cần tái lập kết quả về sau:</b> thêm 07 ngay sau 02, trước khi có kết quả nào đáng giữ.</li>
+  <li><b>Contributor:</b> vào thẳng 09 (sửa CLI) hoặc 10 (đóng góp skill). Không phụ thuộc 01–08.</li>
+</ol>
+
+<h2>Bộ này được kiểm chứng thế nào</h2>
+
+<p class="sub">Mỗi lệnh đối chiếu với mã nguồn, không chỉ với tài liệu. Bảng đối chiếu đầy đủ nằm ở
+<a href="workflows.md">workflows.md</a>; dưới đây là các nguồn chính:</p>
+
+<ul class="plain">
+  <li><b>Cờ CLI và help:</b> <code>cli/packages/coding-agent/src/cli/args.ts</code> → <code>printHelp()</code></li>
+  <li><b>Subcommand <code>repo-skills</code>:</b> <code>cli/.../cli/repo-skills.ts</code> → <code>parseRepoSkillsCommand()</code></li>
+  <li><b>Exit code:</b> đọc literal <code>process.exit(…)</code> / <code>process.exitCode = …</code> — <code>repo-skills</code> dùng <b>2</b> cho lỗi cú pháp và <b>1</b> cho drift; print mode dùng <b>129</b> cho SIGHUP và <b>143</b> cho SIGTERM</li>
+  <li><b>24 lệnh chat:</b> <code>core/slash-commands.ts</code> → <code>BUILTIN_SLASH_COMMANDS</code>, không đoán từ docs</li>
+  <li><b>Đúng 15 meta skill:</b> grep <code>disco-role</code> trong từng <code>SKILL.md</code> — 15 <code>meta</code> + 1 <code>operating</code> + 1 <code>shared</code></li>
+  <li><b>1000 / 2209:</b> đếm thật bằng <code>wc -l</code> trên <code>repositories.jsonl</code> và <code>assignments.jsonl</code></li>
+  <li><b>Manifest đọc trước prose:</b> <code>cli/package.json</code> cho bin, scripts, <code>engines.node</code>, dependency</li>
+</ul>
+
+<div class="note">
+  <b>Điều không được kiểm chứng.</b> Không chạy <code>npm ci</code>, <code>npm test</code>,
+  <code>disco repo-skills install</code>, hay bất kỳ lệnh nào cần mạng hoặc model provider.
+  Máy khảo sát đang chạy Node <b>22.17.0</b>, thấp hơn ngưỡng <code>&gt;=22.19.0</code> của package.
+  Mọi khẳng định ở trên đến từ <b>đọc mã và đếm file</b>, không từ thực thi.
+</div>
+
+<footer>
+  Bộ tài liệu sinh bởi <code>/doyourmagic</code> · nguồn <code>git@github.com:VectorSpaceLab/AREX-Skill.git</code> ·
+  pha khảo sát chỉ-đọc, không sửa file nào trong repo đích.
+  <br>Mỗi skill trong thư viện mang <b>license riêng</b> khai trong <code>SKILL.md</code> của nó — kiểm trước khi copy hay redistribute.
+</footer>
+
+</div>
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    btn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('arex-theme', next); } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>

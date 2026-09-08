@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Assign layers (ordered prefix rules, first match wins), attach tour, validate, save."""
-import json, os, sys, subprocess
+import json, os, sys, subprocess, datetime
 from collections import Counter, defaultdict
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
-T = os.path.join(ROOT, ".orca-onboard", "tmp")
-OUT = os.path.join(ROOT, ".understand-anything")
+T = os.path.join(ROOT, ".overstack", "onboard", "tmp")
+OUT = os.path.join(ROOT, ".overstack", "graph")
 os.makedirs(OUT, exist_ok=True)
 
 g = json.load(open(os.path.join(T, "assembled-graph.json")))
@@ -84,6 +84,12 @@ LAYERS = [
      ".pre-commit-config.yaml gate mọi commit, .template-manifest.json theo dõi drift template.",
      lambda p: p.startswith(".github/") or p in (".pre-commit-config.yaml", ".template-manifest.json",
                                                  ".gitignore", ".gitattributes")),
+
+    ("layer:dot-artifacts", ".overstack/ — artifacts (sinh ra / kéo về)",
+     "Quy ước: mọi artifact sinh/kéo về gom một gốc .overstack/ — .overstack/doyourmagic (bundle skill tool ngoài, "
+     "đồng bộ với rheinmir/dym), .overstack/onboard + .overstack/graph (đầu ra phase 1 /orca-onboard, "
+     "chính là đồ nghề vẽ graph này), .overstack/kit. Không phải lõi, không lẫn vào skills canonical.",
+     lambda p: p.startswith(".overstack/")),
 
     ("layer:project-bootstrap", "Project Bootstrap & Docs",
      "Prompt dựng dự án mới (00→03 + setup.md) và tài liệu gốc repo: README, CLAUDE.md, RELEASE-*.",
@@ -234,6 +240,7 @@ for e in edges:
     deg[e["source"]] += 1; deg[e["target"]] += 1
 orphans = [n["id"] for n in nodes if deg[n["id"]] == 0]
 
+TODAY = datetime.date.today().isoformat()
 commit = subprocess.run(["git", "-C", ROOT, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
 graph = {
     "version": "1.0",
@@ -243,13 +250,13 @@ graph = {
         "frameworks": ["Claude Code hooks", "pre-commit", "GitHub Actions", "promptfoo", "Orca"],
         "description": "Lớp khung self-disciplined cho AI agent: trí nhớ (llmwiki) + guardrail tất định "
                        "(harness) + tay nghề đóng gói (skills), cài bằng một dòng curl.",
-        "analyzedAt": "2026-07-28",
+        "analyzedAt": TODAY,
         "gitCommitHash": commit,
     },
     "nodes": nodes, "edges": edges, "layers": layers, "tour": tour,
 }
 json.dump(graph, open(os.path.join(OUT, "knowledge-graph.json"), "w"), ensure_ascii=False, indent=1)
-json.dump({"lastAnalyzedAt": "2026-07-28", "gitCommitHash": commit, "analyzedFiles": len(nodes)},
+json.dump({"lastAnalyzedAt": TODAY, "gitCommitHash": commit, "analyzedFiles": len(nodes)},
           open(os.path.join(OUT, "meta.json"), "w"), indent=1)
 
 print(f"nodes={len(nodes)} edges={len(edges)} layers={len(layers)} tour={len(tour)} orphans={len(orphans)}")

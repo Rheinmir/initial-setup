@@ -1,6 +1,6 @@
 # example-setup — một lượt chạy thật của /doyourmagic trên rheinmir/setup (overstack)
 
-Bundle gốc nằm ở dự án tiêu thụ: `doyourmagic/setup/` với `skills/<tên>/SKILL.md`. Trong reference này các file skill được lưu dạng `skills/<tên>.skill.md` để loader (`skills/*/SKILL.md`, `npx skills`) không quét nhầm chúng thành skill của repo.
+Bundle gốc nằm ở dự án tiêu thụ: `.overstack/doyourmagic/setup/` với `skills/<tên>/SKILL.md`. Trong reference này các file skill được lưu dạng `skills/<tên>.skill.md` để loader (`skills/*/SKILL.md`, `npx skills`) không quét nhầm chúng thành skill của repo.
 
 Đọc theo thứ tự: `workflows.md` (chỉ mục + bảng "kiểm chứng thế nào" 30+ dòng) → `flow.html` (docs-site-macos: sidebar, mind map, sơ đồ luồng skill→sản phẩm→skill kế, nút gạt sáng/tối) → `skills/dym-setup.skill.md` (hub, 1 dòng context) → 6 sub-skill.
 

@@ -17,7 +17,7 @@ Onboard codebase via distilled understand-anything pipeline (graph + git history
 - "onboard codebase", "analyze codebase", "knowledge graph", "guided tour"
 
 ## Options
-- `--full` — Delete `.understand-anything/` and rebuild
+- `--full` — Delete `.overstack/graph/` and rebuild
 - `--update` — Incremental: re-analyze only changed files since last run
 - `--language <lang>` — Output language (vi, en, zh, ...)
 - `--skip-wiki` — Skip wiki generation
@@ -141,15 +141,15 @@ for arg in "$@"; do
 done
 
 if [ "$UPDATE_MODE" = "true" ]; then
-  [ ! -f "$PROJECT_ROOT/.understand-anything/knowledge-graph.json" ] \
+  [ ! -f "$PROJECT_ROOT/.overstack/graph/knowledge-graph.json" ] \
     && echo "❌ --update requires existing graph. Run without --update first." && exit 1
-  [ ! -f "$PROJECT_ROOT/.understand-anything/meta.json" ] \
+  [ ! -f "$PROJECT_ROOT/.overstack/graph/meta.json" ] \
     && echo "❌ --update requires meta.json. Run without --update first." && exit 1
   echo "[update] Incremental mode — reading changed files from meta.json"
   
   CHANGED_FILES=$(python3 -c "
 import json, sys
-meta = json.load(open('$PROJECT_ROOT/.understand-anything/meta.json'))
+meta = json.load(open('$PROJECT_ROOT/.overstack/graph/meta.json'))
 changed = meta.get('changedFiles', meta.get('changed', []))
 print('\n'.join(changed))
 " 2>/dev/null || echo "")
@@ -186,16 +186,16 @@ if [ ! -d "$PROJECT_ROOT/llmwiki" ] || { [ "$GLOBAL_HARNESS" = "false" ] && [ ! 
 fi
 
 # --- 5. Create dirs ---
-mkdir -p $PROJECT_ROOT/.orca-onboard/{intermediate,tmp}
+mkdir -p $PROJECT_ROOT/.overstack/onboard/{intermediate,tmp}
 mkdir -p $PROJECT_ROOT/llmwiki/wiki/draft/{cave,uiux,orca}
 
 # --- 6. File count & availability check ---
-git rev-parse HEAD 2>/dev/null > $PROJECT_ROOT/.orca-onboard/tmp/commit.txt
-git ls-files > $PROJECT_ROOT/.orca-onboard/tmp/files.txt 2>/dev/null \
+git rev-parse HEAD 2>/dev/null > $PROJECT_ROOT/.overstack/onboard/tmp/commit.txt
+git ls-files > $PROJECT_ROOT/.overstack/onboard/tmp/files.txt 2>/dev/null \
   || find $PROJECT_ROOT -type f \
-       ! -path "*/.orca-onboard/*" ! -path "*/llmwiki/*" ! -path "*/.git/*" \
-     > $PROJECT_ROOT/.orca-onboard/tmp/files.txt
-FILE_COUNT=$(wc -l < $PROJECT_ROOT/.orca-onboard/tmp/files.txt | tr -d ' ')
+       ! -path "*/.overstack/onboard/*" ! -path "*/llmwiki/*" ! -path "*/.git/*" \
+     > $PROJECT_ROOT/.overstack/onboard/tmp/files.txt
+FILE_COUNT=$(wc -l < $PROJECT_ROOT/.overstack/onboard/tmp/files.txt | tr -d ' ')
 
 # Probe agent availability
 AGY_OK=$(agy --version 2>/dev/null && echo "✅ usable" || echo "❌ not found")
@@ -271,9 +271,9 @@ timestamp: $(date +%Y-%m-%d)
 Onboard \`$PROJECT_ROOT\` — understand-anything graph, domain enrichment, wiki, HTML.
 
 ## Output
-- \`.understand-anything/knowledge-graph.json\` (tree-sitter + Louvain)
-- \`.understand-anything/ONBOARDING.md\` (~20k tokens distilled)
-- \`.orca-onboard/intermediate/domain-graph.json\`
+- \`.overstack/graph/knowledge-graph.json\` (tree-sitter + Louvain)
+- \`.overstack/graph/ONBOARDING.md\` (~20k tokens distilled)
+- \`.overstack/onboard/intermediate/domain-graph.json\`
 - \`llmwiki/wiki/\` (index, concepts, entities, architecture, tours)
 - \`llmwiki/html/onboarding-${PROJECT_SLUG}.html\`
 - \`llmwiki/html/wiki-graph.html\` (vector quan hệ concept↔code — STEP C)
@@ -281,9 +281,9 @@ Onboard \`$PROJECT_ROOT\` — understand-anything graph, domain enrichment, wiki
 ## Files
 | File | Action |
 |------|--------|
-| \`.understand-anything/knowledge-graph.json\` | created by Phase 1 pipeline |
-| \`.understand-anything/ONBOARDING.md\` | created by Phase 1 pipeline |
-| \`.orca-onboard/intermediate/domain-graph.json\` | created by Claude |
+| \`.overstack/graph/knowledge-graph.json\` | created by Phase 1 pipeline |
+| \`.overstack/graph/ONBOARDING.md\` | created by Phase 1 pipeline |
+| \`.overstack/onboard/intermediate/domain-graph.json\` | created by Claude |
 | \`llmwiki/wiki/index.md\` | created/modified |
 | \`llmwiki/wiki/concepts/architecture.md\` | created |
 | \`llmwiki/wiki/concepts/*.md\` | created |
@@ -354,9 +354,9 @@ Ask for confirmation before continuing.
 **Pipeline:** scan (bash) → git history (bash) → batch analyze (opencode + DeepSeek) → merge (python) → layers + tour (Claude main thread) → validate + save (python + Claude). Phương pháp distill từ Understand-Anything; mọi prompt/schema nằm ngay dưới đây — không dispatch `/understand`, không cài plugin.
 
 **Required output:**
-- `.understand-anything/knowledge-graph.json` (nodes, edges, layers, tour)
-- `.understand-anything/ONBOARDING.md` (~20k tokens distilled)
-- `.understand-anything/meta.json`
+- `.overstack/graph/knowledge-graph.json` (nodes, edges, layers, tour)
+- `.overstack/graph/ONBOARDING.md` (~20k tokens distilled)
+- `.overstack/graph/meta.json`
 
 **Skip check:** `RESUME_MODE=true` + `PHASE1_STATUS=done` → skip to Phase 2.
 
@@ -367,13 +367,13 @@ Ask for confirmation before continuing.
 | No | (none) | full pipeline |
 | Yes | (none) | skip Phase 1, use existing graph |
 | Yes | `--update` | re-analyze only `git diff <meta.gitCommitHash>..HEAD --name-only` files, merge into existing graph |
-| Yes | `--full` | delete `.understand-anything/`, full pipeline |
+| Yes | `--full` | delete `.overstack/graph/`, full pipeline |
 
 ### 1.1 SCAN (bash — no LLM)
 
 ```bash
-mkdir -p "$PROJECT_ROOT/.understand-anything" "$PROJECT_ROOT/.orca-onboard/tmp"
-git -C "$PROJECT_ROOT" ls-files > "$PROJECT_ROOT/.orca-onboard/tmp/files.txt"
+mkdir -p "$PROJECT_ROOT/.overstack/graph" "$PROJECT_ROOT/.overstack/onboard/tmp"
+git -C "$PROJECT_ROOT" ls-files > "$PROJECT_ROOT/.overstack/onboard/tmp/files.txt"
 # Loại file nhị phân/lock/vendor; phân loại theo extension: code/config/docs/infra/data/script
 # Đọc context: README (3000 chars đầu), manifest (package.json/pyproject.toml/Cargo.toml/go.mod), dir tree 2 cấp
 # Detect entry point: src/index.ts, main.py, app.py, main.go, src/main.rs, cmd/*/main.go, manage.py, __main__.py...
@@ -386,13 +386,13 @@ Tín hiệu lịch sử git làm giàu graph — thứ phân tích tĩnh không 
 ```bash
 # Churn — file nóng (hay sửa nhất, 365 ngày)
 git -C "$PROJECT_ROOT" log --since="365 days ago" --name-only --pretty=format: \
-  | grep -v '^$' | sort | uniq -c | sort -rn | head -40 > "$PROJECT_ROOT/.orca-onboard/tmp/churn.txt"
+  | grep -v '^$' | sort | uniq -c | sort -rn | head -40 > "$PROJECT_ROOT/.overstack/onboard/tmp/churn.txt"
 # Recent — file vừa đổi (30 ngày)
 git -C "$PROJECT_ROOT" log --since="30 days ago" --name-only --pretty=format: | grep -v '^$' | sort -u \
-  > "$PROJECT_ROOT/.orca-onboard/tmp/recent.txt"
+  > "$PROJECT_ROOT/.overstack/onboard/tmp/recent.txt"
 # Commit subjects gần nhất — chủ đề đang phát triển
 git -C "$PROJECT_ROOT" log --since="90 days ago" --pretty=format:'%s' | head -50 \
-  > "$PROJECT_ROOT/.orca-onboard/tmp/recent-subjects.txt"
+  > "$PROJECT_ROOT/.overstack/onboard/tmp/recent-subjects.txt"
 # Co-change — python đọc `git log --name-only` theo commit, đếm cặp file đổi cùng nhau, ngưỡng ≥3
 ```
 
@@ -416,13 +416,13 @@ opencode run "$BATCH_SPEC" --model opencode/deepseek-v4-flash-free < /dev/null
 
 `BATCH_SPEC` (inject đủ context — DeepSeek không tự đọc gì ngoài danh sách được giao):
 
-> Analyze these files in project <name> (<description>, languages: <langs>). For EACH file produce GraphNode `{id, type, name, filePath, summary (1-2 câu), tags[]}` and GraphEdges `{source, target, type, weight}` for imports/calls/configures/documents visible in file content. Read each listed file. Write ONLY valid JSON `{"nodes":[...], "edges":[...]}` to `.orca-onboard/tmp/batch-<i>.json`. ID convention: `file:<relpath>`, `config:<relpath>`, `document:<relpath>`. Files: <list kèm line counts>
+> Analyze these files in project <name> (<description>, languages: <langs>). For EACH file produce GraphNode `{id, type, name, filePath, summary (1-2 câu), tags[]}` and GraphEdges `{source, target, type, weight}` for imports/calls/configures/documents visible in file content. Read each listed file. Write ONLY valid JSON `{"nodes":[...], "edges":[...]}` to `.overstack/onboard/tmp/batch-<i>.json`. ID convention: `file:<relpath>`, `config:<relpath>`, `document:<relpath>`. Files: <list kèm line counts>
 
 Tối đa 5 batch song song. Batch fail → retry 1 lần → fail nữa thì bỏ qua, ghi PHASE_WARNINGS (partial graph > no graph). opencode unavailable → Claude main thread tự analyze batch.
 
 ### 1.4 MERGE + NORMALIZE (python inline — no LLM)
 
-Claude viết script `.orca-onboard/tmp/merge.py` (logic distill từ merge-batch-graphs.py của Understand-Anything): đọc mọi `batch-*.json` → gộp nodes/edges → chuẩn hoá ID prefix (bỏ double-prefix, thêm prefix thiếu) → dedupe node theo id (giữ bản cuối), edge theo (source,target,type) → drop edge dangling (log stderr) → thêm edges `related` từ co-change (1.2) → ghi `assembled-graph.json`.
+Claude viết script `.overstack/onboard/tmp/merge.py` (logic distill từ merge-batch-graphs.py của Understand-Anything): đọc mọi `batch-*.json` → gộp nodes/edges → chuẩn hoá ID prefix (bỏ double-prefix, thêm prefix thiếu) → dedupe node theo id (giữ bản cuối), edge theo (source,target,type) → drop edge dangling (log stderr) → thêm edges `related` từ co-change (1.2) → ghi `assembled-graph.json`.
 
 ### 1.5 LAYERS + TOUR (Claude main thread — REASONING, không dispatch)
 
@@ -449,9 +449,9 @@ Cuối: xoá `batch-*.json`, báo summary (files analyzed, nodes/edges by type, 
 
 ```bash
 # Gate cuối Phase 1
-[ ! -f "$PROJECT_ROOT/.understand-anything/knowledge-graph.json" ] \
+[ ! -f "$PROJECT_ROOT/.overstack/graph/knowledge-graph.json" ] \
   && echo "❌ Phase 1 FAIL: knowledge-graph.json missing" && exit 1
-[ ! -f "$PROJECT_ROOT/.understand-anything/ONBOARDING.md" ] \
+[ ! -f "$PROJECT_ROOT/.overstack/graph/ONBOARDING.md" ] \
   && echo "❌ Phase 1 FAIL: ONBOARDING.md missing" && exit 1
 echo "✅ Phase 1 done"
 # update_phase_status "Phase 1 —" "done"
@@ -485,15 +485,15 @@ echo "[1.7] code-graph: gọi reindex_repo cho mỗi repo code có manifest"
 **Agent:** Claude main thread (no dispatch) | **Model:** Sonnet
 
 > **READ FIRST** (in order, before writing anything):
-> 1. `.understand-anything/ONBOARDING.md` — full read (~20k tokens)
-> 2. `.understand-anything/knowledge-graph.json` — read `layers` array + `entry-point` tagged nodes ONLY (⛔ NOT full file — context overflow)
-> 3. If `UPDATE_MODE=true`: read existing `.orca-onboard/intermediate/domain-graph.json` (merge, don't overwrite)
+> 1. `.overstack/graph/ONBOARDING.md` — full read (~20k tokens)
+> 2. `.overstack/graph/knowledge-graph.json` — read `layers` array + `entry-point` tagged nodes ONLY (⛔ NOT full file — context overflow)
+> 3. If `UPDATE_MODE=true`: read existing `.overstack/onboard/intermediate/domain-graph.json` (merge, don't overwrite)
 
 **DO:**
 1. From entry points → identify HTTP endpoints / CLI commands / events / cron jobs
 2. Reverse-engineer: entry point → flow (process) → steps (actions @ file:line)
 3. Build `domain → flow → step` hierarchy
-4. Write `.orca-onboard/intermediate/domain-graph.json`
+4. Write `.overstack/onboard/intermediate/domain-graph.json`
 
 **Domain graph schema:**
 ```json
@@ -517,7 +517,7 @@ echo "[1.7] code-graph: gọi reindex_repo cho mỗi repo code có manifest"
 }
 ```
 
-**Output:** `.orca-onboard/intermediate/domain-graph.json`
+**Output:** `.overstack/onboard/intermediate/domain-graph.json`
 
 **Skip check:** `RESUME_MODE=true` + `PHASE2_STATUS=done` → skip to Phase 3.
 
@@ -546,10 +546,10 @@ fi
 **Agent:** opencode | **Model:** `opencode/deepseek-v4-flash-free`
 
 > **READ FIRST** (inject into SPEC before dispatch — DeepSeek won't read files unless injected):
-> 1. `.understand-anything/ONBOARDING.md` — full read
-> 2. `.orca-onboard/intermediate/domain-graph.json` — full read
+> 1. `.overstack/graph/ONBOARDING.md` — full read
+> 2. `.overstack/onboard/intermediate/domain-graph.json` — full read
 > 3. If `UPDATE_MODE=true`: grep `llmwiki/wiki/` for refs to `CHANGED_FILES` → identify stale pages
-> - ⛔ DO NOT read `.understand-anything/knowledge-graph.json` — too large, context overflow
+> - ⛔ DO NOT read `.overstack/graph/knowledge-graph.json` — too large, context overflow
 
 **DO:** Fill wiki templates from distilled content. No reasoning — mechanical template fill.
 
@@ -580,7 +580,7 @@ Do NOT regenerate unchanged pages. Preserve existing content in unchanged pages.
       update_phase_status "Phase 3 —" "done"
     fi
   else
-    SPEC="Generate wiki pages from .understand-anything/ONBOARDING.md and .orca-onboard/intermediate/domain-graph.json.
+    SPEC="Generate wiki pages from .overstack/graph/ONBOARDING.md and .overstack/onboard/intermediate/domain-graph.json.
 Create: llmwiki/wiki/index.md, llmwiki/wiki/concepts/*.md (architecture.md + flow pages + onboarding-tour.md),
 llmwiki/wiki/entities/*.md (domain entities + project-structure.md).
 R5: chỉ được ghi vào concepts/ hoặc entities/. R2: mọi trang có '## Origin'. R3: cập nhật index.md.
@@ -609,8 +609,8 @@ fixed + collapse + scroll-spy + tour master-detail + draggable diagram; **Module
 ẩn khi mono**. Nội dung con (layer/tour/module/docker) DATA-DRIVEN từ JSON.
 
 > **READ FIRST** (nguồn GIÀU — inject vào SPEC; DeepSeek không tự đọc file):
-> 1. `.understand-anything/ONBOARDING.md` — full (overview, hot files, flows, tour narrative)
-> 2. `.orca-onboard/intermediate/domain-graph.json` — domain→flow→step (tour + lifecycle)
+> 1. `.overstack/graph/ONBOARDING.md` — full (overview, hot files, flows, tour narrative)
+> 2. `.overstack/onboard/intermediate/domain-graph.json` — domain→flow→step (tour + lifecycle)
 > 3. `knowledge-graph.json` **chỉ** `layers` + `tour` + node entry-point (⛔ KHÔNG full — overflow)
 > ⛔ KHÔNG dùng wiki md mỏng làm nguồn chính (đó là lý do bản cũ sơ sài).
 
@@ -632,8 +632,8 @@ if [ "$RESUME_MODE" != "true" ] || [ "$PHASE4_STATUS" != "done" ]; then
   echo "[Phase 4] skeleton=$SKELETON | compose=$DKFILE | services=$N_SVC"
 
   # --- STEP A: assemble ONBOARD_JSON (model emit JSON ONLY → file) ---
-  JSON_OUT="$PROJECT_ROOT/.orca-onboard/tmp/onboard.json"
-  SPEC="Đọc .understand-anything/ONBOARDING.md + .orca-onboard/intermediate/domain-graph.json.
+  JSON_OUT="$PROJECT_ROOT/.overstack/onboard/tmp/onboard.json"
+  SPEC="Đọc .overstack/graph/ONBOARDING.md + .overstack/onboard/intermediate/domain-graph.json.
 Phát ra MỘT object JSON (KHÔNG markdown, KHÔNG giải thích) theo ĐÚNG schema trong header của
 $SKELETON, ghi vào $JSON_OUT. Yêu cầu chất lượng:
 - project: name/subtitle/about thật; stack[] + versions[] từ manifest; stats[] (files, services, layers, tour steps).
@@ -752,7 +752,7 @@ timestamp: YYYY-MM-DD
 ## Files
 | File | Action |
 |------|--------|
-| `.understand-anything/knowledge-graph.json` | created |
+| `.overstack/graph/knowledge-graph.json` | created |
 | `llmwiki/wiki/index.md` | created/modified |
 | `llmwiki/html/onboarding-<slug>.html` | created |
 
@@ -820,7 +820,7 @@ proposed: YYYY-MM-DD
 ## Files
 | File | Action |
 |------|--------|
-| `.understand-anything/knowledge-graph.json` | created |
+| `.overstack/graph/knowledge-graph.json` | created |
 | `llmwiki/wiki/index.md` | created/modified |
 | `llmwiki/html/onboarding-<slug>.html` | created |
 

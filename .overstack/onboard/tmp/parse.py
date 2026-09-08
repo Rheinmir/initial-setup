@@ -4,7 +4,7 @@ import json, os, re, sys, subprocess
 from collections import defaultdict, Counter
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
-T = os.path.join(ROOT, ".orca-onboard", "tmp")
+T = os.path.join(ROOT, ".overstack", "onboard", "tmp")
 
 SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pyc", ".lock", ".woff", ".woff2", ".zip"}
 CODE_EXT = {".py", ".sh", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs"}

@@ -68,3 +68,6 @@ harness/metrics/.stop-debounce.json
 
 # okf-scan context receipts
 harness/metrics/context-receipts.jsonl
+
+# .overstack/kit — sandbox clone overstack (fdk-kit.sh pull), local-only
+.overstack/kit/

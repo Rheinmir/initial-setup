@@ -4,13 +4,14 @@
 
 - 2026-09-08 · fdk-uat cho `619c78c` (/prd-grade-fe): PHA 1 canary `uat/260908-1512` — 3 trụ ✓ · test-broad 80/80 · skill prd-grade-fe tới tay đủ 7 file (SKILL + 3 script + 3 reference), self-test 4/4 + 3/3, e2e preset→sync→fe-gate rc 0 · orchestration reachable · worktree Orca `uat-260908-1514` assert ✓. PHA 2 main-URL smoke (không override): 3 trụ ✓ · 80/80 · skill reachable · gate rc 0. Canary đã xoá. R7 archify chỉ áp repo framework (downstream dùng policy khai báo).
 
+- 2026-09-08 · docs-gate R10: thêm 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21, hit@3 21/21 (bài test trigger T6 của SPEC 080926 giờ là eval tất định, không cần mở phiên tay). Tài liệu người đọc: `html/080926-prd-grade-fe-docs.html`.
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-09-02 22:26:49 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=d32daf24fa115e707af8c2d38061c8cfb1b5c3057f338c1a |
 | 2026-09-02 22:26:49 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=f6c7d5cdc48e63a13aeb026f3102e1c81921df1e4228f6c0 |
 | 2026-09-03 20:15:40 | `file.write` | llmwiki/html/030926-memory-retrieval-improvement-summary.html · tool=Write · session=dba79064 · actor=agent · prev=55a5d |
 | 2026-09-03 20:15:40 | `file.write` | llmwiki/html/030926-memory-retrieval-improvement-summary.html · tool=Write · session=dba79064 · actor=agent · prev=d2fcf |
@@ -50,6 +51,7 @@
 | 2026-09-07 18:15:52 | `file.write` | llmwiki/wiki/sources/draft/070926-installer-update-idempotent.md · tool=Write · session=75be06f9 · actor=agent · prev=c9 |
 | 2026-09-08 14:57:39 | `file.write` | skills/prd-grade-fe/references/impeccable-audit.md · tool=Write · session=9143b025 · actor=agent · prev=6dde521ebd9ae221 |
 | 2026-09-08 14:57:39 | `file.write` | skills/prd-grade-fe/references/impeccable-audit.md · tool=Write · session=9143b025 · actor=agent · prev=089bfd7c6766d7f2 |
+| 2026-09-08 16:14:06 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/scripts/session-continue.py', 'harness/token-budget.config.yam |
 
 <!-- log:auto:end -->
 - 2026-09-08 · docs-gate R10: trang tài liệu `html/080926-prd-grade-fe-docs.html` (docs-site-macos, 9 mục, Playwright audit pass) + 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21.

@@ -5,12 +5,12 @@
 # Vì sao tồn tại: fdk-gate + fdk/tools KHÔNG travel xuống dự án downstream (cố ý — ADR-004).
 # Nên khi đang dev dở một dự án khác mà muốn chưng cất một skill và adapt vào remote, gọi
 # `/fdk` → nó dùng script này để:
-#   (1) PULL   — clone overstack vào sandbox .overstack-kit/ (có fdk-gate, skills/, new-skill…)
+#   (1) PULL   — clone overstack vào sandbox .overstack/kit/ (có fdk-gate, skills/, new-skill…)
 #   (2) CHECK  — chạy fdk-gate trong kit (đủ 15 bước mới hợp lệ)
 #   (3) SUBMIT — gate xanh → commit lên branch → push → TỰ mở PR vào nhánh base
 #
 # Usage:
-#   bash fdk-kit.sh pull                      # clone/cập-nhật .overstack-kit/ (tự gitignore)
+#   bash fdk-kit.sh pull                      # clone/cập-nhật .overstack/kit/ (tự gitignore)
 #   bash fdk-kit.sh check                     # fdk-gate trong kit (hoặc repo nếu đang ở overstack)
 #   bash fdk-kit.sh submit <branch> "<msg>"   # gate → commit → push → gh pr create
 #
@@ -20,7 +20,7 @@ set -euo pipefail
 
 REMOTE="${OVERSTACK_REMOTE:-https://github.com/Rheinmir/setup.git}"
 BASE="${OVERSTACK_BASE:-orca}"
-KIT="${FDK_KIT_DIR:-.overstack-kit}"
+KIT="${FDK_KIT_DIR:-.overstack/kit}"
 
 in_repo()  { [ -f "harness/scripts/fdk-gate.py" ] && [ -d "fdk/tools" ]; }   # đang đứng trong overstack?
 kit_dir()  { if in_repo; then echo "."; else echo "$KIT"; fi; }
@@ -76,7 +76,7 @@ case "${1:-help}" in
 
   *)
     echo "fdk-kit: pull | check | submit <branch> \"<msg>\""
-    echo "  pull    — clone/cập-nhật .overstack-kit/ (đồ nghề dev overstack)"
+    echo "  pull    — clone/cập-nhật .overstack/kit/ (đồ nghề dev overstack)"
     echo "  check   — fdk-gate trong kit"
     echo "  submit  — gate → commit → push → tự mở PR"
     ;;

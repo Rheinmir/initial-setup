@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>dym-setup — luồng workflow overstack</title>
-<meta name="description" content="Sơ đồ luồng chính xác 6 workflow-skill của bundle doyourmagic/setup: skill nào chạy khi nào, sinh ra gì, skill kế tiếp nhận gì.">
+<meta name="description" content="Sơ đồ luồng chính xác 6 workflow-skill của bundle .overstack/doyourmagic/setup: skill nào chạy khi nào, sinh ra gì, skill kế tiếp nhận gì.">
 <meta name="theme-color" content="#eaf2fd">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a84ff'/%3E%3C/svg%3E">
 <script>(function(){try{var t=localStorage.getItem("dym-setup-flow-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
@@ -129,7 +129,7 @@ html[data-theme=dark] .flow-svg .lbl{stroke:#141a26}
   <p class="lead">Bundle sinh bởi <code>/doyourmagic github.com/rheinmir/setup</code>. Một <span class="term" title="skill trung tâm, chỉ tốn một dòng context; đọc workflow con khi được gọi">hub</span> <code>/dym-setup</code> và 6 <span class="term" title="mỗi workflow là một SKILL.md đầy đủ, copy sang repo chính là thành skill cài bằng npx">sub-skill</span>. Trang này ghi <b>chính xác</b> skill nào chạy khi nào, sinh ra gì, và skill kế nhận gì — không phải mô tả tính năng.</p>
   <div class="card">
     <b>Cài dùng tại chỗ (chỉ hub vào context):</b>
-    <pre><code>mkdir -p .claude/skills &amp;&amp; ln -sfn ../../doyourmagic/setup/skills/dym-setup .claude/skills/dym-setup</code></pre>
+    <pre><code>mkdir -p .claude/skills &amp;&amp; ln -sfn ../../.overstack/doyourmagic/setup/skills/dym-setup .claude/skills/dym-setup</code></pre>
     Gõ <code>/dym-setup</code> để xem bảng slug, <code>/dym-setup install</code> để chạy một workflow. Chế độ đặt tên: mặc định <code>dym-&lt;repo&gt;-&lt;slug&gt;</code>.
   </div>
   <table>
@@ -226,7 +226,7 @@ html[data-theme=dark] .flow-svg .lbl{stroke:#141a26}
   </table></div>
 </section>
 
-<footer>File này: <code id="selfpath">doyourmagic/setup/flow.html</code> · Sinh bởi skill <code>/doyourmagic</code> · chỉ mục + bảng kiểm chứng: <a href="workflows.md">workflows.md</a></footer>
+<footer>File này: <code id="selfpath">.overstack/doyourmagic/setup/flow.html</code> · Sinh bởi skill <code>/doyourmagic</code> · chỉ mục + bảng kiểm chứng: <a href="workflows.md">workflows.md</a></footer>
 </main>
 <script>
 /* nav toggle + active + ripple */

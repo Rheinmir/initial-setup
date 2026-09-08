@@ -3,3 +3,4 @@
 {"ts": "2026-07-21T09:01:13", "status": "drift", "sync_ms": 185, "sync_tokens": 0, "suspects": 76}
 {"ts": "2026-07-23T11:37:16", "status": "drift", "sync_ms": 143, "sync_tokens": 0, "suspects": 88}
 {"ts": "2026-09-07T15:57:55", "status": "anchor-invalid", "sync_ms": 26, "sync_tokens": 0, "suspects": 0}
+{"ts": "2026-09-08T16:48:30", "status": "drift", "sync_ms": 295, "sync_tokens": 0, "suspects": 114}

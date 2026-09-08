@@ -25,6 +25,6 @@ See also: [[architecture]]
 
 ## Origin
 
-- **Source:** `.understand-anything/ONBOARDING.md` (orca-onboard 2026-06-25)
+- **Source:** `.overstack/graph/ONBOARDING.md` (orca-onboard 2026-06-25)
 - **Commit:** 97b0952
 - **Date:** 2026-06-25

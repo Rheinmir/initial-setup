@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Sinh llmwiki/html/290726-overstack-source-map.html — trang mô tả source code repo overstack.
-Mọi con số đọc thẳng từ .understand-anything/knowledge-graph.json, domain-graph.json, policy.yaml.
+Mọi con số đọc thẳng từ .overstack/graph/knowledge-graph.json, domain-graph.json, policy.yaml.
 Design system: /docs-site-macos (liquid glass light-blue, sidebar-only nav, R11)."""
 import json, os, re, sys, html
 from collections import Counter, defaultdict
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
 OUT = os.path.join(ROOT, "llmwiki/html/290726-overstack-source-map.html")
-G = json.load(open(os.path.join(ROOT, ".understand-anything/knowledge-graph.json")))
-D = json.load(open(os.path.join(ROOT, ".orca-onboard/intermediate/domain-graph.json")))
+G = json.load(open(os.path.join(ROOT, ".overstack/graph/knowledge-graph.json")))
+D = json.load(open(os.path.join(ROOT, ".overstack/onboard/intermediate/domain-graph.json")))
 E = html.escape
 
 byid = {n["id"]: n for n in G["nodes"]}
@@ -53,7 +53,7 @@ dep = [(byid[i], c) for i, c in indeg.most_common(40)
        if not byid[i]["filePath"].endswith(("wiki/log.md", "wiki/index.md"))][:15]
 
 subjects = []
-sp = os.path.join(ROOT, ".orca-onboard/tmp/recent-subjects.txt")
+sp = os.path.join(ROOT, ".overstack/onboard/tmp/recent-subjects.txt")
 if os.path.isfile(sp):
     subjects = [l.strip() for l in open(sp, encoding="utf-8") if l.strip()][:14]
 
@@ -976,8 +976,8 @@ if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)
 </div>
 __SECS__
 <footer>
-  <p>Sinh bằng code từ <code>.understand-anything/knowledge-graph.json</code> +
-  <code>.orca-onboard/intermediate/domain-graph.json</code> + <code>harness/policy.yaml</code>
+  <p>Sinh bằng code từ <code>.overstack/graph/knowledge-graph.json</code> +
+  <code>.overstack/onboard/intermediate/domain-graph.json</code> + <code>harness/policy.yaml</code>
   bởi <code>/orca-onboard</code> → <code>/docs-site-macos</code>, ngày 29/07/2026.</p>
   <p style="margin-top:6px">Self-contained: không request ngoài, mở bằng <code>file://</code> vẫn chạy đủ.
   Xem thêm <code>llmwiki/html/onboarding-setup.html</code> (guided tour 13 bước) và

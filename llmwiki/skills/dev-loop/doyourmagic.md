@@ -1,7 +1,7 @@
 ---
 name: doyourmagic
 proof: skills/doyourmagic/references/example-setup/workflows.md
-description: "Given a freshly-cloned external repo/tool, run clone→explore→verify→write to produce a bundle of RUNNABLE workflow skills under doyourmagic/<repo>/skills/ — one hub skill /dym-<repo> (1 dòng context, chỉ nạp workflow con khi được gọi) + N sub-skills dạng SKILL.md promote thẳng lên repo chính (npx skills add) — plus workflows.md (index + bảng kiểm chứng) and flow.html (docs-site-macos, sơ đồ luồng skill→sản phẩm→skill kế). Trigger on 'kéo repo mới về', 'clone tool này làm workflow', 'doyourmagic', 'onboard external tool/repo', 'generate workflow docs/skills for this repo', or /doyourmagic. Options: --name <prefix> · --humanize."
+description: "Given a freshly-cloned external repo/tool, run clone→explore→verify→write to produce a bundle of RUNNABLE workflow skills under .overstack/doyourmagic/<repo>/skills/ — one hub skill /dym-<repo> (1 dòng context, chỉ nạp workflow con khi được gọi) + N sub-skills dạng SKILL.md promote thẳng lên repo chính (npx skills add) — plus workflows.md (index + bảng kiểm chứng) and flow.html (docs-site-macos, sơ đồ luồng skill→sản phẩm→skill kế). Trigger on 'kéo repo mới về', 'clone tool này làm workflow', 'doyourmagic', 'onboard external tool/repo', 'generate workflow docs/skills for this repo', or /doyourmagic. Options: --name <prefix> · --humanize."
 ---
 
 # Skill: doyourmagic
@@ -13,7 +13,7 @@ description: "Given a freshly-cloned external repo/tool, run clone→explore→v
 
 ## Output shape (what a finished run leaves behind)
 ```
-doyourmagic/<repo>/
+.overstack/doyourmagic/<repo>/
   workflows.md                  # chỉ mục + thứ tự chạy + bảng "kiểm chứng thế nào" (thứ không thuộc về một skill nào)
   flow.html                     # docs-site-macos: sidebar · mind map · SƠ ĐỒ LUỒNG skill→sản phẩm→skill kế · toggle sáng/tối
   skills/
@@ -41,13 +41,13 @@ doyourmagic/<repo>/
 5. **Nếu máy đã có một bản tích hợp thật** (config đã commit ở dự án khác) → đọc nó; nó thắng fixture trong clone về "dùng đúng ngoài đời trông thế nào". Tái hiện lỗi trên bản thật là bằng chứng mạnh nhất.
 6. **Chia workflow theo ĐỐI TƯỢNG, không theo tính năng**: tiêu thụ (dùng tool trong dự án của mình) vs đóng góp (sửa chính tool). Lệnh chat (`/x`) và lệnh shell tách skill riêng — trộn là copy-paste gãy.
 7. **Chốt tên** theo bảng Naming (kiểm trùng nếu `--humanize`).
-8. **Viết mỗi workflow thành một sub-skill** `doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md`:
+8. **Viết mỗi workflow thành một sub-skill** `.overstack/doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md`:
    - frontmatter `name: <hub>-<slug>`, `description` = một câu nói KHI NÀO gọi + từ khoá trigger, và **`disable-model-invocation: true`** — để khi cài cả bundle qua `npx skills add` (7 skill) cũng không có dòng description nào tự nhồi vào context; chỉ nạp khi gõ.
    - `## When to use` — tình huống + "tại sao chạy / sinh ra gì".
    - `## Steps` — lệnh copy-paste được, đường dẫn chính xác, output/mã thoát kỳ vọng. Lệnh nào đã chạy thật thì ghi rc đo được.
    - `## Rules` — bẫy đã ĐO (không phải đoán), kèm cách né; carve-out "không được làm".
    - Self-contained: không trỏ tới file chỉ có trong clone; cần thì "nếu file X có mặt thì…".
-9. **Viết hub** `doyourmagic/<repo>/skills/<hub>/SKILL.md`:
+9. **Viết hub** `.overstack/doyourmagic/<repo>/skills/<hub>/SKILL.md`:
    ```
    ---
    name: <hub>
@@ -58,7 +58,7 @@ doyourmagic/<repo>/
    1. Đọc ARGUMENTS → <slug>. Không có slug → in bảng slug + một dòng mục đích, dừng.
    2. Tìm file con theo thứ tự, lấy file ĐẦU TIÊN tồn tại rồi đọc ĐÚNG MỘT file:
       (1) `.claude/skills/<hub>-<slug>/SKILL.md` — đã cài qua `npx skills add rheinmir/dym`;
-      (2) `doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md` — bundle nằm trong dự án, hub symlink;
+      (2) `.overstack/doyourmagic/<repo>/skills/<hub>-<slug>/SKILL.md` — bundle nằm trong dự án, hub symlink;
       (3) `doyourmagic-bundles/<repo>/skills/<hub>-<slug>/SKILL.md` — clone `rheinmir/dym` cạnh dự án.
       Làm theo Steps/Rules của file đó; không đọc file con khác; không thấy cả 3 → nói rõ, dừng.
    ```
@@ -67,11 +67,11 @@ doyourmagic/<repo>/
 12. **Gate adapt-modes** — bundle không phải đích đến. Đưa MỘT verdict cho user: **HÒA TAN** (rewrite thành code/skill của ta) · **KÉO NGOÀI** (pointer + pin) · **NHÚNG-SỞ-HỮU** (vendor) · **KHÔNG LẤY** (đã có gì phủ, ghi path). So trên trục quyết định chi phí — số lượt agent/lần dùng, code sinh được không cần LLM — không so byte. Verdict HÒA TAN/NHÚNG → hỏi trước khi scaffold.
 
 ## Kho bundle đã chạy — `rheinmir/dym`
-Mỗi lượt chạy xong, đẩy `doyourmagic/<repo>/` lên https://github.com/Rheinmir/dym thành `<repo>/` (PR) để người sau **kéo về thay vì chạy lại**: `npx skills add rheinmir/dym` (cài hub + sub-skill, project-scope; thêm `-g` cho global) hoặc `git clone --depth 1 https://github.com/Rheinmir/dym.git doyourmagic-bundles`. Trước khi chạy `/doyourmagic <repo>` mới: **xem ở đó đã có bundle chưa**.
+Mỗi lượt chạy xong, đẩy `.overstack/doyourmagic/<repo>/` lên https://github.com/Rheinmir/dym thành `<repo>/` (PR) để người sau **kéo về thay vì chạy lại**: `npx skills add rheinmir/dym` (cài hub + sub-skill, project-scope; thêm `-g` cho global) hoặc `git clone --depth 1 https://github.com/Rheinmir/dym.git doyourmagic-bundles`. Trước khi chạy `/doyourmagic <repo>` mới: **xem ở đó đã có bundle chưa**.
 
 ## Install (dùng tại chỗ) — một lệnh, chỉ nạp khi cần
 ```bash
-mkdir -p .claude/skills && ln -sfn ../../doyourmagic/<repo>/skills/<hub> .claude/skills/<hub>
+mkdir -p .claude/skills && ln -sfn ../../.overstack/doyourmagic/<repo>/skills/<hub> .claude/skills/<hub>
 ```
 Chỉ hub vào context. Gõ `/<hub>` để xem bảng slug, `/<hub> <slug>` để chạy một workflow. Muốn gọi thẳng `/<hub>-<slug>` thì symlink thêm đúng thư mục đó — mỗi symlink thêm là thêm một dòng context, cân nhắc.
 
@@ -79,8 +79,8 @@ Chỉ hub vào context. Gõ `/<hub>` để xem bảng slug, `/<hub> <slug>` đ�
 Đường `/fdk` có sẵn, không đẻ tool:
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/Rheinmir/setup/orca/fdk/tools/fdk-kit.sh) pull   # lần đầu
-cp -R doyourmagic/<repo>/skills/<hub>-<slug> .overstack-kit/skills/<tên-mới>          # đổi tên nếu bỏ tiền tố dym-
-cd .overstack-kit && python3 fdk/tools/new-skill.py <tên-mới> --dry-run                # in checklist register
+cp -R .overstack/doyourmagic/<repo>/skills/<hub>-<slug> .overstack/kit/skills/<tên-mới>          # đổi tên nếu bỏ tiền tố dym-
+cd .overstack/kit && python3 fdk/tools/new-skill.py <tên-mới> --dry-run                # in checklist register
 # register: LOOP_MAP (sync-skills.py) · LOOP_GROUPS · marketplace.json · bảng AGENT.md+CLAUDE.md · provenance
 bash fdk/tools/fdk-kit.sh check && bash fdk/tools/fdk-kit.sh submit skill/<tên-mới> "<mô tả>"
 ```
@@ -92,7 +92,7 @@ Sửa `name:` trong frontmatter cho khớp tên mới; giữ `description` trigg
 - Không bê `.github/workflows/*.yml` của tool vào skill CI cho người tiêu thụ — viết ví dụ tối giản riêng.
 - Lệnh chat và lệnh shell không chung một skill.
 - **Không chạy installer của tool mà không pin scope** (đo 2026-09-04: `npx impeccable install --help` cài thật vào `$HOME` 13 thư mục). Sandbox + `HOME` cô lập + cờ scope tường minh.
-- Read-only với clone; chỉ ghi vào `doyourmagic/<repo>/`.
+- Read-only với clone; chỉ ghi vào `.overstack/doyourmagic/<repo>/`.
 - Mỗi sub-skill tự chứa; hub chỉ đọc đúng file được gọi — không nhồi cả bundle vào context.
 - `flow.html` tự chứa (không CDN, không path tuyệt đối cục bộ), đọc được cả sáng/tối, mở qua `file://`.
 - Ưu tiên bằng chứng chạy thật hơn trích dẫn; cái gì chưa chạy được thì ghi "chưa kiểm chứng" ngay tại chỗ.

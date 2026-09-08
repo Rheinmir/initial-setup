@@ -92,6 +92,48 @@ def frontmatter(text: str):
     return name, desc
 
 
+# ---- Đường dẫn ĐỘC QUYỀN của overstack đã dời (cũ → mới). Idempotent: chỉ dời khi
+#      cũ có + mới chưa có; mới đã có thì bỏ qua (người dùng tự dời rồi). Thêm dòng
+#      mỗi lần framework đổi vị trí — downstream sync là tự theo, không cần dặn.
+#      Vị trí do tool NGOÀI quy định (.claude/ .github/ .agent) KHÔNG nằm đây.
+PATH_MIGRATIONS = [
+    ("doyourmagic",          ".overstack/doyourmagic"),   # 2026-09-08 gom artifact về 1 gốc
+    (".doyourmagic",         ".overstack/doyourmagic"),
+    (".orca-onboard",        ".overstack/onboard"),
+    (".understand-anything", ".overstack/graph"),
+    (".overstack-kit",       ".overstack/kit"),
+]
+
+def migrate_paths(root: Path, dry_run: bool = False):
+    """Dời thư mục/file theo PATH_MIGRATIONS. Trả list "cũ → mới" đã dời.
+    Dùng `git mv` khi có git để giữ lịch sử; không git → shutil.move."""
+    import shutil
+    moved = []
+    for old, new in PATH_MIGRATIONS:
+        src, dst = root / old, root / new
+        if not src.exists() or dst.exists():
+            continue
+        moved.append(f"{old} → {new}")
+        if dry_run:
+            continue
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        r = subprocess.run(["git", "-C", str(root), "mv", old, new], capture_output=True)
+        if r.returncode != 0:
+            shutil.move(str(src), str(dst))
+    return moved
+
+def _selftest_migrate():
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        r = Path(d); (r / ".orca-onboard").mkdir(); (r / ".orca-onboard" / "x").write_text("1")
+        assert migrate_paths(r) == [".orca-onboard → .overstack/onboard"]
+        assert (r / ".overstack/onboard/x").read_text() == "1" and not (r / ".orca-onboard").exists()
+        assert migrate_paths(r) == []                        # idempotent
+        (r / ".doyourmagic").mkdir(); (r / ".overstack/doyourmagic").mkdir()
+        assert migrate_paths(r) == []                        # đích đã có → không đè
+    print("selftest migrate_paths OK")
+
+
 def okf_migrate(root: Path):
     """Backfill OKF v0.1 in-process: import okf-check.py như module, migrate wiki.
     Fallback subprocess 1 lần nếu import lỗi. Trả (migrated_list, err_or_None).
@@ -248,6 +290,11 @@ def main():
         with cf.ThreadPoolExecutor(max_workers=12) as ex:
             list(ex.map(grabc, CONFLICT))
 
+    # 2a) dời đường dẫn độc quyền đã đổi — luôn chạy, trước mọi bước hậu-sync
+    moved = migrate_paths(root, dry_run=args.dry_run)
+    for m in moved:
+        print(f"[sync] MOVED {m}")
+
     # 2b) [--full] OKF backfill TRƯỚC fingerprint — migrate có thể đổi file wiki,
     #     fingerprint phải chụp trạng thái SAU migrate để health-check không báo DRIFT giả.
     okf_migrated, okf_err = [], None
@@ -347,4 +394,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if "--selftest" in sys.argv:
+        _selftest_migrate(); sys.exit(0)
     sys.exit(main())

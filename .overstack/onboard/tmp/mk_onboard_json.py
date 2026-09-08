@@ -4,9 +4,9 @@ Nội dung do Claude soạn từ ONBOARDING.md + domain-graph.json; churn/hot l�
 import json, os, sys
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
-G = json.load(open(os.path.join(ROOT, ".understand-anything/knowledge-graph.json")))
+G = json.load(open(os.path.join(ROOT, ".overstack/graph/knowledge-graph.json")))
 churn = {n["filePath"]: n.get("churn", 0) for n in G["nodes"]}
-assert os.path.isfile(os.path.join(ROOT, ".orca-onboard/intermediate/domain-graph.json"))
+assert os.path.isfile(os.path.join(ROOT, ".overstack/onboard/intermediate/domain-graph.json"))
 
 def hot(p):  # 'hot' = top-churn (>=14 chạm/365 ngày), cùng ngưỡng Phase 1
     return churn.get(p, 0) >= 14
@@ -209,7 +209,7 @@ data = {
     "docker": None,
 }
 
-out = os.path.join(ROOT, ".orca-onboard/tmp/onboard.json")
+out = os.path.join(ROOT, ".overstack/onboard/tmp/onboard.json")
 json.dump(data, open(out, "w"), ensure_ascii=False, indent=1)
 missing = [s["file"] for s in data["tour"] if not os.path.isfile(os.path.join(ROOT, s["file"]))]
 print("✅ wrote", out)

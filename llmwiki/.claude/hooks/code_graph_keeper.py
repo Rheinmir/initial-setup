@@ -31,7 +31,7 @@ except Exception:
 
 MANIFESTS = {"go.mod", "package.json", "pyproject.toml", "Cargo.toml"}
 SKIP = {"node_modules", ".next", ".git", "vendor", "dist", "build",
-        ".venv", "__pycache__", "llmwiki", ".orca-onboard", ".understand-anything"}
+        ".venv", "__pycache__", "llmwiki", ".overstack/onboard", ".overstack/graph"}
 REG = Path(os.environ.get("GRAPH_HOME", Path.home() / ".graph-agent")) / "repos.txt"
 MAX_DEPTH = 2  # code thật có thể nằm ở subdir của submodule (vd <sub>/<svc>/go.mod)
 

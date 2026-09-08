@@ -12,7 +12,7 @@ overstack không phải một CLI. Nó là **ba trụ** cắm vào dự án củ
 
 ## Cài dùng tại chỗ — một lệnh, chỉ nạp khi cần
 ```bash
-mkdir -p .claude/skills && ln -sfn ../../doyourmagic/setup/skills/dym-setup .claude/skills/dym-setup
+mkdir -p .claude/skills && ln -sfn ../../.overstack/doyourmagic/setup/skills/dym-setup .claude/skills/dym-setup
 ```
 Chỉ hub `dym-setup` vào context (1 dòng). Gõ `/dym-setup` xem bảng slug, `/dym-setup install` để chạy một workflow. **Chế độ đặt tên:** mặc định `dym-<repo>-<slug>` (repo = `setup`). Mỗi thư mục `skills/dym-setup-<slug>/` là một SKILL.md tự chứa — promote lên repo chính bằng cách copy sang `skills/<tên-mới>/` rồi register (xem skill `doyourmagic` mục Promote). Sơ đồ luồng skill: [`flow.html`](flow.html).
 

@@ -1,0 +1,50 @@
+feat(session-continue): bàn giao xong thì ĐÓNG tab terminal cũ — phiên cũ không còn treo
+feat(fdk): ci-local.py — chạy trọn mọi step CI GitHub tại local, thay lời dặn "nhớ chạy job repo-health"
+fix(ci): index search + provenance cho prd-grade-fe — hai gate chỉ chạy trên CI, medic không có
+feat(skill): /prd-grade-fe — một cửa dựng frontend production, hallmark giữ hệ, impeccable gác cổng
+chore(provenance): sổ phiên 080926 — bản đầu tiên sinh SAU fix parser, đường dẫn nguyên vẹn
+fix(gate): cổng tất định đọc GIT, không đọc ĐĨA — một helper, ba nơi hỏi
+fix(scratch-log): sổ hết ghi lẹm tên file + dọn 12 provenance hỏng, gom bundle doyourmagic
+feat(handoff-log) + fix(harness): kéo công việc local-only lên remote, cổng hết im lặng biến mất (#134)
+chore(artifact): dọn sạch path tuyệt đối trong artifact đã commit + phủ nốt 2 caller (#133)
+fix(index): golden mới vào fdk/wiki/index.md — R3 index-sync đỏ CI sau #131 (#132)
+fix(artifact): footer ghi đường TƯƠNG ĐỐI — path tuyệt đối làm file đã commit drift theo máy (#131)
+docs(handover): bước 0 đã xong — cập nhật trạng thái, giữ lại bài học (#130)
+fix(gate): build-overstack-docs --check bỏ qua self-path + bàn giao phiên (#129)
+feat(harness): self-report — hệ tự chấm từ sổ mỗi 50 lượt, tự raise issue về repo mẹ (#128)
+feat(memory): chuỗi phiên + quay lại prompt + quét OKF có biên lai (#127)
+fix(token-budget): $ không kích hoạt bàn giao (subscription) · hỏi Có/Không trước · khung wizard · handover tiếng Anh (#126)
+feat(harness): trần token-budget → 'continue in new session' tự động (bàn giao kiểu Orca + mở phiên mới) (#124)
+doyourmagic: kho bundle rheinmir/dym + hub tìm file con 3 vị trí + sub-skill disable-model-invocation (#123)
+feat(doyourmagic): output = bundle skill cục bộ promote được (hub 1 dòng context) + flow.html docs-site-macos (#122)
+feat(process): map-not-territory — concept + bước 'tìm unknowns' trong /propose (#121)
+fix(hooks): .overstack.yaml wiki_dir là một nguồn cho mọi hook (#120)
+fix(install): migrate dot-layout không giết script + pre-commit trỏ engine đã gỡ (#117)
+feat(skill): playwright-verify — verify code nhanh bằng Playwright standalone .mjs (#119)
+fix(stop-hook): auto-index + R3 soi MỌI wiki, không chỉ fdk/wiki (#118)
+fix(gate): fdk-gate 21/21 xanh trên orca + CI repo-health/skills-sync hết nợ (#116)
+fix(validators): patterns_guard nhận layout dot (.llmwiki/patterns) — sót lại sau #114 (#115)
+fix(harness): rào cắn thật trên dự án layout dot (.llmwiki/.harness) (#114)
+feat(diagram): skill router VN+EN cho sơ đồ/biểu đồ + vá 3 chỗ installer bỏ sót
+feat(diagram-gate): kiểm HÌNH HỌC + giao artifact nguyên tử — lấy nốt lõi của archify
+fix(egress-guard): đuôi file và thuộc tính code không phải hostname
+feat(install): dự án đích dùng layout ẨN .llmwiki/ + .harness/, tự migrate bản cũ
+feat(paths): resolver dùng chung cho layout overstack — chấp cả .llmwiki/ lẫn llmwiki/
+chore(wiki): chốt neo sau đợt absorb
+docs(wiki): ghi lại đợt absorb — 9 năng lực, 8 HÒA TAN + 1 KÉO NGOÀI, kèm hai bài học lặp lại được
+feat(orca-sec-scans): chân thứ ba — nhìn RA NGOÀI, typosquat + CT monitor, keyless
+feat(visual-receipt): biên lai trình duyệt + contact sheet — tách "máy kiểm xong" khỏi "mắt chưa xem"
+feat(ui-detect): mượn 61 luật UI của impeccable theo kiểu KÉO NGOÀI, opt-in
+feat(frontend-gate): neo bằng chứng cho NODE sơ đồ — fail-closed, sơ đồ không nói dối được
+feat(skill-health): thang BẢO CHÂN — đo 30 điểm tĩnh, khai thẳng 70 điểm chưa ai chấm
+feat(hallmark): kỷ luật #9 cho chart — mở cửa cho dataviz, và cho phép biểu đồ TỪ CHỐI
+fix(doyourmagic): kết ở cổng adapt-modes, không kết ở "đã có bundle"
+feat(prose-gate): probe AI-tell cho văn xuôi người đọc — lấy CÓ ĐO từ humanizer
+feat(frontend-gate): gác accessibility + self-containment cho SVG ta tự sinh
+chore(docs): regen overstack.html khớp đĩa sau khi code-logger xoay log tự-động
+fix(dep-health): "nhiều server" không phải orphan — tay ĐO dùng chung định nghĩa với tay HÀNH ĐỘNG
+chore(capability): bump 1.3.65 -> 1.3.66 — bề mặt năng lực đã đổi
+chore(wiki): bù drift 6 tuần — rà 157 cờ, sửa 1 câu, đóng 3 cờ hạ tầng
+fix(wiki-sync): cờ code-drift chỉ bám needle ĐỊNH DANH được, bỏ trang lịch sử
+docs(doyourmagic): bundle workflow chạy được cho pbakaus/impeccable
+Merge pull request #105 from Rheinmir/skill/doyourmagic

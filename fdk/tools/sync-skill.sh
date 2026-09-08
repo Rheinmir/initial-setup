@@ -32,5 +32,16 @@ for name in "$@"; do
   # verify parity — sync mà không kiểm là vòng phản hồi cụt
   [ -z "$mirror" ] || diff -q "$src" "$mirror" >/dev/null
   diff -q "$src" "$inst" >/dev/null
+
+  # Sổ checksum phải đi cùng nhịp với nội dung. Sửa SKILL.md rồi quên `record` thì
+  # CI đỏ ở bước skill-provenance, mà cổng đó lại chạy MUỘN (chỉ trên CI, không phải
+  # pre-commit) nên người sửa biết rất trễ. Đã dính hai lần trong một phiên (08/09:
+  # skill `diagram`, rồi `fdk-uat`) — vá tay lần hai là sai quy trình, nên ghim vào
+  # đây: đã sync là sổ tự cập nhật, không phải nhớ.
+  if [ -f fdk/tools/skill-provenance.py ]; then
+    python3 fdk/tools/skill-provenance.py record "$name" --source local-authored >/dev/null 2>&1 \
+      && echo "✓ $name → sổ checksum (skill-provenance)" \
+      || echo "⚠ $name: không cập nhật được sổ checksum — chạy tay: python3 fdk/tools/skill-provenance.py record $name --source local-authored"
+  fi
 done
 exit $fail

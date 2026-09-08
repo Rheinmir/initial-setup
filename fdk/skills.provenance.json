@@ -234,7 +234,7 @@
       "files": {
         "SKILL.md": "82a4098dd15284f8441d446c3aed2e01b0aaf7ba3de5cf3c262ab5e5fa92ac9b"
       },
-      "recorded": "2026-09-07",
+      "recorded": "2026-09-08",
       "source": "local-authored"
     },
     "docs-curate": {
@@ -307,9 +307,9 @@
     },
     "fdk-uat": {
       "files": {
-        "SKILL.md": "73d67f69fc8d82c74e237183319b0cd8db8fdb9b92e2121d87be7ec7d184695e"
+        "SKILL.md": "3bae4e48d91c0633c172e12b276bcebc75470cda589acc4af6b1e77a36ba3702"
       },
-      "recorded": "2026-08-03",
+      "recorded": "2026-09-08",
       "source": "local-authored"
     },
     "find-skills": {

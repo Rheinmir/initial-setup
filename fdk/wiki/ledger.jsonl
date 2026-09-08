@@ -7,3 +7,5 @@
 {"ts": "2026-07-18T09:50:17", "session": "246fa7ac", "action": "add", "target": "sources/evals/capproof-liveness.md", "tool": "Write"}
 {"ts": "2026-08-20T11:28:21", "session": "72190e1c", "action": "modify", "target": "concepts/docs-site-macos-skill.md", "tool": "Edit"}
 {"ts": "2026-08-20T11:28:21", "session": "72190e1c", "action": "modify", "target": "concepts/docs-site-macos-skill.md", "tool": "Edit"}
+{"ts": "2026-09-08T18:31:39", "session": "f38daa12", "action": "add", "target": "concepts/overstack-artifact-root.md", "tool": "Write"}
+{"ts": "2026-09-08T18:31:39", "session": "f38daa12", "action": "add", "target": "concepts/overstack-artifact-root.md", "tool": "Write"}

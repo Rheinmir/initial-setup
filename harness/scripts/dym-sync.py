@@ -310,7 +310,13 @@ def cmd_push(a):
             print(r.stderr.strip()[:300]); return 1
         repo = "/".join(DYM_REMOTE.replace(".git", "").rstrip("/").split("/")[-2:])
         pr = subprocess.run(["gh", "pr", "create", "--repo", repo, "--head", br, "--fill"], capture_output=True, text=True, cwd=tmp)
-        print(f"  ✓ {a.bundle} → nhánh {br}" + (f" · PR {pr.stdout.strip()}" if pr.returncode == 0 else f" · gh pr: {pr.stderr.strip()[:120]}"))
+        if pr.returncode == 0:
+            tail = f" · PR {pr.stdout.strip()}"
+        elif "already exists" in pr.stderr:
+            tail = " · PR đã có, nhánh vừa cập nhật"
+        else:
+            tail = f" · gh pr: {pr.stderr.strip()[:120]}"
+        print(f"  ✓ {a.bundle} → nhánh {br}{tail}")
     (b / BASELINE).write_text(json.dumps({"remote": DYM_REMOTE, "commit": commit, "tree": tree_hash(b)}, indent=1))
     return 0
 

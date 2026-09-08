@@ -6,16 +6,14 @@
 
 - 2026-09-08 · docs-gate R10: thêm 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21, hit@3 21/21 (bài test trigger T6 của SPEC 080926 giờ là eval tất định, không cần mở phiên tay). Tài liệu người đọc: `html/080926-prd-grade-fe-docs.html`.
 
+- 2026-09-08 · docs-gate R10: trang tài liệu `html/080926-prd-grade-fe-docs.html` (docs-site-macos, 9 mục, Playwright audit pass) + 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21.
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-09-04 16:09:30 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=48b67915556c50482dc3f1237e836be5c184 |
-| 2026-09-04 16:10:04 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Write · session=3e970e77 · actor=agent · prev=e7c7012531b028dfd18e721 |
-| 2026-09-04 16:10:04 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Write · session=3e970e77 · actor=agent · prev=b07879ac08062aed2563b07 |
-| 2026-09-04 16:10:17 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Edit · session=3e970e77 · actor=agent · prev=d05be9101371412e0c5ddf5c |
 | 2026-09-04 16:10:17 | `file.write` | harness/tests/egress-guard-falsepos-test.py · tool=Edit · session=3e970e77 · actor=agent · prev=22b5f885129b99552b12b69a |
 | 2026-09-04 19:46:21 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=ef4e8ef335dde177bce43c25573bcbfc57 |
 | 2026-09-04 19:46:21 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=dc62c050e1608ae931fbd35891b8086954 |
@@ -52,6 +50,9 @@
 | 2026-09-08 17:25:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/version.json', 'fdk/CAPABILITIES.md', 'harness/metrics/.stop-d |
 | 2026-09-08 17:25:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/tests/engines-smoke-test.sh', 'skills/doyourmagic/SKILL.md', ' |
 | 2026-09-08 17:25:22 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/stale.json', 'harness/scripts/dym- |
+| 2026-09-08 18:20:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['fdk/CAPABILITIES.md', 'harness/tests/engines-smoke-test.sh', 'llmwiki/ |
+| 2026-09-08 18:20:41 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/metrics/.stop-debounce.json', 'harness/mem-rank.config.yaml',  |
+| 2026-09-08 18:22:23 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=1 · human=['harness/version.json'] · prev=7ff16f3e36f623f3342c19404682abdfe2b21473 |
+| 2026-09-08 18:26:27 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/poc-vendor-neutral/install.sh', 'harness/tests/skill-provenanc |
 
 <!-- log:auto:end -->
-- 2026-09-08 · docs-gate R10: trang tài liệu `html/080926-prd-grade-fe-docs.html` (docs-site-macos, 9 mục, Playwright audit pass) + 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21.

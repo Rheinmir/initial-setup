@@ -56,6 +56,5 @@ Mọi lệnh trong `01`–`07` đều đối chiếu mã nguồn, và phần l�
 | Extension MV3 v1.3.3, quyền, output zip | `extension/manifest.json` + `scripts/build-extension.js:86-141` |
 | CI của Impeccable **không** được bê nguyên vào `04` | `.github/workflows/ci.yml` build/test *chính Impeccable* (matrix Node 22.18.0/24, Playwright, provider key) — `04` viết mới, tối giản, cho người tiêu thụ |
 
-**Tự soi mình:** `index.html` của bundle này được quét bằng chính detector (`impeccable detect --no-config index.html`). Lượt đầu ra **18 finding** (low-contrast, `gpt-thin-border-wide-shadow`, `side-tab`); đã sửa hết và quét lại còn **0 finding chính**, chỉ còn 1 advisory `em-dash-overuse` (không đổi mã thoát).
 
 **Chưa kiểm chứng, đã ghi rõ tại chỗ:** quét URL `http(s)://` một trang thật (chỉ chạy `file://` qua đúng engine Puppeteer), các suite opt-in cần API key (`skill-behavior`, `live-e2e-*`), và luồng `live` đầu-cuối cần dev server + harness thật.

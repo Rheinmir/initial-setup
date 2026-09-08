@@ -1,13 +1,15 @@
 
 
+- 2026-09-08 · propose+plan+implement `/prd-grade-fe` — SPEC `sources/draft/080926-prd-grade-fe.md` (+ sơ đồ archify `html/080926-prd-grade-fe-seq.html`), PLAN `080926-prd-grade-fe-PLAN.md`. Skill mới `skills/prd-grade-fe/` (design-sync.py, fe-gate.sh, viewport-check.mjs, preset macOS glass, intake, rubric impeccable distill @2bc2879). R7 `proposal_complete.py` nhận artifact archify thay diagram-box (+ --self-test). `sync-skill.sh` rsync scripts/references/assets vào bản cài. Problem-tree p-50.
+
+- 2026-09-08 · fdk-uat cho `619c78c` (/prd-grade-fe): PHA 1 canary `uat/260908-1512` — 3 trụ ✓ · test-broad 80/80 · skill prd-grade-fe tới tay đủ 7 file (SKILL + 3 script + 3 reference), self-test 4/4 + 3/3, e2e preset→sync→fe-gate rc 0 · orchestration reachable · worktree Orca `uat-260908-1514` assert ✓. PHA 2 main-URL smoke (không override): 3 trụ ✓ · 80/80 · skill reachable · gate rc 0. Canary đã xoá. R7 archify chỉ áp repo framework (downstream dùng policy khai báo).
+
 <!-- log:auto:start -->
 
 ### 🤖 Log tự-động (code-logger, không do agent ghi)
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-09-02 22:26:31 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=dba79064 · actor=agent · prev=c4422a6186a7bcc87d8810238fb8c2bb85f924e9329974 |
-| 2026-09-02 22:26:31 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=dba79064 · actor=agent · prev=ff038a986a0e63e9595a01ad865570f8ce539b17c7c1d9 |
 | 2026-09-02 22:26:49 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=d32daf24fa115e707af8c2d38061c8cfb1b5c3057f338c1a |
 | 2026-09-02 22:26:49 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=f6c7d5cdc48e63a13aeb026f3102e1c81921df1e4228f6c0 |
 | 2026-09-03 20:15:40 | `file.write` | llmwiki/html/030926-memory-retrieval-improvement-summary.html · tool=Write · session=dba79064 · actor=agent · prev=55a5d |
@@ -46,6 +48,7 @@
 | 2026-09-05 09:46:40 | `file.write` | harness/scripts/handoff-log.py · tool=Edit · session=3e970e77 · actor=agent · prev=f176c02b7b31a4f8318741b82641d94c76229 |
 | 2026-09-07 18:15:52 | `file.write` | llmwiki/wiki/sources/draft/070926-installer-update-idempotent.md · tool=Write · session=75be06f9 · actor=agent · prev=50 |
 | 2026-09-07 18:15:52 | `file.write` | llmwiki/wiki/sources/draft/070926-installer-update-idempotent.md · tool=Write · session=75be06f9 · actor=agent · prev=c9 |
+| 2026-09-08 14:57:39 | `file.write` | skills/prd-grade-fe/references/impeccable-audit.md · tool=Write · session=9143b025 · actor=agent · prev=6dde521ebd9ae221 |
+| 2026-09-08 14:57:39 | `file.write` | skills/prd-grade-fe/references/impeccable-audit.md · tool=Write · session=9143b025 · actor=agent · prev=089bfd7c6766d7f2 |
 
 <!-- log:auto:end -->
-- 2026-09-08 · propose+plan+implement `/prd-grade-fe` — SPEC `sources/draft/080926-prd-grade-fe.md` (+ sơ đồ archify `html/080926-prd-grade-fe-seq.html`), PLAN `080926-prd-grade-fe-PLAN.md`. Skill mới `skills/prd-grade-fe/` (design-sync.py, fe-gate.sh, viewport-check.mjs, preset macOS glass, intake, rubric impeccable distill @2bc2879). R7 `proposal_complete.py` nhận artifact archify thay diagram-box (+ --self-test). `sync-skill.sh` rsync scripts/references/assets vào bản cài. Problem-tree p-50.

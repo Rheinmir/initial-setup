@@ -847,6 +847,21 @@
       "recorded": "2026-09-07",
       "source": "local-authored"
     },
+    "prd-grade-fe": {
+      "files": {
+        "SKILL.md": "27eebff21ce3902fc6d8d6fa1045cc85ce57d42fd9d9e3cb9a71ff4c70e75375",
+        "references/impeccable-audit.md": "052a2fa1c52962fdd340f6c615b7b185f9ff6ef7d737c5b879fcc1f11da8f5e4",
+        "references/intake.md": "424e768222f1d6166fb02449f8cd25d347c31401f8f8487a93f7563d34a2d62c",
+        "references/presets/macos-glass.design.md": "9ebfad6079fbe224b065745a1504c0dcf26b09e52ef2cc82312816540ef763d1",
+        "references/presets/macos-glass.evidence.md": "4b5104161e05bfe576343fc44e8f8974c1e5e7d636e81870c5a4cc7a7ce35c3a",
+        "references/presets/macos-glass.probe.html": "75e3ce3984495964a872c6f33784ee50fe939537b652afa2dbe6bf7cd00c5c52",
+        "scripts/design-sync.py": "26b2f0a395b78283f3427241c827ece8426660d870bf8eab1257c0ab1a87877a",
+        "scripts/fe-gate.sh": "f6ece5c45b9a48d23215c26e8ab9333e71b495f050057f3a81b520a6ccb9c467",
+        "scripts/viewport-check.mjs": "8014e537dcbf6a7507ab244992d7f2d5442f8b92d8466fe2fff12b5fbb1215c4"
+      },
+      "recorded": "2026-09-08",
+      "source": "local-authored"
+    },
     "propose": {
       "files": {
         "SKILL.md": "73f8caf41d7bb16f61b4d03d2410bed230ead007ac52dea93aa973edd84b65e0"

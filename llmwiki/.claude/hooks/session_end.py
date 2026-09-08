@@ -41,6 +41,12 @@ def flush_problem_tree(root: pathlib.Path, session_id: str) -> None:
         if not m:
             return
         nodes = json.loads(m.group(2))
+        sid = (session_id or "unknown")[:8]
+        # Một phiên chỉ được một thẻ. SessionEnd có thể bắn nhiều lần cho cùng một
+        # phiên (resume, thoát lại) — không chốt thì ra thẻ trùng khít, đã dính:
+        # p-auto-21 ≡ p-auto-22, cùng session dba79064, 14/08/26.
+        if any(n.get("session") == sid and n.get("pending") for n in nodes):
+            return
         n_auto = sum(1 for n in nodes if str(n.get("id", "")).startswith("p-auto-")) + 1
         nodes.append({
             "id": f"p-auto-{n_auto:02d}", "parent": None,
@@ -50,9 +56,9 @@ def flush_problem_tree(root: pathlib.Path, session_id: str) -> None:
                       "lần /fdk kế tiếp sẽ chưng lọc về đúng nhánh.",
             "status": "open", "scope": [],
             "date": datetime.date.today().strftime("%d/%m/%y"),
-            "session": (session_id or "unknown")[:8], "pending": True,
+            "session": sid, "pending": True,
         })
-        html = html[:m.start(2)] + json.dumps(nodes, ensure_ascii=False, indent=2) + html[m.end(2):]
+        html = html[:m.start(2)] + json.dumps(nodes, ensure_ascii=False, indent=1) + html[m.end(2):]
         tree.write_text(html, encoding="utf-8")
     except Exception:
         pass

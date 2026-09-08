@@ -214,10 +214,10 @@
   "session": "session 020726"
  },
  {
-  "id": "p-07",
+  "id": "p-52",
   "parent": "p-01",
   "title": "wiki-graph tự-lệch downstream: split-brain enablement (GH#70)",
-  "desc": "Downstream (bonbon-ai) đổi code/wiki mà đồ thị KHÔNG tự cập nhật. Gốc: cờ bật auto-draw OVERSTACK_WIKIGRAPH=1 chỉ set ở section 4b per-repo của install-harness.sh, nhưng đường cài thật bootstrap→install.sh --full→install-harness.sh --global exit TRƯỚC 4b → không repo downstream nào có cờ → stop.py wikigraph_on=False → im lặng tắt. Migration v4 dời engine sang global nhưng tín hiệu bật không dời theo (anti-pattern AP-5). Test cũ tự set OVERSTACK_WIKIGRAPH=1 nên xanh giả, che bug (AP-6).",
+  "desc": "Downstream (bonbon-ai) đổi code/wiki mà đồ thị KHÔNG tự cập nhật. Gốc: cờ bật auto-draw OVERSTACK_WIKIGRAPH=1 chỉ set ở section 4b per-repo của install-harness.sh, nhưng đường cài thật bootstrap→install.sh --full→install-harness.sh --global exit TRƯỚC 4b → không repo downstream nào có cờ → stop.py wikigraph_on=False → im lặng tắt. Migration v4 dời engine sang global nhưng tín hiệu bật không dời theo (anti-pattern AP-5). Test cũ tự set OVERSTACK_WIKIGRAPH=1 nên xanh giả, che bug (AP-6). [2026-09-08] Node này trước mang id p-07 — TRÙNG với 'Policy chưa DRIVE enforcement' (02/07, cùng parent p-01). Hai vấn đề khác nhau, một id. Đổi sang p-52; giữ p-07 cho node cũ hơn. Không node nào nhận p-07 làm cha và không file wiki nào trỏ tới, nên đổi id không gãy tham chiếu.",
   "status": "partial",
   "scope": [
    "harness",
@@ -1082,6 +1082,7 @@
   "solvedBy": "skill prd-grade-fe (design-sync.py + fe-gate.sh + preset macOS glass) · R7 nhận artifact archify · sync-skill.sh mang theo scripts/references"
  }
 ]
+  
   
   
 </script>

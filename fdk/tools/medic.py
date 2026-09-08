@@ -536,6 +536,15 @@ def p_problemtree():
         nodes = json.loads(m.group(1)) if m else []
     except Exception as exc:
         return "warn", f"không đọc được sổ cây vấn đề: {exc}", f"kiểm {tree}"
+    # id trùng thì mọi thứ trỏ theo id đều mơ hồ (parent, solvedBy, link ngoài). Đã dính:
+    # hai vấn đề khác nhau cùng mang p-07 (02/07 policy-chưa-drive, 08/07 wiki-graph
+    # split-brain) — không cổng nào thấy cho tới khi có người đọc tay 2026-09-08.
+    _ids = [n.get("id") for n in nodes]
+    _dup = sorted({i for i in _ids if _ids.count(i) > 1})
+    if _dup:
+        return "fail", f"cây vấn đề có id TRÙNG: {', '.join(map(str, _dup))}", \
+               "đổi id node mới hơn sang số còn trống, ghi lý do vào desc"
+
     pending = [n for n in nodes if n.get("pending") and n.get("status") == "open"]
     if not pending:
         return "ok", f"cây vấn đề sạch — {len(nodes)} node, 0 thẻ pending chờ chưng lọc", ""

@@ -359,7 +359,7 @@
   "id": "p-10",
   "parent": "p-03",
   "title": "Nhịp ship wiki: 15 draft tồn + flywheel gần rỗng",
-  "desc": "Nguyên tắc #8: 15 draft status proposed chưa promote (cũ nhất 25/06), 2 draft done chưa archive, 1 raw chưa ingest (tech-pattern). Vòng phản hồi #7 chưa chảy: events.jsonl 712 dòng nhưng failures.jsonl chỉ 3; 7 node ghi-tạm p-auto-02..08 trong chính cây này còn open rỗng chưa distill. Fix hệ thống: chạy /docs-curate + /lint định kỳ, và cơ chế flush p-auto phải kèm distill.",
+  "desc": "Nguyên tắc #8: 15 draft status proposed chưa promote (cũ nhất 25/06), 2 draft done chưa archive, 1 raw chưa ingest (tech-pattern). Vòng phản hồi #7 chưa chảy: events.jsonl 712 dòng nhưng failures.jsonl chỉ 3; 7 node ghi-tạm p-auto-02..08 trong chính cây này còn open rỗng chưa distill. Fix hệ thống: chạy /docs-curate + /lint định kỳ, và cơ chế flush p-auto phải kèm distill. 2026-09-08: vế dọn đã có vòng phản hồi — probe medic 'problemtree' đếm thẻ pending và tuổi thẻ già nhất, cảnh báo từ 14 ngày (STALE_CARD_DAYS); trước đó hai lô trôi 19 và 25 ngày mới có người tình cờ thấy. Nâng lên fail khi backlog giữ được ở 0. GH#139.",
   "status": "open",
   "scope": [],
   "date": "2026-07-02",
@@ -988,36 +988,45 @@
  },
  {
   "id": "p-auto-21",
-  "parent": null,
+  "parent": "p-10",
   "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
   "desc": "Bề mặt bị chạm: fdk/CAPABILITIES.md, harness/egress-guard.config.yaml, harness/evidence-terminal.config.yaml, harness/metrics/.stop-debounce.json, harness/metrics/provenance-log.jsonl, harness/metrics/scratch-log.jsonl, harness/metrics/tasks.json, harness/poc-vendor-neutral/install.sh …. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát); lần /fdk kế tiếp sẽ chưng lọc về đúng nhánh.",
-  "status": "open",
-  "scope": [],
+  "status": "solved",
+  "scope": [
+   "harness"
+  ],
   "date": "14/08/26",
   "session": "dba79064",
-  "pending": true
+  "pending": false,
+  "solvedBy": "Triage /fdk 2026-09-08: phiên dba79064 (14/08) đã ship bình thường qua commit 1474a88 'checkpoint trước merge graph-engineering' — bề mặt trong thẻ khớp đúng commit đó. Khiếm khuyết THẬT duy nhất của phiên (xoá nhầm llmwiki/commands/serve) đã bị bắt + khôi phục ở vòng lint-drift 04/09. Không còn vấn đề riêng nào treo."
  },
  {
   "id": "p-auto-22",
-  "parent": null,
+  "parent": "p-10",
   "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
   "desc": "Bề mặt bị chạm: fdk/CAPABILITIES.md, harness/egress-guard.config.yaml, harness/evidence-terminal.config.yaml, harness/metrics/.stop-debounce.json, harness/metrics/provenance-log.jsonl, harness/metrics/scratch-log.jsonl, harness/metrics/tasks.json, harness/poc-vendor-neutral/install.sh …. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát); lần /fdk kế tiếp sẽ chưng lọc về đúng nhánh.",
-  "status": "open",
-  "scope": [],
+  "status": "solved",
+  "scope": [
+   "harness"
+  ],
   "date": "14/08/26",
   "session": "dba79064",
-  "pending": true
+  "pending": false,
+  "solvedBy": "TRÙNG KHÍT p-auto-21 — cùng phiên dba79064, cùng ngày, cùng bề mặt. Không phải vấn đề thứ hai mà là LỖI hook: flush không chốt idempotent theo session_id. Đã vá ở CẢ HAI bản (session_end.py và harness-events.py — bản phát downstream) + probe medic 'problemtree' + test flush-idempotent 8 assertion. GH#139."
  },
  {
   "id": "p-auto-23",
-  "parent": null,
+  "parent": "p-10",
   "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
   "desc": "Bề mặt bị chạm: harness/metrics/.stop-debounce.json, harness/metrics/provenance-log.jsonl, harness/metrics/scratch-log.jsonl, llmwiki/html/wiki-graph.html, llmwiki/innovation/170826-innovation.md, llmwiki/innovation/180826-innovation.md, llmwiki/wiki/log.md, llmwiki/wiki/sources/170826-session-provenance.md …. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát); lần /fdk kế tiếp sẽ chưng lọc về đúng nhánh.",
-  "status": "open",
-  "scope": [],
+  "status": "solved",
+  "scope": [
+   "harness"
+  ],
   "date": "18/08/26",
   "session": "72190e1c",
-  "pending": true
+  "pending": false,
+  "solvedBy": "Triage /fdk 2026-09-08: phiên 72190e1c (18/08) — bề mặt là artifact tự sinh + ghi chép innovation; tính năng của cửa sổ đó ship qua 41ed323 'feat(graph-mode)'. Không có vấn đề riêng."
  },
  {
   "id": "p-47",
@@ -1073,6 +1082,7 @@
   "solvedBy": "skill prd-grade-fe (design-sync.py + fe-gate.sh + preset macOS glass) · R7 nhận artifact archify · sync-skill.sh mang theo scripts/references"
  }
 ]
+  
   
 </script>
 

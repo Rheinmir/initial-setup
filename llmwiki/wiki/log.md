@@ -12,23 +12,6 @@
 
 | Thời điểm | Event | Chi tiết |
 |---|---|---|
-| 2026-09-02 22:26:49 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=f6c7d5cdc48e63a13aeb026f3102e1c81921df1e4228f6c0 |
-| 2026-09-03 20:15:40 | `file.write` | llmwiki/html/030926-memory-retrieval-improvement-summary.html · tool=Write · session=dba79064 · actor=agent · prev=55a5d |
-| 2026-09-03 20:15:40 | `file.write` | llmwiki/html/030926-memory-retrieval-improvement-summary.html · tool=Write · session=dba79064 · actor=agent · prev=d2fcf |
-| 2026-09-03 20:17:30 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=dba79064 · actor=agent · prev=c065e6312d6230dd552d37fd235f2c7aa78d01c40f0819 |
-| 2026-09-03 20:17:30 | `file.write` | llmwiki/wiki/index.md · tool=Edit · session=dba79064 · actor=agent · prev=e93ca9b3fd848b64b13af9be67bf1207e0700c619a0ee3 |
-| 2026-09-03 20:17:38 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=8b33279b91cf3035e7559fa08ee87adb345c628d76c5b575 |
-| 2026-09-03 20:17:38 | `file.write` | llmwiki/wiki/log.md · tool=Edit · session=dba79064 · actor=agent · prev=a90b22aff1ec5fb7d215fa43c82428f61078fac478f9b2fc |
-| 2026-09-04 09:11:37 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=01e00cc7e1eba30d0aab65482e0c796dd732cfc |
-| 2026-09-04 09:11:37 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=99341691ce6394f752acb8a141f296bf0e8411b |
-| 2026-09-04 09:11:53 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=f91c12fbf75fbedeaa09215e5c006fc439b4e77 |
-| 2026-09-04 09:11:53 | `file.write` | harness/scripts/wiki-sync.py · tool=Edit · session=3e970e77 · actor=agent · prev=60c00ca6158856fc2de0ccba12fa11f8b5d4af1 |
-| 2026-09-04 10:28:45 | `file.write` | harness/scripts/dep-health.py · tool=Edit · session=3e970e77 · actor=agent · prev=da98f5ddaeb2fec629737762f78e1732ac9fff |
-| 2026-09-04 10:28:45 | `file.write` | harness/scripts/dep-health.py · tool=Edit · session=3e970e77 · actor=agent · prev=8a73f81581c475b25ef0b1e525719ec15085b9 |
-| 2026-09-04 12:36:57 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=d212f056da6b29711d8dcd37ff6c5d25ef |
-| 2026-09-04 12:36:57 | `file.write` | fdk/tools/frontend-antipattern.py · tool=Edit · session=3e970e77 · actor=agent · prev=fc0ada65565a22840c18c2bf3ce84f5280 |
-| 2026-09-04 16:09:10 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=e3f11c2c0885e5954776ded99e57be5bf66e |
-| 2026-09-04 16:09:10 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=6aceff317091ca679a297dbde7331c7484b7 |
 | 2026-09-04 16:09:22 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=086b120594f3a4c9171efd1cf5f0674519de |
 | 2026-09-04 16:09:22 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=4c0b28b261b4f2893b25ecab413b683a2bfa |
 | 2026-09-04 16:09:30 | `file.write` | harness/scripts/egress-guard.py · tool=Edit · session=3e970e77 · actor=agent · prev=476ed098f0c9f543321ca7a693e1515ac31f |
@@ -52,6 +35,23 @@
 | 2026-09-08 14:57:39 | `file.write` | skills/prd-grade-fe/references/impeccable-audit.md · tool=Write · session=9143b025 · actor=agent · prev=6dde521ebd9ae221 |
 | 2026-09-08 14:57:39 | `file.write` | skills/prd-grade-fe/references/impeccable-audit.md · tool=Write · session=9143b025 · actor=agent · prev=089bfd7c6766d7f2 |
 | 2026-09-08 16:14:06 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['harness/scripts/session-continue.py', 'harness/token-budget.config.yam |
+| 2026-09-08 16:48:51 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['fdk/wiki/concepts/onboarding-tour.md', 'fdk/tools/fdk-kit.sh', 'fdk/wi |
+| 2026-09-08 16:48:51 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['skills/doyourmagic/SKILL.md', 'skills/doyourmagic/references/example-s |
+| 2026-09-08 16:48:51 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['harness/metrics/.stop-debounce.json', 'llmwiki/skills/dev-loop/doyourm |
+| 2026-09-08 16:48:51 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/index.md'] · prev=eec8df71d8de6874 |
+| 2026-09-08 16:48:51 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['harness/scripts/sync-template.py', 'fdk/skills.search.json', 'llmwiki/ |
+| 2026-09-08 16:48:51 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['skills/doyourmagic/references/example-setup/workflows.md', 'llmwiki/wi |
+| 2026-09-08 16:48:51 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/CLAUDE.md', 'fdk/wiki/entities/project-structure.md', 'llmwiki |
+| 2026-09-08 16:49:17 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=4 · human=['skills/doyourmagic/references/example-setup/skills/dym-setup.skill.md' |
+| 2026-09-08 16:49:17 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['fdk/wiki/entities/project-structure.md', 'llmwiki/skills/orchestrate/o |
+| 2026-09-08 16:49:17 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/skills/dev-loop/doyourmagic.md', 'llmwiki/AGENT.md', 'fdk/wiki |
+| 2026-09-08 16:49:17 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=2 · human=['llmwiki/wiki/log.md', 'llmwiki/wiki/index.md'] · prev=c5af6bf0ce6eb661 |
+| 2026-09-08 16:49:17 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['skills/doyourmagic/SKILL.md', 'harness/scripts/sync-template.py', 'har |
+| 2026-09-08 16:49:17 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/sources/080926-session-provenance.md', 'skills/doyourmagi |
+| 2026-09-08 16:49:17 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['skills/orca-onboard/SKILL.md', 'fdk/skills.search.json', 'fdk/wiki/con |
+| 2026-09-08 16:51:59 | `file.write` | harness/scripts/dym-sync.py · tool=Write · session=f38daa12 · actor=agent · prev=84e0db93f8c85ff22513a5cf7e95c23f9440542 |
+| 2026-09-08 16:51:59 | `file.write` | harness/scripts/dym-sync.py · tool=Write · session=f38daa12 · actor=agent · prev=beb571268cba58198fa7769900a64bbfe69bf0f |
+| 2026-09-08 17:01:12 | `commit.reconcile` |  · actor=system · agent_n=0 · human_n=3 · human=['llmwiki/wiki/sources/evals/skill-resolve/prd-grade-fe-production.md',  |
 
 <!-- log:auto:end -->
 - 2026-09-08 · docs-gate R10: trang tài liệu `html/080926-prd-grade-fe-docs.html` (docs-site-macos, 9 mục, Playwright audit pass) + 3 golden skill-resolve cho `prd-grade-fe` (production / url / theme-docs) — `skill-resolve-eval.py` hit@1 21/21.

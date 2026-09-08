@@ -248,6 +248,38 @@ def framework_medic_mirror(root: str) -> int:
     return 2
 
 
+def dym_drift_mirror(root: str) -> int:
+    """T2b: phiên có ĐỤNG .overstack/doyourmagic/ → hỏi dym (rheinmir/dym) xem bundle nào chưa
+    upstream / lệch, in MỘT dòng nhắc kèm lệnh push. Cần mạng → fail-open tuyệt đối, debounce
+    như medic. Không tự push: đẩy lên kho chung là việc người quyết (dym-sync.py check --yes)."""
+    tool = os.path.join(root, "harness", "scripts", "dym-sync.py")
+    if not os.path.isfile(tool):
+        return 0
+    try:
+        st = subprocess.run(["git", "status", "--porcelain"], cwd=root, capture_output=True, text=True, timeout=8).stdout
+    except Exception:
+        return 0
+    if ".overstack/doyourmagic/" not in st:
+        return 0
+    if _debounced(root, "dym", require_ok=True):
+        return 0
+    try:
+        p = subprocess.run([sys.executable, tool, "check", "--json"], cwd=root, capture_output=True,
+                           text=True, timeout=40, stdin=subprocess.DEVNULL)
+        data = json.loads(p.stdout.strip().splitlines()[-1])
+    except Exception:
+        return 0
+    todo = [b for b in data.get("bundles", []) if b.get("action")]
+    _debounce_mark(root, "dym", ok=not todo)
+    if not todo:
+        return 0
+    names = ", ".join(f"{b['bundle']}({b['state']})" for b in todo[:6]) + (" …" if len(todo) > 6 else "")
+    print(f"📦 [dym drift] {len(todo)} bundle lệch với rheinmir/dym: {names}\n"
+          f"   → đẩy: `python3 harness/scripts/dym-sync.py check` (hỏi y/N) · hoặc `push <bundle>` từng cái",
+          file=sys.stderr)
+    return 0
+
+
 def wiki_changed(root: str) -> bool:
     try:
         out = subprocess.run(
@@ -366,6 +398,7 @@ def main() -> None:
     # một cảnh báo đúng nhưng vô phương sửa bằng cách chạy lại generator.
     secondary_memory(root, (payload.get("session_id") or ""))  # issue #5: bộ-nhớ-thứ-cấp tự lưu context vụn cuối lượt
     regen_docs(root)               # overstack.html + CAPABILITIES tự cập nhật khi skill/rule đổi (repo framework)
+    dym_drift_mirror(root)  # T2b: bundle tool ngoài lệch kho dym → nhắc, không chặn
     if framework_medic_mirror(root) == 2:  # T2: đụng framework → soi medic; FAIL thật thì chặn dừng
         sys.exit(2)
     if not wiki_changed(root):

@@ -52,6 +52,8 @@ description: "Given a freshly-cloned external repo/tool, run clone→explore→v
    ---
    name: <hub>
    disable-model-invocation: true
+   domains: [<domain-1>, <domain-2>]      # bắt buộc — /dym định tuyến theo đây (chart · frontend · diagram · security · …)
+   source: <url repo gốc>
    description: "<một dòng: tool gì · gõ /<hub> <slug> · slugs: a · b · c>"
    ---
    ## Steps
@@ -66,8 +68,19 @@ description: "Given a freshly-cloned external repo/tool, run clone→explore→v
 11. **`flow.html`** — sinh theo skill `docs-site-macos` (BẮT BUỘC: sidebar kính, background orbs, mind map collapsible, nút gạt sáng/tối ở footer sidebar + chống FOUC, cỡ chữ compact 13″, skip-link/focus ring, footer hiện **đường dẫn tuyệt đối** của chính file). Nội dung = **luồng chính xác các skill thực hiện**: mỗi skill một node, cạnh `skill → sản phẩm → skill kế` (connector do JS vẽ từ `getBoundingClientRect`, vẽ lại khi resize — không hardcode toạ độ), thứ tự chạy theo nhánh, mỗi node ghi lệnh gọi + sản phẩm + bẫy 1 dòng. Thuật ngữ có giải nghĩa trong ngoặc. **Mở thật bằng trình duyệt** (hoặc `/playwright-verify`) trước khi giao — đọc code không đủ.
 12. **Gate adapt-modes** — bundle không phải đích đến. Đưa MỘT verdict cho user: **HÒA TAN** (rewrite thành code/skill của ta) · **KÉO NGOÀI** (pointer + pin) · **NHÚNG-SỞ-HỮU** (vendor) · **KHÔNG LẤY** (đã có gì phủ, ghi path). So trên trục quyết định chi phí — số lượt agent/lần dùng, code sinh được không cần LLM — không so byte. Verdict HÒA TAN/NHÚNG → hỏi trước khi scaffold.
 
+## Đồng bộ + định tuyến — `harness/scripts/dym-sync.py` (stdlib, 0 token)
+```bash
+S=harness/scripts/dym-sync.py
+python3 $S lint                       # mọi bundle phải ở DẠNG SKILL (hub có `domains:`); dạng cũ NN-*.md → `migrate <repo> --domains chart,report`
+python3 $S index                      # sinh meta-hub .overstack/doyourmagic/dym/SKILL.md: bảng domain → hub → slug
+python3 $S install [dym|<repo>] [--auto slug,slug]   # symlink vào .claude/skills; --auto = bỏ disable-model-invocation, agent tự nạp theo description
+python3 $S check [--yes]              # đĩa ↔ baseline ↔ dym: NEW-LOCAL/SAME/LOCAL/REMOTE-AHEAD/CONFLICT; hỏi y/N rồi push. Hook Stop tự nhắc khi phiên đụng bundle.
+python3 $S push <repo> [--yes]        # copy vào clone dym → nhánh dym/<repo> → PR (gh); ghi .dym-baseline.json
+```
+Hub bắt buộc khai `domains: [a, b]` trong frontmatter — `/dym` (1 dòng context, model-invocable) đọc bảng domain để tự chọn bundle: chart → lieflat-charts, frontend → impeccable… Hub và sub-skill vẫn `disable-model-invocation`, chỉ nạp khi được gọi.
+
 ## Kho bundle đã chạy — `rheinmir/dym`
-Mỗi lượt chạy xong, đẩy `.overstack/doyourmagic/<repo>/` lên https://github.com/Rheinmir/dym thành `<repo>/` (PR) để người sau **kéo về thay vì chạy lại**: `npx skills add rheinmir/dym` (cài hub + sub-skill, project-scope; thêm `-g` cho global) hoặc `git clone --depth 1 https://github.com/Rheinmir/dym.git doyourmagic-bundles`. Trước khi chạy `/doyourmagic <repo>` mới: **xem ở đó đã có bundle chưa**.
+Mỗi lượt chạy xong, `dym-sync.py push <repo>` đẩy `.overstack/doyourmagic/<repo>/` lên https://github.com/Rheinmir/dym thành `<repo>/` (PR) để người sau **kéo về thay vì chạy lại**: `npx skills add rheinmir/dym` (cài hub + sub-skill, project-scope; thêm `-g` cho global) hoặc `git clone --depth 1 https://github.com/Rheinmir/dym.git doyourmagic-bundles`. Trước khi chạy `/doyourmagic <repo>` mới: **xem ở đó đã có bundle chưa**.
 
 ## Install (dùng tại chỗ) — một lệnh, chỉ nạp khi cần
 ```bash

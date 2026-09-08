@@ -74,6 +74,7 @@
     "harness/scripts/health-check.py",
     "harness/scripts/okf-check.py",
     "harness/scripts/sync-template.py",
+    "harness/scripts/dym-sync.py",
     "harness/scripts/archetype.py",
     "harness/scripts/query-log.py",
     "harness/scripts/code-logger.py",

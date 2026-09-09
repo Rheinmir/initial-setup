@@ -9,7 +9,7 @@ Chỉ bám quy ước in của CHÍNH repo này (ok()/bad() trong harness/tests/
 `↳ sửa:` của medic, `✗` của 35 tool). Không khớp thì khai parsed:false và để log
 thô lại — thà nói không biết còn hơn đoán sai cho agent.
 
-    gh run view <id> --log-failed | python3 harness/scripts/ci-fail-parse.py
+    gh run view <id> --log-failed | python3 harness/scripts/ci-fail-parse.py [--repro-out F]
     python3 harness/scripts/ci-fail-parse.py --self-test
 """
 import re, sys
@@ -38,12 +38,32 @@ def parse(raw: bytes):
 
     col = lines[err].split("\t")
     step = col[1] if len(col) > 2 else ""
-    cmd = ""
+    # Một step có thể chạy NHIỀU lệnh; log in chúng từ dòng "##[group]Run <cmd1>" tới
+    # trước "shell:". Rút mỗi dòng đầu là bẫy thật: issue #145 khai repro_cmd là lệnh
+    # index_sync trên fdk/wiki, chạy lại thấy XANH — thủ phạm là lệnh thứ hai (llmwiki/wiki).
+    cmds = []
     for i in range(err, -1, -1):
         c = lines[i].split("\t")
         if (len(c) > 2 and c[1] == step or not step) and RUNCMD in body[i]:
-            cmd = body[i].split(RUNCMD, 1)[1].strip()
+            first = body[i].split(RUNCMD, 1)[1].strip()
+            j, rest, term = i + 1, [], False
+            while j < len(body) and j - i <= 20:
+                head = body[j].lstrip()
+                if head.startswith(("shell:", "env:", "##[")):
+                    # Chỉ shell:/env:/##[endgroup] mới là mốc kết THẬT của khối lệnh.
+                    # ##[error] cũng bắt đầu bằng "##[" nhưng phần trước nó là OUTPUT.
+                    term = head.startswith(("shell:", "env:", "##[endgroup]"))
+                    break
+                if body[j].strip():
+                    rest.append(body[j].rstrip())
+                j += 1
+            # Không gặp mốc kết (shell:/env:/##[) → không dám coi phần sau là lệnh; các dòng
+            # đó có thể là OUTPUT. Lùi về dòng đầu, thà thiếu còn hơn đưa rác cho agent.
+            if not term:
+                rest = []
+            cmds = rest if rest and rest[0].strip() == first else ([first] + rest)
             break
+    cmd = "\n".join(cmds)
 
     cut = body[max(0, err - WINDOW + 1):err + 1]
     checks = [m.group(1).strip() for ln in cut if (m := FAILED.match(ln))]
@@ -64,6 +84,11 @@ def emit(meta, cut, out=sys.stdout):
         return '"%s"' % str(v).replace('\\', '\\\\').replace('"', '\\"') if v else '""'
     for k in ("parsed", "failed_step", "repro_cmd", "exit_code", "tally", "fix_hint"):
         v = meta.get(k, "")
+        if k == "repro_cmd" and "\n" in str(v):      # nhiều lệnh → block scalar, giữ nguyên vẹn
+            print("  repro_cmd: |", file=out)
+            for ln in str(v).splitlines():
+                print("    " + ln, file=out)
+            continue
         print(f"  {k}: " + ("true" if v is True else "false" if v is False else q(v)), file=out)
     print("  failed_checks:" + (" []" if not meta.get("failed_checks") else ""), file=out)
     for c in meta.get("failed_checks", [])[:8]:
@@ -98,6 +123,19 @@ def self_test():
     assert m2["failed_checks"] == ["backcompat loop-runner — rò field mới"], m2
     assert m2["tally"] == "13/14 pass" and m2["exit_code"] == "2", m2
 
+    # Step chạy NHIỀU lệnh: phải rút đủ, không chỉ dòng đầu (bẫy của issue #145).
+    raw4 = "\n".join([
+        line("R3", "##[group]Run python3 harness/validators/index_sync.py --wiki-dir fdk/wiki"),
+        line("R3", "python3 harness/validators/index_sync.py --wiki-dir fdk/wiki"),
+        line("R3", "python3 harness/validators/index_sync.py --wiki-dir llmwiki/wiki"),
+        line("R3", "shell: /usr/bin/bash -e {0}"),
+        line("R3", "##[error]Process completed with exit code 2."),
+    ]).encode()
+    m4, _ = parse(raw4)
+    assert m4["repro_cmd"].splitlines() == [
+        "python3 harness/validators/index_sync.py --wiki-dir fdk/wiki",
+        "python3 harness/validators/index_sync.py --wiki-dir llmwiki/wiki"], m4["repro_cmd"]
+
     # Màu dạng caret-notation "^[" (hai ký tự) — GitHub trả dạng này ở một số job.
     raw3 = raw2.decode().replace("\x1b", "^[").encode()
     m3, _ = parse(raw3)
@@ -108,11 +146,17 @@ def self_test():
 
     # Không có ##[error] → khai không parse được, KHÔNG bịa.
     assert parse(b"nothing here")[0] == {"parsed": False}
-    print("ci-fail-parse self-test: 5/5 pass")
+    print("ci-fail-parse self-test: 6/6 pass")
 
 
 if __name__ == "__main__":
     if "--self-test" in sys.argv:
         self_test()
     else:
-        emit(*parse(sys.stdin.buffer.read()))
+        meta, cut = parse(sys.stdin.buffer.read())
+        # Ghi thẳng lệnh tái hiện ra file: khối YAML có thể là block scalar nhiều dòng,
+        # để shell tự bóc lại là chỗ gãy không cần thiết.
+        if "--repro-out" in sys.argv:
+            with open(sys.argv[sys.argv.index("--repro-out") + 1], "w", encoding="utf-8") as f:
+                f.write(meta.get("repro_cmd", "") + "\n")   # thiếu newline cuối là dính vào ``` đóng khối
+        emit(meta, cut)

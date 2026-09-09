@@ -41,6 +41,29 @@ def gitignored(rel: str, wiki: Path) -> bool:
         except Exception:
             _IGN_CACHE[full] = False
     return _IGN_CACHE[full]
+_TRACKED_CACHE = {}
+
+
+def tracked(wiki: Path):  # -> set[str] | None (3.9 không có union operator)
+    """Tập path (rel theo wiki) mà git ĐANG theo dõi — kể cả mới `git add` (đọc index, không HEAD).
+
+    Lý do tồn tại: file có trên đĩa nhưng CHƯA add và KHÔNG bị ignore thì fresh clone không
+    thấy — index.md trỏ tới nó sẽ đỏ trên CI mà xanh ở máy tác giả. Đó đúng là lỗ mà docstring
+    của gitignored() nói là phải bịt: "nhất quán giữa máy tác giả và clone sạch".
+    Fail-open: git lỗi/không có → None, caller giữ nguyên hành vi cũ.
+    """
+    key = str(wiki.resolve())
+    if key not in _TRACKED_CACHE:
+        try:
+            r = subprocess.run(["git", "ls-files", "-z", "--cached", "."], cwd=key,
+                               capture_output=True, timeout=10)
+            _TRACKED_CACHE[key] = ({p for p in r.stdout.decode().split("\0") if p}
+                                   if r.returncode == 0 else None)
+        except Exception:
+            _TRACKED_CACHE[key] = None
+    return _TRACKED_CACHE[key]
+
+
 CONTENT_DIRS = ("concepts", "entities", "sources", "draft", "architecture", "tours")
 LINK_RE = re.compile(r"\]\(([^)#\s]+\.md)\)")
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)")
@@ -51,14 +74,18 @@ def content_files(wiki: Path) -> set[str]:
     chúng không bắt buộc index và nhất quán local ↔ fresh clone. An-toàn-mặc-định: caller (main,
     audit, indexed_files) khỏi tự lọc lại 'exist' → không tái lặp drift bỏ-quên-lọc gitignored."""
     out = set()
+    trk = tracked(wiki)
     for d in CONTENT_DIRS:
         base = wiki / d
         if not base.is_dir():
             continue
         for f in base.rglob("*.md"):
             rel = f.relative_to(wiki).as_posix()
-            if f.name not in SKIP_BASENAMES and not gitignored(rel, wiki):
-                out.add(rel)
+            if f.name in SKIP_BASENAMES or gitignored(rel, wiki):
+                continue
+            if trk is not None and rel not in trk:
+                continue   # chưa `git add` → fresh clone không có → coi như vắng mặt
+            out.add(rel)
     return out
 
 

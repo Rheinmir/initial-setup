@@ -40,7 +40,7 @@ jobs:
       - name: cắt log đỏ thành KHỐI CẤU TRÚC (agent đoán ngay, không phải đọc cục log)
         run: |
           gh run view "$RUN_ID" --repo "$REPO" --log-failed 2>/dev/null \
-            | python3 harness/scripts/ci-fail-parse.py > /tmp/parsed.txt || true
+            | python3 harness/scripts/ci-fail-parse.py --repro-out /tmp/repro.sh > /tmp/parsed.txt || true
           awk '/^---LOG---$/{f=1;next} !f{print > "/tmp/meta.yaml"} f{print > "/tmp/faillog.txt"}' \
             /tmp/parsed.txt
           test -s /tmp/meta.yaml || echo '  parsed: false' > /tmp/meta.yaml
@@ -51,7 +51,6 @@ jobs:
           gh label create ci-fail --repo "$REPO" --color B60205 \
             --description "CI đỏ trên nhánh mặc định — mở tự động" 2>/dev/null || true
 
-          REPRO=$(sed -n 's/^  repro_cmd: "\(.*\)"$/\1/p' /tmp/meta.yaml)
           TITLE="CI đỏ: $WF trên $BRANCH"
           EXISTING=$(gh issue list --repo "$REPO" --state open --label ci-fail \
             --search "\"$TITLE\" in:title" --json number,title \
@@ -75,7 +74,7 @@ jobs:
             echo "**Kéo về tái hiện:**"
             echo '```bash'
             echo "git fetch origin && git checkout $SHA"
-            echo "${REPRO:-# không rút được lệnh — mở $RUN_URL}"
+            if [ -s /tmp/repro.sh ]; then cat /tmp/repro.sh; else echo "# không rút được lệnh — mở $RUN_URL"; fi
             echo '```'
             echo
             echo "<details><summary>Log thô — 25 dòng kết ở <code>##[error]</code></summary>"
@@ -84,16 +83,31 @@ jobs:
             cat /tmp/faillog.txt
             echo '```'
             echo "</details>"
-            echo
-            echo "---"
-            echo
-            sed -n '/<!--BRIEF-->/,$p' "$BRIEF" | tail -n +2
-          } > /tmp/body.md
+          } > /tmp/head.md
 
+          # Brief CHỈ nhúng ở issue mới (người mở trên web, không clone, vẫn làm được).
+          # Lần đỏ lại chỉ bình luận phần DỮ LIỆU mới + trỏ về file trong repo — dán lại
+          # 4KB prompt mỗi lần đỏ là rác, và bản trong repo mới là bản đúng.
           if [ -n "$EXISTING" ]; then
-            gh issue comment "$EXISTING" --repo "$REPO" --body-file /tmp/body.md
-            echo "→ đỏ lại, đã bình luận vào #$EXISTING (không mở issue trùng)"
+            {
+              cat /tmp/head.md
+              echo
+              echo "> Đỏ lại. Quy trình xử lý không đổi — đọc \`$BRIEF\` trong repo tại"
+              echo "> commit trên (hoặc phần *Prompt cho agent nhận việc* ở thân issue)."
+            } > /tmp/comment.md
+            gh issue comment "$EXISTING" --repo "$REPO" --body-file /tmp/comment.md
+            echo "→ đỏ lại, đã bình luận vào #$EXISTING (không mở issue trùng, không dán lại brief)"
           else
+            {
+              cat /tmp/head.md
+              echo
+              echo "---"
+              echo
+              sed -n '/<!--BRIEF-->/,$p' "$BRIEF" | tail -n +2
+              echo
+              echo "<sub>Nguồn của phần trên: \`$BRIEF\` trong repo. Nếu hai bên lệch,"
+              echo "bản trong repo tại commit đang xử lý là bản đúng.</sub>"
+            } > /tmp/body.md
             gh issue create --repo "$REPO" --title "$TITLE" \
               --label ci-fail --label needs-triage --body-file /tmp/body.md
           fi

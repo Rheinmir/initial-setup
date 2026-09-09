@@ -587,12 +587,6 @@ def run_loop(
             "escalate_after_iter": escalate_after_iter,
         },
         "state_paths": state_paths,
-        # scope_clean/changed_files: đúng hai field mà checker của hoh-wave đọc để
-        # quyết một frame có được merge hay không.
-        "scope_clean": not jailed,
-        "jailed_paths": sorted(set(jailed)),
-        "changed_files": changed_since(cwd, baseline) if commit_sha else [],
-        "commit": commit_sha,
         "started_at": started_at,
         "ended_at": _now_iso(),
         "elapsed_s": round(clock() - start, 4),
@@ -609,6 +603,15 @@ def run_loop(
         }
     if hub_enabled:  # only present on hub runs — hub-off run-logs stay byte-identical
         log["hub"] = {"enabled": True, "agent": hub_agent}
+    # Cùng quy ước với ratchet/hub: field MỚI chỉ xuất hiện khi cờ mới được bật, để
+    # run-log của lượt chạy cũ giữ nguyên bộ khoá (gác bởi harness/tests/ge-backcompat-test.sh).
+    if scope or protect:
+        # scope_clean là field checker của hoh-wave đọc để quyết có merge frame không.
+        log["scope_clean"] = not jailed
+        log["jailed_paths"] = sorted(set(jailed))
+    if commit_on_success:
+        log["changed_files"] = changed_since(cwd, baseline) if commit_sha else []
+        log["commit"] = commit_sha
     if log_path:
         lp = Path(log_path)
         lp.parent.mkdir(parents=True, exist_ok=True)

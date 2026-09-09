@@ -31,17 +31,31 @@ jobs:
       SHA: ${{ github.event.workflow_run.head_sha }}
       BRANCH: ${{ github.event.workflow_run.head_branch }}
       REPO: ${{ github.repository }}
+      BRIEF: llmwiki/wiki/sources/ci-maintainer-brief.md
     steps:
-      - name: gom log bước đỏ (chính thứ người fix cần đọc đầu tiên)
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: rút log + LỆNH tái hiện (thứ khiến issue agent làm được, không chỉ đọc được)
         run: |
-          # Neo vào ##[error] cuối: `tail` trần chỉ ra rác dọn dẹp của runner, không ra lỗi.
-          # cut/sed bỏ cột job+step+timestamp cho thân issue đọc được.
           gh run view "$RUN_ID" --repo "$REPO" --log-failed 2>/dev/null \
-            | sed -e "s/$(printf '\033')\[[0-9;]*m//g" \
-            | awk '{a[NR]=$0} /##\[error\]/{last=NR}
-                   END{if(last){s=(last>25?last-24:1); for(i=s;i<=last;i++) print a[i]}}' \
-            | cut -f3- | sed -E 's/^[0-9T:.Z-]{20,} //' > /tmp/faillog.txt || true
+            | sed -e "s/$(printf '\033')\[[0-9;]*m//g" > /tmp/raw.txt || true
+          # Neo vào ##[error] cuối: `tail` trần chỉ ra rác dọn dẹp của runner, không ra lỗi.
+          # Cùng lượt lần ngược tìm dòng "##[group]Run <cmd>" của CHÍNH step đỏ đó =
+          # lệnh tái hiện tại máy. cut/sed bỏ cột job+step+timestamp cho dễ đọc.
+          awk -F'\t' '{L[NR]=$0} /##\[error\]/{e=NR}
+            END{ if(!e) exit
+              split(L[e],p,"\t"); print "STEP=" p[2] > "/tmp/meta.txt"
+              for(i=e;i>0;i--){ split(L[i],q,"\t")
+                if(q[2]==p[2] && q[3] ~ /##\[group\]Run /){
+                  sub(/.*##\[group\]Run /,"",q[3]); print "CMD=" q[3] > "/tmp/meta.txt"; break } }
+              s=(e>25?e-24:1); for(i=s;i<=e;i++) print L[i] > "/tmp/cut.txt" }' /tmp/raw.txt
+          cut -f3- /tmp/cut.txt 2>/dev/null | sed -E 's/^[0-9T:.Z-]{20,} //' > /tmp/faillog.txt || true
           test -s /tmp/faillog.txt || echo "(không lấy được log — mở $RUN_URL)" > /tmp/faillog.txt
+          test -f /tmp/meta.txt || : > /tmp/meta.txt
+          echo "STEP=$(sed -n 's/^STEP=//p' /tmp/meta.txt | head -1)" >> "$GITHUB_ENV"
+          echo "CMD=$(sed -n 's/^CMD=//p' /tmp/meta.txt | head -1)" >> "$GITHUB_ENV"
 
       - name: mở issue mirror, hoặc bình luận nếu đã có issue mở cùng workflow
         run: |
@@ -54,26 +68,37 @@ jobs:
             --jq "[.[] | select(.title == \"$TITLE\")] | .[0].number // empty")
 
           {
-            echo "| | |"
-            echo "|---|---|"
-            echo "| workflow | \`$WF\` |"
-            echo "| nhánh | \`$BRANCH\` |"
-            echo "| commit | ${SHA:0:8} |"
-            echo "| run | $RUN_URL |"
+            echo "> Issue do CI tự mở. Agent nhận việc: đọc khối \`ci-fail\` rồi làm theo"
+            echo "> **Prompt cho agent nhận việc** ở cuối — không cần hỏi thêm ai."
             echo
-            echo "**Log bước đỏ (25 dòng kết ở ##[error]):**"
+            echo '```yaml'
+            echo "ci-fail:"
+            echo "  workflow: $WF"
+            echo "  branch: $BRANCH"
+            echo "  commit: $SHA"
+            echo "  run_url: $RUN_URL"
+            echo "  failed_step: ${STEP:-'(không rút được)'}"
+            echo "  repro_cmd: ${CMD:-'(không rút được — mở run_url)'}"
+            echo "  verify_cmd: python3 fdk/tools/medic.py --ci"
+            echo "  ledger: llmwiki/wiki/sources/ISSUES.md"
+            echo '```'
+            echo
+            echo "**Kéo về tái hiện:**"
+            echo '```bash'
+            echo "git fetch origin && git checkout $SHA"
+            echo "${CMD:-# xem $RUN_URL}"
+            echo '```'
+            echo
+            echo "<details><summary>Log bước đỏ — 25 dòng kết ở <code>##[error]</code></summary>"
+            echo
             echo '```'
             cat /tmp/faillog.txt
             echo '```'
+            echo "</details>"
             echo
-            echo "**Kéo về fix:**"
-            echo '```bash'
-            echo "git fetch origin && git checkout $BRANCH && git pull"
-            echo "gh run view $RUN_ID --repo $REPO --log-failed   # log đầy đủ"
-            echo '```'
+            echo "---"
             echo
-            echo "Ledger \`llmwiki/wiki/sources/ISSUES.md\` là nguồn chân lý — issue này là"
-            echo "MIRROR do CI mở. Người nhận ghi dòng ledger khi claim (\`/fdk\`)."
+            sed -n '/<!--BRIEF-->/,$p' "$BRIEF" | tail -n +2
           } > /tmp/body.md
 
           if [ -n "$EXISTING" ]; then

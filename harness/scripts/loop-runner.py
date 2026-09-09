@@ -46,6 +46,7 @@ Process exit code: 0 = SUCCESS, 2 = MAX_ITER, 3 = TIMEOUT, 4 = NO_PROGRESS, 5 = 
 import argparse
 import datetime as _dt
 import hashlib
+import fnmatch
 import json
 import re
 import subprocess
@@ -193,6 +194,91 @@ def _git(args, cwd):
     )
 
 
+# ── Diff-jail: frame chỉ được sửa lãnh thổ đã khai ─────────────────────────
+# br-run truyền --scope (file frame ĐƯỢC sửa) và --protect (test bảo vệ, frame KHÔNG
+# được sửa). Thiếu lớp này thì agent làm test xanh bằng cách sửa test, hoặc lan sang
+# file của frame khác — và `scope_clean` mà checker của hoh đọc không bao giờ có thật.
+
+
+def _match_glob(rel, patterns):
+    """Khớp một đường dẫn tương đối với danh sách glob. Một glob không có ký tự
+    đại diện được coi là tiền tố thư mục nếu nó là thư mục."""
+    for g in patterns:
+        g = g.rstrip("/")
+        if rel == g or fnmatch.fnmatch(rel, g) or fnmatch.fnmatch(rel, g + "/*"):
+            return True
+    return False
+
+
+def _changed_paths(cwd):
+    """Mọi đường dẫn khác baseline: sửa, thêm, xoá, đổi tên — kể cả file chưa track."""
+    out = _git(["status", "--porcelain", "-z"], cwd).stdout
+    paths = []
+    for chunk in out.split("\0"):
+        if len(chunk) < 4:
+            continue
+        paths.append(chunk[3:])
+    return sorted(set(p for p in paths if p))
+
+
+def diff_jail(cwd, scope, protect, exempt=None):
+    """Hoàn nguyên MỌI thay đổi ngoài scope, và mọi thay đổi chạm file bảo vệ.
+    Trả danh sách đường dẫn đã bị chặn (rỗng = agent ở đúng lãnh thổ).
+
+    `exempt` là sản phẩm phụ của CÔNG CỤ, không phải công của agent: cache của test
+    runner, node_modules, log mà chính harness ghi vào repo trong lúc agent chạy.
+    Chúng được BỎ QUA hẳn — không hoàn nguyên (xoá node_modules là churn vô ích) và
+    không tính vào scope_clean. Tính chúng vào là đánh đỏ frame đã làm đúng: đo lượt
+    chạy thật walleye 2026-09-09, hai frame có verdict SUCCESS và changed_files đúng
+    y scope vẫn bị checker từ chối chỉ vì vitest ghi .vitest/ và hook ghi llmwiki.
+    Đây KHÔNG phải cửa sau cho agent: exempt do br-run khai cứng, không đọc từ frame."""
+    if not scope and not protect:
+        return []
+    exempt = exempt or []
+    illegal = []
+    for rel in _changed_paths(cwd):
+        if exempt and _match_glob(rel, exempt):
+            continue
+        legal = (not protect or not _match_glob(rel, protect)) and \
+                (not scope or _match_glob(rel, scope))
+        if not legal:
+            illegal.append(rel)
+    for rel in illegal:
+        tracked = _git(["ls-files", "--error-unmatch", "--", rel], cwd).returncode == 0
+        if tracked:
+            _git(["checkout", "--", rel], cwd)
+        else:
+            fp = Path(cwd) / rel
+            if fp.is_file():
+                fp.unlink()
+    return illegal
+
+
+def git_commit_all(cwd, message, scope=None, protect=None):
+    """Đóng băng công của frame thành MỘT commit. Chỉ add đường dẫn HỢP LỆ — `add -A`
+    quét cả file rác mà caller để lại trong cây (br-run ghi .<frame>.verify.out), làm
+    changed_files bẩn. --no-verify: hook của repo tiêu thụ không chặn biên lai dây chuyền."""
+    if scope or protect:
+        legal = [rel for rel in _changed_paths(cwd)
+                 if (not protect or not _match_glob(rel, protect))
+                 and (not scope or _match_glob(rel, scope))]
+        if not legal:
+            return None
+        _git(["add", "--", *legal], cwd)
+    else:
+        _git(["add", "-A"], cwd)
+    r = _git(["commit", "-q", "--no-verify", "-m", message], cwd)
+    return _git_head(cwd) if r.returncode == 0 else None
+
+
+def changed_since(cwd, baseline):
+    """File frame đã đụng, so với baseline — đây là 'file DÙNG ĐƯỢC' mà checker đọc."""
+    if not baseline:
+        return []
+    out = _git(["diff", "--name-only", baseline, "HEAD"], cwd).stdout
+    return sorted(set(l for l in out.splitlines() if l.strip()))
+
+
 # ── Ratchet: score → keep (commit) or revert (git reset) ────────────────────
 _FLOAT = re.compile(r"[-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?")
 
@@ -278,6 +364,13 @@ def run_loop(
     hub_enabled=False,
     hub_agent="loop-runner",
     state_paths=None,
+    scope=None,
+    protect=None,
+    jail_exempt=None,
+    baseline=None,
+    commit_on_success=False,
+    commit_message=None,
+    confirm=1,
     episodic_page=None,
     reflexion_enabled=True,
     cwd=".",
@@ -294,6 +387,16 @@ def run_loop(
         raise ValueError("max_iter must be >= 1 (it is the hard backstop guard)")
     cwd = Path(cwd)
     state_paths = state_paths or []
+    scope = scope or []
+    protect = protect or []
+    jail_exempt = jail_exempt or []
+    jailed = []          # mọi đường dẫn từng bị chặn — nuôi scope_clean
+    commit_sha = None
+    # baseline PHẢI thành SHA ngay: caller hay truyền chữ "HEAD", mà HEAD chạy theo
+    # commit của chính vòng lặp → `git diff HEAD HEAD` rỗng và changed_files mất trắng.
+    if baseline:
+        _r = _git(["rev-parse", baseline], cwd)
+        baseline = _r.stdout.strip() or baseline
     started_at = _now_iso()
     start = clock()
     iterations = []
@@ -357,6 +460,27 @@ def run_loop(
         if exit_code == 0:
             rec["state_hash"] = None
             rec["unchanged_streak"] = streak
+            # HERMETIC: xanh phải LẶP LẠI được. Chạy verify thêm (confirm-1) lần; một
+            # lần đỏ nghĩa là test phụ thuộc thứ tự/thời gian/state ngoài — không tính là xong.
+            flaky = None
+            for c in range(1, max(1, confirm)):
+                c_exit, c_tail = _run_cmd(verify_cmd, cwd)
+                if c_exit != 0:
+                    flaky = (c + 1, c_tail)
+                    break
+            rec["confirm_runs"] = max(1, confirm)
+            if flaky:
+                rec["confirm_failed_at"] = flaky[0]
+                rec["confirm_output_tail"] = flaky[1]
+                iterations.append(rec)
+                verdict, reason = NO_PROGRESS, (
+                    f"verify xanh lần đầu nhưng ĐỎ ở lần chạy lại thứ {flaky[0]}/{confirm} — "
+                    f"không hermetic, không tính là xong")
+                break
+            if commit_on_success:
+                commit_sha = git_commit_all(
+                    cwd, commit_message or f"loop-runner: verify xanh iter {it}", scope, protect)
+                rec["commit"] = commit_sha
             iterations.append(rec)
             verdict, reason = SUCCESS, f"verify passed on iteration {it}"
             break
@@ -440,6 +564,12 @@ def run_loop(
             r_exit, r_tail = _run_cmd(revise_cmd, cwd)
             rec["revise_exit"] = r_exit
             rec["revise_output_tail"] = r_tail
+            # DIFF-JAIL ngay sau revise, TRƯỚC verify kế: agent không được làm test xanh
+            # bằng cách sửa test, cũng không được lan sang lãnh thổ frame khác.
+            blocked = diff_jail(cwd, scope, protect, jail_exempt)
+            if blocked:
+                rec["jailed"] = blocked
+                jailed.extend(blocked)
         else:
             rec["revise_exit"] = None  # no-op stub (LLM adapter not wired)
 
@@ -457,6 +587,12 @@ def run_loop(
             "escalate_after_iter": escalate_after_iter,
         },
         "state_paths": state_paths,
+        # scope_clean/changed_files: đúng hai field mà checker của hoh-wave đọc để
+        # quyết một frame có được merge hay không.
+        "scope_clean": not jailed,
+        "jailed_paths": sorted(set(jailed)),
+        "changed_files": changed_since(cwd, baseline) if commit_sha else [],
+        "commit": commit_sha,
         "started_at": started_at,
         "ended_at": _now_iso(),
         "elapsed_s": round(clock() - start, 4),
@@ -539,6 +675,13 @@ def cmd_run(args):
         hub_enabled=args.hub if args.hub is not None else bool(hb.get("enabled", False)),
         hub_agent=hb.get("agent") or "loop-runner",
         state_paths=args.state if args.state else cfg["progress"].get("state_paths") or [],
+        scope=args.scope or [],
+        jail_exempt=args.jail_exempt or [],
+        protect=args.protect or [],
+        baseline=args.baseline,
+        commit_on_success=args.commit_on_success,
+        commit_message=args.commit_message,
+        confirm=args.confirm,
         episodic_page=args.episodic if args.episodic is not None else cfg["reflexion"].get("episodic_memory_page"),
         reflexion_enabled=cfg["reflexion"].get("enabled", True),
         cwd=args.cwd,
@@ -727,6 +870,131 @@ def selftest():
             dirty_refused = True
             dirty_preserved = (rd / "untracked-work.txt").read_text() == "this must survive"
 
+        # 9) DIFF-JAIL + CONFIRM + COMMIT — ba cờ br-run vẫn truyền mà loop-runner
+        #    chưa từng có. Mỗi cờ một kịch bản, chạy trên git thật.
+        jd = d / "jail"
+        _mk_git_sandbox(jd)
+        (jd / "app").mkdir(parents=True, exist_ok=True)
+        (jd / "tests").mkdir(parents=True, exist_ok=True)
+        (jd / "app" / "own.py").write_text("x = 0\n")
+        (jd / "tests" / "guard.py").write_text("ASSERT = 1\n")
+        (jd / "other.py").write_text("untouched\n")
+        _commit(jd, "seed-jail", "seed")
+        jail_baseline = _git_head(jd)
+        # revise "đi lạc": sửa cả file của mình, file bảo vệ, và file ngoài lãnh thổ
+        stray = _py(
+            "import pathlib;"
+            f"r=pathlib.Path({json.dumps(str(jd))});"
+            "(r/'app'/'own.py').write_text('x = 1\\n');"
+            "(r/'tests'/'guard.py').write_text('ASSERT = 0\\n');"
+            "(r/'other.py').write_text('WANDERED\\n');"
+            "(r/'new_stray.py').write_text('nope\\n')"
+        )
+        jail_log = run_loop(
+            verify_cmd=_py("import sys;sys.exit(1)"), revise_cmd=stray,
+            max_iter=1, no_progress_k=0, state_paths=[], cwd=str(jd),
+            scope=["app/*.py"], protect=["tests/*.py"], quiet=True,
+        )
+        jail_facts = {
+            "own_kept": (jd / "app" / "own.py").read_text() == "x = 1\n",
+            "protected_reverted": (jd / "tests" / "guard.py").read_text() == "ASSERT = 1\n",
+            "outside_reverted": (jd / "other.py").read_text() == "untouched\n",
+            "untracked_removed": not (jd / "new_stray.py").exists(),
+            "scope_clean_false": jail_log.get("scope_clean") is False,
+            "jailed_listed": set(jail_log.get("jailed_paths") or []) ==
+                             {"tests/guard.py", "other.py", "new_stray.py"},
+        }
+
+        # 9b) JAIL-EXEMPT — cache/log của công cụ không phải agent đi lạc
+        ed = d / "exempt"
+        _mk_git_sandbox(ed)
+        (ed / "app").mkdir(parents=True, exist_ok=True)
+        (ed / "tests").mkdir(parents=True, exist_ok=True)
+        (ed / "app" / "own.py").write_text("x = 0\n")
+        (ed / "tests" / "guard.py").write_text("KEEP\n")
+        _commit(ed, "seed-exempt", "seed")
+        noise = _py(
+            "import pathlib;"
+            f"r=pathlib.Path({json.dumps(str(ed))});"
+            "(r/'app'/'own.py').write_text('x = 1\\n');"
+            "(r/'.vitest').mkdir(exist_ok=True);"
+            "(r/'.vitest'/'cache').write_text('rác');"
+            "(r/'run.log').write_text('log cua harness');"
+            "(r/'tests'/'guard.py').write_text('WEAKENED')"
+        )
+        ex_log = run_loop(
+            verify_cmd=_py("import sys;sys.exit(1)"), revise_cmd=noise,
+            max_iter=1, no_progress_k=0, state_paths=[], cwd=str(ed),
+            scope=["app/*.py"], protect=["tests/*.py"],
+            jail_exempt=[".vitest", ".vitest/*", "*.log"], quiet=True,
+        )
+        # kịch bản CHỈ có rác công cụ, không đụng gì khác → scope_clean phải là True
+        ed2 = d / "exempt-only"
+        _mk_git_sandbox(ed2)
+        (ed2 / "app").mkdir(parents=True, exist_ok=True)
+        (ed2 / "app" / "own.py").write_text("x = 0\n")
+        _commit(ed2, "seed-exempt2", "seed")
+        only_noise = _py(
+            "import pathlib;"
+            f"r=pathlib.Path({json.dumps(str(ed2))});"
+            "(r/'app'/'own.py').write_text('x = 1\\n');"
+            "(r/'.vitest').mkdir(exist_ok=True);"
+            "(r/'.vitest'/'cache').write_text('rác');"
+            "(r/'run.log').write_text('log cua harness')"
+        )
+        ex_log2 = run_loop(
+            verify_cmd=_py("import sys;sys.exit(1)"), revise_cmd=only_noise,
+            max_iter=1, no_progress_k=0, state_paths=[], cwd=str(ed2),
+            scope=["app/*.py"], protect=[],
+            jail_exempt=[".vitest", ".vitest/*", "*.log"], quiet=True,
+        )
+        exempt_facts = {
+            "clean_true": ex_log2.get("scope_clean") is True
+                          and not ex_log2.get("jailed_paths"),
+            "not_listed": ".vitest" not in " ".join(ex_log.get("jailed_paths") or [])
+                          and "run.log" not in (ex_log.get("jailed_paths") or []),
+            "kept": (ed / "run.log").exists() and (ed / ".vitest" / "cache").exists(),
+            # exempt là cho RÁC, không phải cửa sau: file bảo vệ vẫn phải bị hoàn nguyên
+            "protect_wins": (ed / "tests" / "guard.py").read_text() == "KEEP\n",
+        }
+
+        # CONFIRM — verify xanh lần đầu, đỏ lần chạy lại: KHÔNG được tính SUCCESS
+        cd2 = d / "confirm"
+        _mk_git_sandbox(cd2)
+        flip = cd2 / "flip"
+        flip.write_text("0")
+        verify_flaky = _py(
+            "import pathlib,sys;"
+            f"p=pathlib.Path({json.dumps(str(flip))});"
+            "n=int(p.read_text() or 0)+1;p.write_text(str(n));"
+            "sys.exit(0 if n==1 else 1)"
+        )
+        confirm_log = run_loop(
+            verify_cmd=verify_flaky, max_iter=1, no_progress_k=0, state_paths=[],
+            cwd=str(cd2), confirm=2, quiet=True,
+        )
+
+        # COMMIT-ON-SUCCESS — xanh thì đóng commit và liệt kê changed_files
+        cd3 = d / "commitok"
+        _mk_git_sandbox(cd3)
+        (cd3 / "app").mkdir(parents=True, exist_ok=True)
+        (cd3 / "app" / "f.py").write_text("v = 0\n")
+        _commit(cd3, "seed-commit", "seed")
+        base3 = _git_head(cd3)
+        (cd3 / "app" / "f.py").write_text("v = 1\n")
+        commit_log = run_loop(
+            verify_cmd=_py("import sys;sys.exit(0)"), max_iter=1, no_progress_k=0,
+            state_paths=[], cwd=str(cd3), baseline=base3, commit_on_success=True,
+            commit_message="frame(x): xong", confirm=1, quiet=True,
+        )
+        commit_facts = {
+            "verdict": commit_log["verdict"] == SUCCESS,
+            "sha": bool(commit_log.get("commit")),
+            "changed": commit_log.get("changed_files") == ["app/f.py"],
+            "msg": "frame(x): xong" in _git(["log", "-1", "--pretty=%s"], cd3).stdout,
+            "clean_tree": not _git(["status", "--porcelain"], cd3).stdout.strip(),
+        }
+
         episodic_written = episodic.exists()
 
     # Assertions (required scenarios 1-3 + guard-proof scenarios 4-5)
@@ -758,6 +1026,25 @@ def selftest():
     )
     baseline = keep_log["iterations"][0]
     extra = [
+        ("diff-jail: giữ file trong scope",            jail_facts["own_kept"]),
+        ("diff-jail: hoàn nguyên file BẢO VỆ (test)",  jail_facts["protected_reverted"]),
+        ("diff-jail: hoàn nguyên file ngoài lãnh thổ", jail_facts["outside_reverted"]),
+        ("diff-jail: xoá file lạc chưa track",         jail_facts["untracked_removed"]),
+        ("diff-jail: scope_clean=false khi đi lạc",    jail_facts["scope_clean_false"]),
+        ("diff-jail: liệt kê ĐÚNG đường dẫn bị chặn",  jail_facts["jailed_listed"]),
+        ("jail-exempt: sản phẩm phụ công cụ KHÔNG bị tính là đi lạc",
+         exempt_facts["clean_true"] and exempt_facts["not_listed"]),
+        ("jail-exempt: file exempt được GIỮ NGUYÊN, không hoàn nguyên",
+         exempt_facts["kept"]),
+        ("jail-exempt KHÔNG che được file bảo vệ",   exempt_facts["protect_wins"]),
+        ("confirm: xanh không lặp lại được → KHÔNG SUCCESS",
+         confirm_log["verdict"] != SUCCESS
+         and confirm_log["iterations"][-1].get("confirm_failed_at") == 2),
+        ("commit-on-success: verdict SUCCESS",         commit_facts["verdict"]),
+        ("commit-on-success: có sha commit",           commit_facts["sha"]),
+        ("commit-on-success: changed_files đúng",      commit_facts["changed"]),
+        ("commit-on-success: dùng đúng lời commit",    commit_facts["msg"]),
+        ("commit-on-success: cây sạch sau commit",     commit_facts["clean_tree"]),
         ("baseline Trial ghi TRƯỚC vòng lặp",
          baseline.get("ratchet") == "baseline" and baseline.get("score") == 1.0),
         ("keep: 3/3 kept, commit thật (seed+seed-n+3)",
@@ -793,6 +1080,20 @@ def build_parser():
     r.add_argument("--verify", required=True, help="shell cmd; exit 0 == pass (e.g. 'pytest -q')")
     r.add_argument("--config", default=None, help="path to loop-runner.config.yaml")
     r.add_argument("--revise", default=None, help="shell cmd for the (adapter) revise step; default = config/no-op")
+    r.add_argument("--scope", action="append",
+                   help="glob file frame ĐƯỢC sửa (lặp lại được). Thay đổi ngoài đây bị hoàn nguyên")
+    r.add_argument("--jail-exempt", action="append",
+                   help="glob sản phẩm phụ của công cụ (cache, node_modules, log của "
+                        "harness): bỏ qua hẳn, không hoàn nguyên và không tính scope_clean")
+    r.add_argument("--protect", action="append",
+                   help="glob file frame KHÔNG được sửa — test bảo vệ (lặp lại được)")
+    r.add_argument("--baseline", default=None,
+                   help="git ref làm mốc để liệt kê changed_files khi frame xanh")
+    r.add_argument("--commit-on-success", action="store_true",
+                   help="verify xanh thì đóng công của frame thành một commit")
+    r.add_argument("--commit-message", default=None, help="lời commit khi xanh")
+    r.add_argument("--confirm", type=int, default=1,
+                   help="số lần chạy verify khi xanh; >1 bắt xanh phải LẶP LẠI được (hermetic)")
     r.add_argument("--state", action="append", default=None, help="state-hash path/glob (repeatable)")
     r.add_argument("--log", default=None, help="run-log JSON output path")
     r.add_argument("--max-iter", type=int, default=None)

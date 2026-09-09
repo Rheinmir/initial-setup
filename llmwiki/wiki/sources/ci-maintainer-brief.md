@@ -40,10 +40,40 @@ Bạn là **maintainer agent** của repo này. Issue trên là một gate CI đ
    có chủ đích → phải FAIL; khôi phục → phải PASS. Không fire-drill thì chưa xong.
 4. **Chốt bằng máy, không bằng cảm giác.** `python3 fdk/tools/medic.py --ci` phải xanh,
    và chạy lại `repro_cmd` phải xanh. Dán output thật vào issue.
-5. **Ghi dòng ledger khi claim** — `llmwiki/wiki/sources/ISSUES.md` là nguồn chân lý,
-   issue GitHub chỉ là mirror. Xem `[[issue-tracker]]` cho cách ghi.
+5. **Ghi dòng ledger** — xem *Tiêu chuẩn nghiệm thu* dưới. Đây là điều kiện ĐÓNG, không
+   phải việc dọn dẹp làm sau.
 6. **Đóng** bằng `gh issue close <n> --comment "<commit sha> — <đã sửa gì> — medic --ci
-   xanh"`. Đổi `status` dòng ledger sang `done`.
+   xanh"`, sau khi và chỉ sau khi cả 5 tiêu chuẩn dưới đã xanh.
+
+## Tiêu chuẩn nghiệm thu (đủ CẢ 5 mới được đóng)
+
+Thiếu một mục = **chưa xong**. Không đóng issue, không báo hoàn thành. Mỗi mục có lệnh
+chứng — dán output THẬT vào issue, đừng viết "đã kiểm tra".
+
+| # | Tiêu chuẩn | Lệnh chứng |
+|---|-----------|-----------|
+| 1 | Đã tái hiện được đỏ trước khi sửa | `repro_cmd` → exit ≠ 0, log khớp `failed_checks` |
+| 2 | Gate đã xanh sau sửa | `repro_cmd` → exit 0 |
+| 3 | Không vỡ chỗ khác | `python3 fdk/tools/medic.py --ci` → `0 fail` |
+| 4 | **Dòng ledger tồn tại và trỏ đúng issue này** | `grep "GH#<n>" llmwiki/wiki/sources/ISSUES.md` |
+| 5 | Chỗ cắn sớm đã fire-drill (nếu bước 3 có thêm) | làm bẩn → FAIL; khôi phục → PASS |
+
+**Mục 4 nói rõ**: `llmwiki/wiki/sources/ISSUES.md` là nguồn chân lý, issue GitHub chỉ là
+mirror do CI mở. CI **không** ghi ledger (commit từ Actions không qua pre-commit, nên
+không gate nào cắn — một đường ghi vào nguồn chân lý mà không có cổng là thứ đắt nhất).
+Nên **agent nhận việc là người ghi**. Ghi ngay lúc claim, không để tới lúc đóng: việc
+không có dòng ledger là việc *không tồn tại* với `frontier.py`, và người kế tiếp sẽ nhận
+trùng.
+
+Dòng ledger theo đúng 10 cột của bảng trong `ISSUES.md`:
+
+```
+| [<DDMMYY-slug>](draft/<DDMMYY-slug>.md) | tech-debt | <tiêu đề issue> | open | @<bạn> | /fdk | [GH#<n>](<url issue>) | ready-for-agent | | <phiên>@<ts> |
+```
+
+Kèm file draft `llmwiki/wiki/sources/draft/<DDMMYY-slug>.md` — phải có YAML frontmatter
+OKF (R9) và mục `## Origin` (R2), nếu không pre-commit chặn. Xem `[[issue-tracker]]` và
+skill `/raise-issue` cho template đầy đủ. Khi đóng: đổi `status` → `done`.
 
 ### Luật cứng của repo này (vi phạm là hỏng commit)
 

@@ -41,10 +41,13 @@ và task-lifecycle. Push trước đó vẫn lọt vì hook pre-push không cắ
 - Bẫy công cụ ghi lại: `sed '0,/re/s//x/'` là cú pháp GNU, BSD sed **nuốt im lặng** — một
   lần commit hụt vì thế; đổi sang python.
 
+- **Hệ quả bậc ba** — [GH#147](https://github.com/Rheinmir/setup/issues/147): chính draft này trích
+  nguyên văn rule R7 và các wikilink cũ nên tự kích hoạt R7 + wiki-health. Diễn đạt lại bằng lời. Commit `653fe6b`.
+
 ## Tiêu chí xong
 
 - [x] tái hiện đỏ (fdk-gate 19/21, R7 local) · [x] fdk-gate 21/21 · [x] `medic --ci` 0 fail
-- [x] CI xanh tại `8adbca1` (harness + skills-sync) · [x] dòng ledger này
+- [x] CI xanh tại `653fe6b` (harness + skills-sync) · [x] dòng ledger này
 
 ## Origin
 - **Source:** fdk-gate tại `ddd366d`; CI run harness cho `e2314dc`, mirror [GH#146](https://github.com/Rheinmir/setup/issues/146)

@@ -50,15 +50,19 @@ def tracked(wiki: Path):  # -> set[str] | None (3.9 không có union operator)
     Lý do tồn tại: file có trên đĩa nhưng CHƯA add và KHÔNG bị ignore thì fresh clone không
     thấy — index.md trỏ tới nó sẽ đỏ trên CI mà xanh ở máy tác giả. Đó đúng là lỗ mà docstring
     của gitignored() nói là phải bịt: "nhất quán giữa máy tác giả và clone sạch".
-    Fail-open: git lỗi/không có → None, caller giữ nguyên hành vi cũ.
+    Fail-open: git lỗi/không có → None, caller giữ nguyên hành vi cũ. RỖNG cũng coi như
+    None: sandbox `git init` mới toanh (harness/tests/*.sh copy cây rồi init, không add)
+    có 0 file tracked — ở đó "chưa add" KHÔNG đồng nghĩa "clone sạch không thấy", và áp
+    luật untracked sẽ báo THỪA toàn bộ index.
     """
     key = str(wiki.resolve())
     if key not in _TRACKED_CACHE:
         try:
             r = subprocess.run(["git", "ls-files", "-z", "--cached", "."], cwd=key,
                                capture_output=True, timeout=10)
-            _TRACKED_CACHE[key] = ({p for p in r.stdout.decode().split("\0") if p}
-                                   if r.returncode == 0 else None)
+            got = ({p for p in r.stdout.decode().split("\0") if p}
+                   if r.returncode == 0 else None)
+            _TRACKED_CACHE[key] = got or None
         except Exception:
             _TRACKED_CACHE[key] = None
     return _TRACKED_CACHE[key]

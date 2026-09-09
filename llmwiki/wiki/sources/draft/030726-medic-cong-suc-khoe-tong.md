@@ -20,7 +20,7 @@ relations:
 `medic` — MỘT lệnh gom mọi kiểm tra tất định của framework thành một **cổng sức khoẻ tổng / tuyến phòng thủ cuối**. Gõ `medic`, xanh = hệ khoẻ; user không phải nhớ/gọi 7 công cụ lẻ.
 
 ## Context (force-query + kim chỉ nam)
-- **[[fdk]] kim chỉ nam 2 (hub & trình bày, 2026-07-03):** hub 1-tên, mô-tả-phạm-vi (không nhớ subcommand), tên NGẮN gõ như `curl`; output TL;DR cô-đọng-đủ-ý; cuối output recap + dạy dùng thụ động; **transparent (show cấu trúc thư mục) = an toàn, usage > performance**. `medic` là hiện thân đầu tiên của kim chỉ nam này.
+- **[fdk](../../../../skills/fdk/SKILL.md) kim chỉ nam 2 (hub & trình bày, 2026-07-03):** hub 1-tên, mô-tả-phạm-vi (không nhớ subcommand), tên NGẮN gõ như `curl`; output TL;DR cô-đọng-đủ-ý; cuối output recap + dạy dùng thụ động; **transparent (show cấu trúc thư mục) = an toàn, usage > performance**. `medic` là hiện thân đầu tiên của kim chỉ nam này.
 - **`harness/scripts/harness-doctor.py`** (đã có) — fire-drill "mỗi rule 1 fixture BAD+GOOD, chạy validator thật, BAD phải bị chặn". Là **probe `rules`** của medic. Vấn đề: mới phủ **5/17** rule.
 - **`build-overstack-docs.py` / `build-capabilities.py`** (đã có, `--check`, wired `stop.py`) — probe `docs`.
 - Meadows: medic = vòng phản hồi trên chính tầng enforcement; **tự-mở-coverage** để không mục nào lọt lưới khi hệ lớn lên.

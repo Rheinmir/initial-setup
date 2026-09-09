@@ -418,5 +418,33 @@
         "note": "backfill 2026-09-07 (GH#108): draft trỏ task chưa từng đăng ký trong store"
       }
     ]
+  },
+  "T-260908-01": {
+    "id": "T-260908-01",
+    "title": "080926-prd-grade-fe-PLAN — hub /prd-grade-fe: design.md + fe-gate.sh tất định",
+    "state": "done",
+    "created": "2026-09-08T00:00:00",
+    "updated": "2026-09-08T00:00:00",
+    "history": [
+      {
+        "state": "proposed",
+        "ts": "2026-09-08T00:00:00"
+      },
+      {
+        "state": "approved",
+        "ts": "2026-09-08T00:00:00",
+        "note": "SPEC 080926-prd-grade-fe đã duyệt 2026-09-08"
+      },
+      {
+        "state": "dispatched",
+        "ts": "2026-09-08T00:00:00",
+        "note": "backfill 2026-09-09 (GH#108): draft 080926-prd-grade-fe-PLAN trỏ task chưa đăng ký; implement trực tiếp trong phiên 08-09 (skill prd-grade-fe đã ship), các bước không được ghi lúc chạy"
+      },
+      {
+        "state": "done",
+        "ts": "2026-09-08T00:00:00",
+        "note": "ship 1913bbc (viewport-check) + prd-grade-fe trong skills/"
+      }
+    ]
   }
 }

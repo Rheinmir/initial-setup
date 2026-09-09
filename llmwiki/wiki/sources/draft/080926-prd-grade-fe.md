@@ -102,7 +102,7 @@ Adapt-modes (memory `adapt-modes-taxonomy`): detect CLI = **KÉO NGOÀI** (pin `
 - Không dẫm module: hallmark/impeccable chỉ được gọi; `new-skill.py --strict` chạy ở T1.
 
 ## Notes
-- [[hallmark]] · [[adapt-modes-taxonomy]] · [[docs-site-macos]] · [[playwright-verify]]
+- [hallmark](../../../../skills/hallmark/SKILL.md) · [[adapt-modes]] · [docs-site-macos](../../../../skills/docs-site-macos/SKILL.md) · [playwright-verify](../../../../skills/playwright-verify/SKILL.md)
 - Bundle nguồn: `doyourmagic/impeccable/02-detect-cli-scan.md`, `05-chat-commands.md`, `03-tune-detector-ignores.md`.
 
 ## Origin

@@ -21,7 +21,7 @@ relations:
 
 ## Context (force-query — wiki đã đọc trước khi draft)
 - **`ADR-001-policy-as-source-of-truth`** — nguyên tắc *một nguồn chân lý, derive-không-duplicate*. `MECHANISMS` hardcode trong `build-overstack-docs.py` **vi phạm trực tiếp**: nó là bản CHÉP TAY của trạng thái hệ, không phải suy ra từ nguồn. Đây là gốc-rễ của drift.
-- **[[fdk]]** (concept, mục Rules) — "**Đếm số luôn LIVE; không hardcode (anti-drift)**". Số đếm skill/rule đã tuân (generator đếm đĩa); nhưng *danh sách cơ-chế* thì chưa — cùng một luật, chưa áp cho narrative.
+- **[fdk](../../../../skills/fdk/SKILL.md)** (concept, mục Rules) — "**Đếm số luôn LIVE; không hardcode (anti-drift)**". Số đếm skill/rule đã tuân (generator đếm đĩa); nhưng *danh sách cơ-chế* thì chưa — cùng một luật, chưa áp cho narrative.
 - **[[feature-catalog]]** — concept "vì sao" mà overstack.html render; là ứng viên nguồn narrative nhưng hiện không có tầng máy-đọc cho *defense-line*.
 - **council-report-025-seed42.html** — verdict: consensus Taleb+Munger (iatrogenics: tài liệu sai mang nhãn "đáng tin" nguy hiểm hơn không có; medic kiểm *tính trung thành bản sao*, không kiểm *tính trung thực bản gốc*). Đòn bẩy hội tụ: **narrative → DATA + probe cắn**. Aurelius (ranh giới): phần *ý-nghĩa/giọng-văn* CHẤP NHẬN cần người — đừng hứa tự-động cái không tự-động được; tối thiểu **đổi nhãn** "sinh từ đĩa nên luôn khớp".
 - Tiền lệ [[030726-milestone-v106-harden]] **T3 generator-only probe** — proposal này là hiện-thực-hoá + mở rộng T3 (từ "artifact khác generator" sang "narrative thiếu cơ-chế LIVE").

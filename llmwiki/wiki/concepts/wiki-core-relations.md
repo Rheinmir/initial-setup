@@ -226,7 +226,7 @@ Council seed42 chê bộ test cũ "tự chọn đề thi (ludic fallacy)". Đáp
 
 **Kết quả (graph-builder đơn lẻ):** semantic-relation F1 **0.842** (P .889/R .8), hallucination .125, negative PASS. Phân tích năng lực:
 - ✅ **Mạnh:** đọc đúng 5/5 quan hệ khai tường minh (derives-from/supersedes/contradicts/implements/depends-on); **không** đối-xứng-hóa contradicts; **không** bịa cạnh negative; **không** bịa implements cho YAML hỏng.
-- ❌ **Giòn (3 defect → [[failure-flywheel]]):** (1) `enrich_code` chỉ parse `.py` → **mù imports/touches code TS**; (2) graph-builder thiếu cờ chu trình + không quarantine YAML hỏng; (3) `WIKILINK_RE` không strip code-fence → false-positive `[[NotALink]]`.
+- ❌ **Giòn (3 defect → [failure-flywheel](../../../skills/failure-flywheel/SKILL.md)):** (1) `enrich_code` chỉ parse `.py` → **mù imports/touches code TS**; (2) graph-builder thiếu cờ chu trình + không quarantine YAML hỏng; (3) `WIKILINK_RE` không strip code-fence → false-positive `[[NotALink]]`.
 
 **Kết luận:** xác nhận engine **robust ở mặt thiết kế, chưa anti-fragile** ở đuôi ngoài-mẫu. ⚠️ Phạm vi: mới test `build-wiki-graph.py` đơn lẻ; hook auto-touches + validator `rel_integrity` + code-graph MCP **chưa exercise** — cần run tích hợp mới kết luận toàn hệ. Report: `llmwiki/html/030726-self-index-benchmark-report.html`. Đề: `council-report-010-seed42.html`. Proposal: [[020726-council-chon-de-thi-self-index]].
 

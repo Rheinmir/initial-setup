@@ -95,7 +95,7 @@ Chạy `build-wiki-graph.py` (scan+enrich_code) trên app mẫu, chấm mù. **�
 
 **Kết luận đối chiếu council seed42:** khẳng định đúng lời phê — engine **robust ở mặt nó được thiết kế** (đọc quan hệ khai báo, không bịa cạnh negative, không đối-xứng-hóa contradicts) nhưng **giòn ở đuôi ngoài-mẫu**: mù code TS, thiếu cờ toàn vẹn, lẫn link trong code-fence. Không có cái nào "mạnh lên nhờ stress" → **robust, chưa anti-fragile** — đúng như dự báo. Đây là bằng chứng NGOÀI MẪU mà council đòi.
 
-**Nợ để T5 hoàn tất:** report HTML + đưa 3 defect (import-TS-blind, cycle/quarantine-flag, code-fence-strip) vào [[failure-flywheel]] + cập nhật [[wiki-core-relations]].
+**Nợ để T5 hoàn tất:** report HTML + đưa 3 defect (import-TS-blind, cycle/quarantine-flag, code-fence-strip) vào [failure-flywheel](../../../../skills/failure-flywheel/SKILL.md) + cập nhật [[wiki-core-relations]].
 
 ## Success (tiêu chí kiểm chứng được)
 1. Council **chốt được đề thi** (app + harass set) qua transcript blind peer-rank — người KHÔNG chọn đề.

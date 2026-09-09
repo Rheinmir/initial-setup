@@ -22,7 +22,7 @@ Milestone v1.0.6: hiện thực các NỢ đã ghi ở v1.0.5 — biến 2 verdi
 ## Context (force-query — nợ từ v1.0.5)
 - **[[030726-eval-report]]** + council `council-report-020-seed42.html` (winner Lão Tử): đòn bẩy = **medic gương-soi-cuối-phiên khi đụng framework**; giữ 2 cổng tự-cắn **A1** (generator-only + probe) + **A7** (medic 5/17→17/17, hấp thụ A3 sync-direction-check); A2/A6 thành phụ lục /fdk. Bằng chứng cấp thiết: release v1.0.5 vừa lộ **dark rail R7-f** (validator thiếu check `## Context`) mà medic 5/17 KHÔNG bắt — chỉ commit-gate bắt.
 - Council `council-report-022-seed42.html` (query): query-rate là **vanity/Goodhart**; đo **reinvent-rate + cross-break-rate + harm-when-missing**; tách 3 lớp — wiki-content (giữ), code-graph/quan-hệ-phi-cục-bộ (giữ+đầu tư, cho **entrypoint rẻ 1-lệnh**), /query-skill (**hạ xuống optional**); retrieval **tự-surface** thay vì ép gọi.
-- **Issue #4** (github) — logger có đủ thông tin cho trace-grading 5 phiên cũ không (tiền-đề cho đo reinvent/cross-break qua [[trace-grader]]).
+- **Issue #4** (github) — logger có đủ thông tin cho trace-grading 5 phiên cũ không (tiền-đề cho đo reinvent/cross-break qua [trace-grader](../../../../skills/trace-grader/SKILL.md)).
 
 ## Impact
 | Vùng | Ảnh hưởng |

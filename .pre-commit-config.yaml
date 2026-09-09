@@ -60,6 +60,13 @@ repos:
         language: system
         files: '.*-seq\.html$'
 
+      - id: skill-provenance
+        name: "GH#13: sua skill phai record lai so provenance (checksum khong lech)"
+        entry: python3 fdk/tools/skill-provenance.py check --ci
+        language: system
+        files: '^(skills/|fdk/skills\.provenance\.json$)'
+        pass_filenames: false
+
       - id: harness-local
         name: "harness-local: rule RIÊNG của dự án (P-namespace, sync-safe)"
         entry: bash -c 'test -f harness-local/run.py && python3 harness-local/run.py files "$@" || true' --

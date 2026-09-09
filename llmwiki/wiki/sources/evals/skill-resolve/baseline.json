@@ -49,6 +49,18 @@
       "hit1": 1,
       "hit3": 1
     },
+    "prd-grade-fe-production": {
+      "hit1": 1,
+      "hit3": 1
+    },
+    "prd-grade-fe-theme-docs": {
+      "hit1": 1,
+      "hit3": 1
+    },
+    "prd-grade-fe-url": {
+      "hit1": 1,
+      "hit3": 1
+    },
     "raise-issue": {
       "hit1": 1,
       "hit3": 1
@@ -76,8 +88,8 @@
   },
   "schema": "skill-resolve-baseline/v1",
   "totals": {
-    "hit1": 18,
-    "hit3": 18,
-    "n": 18
+    "hit1": 21,
+    "hit3": 21,
+    "n": 21
   }
 }

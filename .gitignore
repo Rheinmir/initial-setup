@@ -71,3 +71,7 @@ harness/metrics/context-receipts.jsonl
 
 # .overstack/kit — sandbox clone overstack (fdk-kit.sh pull), local-only
 .overstack/kit/
+
+# handover tự sinh khi phiên hết ngân sách (per-terminal, đã consume) + artifact visual-check của viewport-check
+llmwiki/handover/
+*.visual-check.*

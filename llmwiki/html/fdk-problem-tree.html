@@ -1071,6 +1071,17 @@
     "date": "2026-09-08",
     "session": "proposal 080926-prd-grade-fe",
     "solvedBy": "skill prd-grade-fe (design-sync.py + fe-gate.sh + preset macOS glass) · R7 nhận artifact archify · sync-skill.sh mang theo scripts/references"
+  },
+  {
+    "id": "p-51",
+    "parent": "p-01",
+    "title": "Kho nháp draft/ phình (58 file) mà không vòng phản hồi nào hỏi dọn; status frontmatter không được đọc làm tín hiệu outdated",
+    "desc": "Chạy thử docs-curate plan thật đo được 3 nợ: D1 apply dời draft TRACKED (Path.replace) vào archive/ gitignored = xoá khỏi repo, ~30 draft đang được wikilink → wiki-health đỏ; D2 archive theo tuổi xếp 26 draft còn status proposed vào archive; D3 tên khó nhớ nên user chưa gọi bao giờ. Đề xuất: docs-curate check (0-token, ngưỡng >10 file tầng gốc) + session_start hỏi user 1 lần/phiên (quét outdated → promote/ingest → cold archive) + đọc status: frontmatter; skill /docs-curate vẫn gọi tay bất cứ lúc nào",
+    "status": "solved",
+    "scope": "full",
+    "date": "2026-09-09",
+    "session": "proposal 090926-docs-curate-threshold-gate",
+    "solvedBy": "harness/scripts/tidy.py + session_start.draft_threshold + skill /tidy + validator/engine miễn archive/ (proposal 090926-docs-curate-threshold-gate, test tidy-test.sh 11/11)"
   }
 ]
 </script>

@@ -37,31 +37,21 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-      - name: rút log + LỆNH tái hiện (thứ khiến issue agent làm được, không chỉ đọc được)
+      - name: cắt log đỏ thành KHỐI CẤU TRÚC (agent đoán ngay, không phải đọc cục log)
         run: |
           gh run view "$RUN_ID" --repo "$REPO" --log-failed 2>/dev/null \
-            | sed -e "s/$(printf '\033')\[[0-9;]*m//g" > /tmp/raw.txt || true
-          # Neo vào ##[error] cuối: `tail` trần chỉ ra rác dọn dẹp của runner, không ra lỗi.
-          # Cùng lượt lần ngược tìm dòng "##[group]Run <cmd>" của CHÍNH step đỏ đó =
-          # lệnh tái hiện tại máy. cut/sed bỏ cột job+step+timestamp cho dễ đọc.
-          awk -F'\t' '{L[NR]=$0} /##\[error\]/{e=NR}
-            END{ if(!e) exit
-              split(L[e],p,"\t"); print "STEP=" p[2] > "/tmp/meta.txt"
-              for(i=e;i>0;i--){ split(L[i],q,"\t")
-                if(q[2]==p[2] && q[3] ~ /##\[group\]Run /){
-                  sub(/.*##\[group\]Run /,"",q[3]); print "CMD=" q[3] > "/tmp/meta.txt"; break } }
-              s=(e>25?e-24:1); for(i=s;i<=e;i++) print L[i] > "/tmp/cut.txt" }' /tmp/raw.txt
-          cut -f3- /tmp/cut.txt 2>/dev/null | sed -E 's/^[0-9T:.Z-]{20,} //' > /tmp/faillog.txt || true
+            | python3 harness/scripts/ci-fail-parse.py > /tmp/parsed.txt || true
+          awk '/^---LOG---$/{f=1;next} !f{print > "/tmp/meta.yaml"} f{print > "/tmp/faillog.txt"}' \
+            /tmp/parsed.txt
+          test -s /tmp/meta.yaml || echo '  parsed: false' > /tmp/meta.yaml
           test -s /tmp/faillog.txt || echo "(không lấy được log — mở $RUN_URL)" > /tmp/faillog.txt
-          test -f /tmp/meta.txt || : > /tmp/meta.txt
-          echo "STEP=$(sed -n 's/^STEP=//p' /tmp/meta.txt | head -1)" >> "$GITHUB_ENV"
-          echo "CMD=$(sed -n 's/^CMD=//p' /tmp/meta.txt | head -1)" >> "$GITHUB_ENV"
 
       - name: mở issue mirror, hoặc bình luận nếu đã có issue mở cùng workflow
         run: |
           gh label create ci-fail --repo "$REPO" --color B60205 \
             --description "CI đỏ trên nhánh mặc định — mở tự động" 2>/dev/null || true
 
+          REPRO=$(sed -n 's/^  repro_cmd: "\(.*\)"$/\1/p' /tmp/meta.yaml)
           TITLE="CI đỏ: $WF trên $BRANCH"
           EXISTING=$(gh issue list --repo "$REPO" --state open --label ci-fail \
             --search "\"$TITLE\" in:title" --json number,title \
@@ -73,23 +63,22 @@ jobs:
             echo
             echo '```yaml'
             echo "ci-fail:"
-            echo "  workflow: $WF"
-            echo "  branch: $BRANCH"
-            echo "  commit: $SHA"
-            echo "  run_url: $RUN_URL"
-            echo "  failed_step: ${STEP:-'(không rút được)'}"
-            echo "  repro_cmd: ${CMD:-'(không rút được — mở run_url)'}"
-            echo "  verify_cmd: python3 fdk/tools/medic.py --ci"
-            echo "  ledger: llmwiki/wiki/sources/ISSUES.md"
+            echo "  workflow: \"$WF\""
+            echo "  branch: \"$BRANCH\""
+            echo "  commit: \"$SHA\""
+            echo "  run_url: \"$RUN_URL\""
+            cat /tmp/meta.yaml
+            echo "  verify_cmd: \"python3 fdk/tools/medic.py --ci\""
+            echo "  ledger: \"llmwiki/wiki/sources/ISSUES.md\""
             echo '```'
             echo
             echo "**Kéo về tái hiện:**"
             echo '```bash'
             echo "git fetch origin && git checkout $SHA"
-            echo "${CMD:-# xem $RUN_URL}"
+            echo "${REPRO:-# không rút được lệnh — mở $RUN_URL}"
             echo '```'
             echo
-            echo "<details><summary>Log bước đỏ — 25 dòng kết ở <code>##[error]</code></summary>"
+            echo "<details><summary>Log thô — 25 dòng kết ở <code>##[error]</code></summary>"
             echo
             echo '```'
             cat /tmp/faillog.txt

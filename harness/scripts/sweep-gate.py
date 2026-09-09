@@ -58,7 +58,7 @@ def check(root: Path, cfg) -> str:
         return f"[sweep-gate] chưa có baseline — chạy `sweep-gate.py --mark` để chốt mốc Sweep đầu (tổng {total})."
     if delta >= thr:
         return (f"⟳ [sweep-gate] đã THÊM {delta} đơn vị kể từ Sweep cuối (ngưỡng {thr}) → đến lúc "
-                f"SWEEP: /simplify, gỡ trùng/merge, unship cái không dùng, /docs-curate. "
+                f"SWEEP: /simplify, gỡ trùng/merge, unship cái không dùng, /tidy. "
                 f"Xong chạy `sweep-gate.py --mark`. (Boris: Sweeper là thói quen, không phải khi-nhớ-ra.)")
     return f"[sweep-gate] +{delta}/{thr} kể từ Sweep cuối — chưa cần gọt."
 

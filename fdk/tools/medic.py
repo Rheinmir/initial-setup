@@ -193,7 +193,7 @@ PROBE_MECH_MAP = {
     "narrative": None, "foundation": None, "code": None, "eval": None, "freshinstall": None,
     "selfstate": "code-state", "capsurface": "capsurface",
     "capproof": "capproof", "provenance": "provenance-scope",
-    "orchestration": None, "deps": None, "wikisummary": None,
+    "orchestration": None, "deps": None, "wikisummary": None, "tidy": None,
 }
 
 
@@ -511,8 +511,25 @@ def p_deps():
                   + (f" ({', '.join(d['name'] for d in ok)})" if ok else "")), ""
 
 
+def p_tidy():
+    """Kho nháp phình? (tidy check, 0 token) — warn, không fail: docs-sprawl là sức khoẻ, không phải lỗi chặn."""
+    t = ROOT / "harness/scripts/tidy.py"
+    if not t.is_file():
+        return "skip", "thiếu harness/scripts/tidy.py", ""
+    r = sh([sys.executable, str(t), "check", "--root", str(ROOT), "--json"], timeout=20)
+    try:
+        s = json.loads(r.stdout or "{}")
+    except Exception:
+        return "skip", "tidy check không parse được", ""
+    if r.returncode == 3:
+        return ("warn", f"draft/ {s.get('draft_top')} file (> {s.get('threshold')}) · outdated {s.get('outdated')} · promote? {s.get('promote')}",
+                "/tidy  (plan → promote bản chất → apply)")
+    return "ok", f"draft/ {s.get('draft_top')} file ≤ ngưỡng {s.get('threshold')}", ""
+
+
 PROBES = [
     ("rules",    ["rules", "luật", "bite"],      p_rules),
+    ("tidy",     ["tidy", "docs", "draft", "sprawl", "archive"], p_tidy),
     ("coverage", ["rules", "coverage", "luật"],  p_coverage),
     ("drift",    ["drift", "rules"],             lambda: p_rules()),  # drift lộ trong p_rules
     ("backstop", ["backstop", "git", "commit"],  p_backstop),

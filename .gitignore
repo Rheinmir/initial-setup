@@ -58,7 +58,7 @@ fdk/docs/superpowers/
 
 # flywheel success-flywheel raw history (local)
 harness/metrics/successes.jsonl
-llmwiki/wiki/sources/draft/archive/
+# llmwiki/wiki/sources/draft/archive/ được TRACK từ 2026-09-09 (tidy, D1): archive phải travel theo clone
 
 # mem-rank local memory store
 harness/metrics/memory.jsonl

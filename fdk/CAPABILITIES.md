@@ -1,7 +1,7 @@
 <!-- SINH BẰNG CODE: build-capabilities.py — ĐỪNG sửa tay; chạy lại để cập nhật. -->
 # CAPABILITIES — toàn bộ đồ nghề (luôn-mới, đếm từ đĩa)
 
-**89 skill · 19 rule · 24 fdk-tool · 72 harness-script.** Agent: đây là danh sách ĐẦY ĐỦ những gì bạn có để dùng. Tìm nhanh: `python3 fdk/tools/build-skill-search.py` rồi `find-skill "<việc cần làm>"`. Phát triển framework: gọi `/fdk`.
+**89 skill · 19 rule · 23 fdk-tool · 73 harness-script.** Agent: đây là danh sách ĐẦY ĐỦ những gì bạn có để dùng. Tìm nhanh: `python3 fdk/tools/build-skill-search.py` rồi `find-skill "<việc cần làm>"`. Phát triển framework: gọi `/fdk`.
 
 ## Skills (gọi bằng `/<tên>`)
 
@@ -63,7 +63,6 @@
 - **`/design-taste-frontend`** — Anti-slop frontend skill for landing pages, portfolios, and redesigns
 - **`/design-taste-frontend-v1`** — The original v1 taste-skill, preserved for projects depending on its exact behavior
 - **`/diagram`** — Vẽ SƠ ĐỒ và BIỂU ĐỒ bằng máy, không để model tự bịa hình
-- **`/docs-curate`** — Sắp xếp gọn kho tài liệu LOCAL (llmwiki/html/ + wiki/sources/draft/) khi phình to
 - **`/docs-site-macos`** — Build a beautiful macOS-inspired documentation site (single HTML file) with a liquid-glass…
 - **`/extract-site`** — Extract and convert a website or docs site into clean markdown
 - **`/fable5`** — Reasoning protocol distilled from Claude Fable 5
@@ -96,6 +95,7 @@
 - **`/snapshot-push`** — Push bonbon-ai outer repo as full snapshot, including be/ and fe/ content
 - **`/stitch-design-taste`** — Semantic Design System Skill for Google Stitch
 - **`/sync-template`** — Sync structural improvements between project and master template repo
+- **`/tidy`** — Dọn + validate kho nháp và render (wiki/sources/draft/*.md + llmwiki/html/*.html) khi phìn…
 - **`/tour-guide`** — Thêm một in-app product tour (spotlight onboarding overlay) tự viết, KHÔNG cần thư viện (k…
 - **`/tour-guide-supademo`** — Style thiết kế Supademo cho in-app product tour (dùng kèm skill tour-guide
 - **`/uat-nonit-testcase`** — Tạo bộ test case / checklist UAT cho người dùng nghiệp vụ NON-IT (C&B, kế toán, vận hành)
@@ -135,7 +135,6 @@
 - `ci-local.py`
 - `code-state.py`
 - `code_imports.py`
-- `docs-curate.py`
 - `frontend-antipattern.py`
 - `medic.py`
 - `memory-map.py`
@@ -211,6 +210,7 @@
 - `sweep-gate.py`
 - `sync-skills.py`
 - `sync-template.py`
+- `tidy.py`
 - `token-attrib.py`
 - `token-budget.py`
 - `trace-grader.py`

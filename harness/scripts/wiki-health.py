@@ -52,7 +52,7 @@ def local_only_stem(stem: str, wiki: Path) -> bool:
 
 
 def _archived(p: Path) -> bool:
-    # archive/ = lịch sử đông cứng (docs-curate dời vào, không bảo trì nữa) —
+    # archive/ = lịch sử đông cứng (tidy dời vào, không bảo trì nữa) —
     # link gãy trong đó không phải nợ sống, quét chỉ tạo nhiễu vĩnh viễn.
     return "archive" in p.parts
 
@@ -114,6 +114,9 @@ def main() -> None:
     # orphan/index vẫn đo trên content_files như cũ.
     stems = {p.stem: p for p in all_pages(wiki)}
     stems.update({p.stem: p for p in pages})
+    # archive/ (tidy dời vào, tracked từ 2026-09-09): wikilink trỏ stem đã archive = resolved-frozen —
+    # không broken (file vẫn có trên clone), không quét nội dung, không đếm inbound.
+    frozen = {p.stem for p in wiki.rglob("*.md") if _archived(p.relative_to(wiki))}
     rel = {p: p.relative_to(wiki).as_posix() for p in pages}
 
     # 1. broken wikilinks + inbound graph
@@ -125,7 +128,7 @@ def main() -> None:
             name = name.strip()
             target = stems.get(name)
             if target is None:
-                if not local_only_stem(name, wiki):   # wikilink→draft local-only ≠ broken
+                if name not in frozen and not local_only_stem(name, wiki):   # archive/ hoặc draft local-only ≠ broken
                     broken.append({"from": src.relative_to(wiki).as_posix(), "wikilink": name})
             elif target != src and target in inbound:  # inbound chỉ đo trên content pages
                 inbound[target] += 1

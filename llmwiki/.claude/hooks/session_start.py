@@ -81,6 +81,29 @@ def wiki_drift(root: Path) -> None:
 
 
 
+def draft_threshold(root: Path) -> None:
+    """Kho nháp phình (draft/*.md tầng gốc > ngưỡng, mặc định 10) → in 1 khối HỎI user có chạy /tidy
+    không (quét outdated → promote/ingest → cold archive). Vòng phản hồi Meadows cho docs-sprawl
+    (proposal 090926-docs-curate-threshold-gate). Hỏi 1 lần/phiên (SessionStart chạy 1 lần);
+    tất định, 0 token, fail-open; không có tidy.py (bản cũ) → im lặng."""
+    try:
+        t = resolve_tool(str(root), "harness/scripts/tidy.py")
+        if not t:
+            return
+        r = subprocess.run([sys.executable, t, "check", "--root", str(root), "--json"],
+                           cwd=root, capture_output=True, text=True, timeout=5)
+        if r.returncode != 3:
+            return
+        s = json.loads(r.stdout or "{}")
+        print(f"🧹 [tidy] draft/ có {s.get('draft_top')} file .md tầng gốc (> ngưỡng {s.get('threshold')}) — "
+              f"outdated {s.get('outdated')} · promote? {s.get('promote')} · html cũ {s.get('html_archive')}.\n"
+              f"   HỎI user (1 câu, trước khi làm việc khác): \"Chạy /tidy để quét nháp lỗi thời so với thực tế → "
+              f"promote/ingest bản chất quý vào wiki → dời .md đã xong vào cold archive?\" "
+              f"ĐỒNG Ý → gọi skill `tidy`. TỪ CHỐI → bỏ qua, KHÔNG hỏi lại trong phiên này.")
+    except Exception:
+        pass
+
+
 def output_style(root: Path) -> None:
     """Nhắc kiểu OUTPUT đầu mỗi phiên — chỉ khi skill thật sự có mặt (thăm dò, không đoán).
 
@@ -266,6 +289,7 @@ def main() -> None:
     harness_integrity(root)  # U11: so stamp↔global TRƯỚC early-exit (downstream v4 không có manifest)
     wiki_drift(root)         # code→wiki drift — cũng TRƯỚC early-exit (downstream v4 là đích chính)
     wikigraph_reminder(root) # C: cờ bật mà vector thiếu/cũ → nhắc 1 dòng (trước early-exit, downstream primary)
+    draft_threshold(root)    # kho nháp vượt ngưỡng → HỎI user chạy /tidy (trước early-exit, downstream primary)
     if not (root / ".template-manifest.json").is_file():
         sys.exit(0)  # không phải project dùng template → bỏ qua
 

@@ -102,7 +102,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `council` | Hội đồng nhiều model đánh giá → câu trả lời tốt nhất (Karpathy) | `skills/orchestrate/council.md` | orchestrate |
 | `trace-grader` | Chấm ĐƯỜNG ĐI của agent (tool/thứ tự/pass^k), không chỉ kết quả | `skills/orchestrate/trace-grader.md` | orchestrate |
 | `wikieval` | Bộ eval hồi quy từ wiki goldens (cascade assert + baseline, CI gate) | `skills/dev-loop/wikieval.md` | dev-loop |
-| `docs-curate` | Sắp xếp gọn kho docs local (html/draft phình to): promote bản chất→wiki, archive render, re-index | `skills/utils/docs-curate.md` | utils |
+| `tidy` | Dọn kho nháp/render (ex docs-curate): `check` ngưỡng >10 draft → hỏi đầu phiên; plan → promote bản chất→wiki → apply (git mv vào archive/ tracked, không giết draft sống) | `skills/utils/tidy.md` | utils |
 | `raise-issue` | Raise issue đầy đủ bối cảnh vào ledger local (draft) để dev khác pull về xử lý qua /fdk — feature-gap/tech-debt/foundation (KHÁC orca-issue = bug repro-first) | `skills/utils/raise-issue.md` | utils |
 | `frontier-scan` | Quét đối thủ + đối chiếu overstack 8 trục (gọi instant) — "frontier scan", "chúng ta thua gì" | `skills/utils/frontier-scan.md` | utils |
 | `brandkit` | Premium brand-kit image generation skill for creating high-end… | `skills/utils/brandkit.md` | utils |

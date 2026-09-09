@@ -151,7 +151,7 @@ LOOP_GROUPS = {
          "cavecrew": "caveman", "caveman": "caveman", "caveman-commit": "caveman", "caveman-compress": "caveman",
          "caveman-help": "caveman", "caveman-review": "caveman", "caveman-stats": "caveman",
          "fdk": "fdk", "fdk-uat": "fdk", "medic": "fdk", "harness-tour": "fdk", "harness-update": "fdk", "health-check": "fdk",
-         "snapshot-push": "fdk", "sync-template": "fdk", "docs-curate": "fdk",
+         "snapshot-push": "fdk", "sync-template": "fdk", "tidy": "fdk",
          "agent-reach": "utility",
          "check-approve": "utility", "computer-use": "utility", "find-skills": "utility",
          "full-output-enforcement": "utility", "join-project": "utility", "last30days": "utility",

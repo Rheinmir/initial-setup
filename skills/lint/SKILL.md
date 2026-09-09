@@ -48,7 +48,7 @@ After every 10 ingests, or when wiki stale/inconsistent, hoặc session_start b�
 
 8b. **Skill-usage pulse (0 token, chỉ repo framework)** — `RUN: python3 fdk/tools/skill-usage.py --weekly --no-html` → bảng tần suất tuần + skill chết (idle ≥4 tuần). Đây là dây nuôi máy đo "skill nào đáng giữ" (wired 2026-07-18, vòng grower): usage tụt/chết là DỮ KIỆN cho quyết định cắt-giữ, không phải cảm tính. Downstream không có `fdk/tools` → bỏ qua bước này.
 
-8c. **Docs-sprawl pulse (0 token)** — `RUN: python3 fdk/tools/docs-curate.py plan | head -5` → đếm KEEP/ARCHIVE. Nhóm ARCHIVE ≥ 30 mục → báo user gợi ý chạy `/docs-curate` (apply dời vào `archive/` + reindex — có gate người duyệt, tool không tự dời khi lint). Draft/html là RENDER ephemeral; để phình là chôn bản chất dưới rác — vòng đời phải có người quét theo nhịp (wired 2026-07-18).
+8c. **Docs-sprawl pulse (0 token)** — `RUN: python3 harness/scripts/tidy.py check` → exit 3 khi draft tầng gốc > 10 → báo user gợi ý chạy `/tidy` (apply dời vào `archive/` + reindex — có gate người duyệt, tool không tự dời khi lint). Draft/html là RENDER ephemeral; để phình là chôn bản chất dưới rác — vòng đời phải có người quét theo nhịp (wired 2026-07-18).
 
 8d. **Claim-receipts trên draft ACTIVE (0 token)** — với mỗi draft KEEP/TREO (không rà đồ sắp archive): `RUN: python3 harness/scripts/claim-receipts.py --check <draft>` → trích mọi file/path văn bản TRÍCH DẪN, verify còn resolve trên đĩa. Unresolved = bằng chứng tất định **nội-dung-outdated** (trỏ tới thứ đã chết/đổi tên) — flag kèm danh sách ref chết, người quyết sửa-hay-archive. Advisory (adapter `claim-receipts.config.yaml` verified:false) — không chặn, chỉ soi (wired 2026-07-18, ca unwired thứ 7).
 

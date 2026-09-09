@@ -2,12 +2,12 @@
 # engines-smoke-test — CHẠY THẬT từng engine chưa có proof (26 nợ capproof 2026-07-18),
 # mỗi cái execute với input thật trong sandbox/read-only, assert exit-code + output thật.
 # KHÔNG phải danh sách tên cho resolver ăn: tên chỉ xuất hiện vì lệnh thật được chạy ở đây.
-# Phủ: mech:harness-lint, mech:medic-mirror, skill:docs-curate, skill:ovs-notes,
+# Phủ: mech:harness-lint, mech:medic-mirror, skill:tidy, skill:ovs-notes,
 #      script: adapt-registry.py arch-scan.py dispatch-verify.py
 #              harness-lint.py ovs-notes.py query-log.py query-proxy.py skill-health.py
 #              skill-registry.py sync-skills.py sync-template.py wiki-health.py dym-sync.py
 #      tool:   artifacts.py build-cheatsheet.py build-docs-index.py build-health-dashboard.py
-#              build-skill-search.py docs-curate.py whiteboard-skill-map.py wiki-relations.py
+#              build-skill-search.py tidy.py whiteboard-skill-map.py wiki-relations.py
 set -u
 ROOT="$(cd "${1:-.}" && pwd)"
 fail=0
@@ -163,14 +163,14 @@ sum_after=$(cat "$SB/wiki/concepts/page-a.md")
 [ $rc -eq 0 ] && [ "$sum_before" = "$sum_after" ] \
   && ok "wiki-relations.py --dry-run chạy sạch, không sửa file" || bad "wiki-relations.py rc=$rc hoặc dry-run có side-effect"
 
-# ── 22. docs-curate.py (skill:docs-curate): plan trong sandbox-repo → phân loại thật ──
-T="$SB/dc"; clone_tool "$T" fdk/tools/docs-curate.py
+# ── 22. tidy.py (skill:tidy, ex docs-curate): plan trong sandbox-repo → phân loại thật ──
+T="$SB/dc"; clone_tool "$T" harness/scripts/tidy.py
 mkdir -p "$T/llmwiki/html" "$T/llmwiki/wiki/sources/draft" "$T/harness/metrics"
 printf '<html><title>a</title></html>\n' > "$T/llmwiki/html/180726-smoke.html"
 printf -- '---\ntitle: draft smoke\n---\nnoi dung\n' > "$T/llmwiki/wiki/sources/draft/180726-smoke.md"
-out=$(python3 "$T/fdk/tools/docs-curate.py" plan 2>&1); rc=$?
-[ $rc -eq 0 ] && echo "$out" | grep -q "plan" && ok "docs-curate.py plan phân loại kho fixture (rc=0)" \
-  || bad "docs-curate.py rc=$rc: $(echo "$out" | head -3)"
+out=$(python3 "$T/harness/scripts/tidy.py" plan --root "$T" 2>&1); rc=$?
+[ $rc -eq 0 ] && echo "$out" | grep -q "plan" && ok "tidy.py plan phân loại kho fixture (rc=0)" \
+  || bad "tidy.py rc=$rc: $(echo "$out" | head -3)"
 
 # ── 23. stop.py (mech:medic-mirror): payload ngoài framework → fail-open rc 0 ──
 out=$(printf '{"session_id":"smoke","transcript_path":"%s/nope.jsonl","cwd":"%s"}' "$SB" "$SB" \

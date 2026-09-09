@@ -127,6 +127,8 @@ jobs:
         run: bash harness/tests/hook-guard-invariant-test.sh .
       - name: wiki-sync — neo code→wiki (no-op gate 0-token)
         run: bash harness/tests/wiki-sync-test.sh .
+      - name: tidy — ngưỡng nháp + git-aware archive (D1/D2, không giết draft sống)
+        run: bash harness/tests/tidy-test.sh .
       - name: docs-skill-okf — skill tạo wiki .md phải xuất chuẩn OKF v0.1 (R9)
         run: bash harness/tests/docs-skill-okf-test.sh .
       - name: harness-update — T1-T4 cài/refresh trong repo tạm cô lập

@@ -34,6 +34,7 @@ rules:
       - "**/wiki/architecture/**/*.md"
       - "**/wiki/tours/**/*.md"
     exclude_basenames: ["README.md", "_template.md", "index.md", "log.md"]
+    exclude_globs: ["**/draft/archive/**"]   # nháp đông cứng (tidy dời vào, tracked) — không soi lại
 
   folder_structure:
     id: R5
@@ -53,6 +54,7 @@ rules:
     enforce_at: [session, repo]
     target_globs: ["**/wiki/sources/draft/**/*.md", "**/wiki/draft/**/*.md"]
     exclude_basenames: ["_template.md", "README.md", "index.md", "log.md"]   # template/meta miễn R7 (khớp production proposal_complete.py)
+    exclude_globs: ["**/draft/archive/**"]   # nháp đông cứng (tidy) — CI từng cắn nháp cũ khi chạm (GH#146)
     when_contains: ["## Plan", "proposed"]
     need_contains: ["## Agent Task Assignment", "Sequence diagram", "## Global constraints"]
     # Model TỰ ĐIỀN mặc định là bình thường (khai bằng tag '(default)' trong ## Assumptions).
@@ -69,6 +71,7 @@ rules:
     enforce_at: [session, repo]
     target_globs: ["**/wiki/sources/draft/*-PLAN.md", "**/wiki/draft/*-PLAN.md"]
     exclude_basenames: ["_template.md", "README.md"]
+    exclude_globs: ["**/draft/archive/**"]
     when_contains: ["### Task"]
     need_contains: ["**Files:**", "**Interfaces:**", "## Global constraints", "**Thoả:**"]
     # TRẦN của bản khai báo: engine vendor-neutral chỉ so 'file có chứa X' nên nó gác ở mức FILE.
@@ -84,6 +87,7 @@ rules:
     enforce_at: [session, repo]
     target_globs: ["**/wiki/concepts/**/*.md", "**/wiki/entities/**/*.md", "**/wiki/sources/**/*.md", "**/wiki/draft/**/*.md", "**/wiki/architecture/**/*.md", "**/wiki/tours/**/*.md"]
     exclude_basenames: ["README.md", "_template.md", "index.md", "log.md", "decisions.md", "active-context.md"]
+    exclude_globs: ["**/draft/archive/**"]   # nháp đông cứng (tidy) — không soi lại
     require_key: type
 
   seq_html_glass:

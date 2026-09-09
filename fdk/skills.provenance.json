@@ -237,13 +237,6 @@
       "recorded": "2026-09-07",
       "source": "local-authored"
     },
-    "docs-curate": {
-      "files": {
-        "SKILL.md": "0aa107a85ce5cfddab929f3945a5f1807174fde792e72b1a40d460e56b85bf80"
-      },
-      "recorded": "2026-07-18",
-      "source": "local-authored"
-    },
     "docs-site-macos": {
       "files": {
         "SKILL.md": "dfb6db8cb6d58a9b94fb6825728aac0ccfd4ee6ed619c0b199e5b18a227ba75c",
@@ -707,9 +700,9 @@
     },
     "lint": {
       "files": {
-        "SKILL.md": "3acd731a83447568ef85a7a71791686de52ab2f8cb486155547dd9f8dbbb89ce"
+        "SKILL.md": "98a7a12bfc2d09673df9157ffee40ca256e197946044fdee06afffc80c9a957f"
       },
-      "recorded": "2026-08-03",
+      "recorded": "2026-09-09",
       "source": "local-authored"
     },
     "loop-runner": {
@@ -951,6 +944,13 @@
         "SKILL.md": "c3b918c5caeb1c96650bb858b892349e32a34a8c4ca80c2683eabdde6fe7b5e3"
       },
       "recorded": "2026-08-03",
+      "source": "local-authored"
+    },
+    "tidy": {
+      "files": {
+        "SKILL.md": "71693efbb83a7c486307a022284c0d027cf9e5952fb7c7b66b97249b9bffd562"
+      },
+      "recorded": "2026-09-09",
       "source": "local-authored"
     },
     "tour-guide": {

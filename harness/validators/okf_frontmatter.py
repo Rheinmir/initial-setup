@@ -38,8 +38,8 @@ def is_wiki_content_file(path: str) -> bool:
     if not m:
         return False
     rel = m.group(1)
-    if Path(rel).name in SKIP_BASENAMES:
-        return False
+    if Path(rel).name in SKIP_BASENAMES or "archive" in Path(rel).parts:
+        return False   # archive/ = nháp đông cứng (tidy dời vào) — không soi lại lịch sử
     return rel.startswith(CONTENT_DIRS)
 
 

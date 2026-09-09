@@ -76,7 +76,8 @@
     "harness/scripts/archetype.py",
     "harness/scripts/query-log.py",
     "harness/scripts/code-logger.py",
-    "harness/scripts/wiki-sync.py"
+    "harness/scripts/wiki-sync.py",
+    "harness/scripts/tidy.py"
   ],
   "excludes": [
     ".env",

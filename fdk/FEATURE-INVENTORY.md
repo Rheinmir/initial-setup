@@ -109,7 +109,7 @@
 | sync-template | Sync cải tiến cấu trúc project ↔ repo template master. |
 | join-project | Orient nhanh vào project đang chạy đã có llmwiki (read-only). |
 | raise-issue | Raise issue đầy bối cảnh vào ledger local + mirror tracker remote. |
-| docs-curate | Sắp xếp gọn kho tài liệu local (html + draft): promote/archive/re-index. |
+| tidy | Sắp xếp gọn kho tài liệu local (html + draft): promote/archive/re-index. |
 | ovs-notes | Viewer release-notes overstack tức thì (kiểu /release-notes). |
 | frontier-scan | Quét biên giới agent-framework 30 ngày + đối chiếu overstack 8 trục. |
 | find-skills | Giúp user khám phá + cài skill khi hỏi "làm sao X / có skill nào cho X". |

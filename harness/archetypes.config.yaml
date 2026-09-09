@@ -28,7 +28,7 @@ archetypes:
     phase: "clean / unship"
     cli: opencode                 # ASSUMPTION (not verified) — gọt cơ học, độc lập, verify được → CLI rẻ
     model: opencode/big-pickle
-    tools: [simplify, docs-curate, sweep-gate]
+    tools: [simplify, tidy, sweep-gate]
     posture: llmwiki/personas/sweeper.md
   grower:
     keyword: "/grow"

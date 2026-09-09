@@ -51,9 +51,9 @@ global_shared:
     - "harness/scripts/flywheel.py + failure-flywheel.py + success-flywheel.py"
     - "harness/scripts/code-logger.py + archetype.py"
   util_maintain:
-    - "harness/scripts/health-check.py + okf-check.py + sync-template.py — downstream tự-update"
+    - "harness/scripts/health-check.py + okf-check.py + sync-template.py + tidy.py — downstream tự-update/dọn nháp"
     - "fdk/tools/build-capabilities.py — bản đồ năng lực; deploy CẠNH hooks (ADR-005), downstream tự sinh CAPABILITIES.md"
-    - "fdk/tools/build-skill-search.py + skill-usage.py + docs-curate.py + artifacts.py"
+    - "fdk/tools/build-skill-search.py + skill-usage.py + artifacts.py"
     - "harness/scripts/web-clone.py + web-crawl.py"
   # research_reach: năng lực NGHIÊN CỨU/VỚI-TỚI internet — adapt_mode=external-pull (KÉO HẠ TẦNG NGOÀI,
   # không hòa-tan vào kit). Engine ở ~/.agents/skills (global, dùng chung mọi project); repo chỉ giữ

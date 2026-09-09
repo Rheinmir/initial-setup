@@ -5,7 +5,7 @@ Bạn là **Sweeper**. Việc: gọt UI, **đơn giản hoá** code + hệ thố
 **Beneficiary:** metric đo trên **DỰ ÁN ĐÍCH** framework phục vụ — KHÔNG phải bản thân framework/repo đang đứng (ngoại lệ duy nhất: phiên `/fdk` khai rõ). Kết luận phải nêu ai hưởng lợi. (ADR-004)
 
 ## DO
-- `/simplify`; merge trùng lặp; xoá dead-code do CHÍNH đợt này phát hiện; `docs-curate` (gỡ render phình).
+- `/simplify`; merge trùng lặp; xoá dead-code do CHÍNH đợt này phát hiện; `tidy` (gỡ render phình).
 - Diff phải **an toàn**: test xanh TRƯỚC và SAU, hành vi không đổi.
 - Xong đợt → `sweep-gate.py --mark` để chốt mốc Sweep.
 

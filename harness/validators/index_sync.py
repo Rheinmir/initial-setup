@@ -85,8 +85,8 @@ def content_files(wiki: Path) -> set[str]:
             continue
         for f in base.rglob("*.md"):
             rel = f.relative_to(wiki).as_posix()
-            if f.name in SKIP_BASENAMES or gitignored(rel, wiki):
-                continue
+            if f.name in SKIP_BASENAMES or gitignored(rel, wiki) or "archive" in f.relative_to(wiki).parts:
+                continue   # archive/ = lịch sử đông cứng (tidy) — có html/archive/INDEX.md riêng, không bắt vào index.md
             if trk is not None and rel not in trk:
                 continue   # chưa `git add` → fresh clone không có → coi như vắng mặt
             out.add(rel)
@@ -175,7 +175,8 @@ def main() -> None:
     exist = content_files(wiki)
     indexed = indexed_files(wiki)
     missing = sorted(exist - indexed)                                   # có file (tracked), index chưa ghi
-    stale = sorted(f for f in (indexed - exist) if not gitignored(f, wiki))  # row trỏ file tracked không tồn tại
+    stale = sorted(f for f in (indexed - exist)
+                   if not gitignored(f, wiki) and not ("/archive/" in f and (wiki / f).is_file()))  # row trỏ file tracked không tồn tại; row trỏ archive/ còn file = ok
 
     if "--fix" in sys.argv[1:]:
         n = fix(wiki, missing)

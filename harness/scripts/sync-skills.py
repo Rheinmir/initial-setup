@@ -47,7 +47,7 @@ LOOP_MAP = {
     "caveman-help": "utils", "caveman-review": "utils", "caveman-stats": "utils",
     "extract-site": "utils", "harness-tour": "utils",
     "harness-update": "utils", "health-check": "utils", "fdk": "utils", "fdk-uat": "utils", "medic": "utils", "md-to-html": "utils",
-    "docs-curate": "utils", "raise-issue": "utils",
+    "tidy": "utils", "raise-issue": "utils",
     "frontier-scan": "utils", "ovs-notes": "utils",
     "sync-template": "utils", "uat-nonit-testcase": "utils", "cursor-animated-sites": "utils",
     # publish 260626 — skill trước LOCAL-ONLY (đẩy vào repo để không mất khi cài máy/dự án khác)

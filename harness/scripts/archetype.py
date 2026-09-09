@@ -23,7 +23,7 @@ _FALLBACK = {"verified": False, "archetypes": {
     "builder": {"keyword": "/build", "phase": "1→N production", "cli": "claude",
                 "tools": ["propose", "verify-before-commit"], "posture": "llmwiki/personas/builder.md"},
     "sweeper": {"keyword": "/sweep", "phase": "clean / unship", "cli": "opencode",
-                "tools": ["simplify", "docs-curate", "sweep-gate"], "posture": "llmwiki/personas/sweeper.md"},
+                "tools": ["simplify", "tidy", "sweep-gate"], "posture": "llmwiki/personas/sweeper.md"},
     "grower": {"keyword": "/grow", "phase": "iterate PMF", "cli": "claude",
                "tools": ["success-flywheel", "wikieval"], "posture": "llmwiki/personas/grower.md"},
     "maintainer": {"keyword": "/maintain", "phase": "scale / harden", "cli": "claude",

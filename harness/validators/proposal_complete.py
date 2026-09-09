@@ -151,7 +151,8 @@ def section(text, title):
 
 def is_in_scope(path):
     p = (path or "").replace("\\", "/")
-    return p.endswith(".md") and DRAFT_RE.search(p) and Path(p).name not in ("README.md", "_template.md")
+    return (p.endswith(".md") and DRAFT_RE.search(p) and Path(p).name not in ("README.md", "_template.md")
+            and "/archive/" not in p)   # archive/ = nháp đông cứng (tidy) — không soi lại lịch sử (GH#146)
 
 
 def check(path):

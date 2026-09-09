@@ -54,7 +54,7 @@ def _check_lifecycle(tasks: dict) -> list:
             continue
         states = [h.get("state") for h in hist]
         # 'superseded' = terminal hợp lệ từ BẤT KỲ điểm nào của chuỗi (task bị thay thế
-        # bởi task/issue khác — ngữ nghĩa docs-curate JOIN); phần trước nó vẫn phải liền mạch.
+        # bởi task/issue khác — ngữ nghĩa tidy JOIN); phần trước nó vẫn phải liền mạch.
         chain = states[:-1] if states and states[-1] == "superseded" else states
         if not chain:
             errs.append(f"{tid}: 'superseded' phải đứng sau ít nhất 'proposed'")

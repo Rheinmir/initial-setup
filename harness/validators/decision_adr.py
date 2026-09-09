@@ -48,7 +48,7 @@ def check_decisions(path: str) -> list:
         if typ.lower() in ARCH_TYPES:
             if not ADR_REF.search(outcome) and "no-adr" not in outcome.lower():
                 bad.append(f"  • '{decision[:48]}' (architecture) — cột Outcome thiếu 'ADR-N' "
-                           f"(promote /docs-curate hoặc /adr new) hoặc khai '(no-adr: <lý do>)'")
+                           f"(promote /tidy hoặc /adr new) hoặc khai '(no-adr: <lý do>)'")
     return bad
 
 

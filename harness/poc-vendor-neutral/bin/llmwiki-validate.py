@@ -120,6 +120,8 @@ def check_require_section(path, content, rule):
     p = norm(path)
     if os.path.basename(p) in (rule.get("exclude_basenames") or []):
         return None
+    if any(glob_to_regex(g).match(p) for g in (rule.get("exclude_globs") or [])):
+        return None   # vd **/draft/archive/** — nháp đông cứng (tidy), không soi lại
     if not any(glob_to_regex(g).match(p) for g in rule.get("target_globs", [])):
         return None
     if content is None:
@@ -141,6 +143,8 @@ def _in_scope(path, rule):
     p = norm(path)
     if os.path.basename(p) in (rule.get("exclude_basenames") or []):
         return None
+    if any(glob_to_regex(g).match(p) for g in (rule.get("exclude_globs") or [])):
+        return None   # vd **/draft/archive/** — nháp đông cứng (tidy), không soi lại
     if not any(glob_to_regex(g).match(p) for g in rule.get("target_globs", [])):
         return None
     return p

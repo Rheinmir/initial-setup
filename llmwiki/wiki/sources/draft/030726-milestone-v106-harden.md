@@ -1,7 +1,7 @@
 ---
 type: draft
 title: "030726-milestone-v106 — hardening (medic 17/17 + framework-touch hook) + query-implement"
-status: proposed
+status: implemented
 tags: [milestone, v1.0.6, medic, fdk-hardening, query, retrieval, output-report]
 timestamp: 2026-07-03
 task: T-260703-02
@@ -65,3 +65,8 @@ Milestone v1.0.6: hiện thực các NỢ đã ghi ở v1.0.5 — biến 2 verdi
 - **Draft:** `wiki/sources/draft/030726-milestone-v106-harden.md`
 - **Commit:** _(verify-before-commit điền)_
 - **Date promoted:** _(verify-before-commit điền)_
+
+## Global constraints
+
+- Proposal này **đã implemented** (status ở frontmatter); ràng buộc bao trùm lúc thi hành là bộ luật chung của repo tại thời điểm đó — không ghi công AI trong commit (R15), không `--no-verify`, `medic --ci` xanh trước khi push.
+- Mục này bổ sung 2026-09-09 để thoả R7 (policy `when_contains: ["## Plan", "proposed"]` soi theo chuỗi, không theo frontmatter, nên chữ 'proposed' trong thân vẫn kích hoạt).

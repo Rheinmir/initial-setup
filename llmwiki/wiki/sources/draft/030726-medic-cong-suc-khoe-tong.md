@@ -1,7 +1,7 @@
 ---
 type: draft
 title: "030726-medic — cổng sức khoẻ tổng / tuyến phòng thủ cuối của framework (1 lệnh, tự-mở-coverage)"
-status: proposed
+status: implemented
 tags: [medic, health-gate, enforcement, harness-doctor, hub, output-report]
 timestamp: 2026-07-03
 task: T-260703-01
@@ -67,3 +67,8 @@ relations:
 - **Draft:** `wiki/sources/draft/030726-medic-cong-suc-khoe-tong.md`
 - **Commit:** _(verify-before-commit điền)_
 - **Date promoted:** _(verify-before-commit điền)_
+
+## Global constraints
+
+- Proposal này **đã implemented** (status ở frontmatter); ràng buộc bao trùm lúc thi hành là bộ luật chung của repo tại thời điểm đó — không ghi công AI trong commit (R15), không `--no-verify`, `medic --ci` xanh trước khi push.
+- Mục này bổ sung 2026-09-09 để thoả R7 (policy `when_contains: ["## Plan", "proposed"]` soi theo chuỗi, không theo frontmatter, nên chữ 'proposed' trong thân vẫn kích hoạt).

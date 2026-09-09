@@ -105,6 +105,7 @@ Karpathy ở trên là "vì sao"; đây là "làm sao". (Chưng cất từ ponyt
 | `docs-curate` | Sắp xếp gọn kho docs local (html/draft phình to): promote bản chất→wiki, archive render, re-index | `skills/utils/docs-curate.md` | utils |
 | `raise-issue` | Raise issue đầy đủ bối cảnh vào ledger local (draft) để dev khác pull về xử lý qua /fdk — feature-gap/tech-debt/foundation (KHÁC orca-issue = bug repro-first) | `skills/utils/raise-issue.md` | utils |
 | `frontier-scan` | Quét đối thủ + đối chiếu overstack 8 trục (gọi instant) — "frontier scan", "chúng ta thua gì" | `skills/utils/frontier-scan.md` | utils |
+| `br` | Dây chuyền sản xuất Ralph: BR-kỹ (Business Requirements) → frames gắn-chặt-code → mỗi frame là loop có harness. `/br interview·compile·slice·run·qc·status` |
 | `brandkit` | Premium brand-kit image generation skill for creating high-end… | `skills/utils/brandkit.md` | utils |
 | `hallmark` | **NỀN design mặc định** (Together AI) — 6 discipline + 57 cổng slop-test, từ chối trông AI-generated. Mọi UI đứng trên nó; skill taste khác là flavour. 4 verb: build/audit/redesign/study. Xem [[design-foundation]] | `skills/utils/hallmark.md` | utils |
 | `prd-grade-fe` | Pipeline MỘT CỬA ra frontend chuẩn production có cổng máy gác: interview nguồn theme (A macOS glass · B tài liệu · C URL) → khoá vào `design.md` (hallmark + impeccable đọc chung) → build token-only → `fe-gate.sh` (impeccable detect + 4 viewport) + rubric audit/harden/polish → mới giao. Đứng TRÊN hallmark, thêm gate | `skills/utils/prd-grade-fe.md` | utils |

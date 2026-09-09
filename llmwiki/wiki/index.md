@@ -12,6 +12,7 @@
 | [repowise](entities/repowise.md) | entity | Đối thủ codebase-intelligence (CLI+MCP, AGPL-3.0, 5088★): 5-lớp index, 10 MCP tool task-shaped, code-health 49-detector defect-validated, PR bot 0-LLM — so sánh điểm chạm thật với code-graph/ingest nội bộ |
 | [adapt-modes](concepts/adapt-modes.md) | concept | 3 kiểu absorb năng lực vào dự án — HÒA TAN / KÉO NGOÀI / NHÚNG-SỞ-HỮU; gọi đúng tên chọn đúng phương án |
 | [decision-anchoring](concepts/decision-anchoring.md) | concept | Neo quyết định vào symbol code, 4 trạng thái LIVE/STALE/ORPHAN/UNAVAILABLE suy từ code-graph, không cất tay |
+| [ci-issue-loop](concepts/ci-issue-loop.md) | concept | Vòng CI → issue → agent: 3 lớp gác (pre-commit cắn sớm · CI cắn chắc · đỏ thì tự mở issue có khối ci-fail máy đọc + prompt cố định); vì sao CI KHÔNG ghi ledger | 2026-09-09 |
 | [log-model](concepts/log-model.md) | concept | Bản đồ 5 cơ chế "ghi lại chuyện đã xảy ra" (events/scratch-log/mem-rank/touches/provenance-log) — mỗi cái độc lập, đừng ép hợp nhất |
 | [provenance-log](concepts/provenance-log.md) | concept | Sổ sự kiện artifact-level git-native, hash-chain theo writer, merge=union, CAP=AP — pattern Kafka rẻ dựng từ mảnh đã có sẵn |
 | [evidence-terminal-chain](concepts/evidence-terminal-chain.md) | concept | Schema chuỗi chứng cứ và sáu loại điểm cuối của luật R19 — chuỗi kết luận phải chấm dứt ở thứ xem được, `web` đòi link đúng chỗ + ngày + trích nguyên văn, `parametric` (kiến thức từ training) đòi origin và cấm đứng một mình; kèm giới hạn "resolve path không đồng nghĩa chống lưng nội dung" |
@@ -132,6 +133,8 @@
 | [prd-grade-fe-production](sources/evals/skill-resolve/prd-grade-fe-production.md) | eval | skill-resolve golden: prd-grade-fe-production |
 | [prd-grade-fe-theme-docs](sources/evals/skill-resolve/prd-grade-fe-theme-docs.md) | eval | skill-resolve golden: prd-grade-fe-theme-docs |
 | [prd-grade-fe-url](sources/evals/skill-resolve/prd-grade-fe-url.md) | eval | skill-resolve golden: prd-grade-fe-url |
+| [090926-session-provenance](sources/090926-session-provenance.md) | source | session-provenance f38daa12 — auto-distill |
+| [ci-maintainer-brief](sources/ci-maintainer-brief.md) | reference | CI maintainer brief |
 <!-- index:auto:end -->
 | [140726-propose-plan-split-superpowers](sources/draft/140726-propose-plan-split-superpowers.md) | draft | Tách vòng đời đề xuất thành SPEC (/propose, người duyệt) và PLAN (/plan mới, agent mù thi hành), mở rộng R7 cắn cả hai |
 | [110726-shipped-vs-documented-parity](sources/draft/110726-shipped-vs-documented-parity.md) | draft | Issue: tài liệu hứa 74 skill nhưng npx chỉ giao 67 trong im lặng — cần cổng so hứa với giao ở fresh-install-smoke --remote |

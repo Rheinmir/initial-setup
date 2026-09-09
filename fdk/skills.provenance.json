@@ -842,9 +842,9 @@
     },
     "playwright-verify": {
       "files": {
-        "SKILL.md": "87e1a19de3fcb192032584cb3fecdb38efc37cbe17005442034a979adcf952a1"
+        "SKILL.md": "5d461fd3735f20db525841fac1548fb7082d616f7bc032d5dd9699dd6872ef46"
       },
-      "recorded": "2026-09-07",
+      "recorded": "2026-09-09",
       "source": "local-authored"
     },
     "prd-grade-fe": {

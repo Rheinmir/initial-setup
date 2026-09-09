@@ -1,0 +1,298 @@
+<title>browser-use · luồng skill</title>
+<script>
+  // chống FOUC: đặt theme trước khi trang vẽ
+  (function () {
+    try {
+      var t = localStorage.getItem('dym-bu-theme');
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+  :root {
+    --bg1: #eaf2fb; --bg2: #f7fbff; --orb1: #bcd9f7; --orb2: #d9e9fb;
+    --glass: rgba(255,255,255,.62); --glass-2: rgba(255,255,255,.42);
+    --stroke: rgba(15,42,74,.13); --edge: rgba(255,255,255,.75);
+    --ink: #10233c; --ink-2: #46617f; --ink-3: #7a90a8;
+    --accent: #1f6feb; --ok: #157a54; --warn: #9a5b06; --stop: #a32b2b;
+    --code-bg: rgba(15,42,74,.055);
+  }
+  :root[data-theme="dark"] {
+    --bg1: #070d16; --bg2: #0d1725; --orb1: #14314f; --orb2: #10233a;
+    --glass: rgba(20,33,52,.60); --glass-2: rgba(20,33,52,.40);
+    --stroke: rgba(150,190,235,.15); --edge: rgba(160,200,245,.10);
+    --ink: #dfeaf7; --ink-2: #9db4cd; --ink-3: #6b8199;
+    --accent: #6aa6ff; --ok: #4fc496; --warn: #e0a341; --stop: #ef7f7f;
+    --code-bg: rgba(160,200,245,.09);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--ink); font: 13px/1.6 -apple-system, BlinkMacSystemFont,
+      "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(155deg, var(--bg1), var(--bg2));
+    min-height: 100vh; overflow-x: hidden;
+  }
+  .orb { position: fixed; border-radius: 50%; filter: blur(80px); z-index: 0; pointer-events: none; }
+  .orb.a { width: 46vw; height: 46vw; background: var(--orb1); top: -14vw; left: -10vw; opacity: .55; }
+  .orb.b { width: 38vw; height: 38vw; background: var(--orb2); bottom: -14vw; right: -8vw; opacity: .5; }
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 12px; top: 12px; z-index: 99; background: var(--glass); padding: 8px 14px;
+    border-radius: 10px; border: 1px solid var(--stroke); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+  .shell { position: relative; z-index: 1; display: grid; grid-template-columns: 232px 1fr;
+    gap: 22px; max-width: 1180px; margin: 0 auto; padding: 26px 22px 60px; align-items: start; }
+  aside { position: sticky; top: 26px; background: var(--glass); backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid var(--stroke);
+    border-top-color: var(--edge); border-radius: 16px; padding: 16px 14px; }
+  .chrome { display: flex; gap: 6px; margin-bottom: 14px; }
+  .chrome i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+  .chrome i:nth-child(1) { background: #ff5f57; } .chrome i:nth-child(2) { background: #febc2e; }
+  .chrome i:nth-child(3) { background: #28c840; }
+  aside h1 { font-size: 13px; margin: 0 0 3px; letter-spacing: -.01em; }
+  aside p { margin: 0 0 14px; font-size: 11.5px; color: var(--ink-3); }
+  nav a { display: block; padding: 6px 9px; border-radius: 8px; color: var(--ink-2);
+    text-decoration: none; font-size: 12.5px; }
+  nav a:hover { background: var(--glass-2); color: var(--ink); }
+  .toggle { margin-top: 16px; width: 100%; padding: 7px; border-radius: 9px; cursor: pointer;
+    background: var(--glass-2); border: 1px solid var(--stroke); color: var(--ink-2); font-size: 12px; }
+  .toggle:hover { color: var(--ink); }
+
+  main { min-width: 0; }
+  section { background: var(--glass); backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid var(--stroke);
+    border-top-color: var(--edge); border-radius: 16px; padding: 20px 22px; margin-bottom: 18px; }
+  h2 { font-size: 15px; margin: 0 0 4px; letter-spacing: -.01em; }
+  h2 + .sub { margin: 0 0 16px; color: var(--ink-3); font-size: 12px; }
+  p { margin: 0 0 11px; color: var(--ink-2); }
+  strong { color: var(--ink); font-weight: 600; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 5px; font-size: 11.5px;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 12px; min-width: 480px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--stroke); vertical-align: top; }
+  th { color: var(--ink-3); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+
+  /* ---- sơ đồ luồng ---- */
+  #flow { position: relative; }
+  #wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .lane { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 26px; }
+  .lane-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--ink-3); margin-bottom: 8px; width: 100%; }
+  .node { flex: 1 1 210px; min-width: 190px; background: var(--glass-2); border: 1px solid var(--stroke);
+    border-left: 3px solid var(--accent); border-radius: 11px; padding: 11px 13px; }
+  .node.out { border-left-color: var(--ok); }
+  .node.trap { border-left-color: var(--stop); }
+  .node b { display: block; font-size: 12.5px; margin-bottom: 4px; }
+  .node .cmd { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 11px;
+    color: var(--accent); display: block; margin-bottom: 5px; word-break: break-all; }
+  .node small { color: var(--ink-3); font-size: 11.5px; line-height: 1.5; display: block; }
+  .tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 20px;
+    border: 1px solid var(--stroke); color: var(--ink-3); margin-bottom: 6px; }
+
+  details { border-top: 1px solid var(--stroke); padding: 9px 0 2px; }
+  details summary { cursor: pointer; font-size: 12.5px; color: var(--ink); }
+  details p, details ul { margin-top: 8px; }
+  ul { margin: 0 0 11px; padding-left: 18px; color: var(--ink-2); }
+  li { margin-bottom: 5px; }
+  footer { color: var(--ink-3); font-size: 11px; padding: 4px 2px 0; word-break: break-all; }
+  @media (max-width: 820px) { .shell { grid-template-columns: 1fr; } aside { position: static; } }
+</style>
+
+<a class="skip" href="#main">Bỏ qua tới nội dung</a>
+<div class="orb a"></div><div class="orb b"></div>
+
+<div class="shell">
+  <aside>
+    <div class="chrome"><i></i><i></i><i></i></div>
+    <h1>browser-use</h1>
+    <p>bundle doyourmagic · 09/2026</p>
+    <nav>
+      <a href="#phat-hien">Phát hiện</a>
+      <a href="#flow">Sơ đồ luồng</a>
+      <a href="#doi-chieu">Đối chiếu số đo</a>
+      <a href="#bay">Bẫy đã đo</a>
+      <a href="#khong-lay">Không lấy</a>
+    </nav>
+    <button class="toggle" id="themeBtn" type="button">Đổi sáng / tối</button>
+  </aside>
+
+  <main id="main">
+    <section id="phat-hien">
+      <h2>Phát hiện lật ngược giả định</h2>
+      <p class="sub">Câu hỏi mở đầu hỏi sai chỗ — và đó là thông tin tốt.</p>
+      <p>Ta đi tìm "cách họ dùng Playwright". <strong>Họ không dùng Playwright.</strong>
+        browser-use v0.13.10 đã bỏ hẳn, chuyển sang nói CDP (Chrome DevTools Protocol —
+        giao thức Chrome mở sẵn để điều khiển từ ngoài) trực tiếp qua thư viện <code>cdp-use</code>.
+        Mọi chữ "playwright" còn sót trong mã nguồn chỉ là comment và link tài liệu.
+        Chính họ ghi trong manifest: <code># not actually needed I think</code>.</p>
+      <p>Thứ đáng học nằm ở <strong>hình dạng công cụ</strong>, không ở mẹo API. Họ tách tầng
+        lái trình duyệt (<code>browser-harness</code> — 4 dependency) khỏi tầng agent
+        (<code>browser-use</code> — 50+ dependency, có cả openai/anthropic/google-genai).
+        Tầng lái trình duyệt là một <strong>daemon có trạng thái</strong>: mỗi lượt gọi CLI là một
+        hành động nhỏ, tab và cookie giữ nguyên giữa các lượt.</p>
+    </section>
+
+    <section id="flow">
+      <h2>Sơ đồ luồng — skill nào sinh ra gì, nuôi skill nào</h2>
+      <p class="sub">Đường kẻ do JS vẽ từ vị trí thật của từng ô, vẽ lại khi đổi kích thước cửa sổ.</p>
+      <div style="position:relative">
+        <svg id="wires" aria-hidden="true"></svg>
+
+        <div class="lane">
+          <span class="lane-label">Nền — cài một lần</span>
+          <div class="node" id="n-setup">
+            <span class="tag">bước 0</span>
+            <b>Cài browser-harness</b>
+            <span class="cmd">python3.13 -m venv ~/.bh-venv</span>
+            <small>Sinh ra: một CLI 4-dependency, không SDK LLM.
+              Bẫy: <code>python3</code> của macOS là 3.9.6 → trượt, tool cần ≥ 3.11.</small>
+          </div>
+          <div class="node out" id="n-chrome">
+            <span class="tag">bước 0</span>
+            <b>Chrome riêng có cổng CDP</b>
+            <span class="cmd">--remote-debugging-port=9333</span>
+            <small>Sinh ra: một endpoint CDP dùng chung cho mọi skill dưới.
+              Không mượn Chrome cá nhân của user — macOS sẽ hỏi quyền và chiếm tab đang làm.</small>
+          </div>
+        </div>
+
+        <div class="lane">
+          <span class="lane-label">Tiêu thụ — ba workflow</span>
+          <div class="node" id="n-repl">
+            <span class="tag">nền của hai ô bên phải</span>
+            <b>repl</b>
+            <span class="cmd">/dym-browser-use repl</span>
+            <small>Lái trình duyệt kiểu REPL. Sinh ra: ảnh chụp, số đo DOM, danh sách event lỗi.
+              Bẫy: lượt đầu <code>new_tab</code>, các lượt sau đừng gọi lại.</small>
+          </div>
+          <div class="node" id="n-qa">
+            <span class="tag">đứng trên repl</span>
+            <b>qa</b>
+            <span class="cmd">/dym-browser-use qa</span>
+            <small>Biến quan sát thành verdict 1–5 có dẫn chứng.
+              Bẫy: ảnh chụp sạch không chứng minh gì — phải <code>drain_events()</code>.</small>
+          </div>
+          <div class="node" id="n-cloud">
+            <span class="tag">đứng trên repl · tốn tiền</span>
+            <b>cloud</b>
+            <span class="cmd">/dym-browser-use cloud</span>
+            <small>Môi trường sạch + chạy song song, tunnel localhost ra ngoài.
+              Bẫy: quên <code>--host-header=rewrite</code> là ăn 403 ngay.</small>
+          </div>
+        </div>
+
+        <div class="lane">
+          <span class="lane-label">Sản phẩm</span>
+          <div class="node out" id="n-verdict">
+            <b>Verdict chấm được, cãi lại được</b>
+            <small>Điểm 1–5 neo vào hoàn thành tác vụ, kèm lỗi console/network, edge case đã thử,
+              và đường dẫn ảnh chứng. Nuôi thẳng vào <code>/br qc</code>.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="doi-chieu">
+      <h2>Đối chiếu số đo — cùng máy, cùng một trang <code>file://</code></h2>
+      <p class="sub">Đo ngày 09/09/2026. Đây là con số quyết định, không phải cảm giác.</p>
+      <div class="scroll">
+        <table>
+          <tr><th>cách</th><th>thời gian một lượt</th><th>state giữa các lượt</th><th>lệ thuộc</th></tr>
+          <tr><td>Playwright script <code>.mjs</code> (hiện tại)</td><td>1.1–1.9 s (lần đầu cold-cache 3.38 s)</td>
+              <td>mất sạch — relaunch mỗi lần</td><td>node + <code>@playwright/test</code> trong project</td></tr>
+          <tr><td>browser-harness, lượt đầu</td><td>~2 s</td><td>—</td><td>python ≥ 3.11, 4 dep</td></tr>
+          <tr><td>browser-harness, lượt sau</td><td><strong>0.138 s</strong></td>
+              <td>tab + cookie + scroll giữ nguyên</td><td>như trên</td></tr>
+        </table>
+      </div>
+      <p>Chênh lệch tốc độ (~2× so với Playwright bám CDP, ~10× so với daemon) không phải điểm chính. Điểm chính là cột thứ ba: giữ được state nghĩa là
+        agent <strong>không phải viết mù cả kịch bản trước khi chạy</strong>. Một hành động, quan sát,
+        rồi mới quyết hành động kế — đúng cách một người thật dùng trình duyệt.</p>
+    </section>
+
+    <section id="bay">
+      <h2>Bẫy đã đo</h2>
+      <p class="sub">Không phải đoán — mỗi mục dưới đây là một lần chạy thật thất bại.</p>
+      <details open><summary><code>AF_UNIX path too long</code> — chết ngay lượt đầu</summary>
+        <p>Socket của daemon nằm dưới <code>$HOME</code>, macOS giới hạn đường dẫn socket 104 ký tự.
+          Scratchpad của Claude Code sâu hơn thế. Thông báo lỗi không hề nhắc tới <code>$HOME</code>,
+          nên rất dễ đi tìm nhầm chỗ. Cách né: <code>HOME=/tmp/bhh</code>.</p></details>
+      <details><summary><code>doctor --json</code> fail-open: rc=0 khi <code>healthy: false</code></summary>
+        <p>Chạy thật cho <code>{"chrome_running": true, "daemon": {"alive": false}, "healthy": false}</code>
+          mà mã thoát vẫn là 0. Wrapper nào rẽ nhánh theo mã thoát sẽ tưởng mọi thứ ổn trong khi
+          daemon chưa sống. Parse trường <code>.healthy</code>.</p></details>
+      <details><summary>Python mặc định của macOS quá cũ</summary>
+        <p><code>python3</code> trên máy này là 3.9.6; tool cần ≥ 3.11. Cài bằng <code>python3</code>
+          trượt ở bước build <code>setuptools==84.0.0</code> với một thông báo pip dài và không nói
+          gì về phiên bản Python. Dùng <code>python3.13</code> tường minh.</p></details>
+      <details><summary>Bấm theo pixel ảnh đã co là bấm trượt</summary>
+        <p>Co ảnh chụp xuống (vd <code>max_dim=1800</code> trên viewport 1920) thì pixel không còn
+          ánh xạ 1:1. Đọc toạ độ từ <code>getBoundingClientRect()</code> rồi mới
+          <code>click_at_xy</code>.</p></details>
+    </section>
+
+    <section id="khong-lay">
+      <h2>Không lấy — và vì sao</h2>
+      <ul>
+        <li><strong>Gói <code>browser-use</code> (agent tự lái).</strong> Nó là một agent LLM tự
+          quyết định bấm gì, kéo theo openai + anthropic + google-genai + groq + ollama + mcp +
+          posthog. Framework này đã có agent — là chính Claude Code. Nhét thêm một vòng agent bên
+          trong chỉ để bấm nút là trả tiền hai lần cho cùng một việc suy luận, và mất luôn khả năng
+          nhìn thấy agent đang làm gì.</li>
+        <li><strong>Workflow đóng góp cho chính repo browser-use.</strong> Ta là người tiêu thụ.</li>
+        <li><strong>Skill <code>x402</code>, <code>open-source</code>, <code>remote-browser</code>
+          của họ.</strong> Bán hàng cho Cloud của họ, không phải tri thức chuyển giao được.</li>
+      </ul>
+    </section>
+
+    <footer id="path"></footer>
+  </main>
+</div>
+
+<script>
+  // ---- toggle sáng/tối ----
+  document.getElementById('themeBtn').addEventListener('click', function () {
+    var cur = document.documentElement.getAttribute('data-theme');
+    var next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('dym-bu-theme', next); } catch (e) {}
+    draw();
+  });
+
+  // ---- đường nối: vẽ từ vị trí THẬT, không hardcode toạ độ ----
+  var EDGES = [
+    ['n-setup', 'n-repl'], ['n-chrome', 'n-repl'],
+    ['n-repl', 'n-qa'], ['n-repl', 'n-cloud'],
+    ['n-qa', 'n-verdict'], ['n-cloud', 'n-verdict']
+  ];
+  var svg = document.getElementById('wires');
+
+  function draw() {
+    var host = svg.parentElement, hb = host.getBoundingClientRect();
+    svg.setAttribute('viewBox', '0 0 ' + hb.width + ' ' + hb.height);
+    svg.style.height = hb.height + 'px';
+    var stroke = getComputedStyle(document.documentElement).getPropertyValue('--stroke').trim();
+    var d = '';
+    EDGES.forEach(function (e) {
+      var a = document.getElementById(e[0]), b = document.getElementById(e[1]);
+      if (!a || !b) return;
+      var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      var x1 = ra.left - hb.left + ra.width / 2, y1 = ra.bottom - hb.top;
+      var x2 = rb.left - hb.left + rb.width / 2, y2 = rb.top - hb.top;
+      if (y2 < y1) return;                       // cùng hàng khi màn hẹp → bỏ đường nối
+      var m = (y1 + y2) / 2;
+      d += 'M' + x1 + ',' + y1 + ' C' + x1 + ',' + m + ' ' + x2 + ',' + m + ' ' + x2 + ',' + y2 + ' ';
+    });
+    svg.innerHTML = '<path d="' + d + '" fill="none" stroke="' + stroke + '" stroke-width="1.5"/>';
+  }
+
+  addEventListener('resize', draw);
+  addEventListener('load', draw);
+  document.querySelectorAll('details').forEach(function (el) { el.addEventListener('toggle', draw); });
+  draw();
+
+  document.getElementById('path').textContent =
+    decodeURIComponent(location.pathname) || 'doyourmagic/browser-use/flow.html';
+</script>

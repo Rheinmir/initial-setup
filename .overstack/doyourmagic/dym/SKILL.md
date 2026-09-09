@@ -1,6 +1,6 @@
 ---
 name: dym
-description: "Tool ngoài ĐÃ KIỂM CHỨNG, chọn theo domain: agent · architecture · chart · copy · design-audit · diagram · frontend · report · research · science · security · skill-authoring · threat-intel · writing. Gọi khi việc thuộc một domain đó (vd vẽ chart → lieflat-charts, frontend → impeccable) và skill canonical chưa phủ; gõ /dym <domain> hoặc /dym."
+description: "Tool ngoài ĐÃ KIỂM CHỨNG, chọn theo domain: agent · architecture · browser · chart · copy · design-audit · diagram · frontend · playwright · qa · report · research · science · security · skill-authoring · threat-intel · writing. Gọi khi việc thuộc một domain đó (vd vẽ chart → lieflat-charts, frontend → impeccable) và skill canonical chưa phủ; gõ /dym <domain> hoặc /dym."
 ---
 
 # Skill: dym — định tuyến domain → bundle tool ngoài
@@ -17,11 +17,14 @@ Sinh bởi `harness/scripts/dym-sync.py index` từ `domains:` trong hub của t
 |---|---|
 | agent | `dym-arex-skill` · `dym-nuwa-skill` |
 | architecture | `dym-archify` |
+| browser | `dym-browser-use` |
 | chart | `dym-lieflat-charts` |
 | copy | `dym-humanizer` |
 | design-audit | `dym-impeccable` |
 | diagram | `dym-archify` · `dym-diagram-design` |
 | frontend | `dym-diagram-design` · `dym-impeccable` |
+| playwright | `dym-browser-use` |
+| qa | `dym-browser-use` |
 | report | `dym-lieflat-charts` |
 | research | `dym-scientific-agent-skills` |
 | science | `dym-scientific-agent-skills` |
@@ -35,6 +38,7 @@ Sinh bởi `harness/scripts/dym-sync.py index` từ `domains:` trong hub của t
 |---|---|---|---|
 | `dym-archify` | archify | diagram, architecture | agent-chat-authoring · ci-diagram-gate · cli-authoring-loop · compare-architecture-delta · contributor-build-and-test · install-and-verify · migrate-workflow-v2 · repository-evidence · visual-check-and-preview |
 | `dym-arex-skill` | arex-skill | skill-authoring, agent | cai-dat-disco · cai-thu-vien-skill · chay-viec-researcher · contributor-dong-gop-skill · contributor-phat-trien-cli · creator-paper-to-skills · creator-tao-repo-skill · lenh-chat-trong-tui · tich-hop-ci · xuat-skill-sang-agent-khac |
+| `dym-browser-use` | browser-use | browser, qa, playwright | cloud · qa · repl |
 | `dym-cti-expert` | cti-expert | security, threat-intel | api-keys-and-capabilities · case-pipeline-and-kb · ci-monitoring · cli-dispatcher · contributor-develop-and-gate · install-and-register · investigate-in-claude-code · reports-and-iocs · safety-gates |
 | `dym-diagram-design` | diagram-design | diagram, frontend | authoring-in-chat · brand-onboarding-and-profiles · contributor-gates · import-export-slash-commands · import-extractors-shell · install-and-verify · selfcheck-and-your-ci |
 | `dym-humanizer` | humanizer | writing, copy | contributor-validate-and-release · humanize-files-and-embedded · humanize-pasted-text · install-claude-plugin · install-shell · tune-false-positives |

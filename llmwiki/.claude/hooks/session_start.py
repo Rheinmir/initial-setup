@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from hooklib import HARNESS_HOME, audit, project_dir, read_payload, resolve_tool
+from hooklib import HARNESS_HOME, audit, find_wiki_dir, project_dir, read_payload, resolve_tool
 
 
 def find_health_check(root: Path):
@@ -291,7 +291,12 @@ def main() -> None:
     wikigraph_reminder(root) # C: cờ bật mà vector thiếu/cũ → nhắc 1 dòng (trước early-exit, downstream primary)
     draft_threshold(root)    # kho nháp vượt ngưỡng → HỎI user chạy /tidy (trước early-exit, downstream primary)
     if not (root / ".template-manifest.json").is_file():
-        sys.exit(0)  # không phải project dùng template → bỏ qua
+        # GH#151: bản cài downstream (v4) KHÔNG có manifest nhưng CÓ wiki. UserPromptSubmit/Stop gác
+        # bằng find_wiki_dir nên vẫn ghi số đo, còn hook này thoát ở đây → recall/okf-scan không bao giờ
+        # chạy, self-report báo "N phiên có số đo, 0 biên lai". Cùng một điều kiện cho cả ba hook.
+        if find_wiki_dir(str(root)) is not None:
+            recall(root, payload.get("session_id") or "")
+        sys.exit(0)  # không phải project dùng template → bỏ qua phần còn lại
 
     output_style(root)  # đầu phiên: chốt KIỂU nói chuyện (chat), trước khi nói gì
     orient(root)  # đầu phiên: cho agent BIẾT project có gì + nhắc query trước (chống 'lơ ngơ')

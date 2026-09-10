@@ -36,6 +36,13 @@ repos:
         language: system
         files: ^(fdk|llmwiki)/wiki/.*\.md$
 
+      - id: wiki-index-sync
+        name: "R3 index-sync: trang wiki mới phải có dòng trong index.md (GH#150 — trước chỉ CI bắt)"
+        entry: bash -c 'python3 harness/validators/index_sync.py --wiki-dir fdk/wiki && python3 harness/validators/index_sync.py --wiki-dir llmwiki/wiki'
+        language: system
+        files: ^(fdk|llmwiki)/wiki/.*\.md$
+        pass_filenames: false
+
       - id: wiki-proposal-complete
         name: "R7: proposal cho duyet phai co Agent table + seq per-task"
         entry: python3 harness/validators/proposal_complete.py

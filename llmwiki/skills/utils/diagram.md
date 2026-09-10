@@ -71,6 +71,20 @@ Ba điều phải biết trước khi gọi, đã kiểm chứng bằng cách ch
 3. Sau một `deliver` ĐỎ, **đừng đi soi file đích** — nó vẫn là bản tốt CŨ, không phải bản vừa
    hỏng. Đây là hệ quả trực tiếp của giao-nguyên-tử, không phải lỗi.
 
+Riêng `lifecycle`, ba luật nằm trong code chứ không nằm trong schema — đo 10/09/2026,
+đã vá ở fork nên bản cài mới mới có:
+
+- **Tên lane là hợp đồng.** `main` → dải trên, **`terminal`** → dải dưới (Outcomes), mọi id
+  khác dồn chung dải giữa. Đặt tên khác (`outcome`, `recover`, …) là rơi vào dải giữa và
+  đè lên nhau — đây là chỗ đã đốt 4 vòng bố cục.
+- **Hai sàn chiều cao khác nhau.** Không dùng dải terminal → `viewBox[1] ≥ 510`; có dùng →
+  `≥ 630`. Trước bản vá cả hai đều báo 566, nên khai `terminal` ở 566 là rơi vào vòng lặp
+  "State exceeds the vertical lifecycle area" không lối ra.
+- **Rail chính KHÔNG tự thành quan hệ.** Thứ tự `step` chỉ vẽ đường; muốn Route Probe /
+  passport / trace thấy được thì phải khai transition thật (bỏ nhãn nếu khe hẹp). Bấm một
+  node rồi đọc Semantic Passport: thấy `No connected relationships` là sơ đồ rỗng ruột dù
+  validate/visual-check đều xanh.
+
 Sơ đồ kiến trúc cần bám mã thật thì khai `sources[]` (path + khoảng dòng) + `meta.repository`
 + `--repo-root`. Cổng đó **fail-closed**: revision phải là SHA đủ 40 ký tự, `--repo-root` phải
 là top-level checkout có `origin` khớp. Neo sai thì nó từ chối vẽ.

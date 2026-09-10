@@ -7,7 +7,7 @@
     "quality_profile": "showcase",
     "viewBox": [
       1080,
-      566
+      510
     ],
     "views": [
       {
@@ -42,10 +42,7 @@
         ],
         "note": "Biên lai máy đọc, bản bàn giao người đọc, rồi hook nạp lại ở phiên sau."
       }
-    ],
-    "legend": {
-      "mode": "hidden"
-    }
+    ]
   },
   "lanes": [
     {
@@ -185,28 +182,32 @@
       "dot": "cyan",
       "title": "Hai thứ hay bị lẫn",
       "items": [
-        "Task sống trong Run của Orca — phiên đóng không đụng tới nó"
+        "Task sống trong Run của Orca — phiên đóng không đụng tới nó",
+        "Context coordinator chết theo phiên, đó mới là thứ phải chở đi"
       ]
     },
     {
       "dot": "violet",
       "title": "Ba băng chuyền",
       "items": [
-        "provenance-log + memory.jsonl, bàn giao .md, SessionStart recall"
+        "provenance-log + memory.jsonl — máy truy hồi",
+        "bàn giao .md + SessionStart recall — agent phiên sau"
       ]
     },
     {
       "dot": "amber",
       "title": "Đo 20/07/2026",
       "items": [
-        "59 task, chỉ 13 từng dispatch; 46 chưa bao giờ được giao"
+        "59 task, chỉ 13 từng dispatch; 46 chưa bao giờ được giao",
+        "Mọi task treo đều nằm trong nhóm chưa-từng-giao"
       ]
     },
     {
       "dot": "rose",
       "title": "Không vẽ ở đây",
       "items": [
-        "blocked: chờ ask/reply hoặc decision gate, vẫn nằm trong phiên"
+        "settle → failed → retry-request → quay lại ready",
+        "blocked: chờ ask/reply, vẫn nằm trong phiên"
       ]
     }
   ]

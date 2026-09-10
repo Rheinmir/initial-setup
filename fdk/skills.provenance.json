@@ -195,13 +195,6 @@
       "recorded": "2026-07-18",
       "source": "local-authored"
     },
-    "computer-use": {
-      "files": {
-        "SKILL.md": "7f5a7bbe8b2fb51a9637e8df71cd1dca1a84b213ffe5bf56dcdd3417d7fb1601"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
     "council": {
       "files": {
         "SKILL.md": "415a4e71cfb20f84b991fd3fa7476a8ca9eb2ae42c518bd2b2a95d143ce72e95"
@@ -232,9 +225,9 @@
     },
     "diagram": {
       "files": {
-        "SKILL.md": "01d31768b31e708baa23e9e564d6b1ca5d3e37ebcc554cbab83f0664bfcd0d5f"
+        "SKILL.md": "701a3303a3dbff96cdd6e2c470b17277ac84e99b6d575d923aa40bae4f937df2"
       },
-      "recorded": "2026-09-08",
+      "recorded": "2026-09-10",
       "source": "local-authored"
     },
     "docs-site-macos": {
@@ -754,13 +747,6 @@
       "recorded": "2026-07-04",
       "source": "local-authored"
     },
-    "orca-cli": {
-      "files": {
-        "SKILL.md": "74c9559cc2826358a57eb4c4d117325ff413be05c7bcb181f017f474ebc07ecb"
-      },
-      "recorded": "2026-07-04",
-      "source": "local-authored"
-    },
     "orca-dispatch-reference": {
       "files": {
         "SKILL.md": "e9686c010280619826dd6aea52df2039155593dd5e8c465c77ce18811705e75a"
@@ -810,13 +796,6 @@
         "SKILL.md": "e83cd4f545d2ed396a5b8265d6031bd843c1148edf22817c5957d66f5bc915a3"
       },
       "recorded": "2026-08-03",
-      "source": "local-authored"
-    },
-    "orchestration": {
-      "files": {
-        "SKILL.md": "d33b879e6682a61357401c3d3c1a688460278380fe09c24783fcb770e59b513c"
-      },
-      "recorded": "2026-07-04",
       "source": "local-authored"
     },
     "ovs-notes": {

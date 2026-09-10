@@ -175,7 +175,9 @@
       "to": "ready",
       "label": "task-list vẫn còn, nhặt lại",
       "variant": "emphasis",
-      "route": "bottom-channel"
+      "route": "bottom-channel",
+      "fromSide": "bottom",
+      "toSide": "bottom"
     }
   ],
   "cards": [

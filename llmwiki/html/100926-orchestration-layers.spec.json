@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Bốn tầng điều phối agent — ai đứng ở đâu",
+    "output": "100926-orchestration-layers.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "quan-sat-pane",
+        "label": "Tầng quan sát pane",
+        "focus": [
+          "tmux",
+          "herdr",
+          "crewtmux",
+          "agents"
+        ],
+        "note": "herdr đọc màn hình pane để biết agent đang chạy, kẹt hay rảnh."
+      },
+      {
+        "id": "sentinel",
+        "label": "Tầng sentinel shell",
+        "focus": [
+          "orcaterm",
+          "dispatch",
+          "agents",
+          "tmux"
+        ],
+        "note": "Cách của ta: bọc lệnh bằng sentinel rồi poll — chỗ thiếu là transport tmux."
+      },
+      {
+        "id": "trong-phien",
+        "label": "Tầng trong phiên",
+        "focus": [
+          "claudecode",
+          "ruflo",
+          "tasktool",
+          "settings"
+        ],
+        "note": "ruflo chỉ điều phối; Task tool mới làm việc, và settings.json bị chiếm."
+      }
+    ],
+    "repository": {
+      "url": "https://github.com/Rheinmir/setup",
+      "revision": "e08ae8df619fc07c52473e37d1179bf522d47743"
+    }
+  },
+  "components": [
+    {
+      "id": "tmux",
+      "type": "external",
+      "label": "tmux pane",
+      "sublabel": "có sẵn mọi máy",
+      "tag": "có sẵn mọi máy",
+      "pos": [
+        60,
+        70
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "herdr",
+      "type": "backend",
+      "label": "herdr 0.9.0",
+      "sublabel": "detect từ pane · 266k LOC",
+      "tag": "266k LOC · Apache-2.0",
+      "pos": [
+        430,
+        55
+      ],
+      "size": [
+        210,
+        92
+      ]
+    },
+    {
+      "id": "crewtmux",
+      "type": "external",
+      "label": "crew-tmux",
+      "sublabel": "đề xuất — đã rút",
+      "tag": "RÚT — trùng làn herdr",
+      "pos": [
+        430,
+        190
+      ],
+      "size": [
+        210,
+        72
+      ]
+    },
+    {
+      "id": "agents",
+      "type": "external",
+      "label": "CLI agent",
+      "sublabel": "claude · codex · opencode",
+      "tag": "thứ thật sự chạy việc",
+      "pos": [
+        790,
+        95
+      ],
+      "size": [
+        200,
+        90
+      ]
+    },
+    {
+      "id": "orcaterm",
+      "type": "cloud",
+      "label": "orca terminal",
+      "sublabel": "cần Orca.app",
+      "tag": "máy trần không có",
+      "pos": [
+        60,
+        305
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "dispatch",
+      "type": "backend",
+      "label": "orca-dispatch.py",
+      "sublabel": "sentinel · ~300 dòng",
+      "tag": "~300 dòng · của ta",
+      "pos": [
+        430,
+        290
+      ],
+      "size": [
+        210,
+        92
+      ],
+      "sources": [
+        {
+          "path": "harness/scripts/orca-dispatch.py",
+          "line": 19,
+          "label": "gốc HÒA TAN từ herdr"
+        }
+      ]
+    },
+    {
+      "id": "claudecode",
+      "type": "frontend",
+      "label": "Claude Code",
+      "sublabel": "giữ vòng đời agent",
+      "tag": "vòng đời do nó giữ",
+      "pos": [
+        60,
+        460
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "ruflo",
+      "type": "backend",
+      "label": "ruflo 3.40",
+      "sublabel": "MCP + hook · 1.5 GB",
+      "tag": "1.5 GB · 2280 file",
+      "pos": [
+        430,
+        445
+      ],
+      "size": [
+        210,
+        92
+      ]
+    },
+    {
+      "id": "tasktool",
+      "type": "backend",
+      "label": "Task tool",
+      "sublabel": "nơi việc thật xảy ra",
+      "tag": "nơi việc thật xảy ra",
+      "pos": [
+        790,
+        445
+      ],
+      "size": [
+        200,
+        84
+      ]
+    },
+    {
+      "id": "settings",
+      "type": "security",
+      "label": ".claude/settings.json",
+      "sublabel": "13 hook · 241 file bị ghi",
+      "tag": "241 file bị ghi đè",
+      "pos": [
+        1030,
+        445
+      ],
+      "size": [
+        210,
+        84
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Tầng 1 — quan sát pane (không cần agent hợp tác)",
+      "wraps": [
+        "tmux",
+        "herdr",
+        "crewtmux"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Tầng 2 — sentinel trong shell (mọi vendor đều đi qua)",
+      "wraps": [
+        "orcaterm",
+        "dispatch"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Tầng 3 — bên trong MỘT phiên Claude Code",
+      "wraps": [
+        "claudecode",
+        "ruflo",
+        "tasktool",
+        "settings"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "vùng overstack đang sở hữu",
+      "wraps": [
+        "settings"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "tmux-to-herdr",
+      "from": "tmux",
+      "to": "herdr",
+      "label": "đọc screen + osc_title"
+    },
+    {
+      "id": "herdr-to-agents",
+      "from": "herdr",
+      "to": "agents",
+      "label": "working / blocked / idle",
+      "variant": "emphasis"
+    },
+    {
+      "id": "dispatch-to-orcaterm",
+      "from": "dispatch",
+      "to": "orcaterm",
+      "label": "terminal create / read"
+    },
+    {
+      "id": "dispatch-to-agents",
+      "from": "dispatch",
+      "to": "agents",
+      "label": "chờ sentinel : $?",
+      "variant": "emphasis"
+    },
+    {
+      "id": "dispatch-needs-tmux",
+      "from": "dispatch",
+      "to": "tmux",
+      "label": "thiếu: tmux capture-pane",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "bottom",
+      "labelDx": -150
+    },
+    {
+      "id": "claudecode-to-ruflo",
+      "from": "claudecode",
+      "to": "ruflo",
+      "label": "gọi MCP tool"
+    },
+    {
+      "id": "ruflo-to-tasktool",
+      "from": "ruflo",
+      "to": "tasktool",
+      "label": "điều phối, không tự chạy",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ruflo-writes-settings",
+      "from": "ruflo",
+      "to": "settings",
+      "label": "init ghi đè",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "bottom"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "herdr — XÉT LẠI",
+      "items": [
+        "266k dòng Rust, một binary, Apache-2.0 ở v0.9.0 — không còn AGPL",
+        "Socket API: agent tự spawn pane và chờ agent khác xong"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "orca-dispatch.py — GIỮ",
+      "items": [
+        "~300 dòng stdlib, đã trả xong chi phí",
+        "Đo LỆNH kết thúc, không đo AGENT nghĩ xong"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "ruflo — KHÔNG LẤY",
+      "items": [
+        "init ghi 241 file vào .claude/, 13 hook trên 10 loại",
+        "1.5 GB prefix npm; bỏ Claude Code ra thì không còn gì chạy"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "crew-tmux — RÚT",
+      "items": [
+        "Làn của herdr, lõi đã có trong orca-dispatch.py",
+        "Thiếu đúng một transport tmux capture-pane"
+      ]
+    }
+  ]
+}

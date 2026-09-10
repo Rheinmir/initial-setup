@@ -40,8 +40,9 @@ must_bite:
 
 # Skill PHẢI reachable (global) để dự án mới dùng được ngay.
 must_reach_skills:
-  - orchestration
-  - orca-cli
+  # orchestration/orca-cli/computer-use do CHÍNH Orca.app quản và tự cài qua
+  # `orca skills install` — ta KHÔNG publish trùng tên nữa (gỡ 09/09/2026): bản ta
+  # publish là bản Orca CŨ, đè lên bản Orca đang quản → app báo 'out of date' mãi.
   - orca-dispatch-reference
 
 # Mọi rule id (R\d+) trong policy.yaml của REPO phải có mặt trong policy.yaml DOWNSTREAM.

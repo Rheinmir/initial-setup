@@ -157,7 +157,7 @@ fi
 # ── (F) orchestration-ready: skill reachable ─────────────────────────────────
 echo "${Y}orchestration-ready:${X}"
 SK="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
-for s in $(contract_list must_reach_skills 2>/dev/null || echo "orchestration orca-cli orca-dispatch-reference"); do
+for s in $(contract_list must_reach_skills 2>/dev/null || echo "orca-dispatch-reference"); do
   if [ -e "$SK/$s" ] || [ -e "$SK/$s/SKILL.md" ]; then ok "skill '$s' reachable"
   else bad "skill '$s' THIẾU global ($SK) — cài: npx skills add rheinmir/setup#orca --global --all"; fi
 done

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ba lỗi harness đã sửa — 10/09/2026</title>
+<meta name="description" content="Ba lỗi harness đã sửa trong ngày 10/09/2026: CI đỏ R3 index-sync, recall bỏ qua downstream, và cơ chế đầy context chưa chạy.">
+<meta name="theme-color" content="#eaf2fd">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a84ff'/%3E%3C/svg%3E">
+<script>(function(){try{var t=localStorage.getItem("100926-harness-fixes-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
+<style>
+:root{
+  --glass-1:rgba(255,255,255,.55);--glass-2:rgba(255,255,255,.7);--glass-3:rgba(255,255,255,.88);
+  --blur-1:24px;--blur-2:8px;--blur-3:4px;
+  --edge-hi:inset 0 1px 0 rgba(255,255,255,.85);
+  --border:rgba(30,90,170,.14);
+  --ink1:#0f0f12;--ink2:#4a4a55;
+  --font-text:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue','Roboto','Segoe UI',sans-serif;
+  --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Roboto','Segoe UI',sans-serif;
+  --font-mono:'SF Mono',ui-monospace,'SFMono-Regular',Menlo,'Roboto Mono',Consolas,monospace;
+  --nav-pad-y:18px;
+}
+html{background:#e9f0fb;scrollbar-width:thin;scrollbar-color:transparent transparent}
+html.scrolling{scrollbar-color:rgba(10,132,255,.32) transparent}
+body{
+  background:
+    radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.10),transparent 60%),
+    radial-gradient(700px 420px at 95% 15%,rgba(90,162,232,.08),transparent 55%),
+    linear-gradient(180deg,#f7fbff 0%,#eaf2fd 100%);
+  font-family:var(--font-text);color:var(--ink1);line-height:1.6;margin:0;padding-left:200px;
+  -webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(640px 440px at 10% 14%,rgba(10,132,255,.22),transparent 65%),
+    radial-gradient(380px 460px at 4% 52%,rgba(48,176,199,.18),transparent 65%),
+    radial-gradient(540px 400px at 88% 10%,rgba(88,86,214,.13),transparent 60%),
+    radial-gradient(720px 500px at 74% 76%,rgba(48,176,199,.13),transparent 65%),
+    radial-gradient(480px 380px at 16% 86%,rgba(255,149,0,.12),transparent 60%);
+  animation:orbDrift 46s ease-in-out infinite alternate}
+@keyframes orbDrift{100%{transform:translate(2.2%,1.6%) scale(1.045)}}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(rgba(30,90,170,.11) 1px,transparent 1.3px);
+  background-size:22px 22px;
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.22))}
+@media(prefers-reduced-motion:reduce){body::before{animation:none}}
+html,nav{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,nav::-webkit-scrollbar{width:0;height:0;display:none}
+
+nav{position:fixed;top:0;left:0;bottom:0;width:200px;z-index:100;
+  display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:var(--nav-pad-y) 12px;
+  background:linear-gradient(165deg,rgba(255,255,255,.46) 0%,rgba(255,255,255,.22) 48%,rgba(240,248,255,.34) 100%);
+  backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  -webkit-backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  border-right:1px solid rgba(255,255,255,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 1px 0 0 rgba(255,255,255,.5),
+    inset -1px 0 0 rgba(30,90,170,.10),4px 0 24px rgba(30,90,170,.08)}
+nav::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(220px 160px at 18% 4%,rgba(255,255,255,.55),transparent 70%),
+    linear-gradient(115deg,rgba(255,255,255,.28) 0%,transparent 28%,transparent 72%,rgba(255,255,255,.14) 100%)}
+nav>*{position:relative}
+nav .logo{margin:0 0 12px;padding:6px 10px;
+  background:linear-gradient(135deg,#0a84ff,#64b5f7);-webkit-background-clip:text;background-clip:text;color:transparent;font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:-.02em}
+nav a{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;font-size:13px;position:relative;overflow:hidden;text-decoration:none;color:var(--ink1);transition:background .15s}
+nav a.active{color:#0a84ff;background:rgba(10,132,255,.08);font-weight:600}
+nav a:hover:not(.active){background:rgba(10,132,255,.04)}
+nav a .ic{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex-shrink:0}
+nav a .ic svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic-0{background:linear-gradient(135deg,#0a84ff,#5aa8ff)}.ic-1{background:linear-gradient(135deg,#30b0c7,#48c8dd)}
+.ic-2{background:linear-gradient(135deg,#5856d6,#7a78e8)}.ic-3{background:linear-gradient(135deg,#34c759,#5dd87a)}
+nav .theme-row{position:sticky;bottom:calc(-1 * var(--nav-pad-y));margin-top:auto;display:flex;align-items:center;justify-content:space-between;
+  padding:11px 16px;border-top:1px solid rgba(30,90,170,.14);
+  background:linear-gradient(165deg,rgba(255,255,255,.46),rgba(255,255,255,.22));
+  backdrop-filter:blur(14px) saturate(1.5)}
+.theme-row .lbl{font-size:12px;color:var(--ink2)}
+.theme-switch{position:relative;width:50px;height:26px;border-radius:999px;cursor:pointer;
+  background:linear-gradient(135deg,rgba(10,132,255,.18),rgba(10,132,255,.10));
+  border:1px solid rgba(30,90,170,.18);transition:background .2s}
+.theme-switch .track{display:flex;align-items:center;justify-content:space-between;padding:0 5px;height:100%;font-size:11px}
+.theme-switch .knob{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.15);transition:left .18s}
+.theme-switch.on .knob{left:26px}
+.theme-switch.on{background:linear-gradient(135deg,rgba(30,46,72,.7),rgba(20,30,50,.8));border-color:rgba(120,160,220,.3)}
+
+body.nav-collapsed nav{transform:translateX(-100%)}
+body.nav-collapsed{padding-left:0}
+body{transition:padding-left .28s cubic-bezier(.4,0,.2,1)}
+nav{transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.nav-toggle{position:fixed;top:12px;left:12px;z-index:120;width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:#4a4a55;cursor:pointer;
+  background:linear-gradient(165deg,rgba(255,255,255,.5),rgba(255,255,255,.24));
+  backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  -webkit-backdrop-filter:blur(var(--blur-1)) saturate(1.7) brightness(1.04);
+  border:1px solid transparent;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 0 0 1px rgba(30,90,170,.08),0 2px 10px rgba(30,90,170,.12);
+  transition:opacity .2s,transform .28s cubic-bezier(.4,0,.2,1)}
+.nav-toggle:hover{color:#0a84ff}
+body:not(.nav-collapsed) .nav-toggle{opacity:0;pointer-events:none;transform:translateX(-6px)}
+.nav-close{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:#4a4a55;cursor:pointer;
+  background:rgba(0,0,0,.04);border:none;overflow:hidden}
+.nav-close:hover{color:#0a84ff;background:rgba(10,132,255,.10)}
+
+.ripple-ink{position:absolute;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.70) 0%,rgba(255,255,255,.28) 38%,rgba(10,132,255,.20) 72%,transparent 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -10px 20px rgba(10,132,255,.12),0 0 14px rgba(10,132,255,.10);
+  backdrop-filter:blur(2px) saturate(1.25);-webkit-backdrop-filter:blur(2px) saturate(1.25);
+  transform:scale(0);opacity:1;animation:rippleGrow .6s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes rippleGrow{55%{transform:scale(1);opacity:.75}100%{transform:scale(1.04);opacity:0}}
+
+.skip-link{position:fixed;top:8px;left:8px;z-index:200;padding:8px 14px;border-radius:10px;
+  background:var(--glass-1);backdrop-filter:blur(var(--blur-1));border:1px solid var(--border);
+  transform:translateY(-150%);transition:transform .2s;text-decoration:none;color:var(--ink1);font-size:13px}
+.skip-link:focus-visible{transform:translateY(0)}
+:focus-visible{outline:2px solid #0a84ff;outline-offset:2px;border-radius:8px}
+:focus:not(:focus-visible){outline:none}
+
+main{scroll-behavior:smooth}
+section[id]{scroll-margin-top:24px}
+@media(prefers-reduced-motion:reduce){main{scroll-behavior:auto}}
+
+hero{display:block;padding:56px 24px 28px;max-width:1100px;margin:0 auto}
+hero h1{font-family:var(--font-display);font-size:clamp(26px,4vw,40px);font-weight:700;letter-spacing:-.03em;
+  background:linear-gradient(135deg,#0a84ff,#5aa2e8,#cfe3fb);-webkit-background-clip:text;background-clip:text;color:transparent;
+  text-wrap:balance;margin:0 0 6px}
+hero p{font-size:14px;color:var(--ink2);margin:0;max-width:680px}
+
+.mm{overflow-x:auto;padding:14px 4px 6px;max-width:1100px;margin:0 auto}
+.mm-canvas{position:relative;width:max-content}
+.mm-links{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;z-index:0}
+.mm-links path{fill:none;stroke-width:2.2;opacity:.55;stroke-linecap:round}
+.mm .tree{position:relative;z-index:1}
+.mm .tree,.mm .children{display:flex;flex-direction:column;gap:9px;justify-content:center}
+.mm .row{display:flex;align-items:center;gap:48px;position:relative}
+.mm .children{position:relative}.mm .children.collapsed{display:none}
+.mm .node{position:relative;display:inline-flex;flex-direction:column;gap:1px;padding:7px 13px;border-radius:13px;cursor:default;white-space:nowrap;background:rgba(255,255,255,.72);backdrop-filter:blur(7px) saturate(1.1);border:1px solid var(--border);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 3px 14px rgba(20,40,90,.07);transition:transform .12s}
+.mm .node.has-children{cursor:pointer}.mm .node:hover{transform:translateY(-1px)}
+.mm .node .nm{font-size:13px;font-weight:700;letter-spacing:-.01em}.mm .node .ds{font-size:10.5px;color:var(--ink2)}
+.mm .node .ct{font-size:10px;color:#fff;font-weight:700;padding:1px 7px;border-radius:999px;position:absolute;top:-8px;right:-8px;background:#0a84ff}
+.mm .node.has-children::after{content:'';position:absolute;right:-7px;top:50%;width:6px;height:6px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:translateY(-50%) rotate(-45deg);opacity:.5}
+.mm .node.collapsed-parent::after{transform:translateY(-50%) rotate(45deg)}
+.mm .node.root{background:linear-gradient(135deg,rgba(10,132,255,.16),rgba(88,86,214,.14));border-color:rgba(10,132,255,.4)}
+
+.section-bg{position:relative;overflow:visible}
+.section-bg::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);pointer-events:none}
+section{padding:64px 24px 72px;max-width:1100px;margin:0 auto}
+.section-header{margin-bottom:24px}
+.section-header .tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.section-header h2{font-family:var(--font-display);font-size:21px;font-weight:700;color:#1d1d1f;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
+.section-header p{font-size:13px;color:var(--ink2);margin:0;max-width:640px}
+.content-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.card{background:var(--glass-2);backdrop-filter:blur(var(--blur-2)) saturate(1.1);border:1px solid var(--border);border-radius:16px;box-shadow:var(--edge-hi),0 4px 20px rgba(20,40,90,.08);padding:20px}
+.card h4{font-family:var(--font-display);font-size:14px;font-weight:700;margin:0 0 10px;letter-spacing:-.01em}
+.card ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px}
+.card li{font-size:13px;color:var(--ink1);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.card li::before{content:'›';font-weight:700;flex-shrink:0;margin-top:1px}
+.card .detail{font-size:12px;color:var(--ink2);margin-top:10px;padding-top:10px;border-top:1px solid rgba(30,90,170,.08)}
+.diagram-box{background:var(--glass-2);backdrop-filter:blur(var(--blur-2)) saturate(1.1);border:1px solid var(--border);border-radius:16px;box-shadow:var(--edge-hi),0 4px 20px rgba(20,40,90,.08);padding:24px;margin:24px 0;position:relative;overflow:hidden;display:flex;flex-direction:column;resize:vertical;min-height:160px;transition:box-shadow .2s ease}
+.diagram-box:hover{box-shadow:var(--edge-hi),0 6px 28px rgba(20,40,90,.14)}
+.diagram-viewport{position:relative;flex:1 1 auto;width:100%;overflow:hidden;cursor:grab;touch-action:none}
+.diagram-viewport.grabbing{cursor:grabbing}
+.diagram-viewport svg{width:100%;height:auto;display:block;overflow:visible;transform-origin:0 0;will-change:transform;user-select:none;-webkit-user-select:none}
+.dnode{cursor:move}.dnode>rect{transition:filter .15s ease}.dnode:hover>rect:first-of-type{filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))}
+.diagram-hint{position:absolute;top:8px;right:12px;z-index:5;font-size:10px;color:#4a4a55;background:rgba(255,255,255,.75);border:1px solid rgba(0,0,0,.05);border-radius:20px;padding:3px 10px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.diagram-box:hover .diagram-hint{opacity:.9}
+.diagram-reset{position:absolute;bottom:8px;right:10px;z-index:5;font-size:11px;background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.08);border-radius:8px;padding:3px 9px;cursor:pointer;color:#4a4a55;opacity:0;transition:opacity .2s}
+.diagram-box:hover .diagram-reset{opacity:1}.diagram-reset:hover{background:#fff;color:#0f0f12}
+.diagram-box::after{content:'';position:absolute;right:5px;bottom:5px;width:16px;height:16px;pointer-events:none;opacity:0;transition:opacity .25s ease;clip-path:polygon(100% 0,100% 100%,0 100%);background:repeating-linear-gradient(135deg,transparent 0 3.5px,rgba(10,132,255,.45) 3.5px 5px)}
+.diagram-box:hover::after{opacity:.85}.diagram-box::-webkit-resizer{display:none}
+
+footer{max-width:1100px;margin:0 auto;padding:32px 24px 40px;font-size:11px;color:var(--ink2);border-top:1px solid rgba(30,90,170,.08)}
+footer a{color:#0a84ff;text-decoration:none}
+
+@media(max-width:700px){.content-grid{grid-template-columns:1fr}}
+@media(max-width:640px){body{padding-left:0}nav{box-shadow:0 8px 30px rgba(0,0,0,.14)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+#sec-0 .tag{background:rgba(10,132,255,.10);color:#0a84ff}
+#sec-0 .card h4{color:#0a84ff}#sec-0 .card li::before{color:#0a84ff}
+.s-bg0::before{background:linear-gradient(180deg,rgba(10,132,255,.05) 0%,transparent 60%)}
+#sec-1 .tag{background:rgba(48,176,199,.10);color:#30b0c7}
+#sec-1 .card h4{color:#30b0c7}#sec-1 .card li::before{color:#30b0c7}
+.s-bg1::before{background:linear-gradient(180deg,rgba(48,176,199,.05) 0%,transparent 60%)}
+#sec-2 .tag{background:rgba(88,86,214,.10);color:#5856d6}
+#sec-2 .card h4{color:#5856d6}#sec-2 .card li::before{color:#5856d6}
+.s-bg2::before{background:linear-gradient(180deg,rgba(88,86,214,.05) 0%,transparent 60%)}
+
+@media(prefers-color-scheme:dark){html:not([data-theme=light]){
+  --glass-1:rgba(20,30,50,.55);--glass-2:rgba(20,30,50,.7);--glass-3:rgba(20,30,50,.88);
+  --border:rgba(120,160,220,.2);--ink1:#e8f0fb;--ink2:#9fb4d1;
+  background:#0c0f16}
+  html:not([data-theme=light]) body{background:radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.15),transparent 60%),radial-gradient(700px 420px at 95% 15%,rgba(90,162,232,.10),transparent 55%),linear-gradient(180deg,#0c0f16 0%,#0a1628 100%)}
+  html:not([data-theme=light]) nav{background:linear-gradient(165deg,rgba(20,30,50,.46) 0%,rgba(20,30,50,.22) 48%,rgba(15,25,45,.34) 100%);border-right-color:rgba(120,160,220,.15)}
+  html:not([data-theme=light]) nav::before{background:radial-gradient(220px 160px at 18% 4%,rgba(255,255,255,.12),transparent 70%),linear-gradient(115deg,rgba(255,255,255,.08) 0%,transparent 28%,transparent 72%,rgba(255,255,255,.04) 100%)}
+  html:not([data-theme=light]) .nav-toggle{background:linear-gradient(165deg,rgba(20,30,50,.5),rgba(20,30,50,.24))}
+  html:not([data-theme=light]) .theme-row{background:linear-gradient(165deg,rgba(20,30,50,.46),rgba(20,30,50,.22))}
+  html:not([data-theme=light]) .theme-switch{background:linear-gradient(135deg,rgba(90,168,255,.2),rgba(90,168,255,.12));border-color:rgba(120,160,220,.3)}
+  html:not([data-theme=light]) .theme-switch.on{background:linear-gradient(135deg,rgba(30,46,72,.9),rgba(20,30,50,.95))}
+  html:not([data-theme=light]) .mm .node{background:rgba(20,30,50,.72);border-color:rgba(120,160,220,.2)}
+  html:not([data-theme=light]) .mm .node.root{background:linear-gradient(135deg,rgba(10,132,255,.2),rgba(88,86,214,.18));border-color:rgba(10,132,255,.5)}
+  html:not([data-theme=light]) .card{background:rgba(20,30,50,.7)}
+  html:not([data-theme=light]) .diagram-box{background:rgba(20,30,50,.7)}
+  html:not([data-theme=light]) .section-header h2{color:#e8f0fb}
+  html:not([data-theme=light]) .diagram-hint{background:rgba(20,30,50,.75);color:#9fb4d1}
+  html:not([data-theme=light]) .diagram-reset{background:rgba(20,30,50,.85);color:#9fb4d1}
+  html:not([data-theme=light]) footer{border-top-color:rgba(120,160,220,.12)}
+}
+html[data-theme=dark]{
+  --glass-1:rgba(20,30,50,.55);--glass-2:rgba(20,30,50,.7);--glass-3:rgba(20,30,50,.88);
+  --border:rgba(120,160,220,.2);--ink1:#e8f0fb;--ink2:#9fb4d1;
+  background:#0c0f16}
+html[data-theme=dark] body{background:radial-gradient(900px 500px at 12% -10%,rgba(10,132,255,.15),transparent 60%),radial-gradient(700px 420px at 95% 15%,rgba(90,162,232,.10),transparent 55%),linear-gradient(180deg,#0c0f16 0%,#0a1628 100%)}
+html[data-theme=dark] nav{background:linear-gradient(165deg,rgba(20,30,50,.46) 0%,rgba(20,30,50,.22) 48%,rgba(15,25,45,.34) 100%);border-right-color:rgba(120,160,220,.15)}
+html[data-theme=dark] nav::before{background:radial-gradient(220px 160px at 18% 4%,rgba(255,255,255,.12),transparent 70%),linear-gradient(115deg,rgba(255,255,255,.08) 0%,transparent 28%,transparent 72%,rgba(255,255,255,.04) 100%)}
+html[data-theme=dark] .nav-toggle{background:linear-gradient(165deg,rgba(20,30,50,.5),rgba(20,30,50,.24))}
+html[data-theme=dark] .theme-row{background:linear-gradient(165deg,rgba(20,30,50,.46),rgba(20,30,50,.22))}
+html[data-theme=dark] .theme-switch{background:linear-gradient(135deg,rgba(90,168,255,.2),rgba(90,168,255,.12));border-color:rgba(120,160,220,.3)}
+html[data-theme=dark] .theme-switch.on{background:linear-gradient(135deg,rgba(30,46,72,.9),rgba(20,30,50,.95))}
+html[data-theme=dark] .mm .node{background:rgba(20,30,50,.72);border-color:rgba(120,160,220,.2)}
+html[data-theme=dark] .mm .node.root{background:linear-gradient(135deg,rgba(10,132,255,.2),rgba(88,86,214,.18));border-color:rgba(10,132,255,.5)}
+html[data-theme=dark] .card{background:rgba(20,30,50,.7)}
+html[data-theme=dark] .diagram-box{background:rgba(20,30,50,.7)}
+html[data-theme=dark] .section-header h2{color:#e8f0fb}
+html[data-theme=dark] .diagram-hint{background:rgba(20,30,50,.75);color:#9fb4d1}
+html[data-theme=dark] .diagram-reset{background:rgba(20,30,50,.85);color:#9fb4d1}
+html[data-theme=dark] footer{border-top-color:rgba(120,160,220,.12)}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav>
+  <div class="logo">Harness Fixes</div>
+  <a href="#sec-0"><span class="ic ic-0"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1"/></svg></span>GH#150 CI đỏ R3</a>
+  <a href="#sec-1"><span class="ic ic-1"><svg viewBox="0 0 16 16"><path d="M4 8h8M8 4v8"/></svg></span>GH#151 Recall bỏ qua</a>
+  <a href="#sec-2"><span class="ic ic-2"><svg viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10" rx="2"/><path d="M6 8h4"/></svg></span>Context window</a>
+  <a href="#sec-3"><span class="ic ic-3"><svg viewBox="0 0 16 16"><path d="M3 8l3 3 7-7"/></svg></span>Sơ đồ vòng đời</a>
+</nav>
+
+<main id="main">
+
+<hero>
+  <h1>Ba lỗi harness đã sửa — 10/09/2026</h1>
+  <p>GH#150 CI đỏ R3 index-sync, GH#151 recall bỏ qua bản downstream, và cơ chế "đầy context thì tự xoay phiên" chưa từng chạy.</p>
+</hero>
+
+<div class="mm"><div class="mm-canvas"><svg class="mm-links"></svg><div class="tree"><div class="row">
+  <div class="node root has-children"><span class="nm">Harness fixes</span><span class="ds">10/09/2026</span><span class="ct">3</span></div>
+  <div class="children">
+    <div class="row">
+      <div class="node b-0 cat has-children"><span class="nm">GH#150</span><span class="ds">CI đỏ R3 index-sync</span><span class="ct">3</span></div>
+      <div class="children">
+        <div class="row"><div class="node b-0 leaf"><span class="nm">Triệu chứng</span><span class="ds">CI đỏ, máy xanh do hook</span></div></div>
+        <div class="row"><div class="node b-0 leaf"><span class="nm">Gốc</span><span class="ds">Commit 52f3334 thiếu dòng index</span></div></div>
+        <div class="row"><div class="node b-0 leaf"><span class="nm">Sửa</span><span class="ds">Hook wiki-index-sync pre-commit</span></div></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="node b-1 cat has-children"><span class="nm">GH#151</span><span class="ds">0 biên lai recall downstream</span><span class="ct">3</span></div>
+      <div class="children">
+        <div class="row"><div class="node b-1 leaf"><span class="nm">Triệu chứng</span><span class="ds">11 phiên, 0 biên lai okf-scan</span></div></div>
+        <div class="row"><div class="node b-1 leaf"><span class="nm">Gốc</span><span class="ds">session_start thoát trước recall</span></div></div>
+        <div class="row"><div class="node b-1 leaf"><span class="nm">Sửa</span><span class="ds">Gọi recall() khi find_wiki_dir thấy wiki</span></div></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="node b-2 cat has-children"><span class="nm">Context window</span><span class="ds">Gác context chưa chạy</span><span class="ct">3</span></div>
+      <div class="children">
+        <div class="row"><div class="node b-2 leaf"><span class="nm">Triệu chứng</span><span class="ds">Tự-report 0 bàn giao tự động</span></div></div>
+        <div class="row"><div class="node b-2 leaf"><span class="nm">Gốc</span><span class="ds">Chỉ cộng input_tokens</span></div></div>
+        <div class="row"><div class="node b-2 leaf"><span class="nm">Sửa</span><span class="ds">Cộng cache_read + cache_creation</span></div></div>
+      </div>
+    </div>
+  </div>
+</div></div></div></div>
+
+<section id="sec-0" class="section-bg s-bg0">
+  <div class="section-header">
+    <span class="tag">01 · GH#150</span>
+    <h2>CI đỏ ở R3 index-sync</h2>
+    <p>Commit 6a1024d — hook wiki-index-sync đưa vào pre-commit.</p>
+  </div>
+  <div class="diagram-box" style="min-height:180px">
+    <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>@keyframes flowArrow{0%{stroke-dashoffset:20}100%{stroke-dashoffset:0}}.flow{stroke-dasharray:6 4;animation:flowArrow 1.2s linear infinite}</style>
+        <marker id="arrow0" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#0a84ff"/></marker>
+      </defs>
+      <rect x="20" y="70" width="150" height="60" rx="8" fill="rgba(255,255,255,.7)" stroke="#0a84ff" stroke-width="1.5"/>
+      <text x="95" y="96" text-anchor="middle" font-size="11" font-weight="600" fill="#0f0f12">git add file.md</text>
+      <text x="95" y="112" text-anchor="middle" font-size="10" fill="#4a4a55">stage draft mới</text>
+      <line x1="170" y1="100" x2="260" y2="100" stroke="#0a84ff" stroke-width="2" marker-end="url(#arrow0)" class="flow"/>
+      <rect x="260" y="55" width="180" height="90" rx="8" fill="rgba(255,255,255,.7)" stroke="#0a84ff" stroke-width="1.5"/>
+      <text x="350" y="80" text-anchor="middle" font-size="11" font-weight="600" fill="#0f0f12">pre-commit hook</text>
+      <text x="350" y="96" text-anchor="middle" font-size="10" fill="#4a4a55">wiki-index-sync</text>
+      <text x="350" y="112" text-anchor="middle" font-size="10" fill="#4a4a55">chỉ chạy khi đổi *.md</text>
+      <text x="350" y="128" text-anchor="middle" font-size="10" fill="#30b0c7">2.26s + 0.71s</text>
+      <line x1="440" y1="82" x2="530" y2="82" stroke="#0a84ff" stroke-width="2" marker-end="url(#arrow0)" class="flow"/>
+      <line x1="440" y1="118" x2="530" y2="118" stroke="#0a84ff" stroke-width="2" marker-end="url(#arrow0)" class="flow"/>
+      <rect x="530" y="55" width="160" height="38" rx="8" fill="rgba(52,199,89,.15)" stroke="#34c759" stroke-width="1.5"/>
+      <text x="610" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#28a745">Passed rc=0</text>
+      <rect x="530" y="100" width="160" height="38" rx="8" fill="rgba(255,45,85,.12)" stroke="#ff2d55" stroke-width="1.5"/>
+      <text x="610" y="123" text-anchor="middle" font-size="11" font-weight="600" fill="#e0264b">Failed rc=1</text>
+      <text x="530" y="158" font-size="10" fill="#4a4a55">Thiếu dòng index → chặn</text>
+    </svg>
+  </div>
+  <div class="content-grid">
+    <div class="card">
+      <h4>Triệu chứng</h4>
+      <ul>
+        <li>CI job harness đỏ ở bước R3 index-sync, commit 8f0a24f</li>
+        <li>Log ghi thiếu trong index: sources/draft/100926-install-seed-skipped-on-migrate.md</li>
+        <li>Working tree máy vẫn xanh — vì hook đã tự chèn dòng mà chưa commit</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Gốc (đã đo)</h4>
+      <ul>
+        <li>Commit 52f3334 thêm draft mà quên dòng index vào index.md</li>
+        <li>HEAD 9cd53d0: grep -c → 0, bản đã commit đỏ thật</li>
+        <li>R3 bị dời sang CI theo issue #18 — bộ fire-drill đầy đủ không chạy mỗi commit</li>
+      </ul>
+      <div class="detail">Đo: R3 mất 2.26s cho llmwiki/wiki, 0.71s cho fdk/wiki — rẻ, nên đưa lại pre-commit.</div>
+    </div>
+    <div class="card">
+      <h4>Sửa</h4>
+      <ul>
+        <li>Commit dòng index còn thiếu</li>
+        <li>Thêm hook wiki-index-sync vào pre-commit, chỉ chạy khi đổi ^(fdk|llmwiki)/wiki/.*\.md$</li>
+        <li>Giữ tinh thần #18: không chạy cả bộ mỗi commit, vẫn chặn đúng lớp lỗi</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Bằng chứng</h4>
+      <ul>
+        <li>Fire-drill: draft mới stage, index KHÔNG stage → Failed rc=1</li>
+        <li>Stage dòng index → Passed rc=0</li>
+        <li>Pre-commit stash phần chưa stage trước khi chạy hook</li>
+      </ul>
+      <div class="detail">Nợ mở: prompt CI yêu cầu nhãn ready-for-agent nhưng repo chỉ có ready-for-human.</div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-1" class="section-bg s-bg1">
+  <div class="section-header">
+    <span class="tag">02 · GH#151</span>
+    <h2>"0 biên lai quét context" — recall bỏ qua downstream</h2>
+    <p>Commit 6a1024d — đồng nhất điều kiện cho cả ba hook.</p>
+  </div>
+  <div class="diagram-box" style="min-height:180px">
+    <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow1" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#30b0c7"/></marker>
+      </defs>
+      <rect x="20" y="55" width="180" height="90" rx="8" fill="rgba(255,255,255,.7)" stroke="#30b0c7" stroke-width="1.5"/>
+      <text x="110" y="80" text-anchor="middle" font-size="11" font-weight="600" fill="#0f0f12">session_start.py</text>
+      <text x="110" y="96" text-anchor="middle" font-size="10" fill="#4a4a55">Gác: .template-manifest</text>
+      <text x="110" y="112" text-anchor="middle" font-size="10" fill="#e0264b">THOÁT trước recall()</text>
+      <text x="110" y="128" text-anchor="middle" font-size="10" fill="#4a4a55">→ 0 biên lai</text>
+      <line x1="200" y1="78" x2="300" y2="78" stroke="#ff2d55" stroke-width="2" stroke-dasharray="4 3"/>
+      <rect x="300" y="55" width="180" height="90" rx="8" fill="rgba(255,255,255,.7)" stroke="#30b0c7" stroke-width="1.5"/>
+      <text x="390" y="80" text-anchor="middle" font-size="11" font-weight="600" fill="#0f0f12">user_prompt_submit.py</text>
+      <text x="390" y="96" text-anchor="middle" font-size="10" fill="#4a4a55">Gác: find_wiki_dir</text>
+      <text x="390" y="112" text-anchor="middle" font-size="10" fill="#34c759">CHẠY, ghi số đo</text>
+      <text x="390" y="128" text-anchor="middle" font-size="10" fill="#34c759">11 phiên, 0 biên lai</text>
+      <line x1="480" y1="78" x2="570" y2="78" stroke="#30b0c7" stroke-width="2" marker-end="url(#arrow1)" class="flow"/>
+      <rect x="570" y="55" width="160" height="90" rx="8" fill="rgba(255,255,255,.7)" stroke="#30b0c7" stroke-width="1.5"/>
+      <text x="650" y="80" text-anchor="middle" font-size="11" font-weight="600" fill="#0f0f12">Stop hook</text>
+      <text x="650" y="96" text-anchor="middle" font-size="10" fill="#4a4a55">Gác: find_wiki_dir</text>
+      <text x="650" y="112" text-anchor="middle" font-size="10" fill="#34c759">CHẠY, ghi số đo</text>
+      <text x="650" y="128" text-anchor="middle" font-size="10" fill="#34c759">0 biên lai</text>
+      <text x="300" y="170" font-size="10" fill="#e0264b">Sau sửa: cả 3 dùng find_wiki_dir → recall() chạy</text>
+    </svg>
+  </div>
+  <div class="content-grid">
+    <div class="card">
+      <h4>Triệu chứng</h4>
+      <ul>
+        <li>self-report tự mở GH#151: fingerprint recall-never-ran, mức high</li>
+        <li>tester-kit: 11 phiên có số đo, 0 biên lai okf-scan</li>
+        <li>Có wiki + stamp, KHÔNG có .template-manifest.json</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Gốc (đã đo)</h4>
+      <ul>
+        <li>session_start.py thoát ở kiểm .template-manifest.json TRƯỚC recall()</li>
+        <li>UserPromptSubmit và Stop gác bằng find_wiki_dir → vẫn chạy, vẫn ghi số đo</li>
+        <li>Hai tiêu chí khác nhau cho cùng câu hỏi "đây có phải bản cài"</li>
+      </ul>
+      <div class="detail">Bản cài downstream (v4) không có manifest là bình thường — chính harness_integrity, wiki_drift, draft_threshold đã được dời lên trước lệnh thoát.</div>
+    </div>
+    <div class="card">
+      <h4>Sửa</h4>
+      <ul>
+        <li>Ở nhánh thiếu manifest: nếu find_wiki_dir thấy wiki thì gọi recall() rồi mới thoát</li>
+        <li>Cùng một điều kiện cho cả ba hook</li>
+        <li>Chép session_start.py sang ~/.claude/harness/hooks/ cho các dự án hook global</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Bằng chứng</h4>
+      <ul>
+        <li>Fire-drill bản sao cô lập: trước vá 0 biên lai, sau vá 1</li>
+        <li>Hook in "Quét OKF (40 mục, có biên lai)"</li>
+        <li>Self-report dedupe theo fingerprint — nếu đã xanh thì không mở lại</li>
+      </ul>
+      <div class="detail">Nợ mở: output_style và orient vẫn chỉ chạy cho project có manifest. Giữ phạm vi ở recall().</div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-2" class="section-bg s-bg2">
+  <div class="section-header">
+    <span class="tag">03 · Context window</span>
+    <h2>Cơ chế "đầy context thì tự xoay phiên" chưa từng chạy</h2>
+    <p>Commit 7803210 — sửa phép tính dùng cả cache_read + cache_creation.</p>
+  </div>
+  <div class="diagram-box" style="min-height:180px">
+    <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow2" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#5856d6"/></marker>
+      </defs>
+      <rect x="20" y="30" width="200" height="70" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="120" y="55" text-anchor="middle" font-size="11" font-weight="600" fill="#0f0f12">input_tokens</text>
+      <text x="120" y="72" text-anchor="middle" font-size="10" fill="#4a4a55">3 866 (cũ — chỉ cộng cái này)</text>
+      <text x="120" y="88" text-anchor="middle" font-size="10" fill="#e0264b">→ ~15% trần 2M → KHÔNG kích hoạt</text>
+      <rect x="20" y="120" width="200" height="55" rx="8" fill="rgba(88,86,214,.12)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="120" y="142" text-anchor="middle" font-size="11" font-weight="600" fill="#5856d6">cache_read_input_tokens</text>
+      <text x="120" y="158" text-anchor="middle" font-size="10" fill="#4a4a55">606 145 (đã bỏ — SAI)</text>
+      <rect x="20" y="190" width="200" height="28" rx="8" fill="rgba(88,86,214,.08)" stroke="#5856d6" stroke-width="1"/>
+      <text x="120" y="208" text-anchor="middle" font-size="10" fill="#5856d6">cache_creation_input_tokens: 7 069</text>
+      <line x1="220" y1="65" x2="340" y2="65" stroke="#ff2d55" stroke-width="2" stroke-dasharray="4 3"/>
+      <line x1="220" y1="147" x2="340" y2="147" stroke="#ff2d55" stroke-width="2" stroke-dasharray="4 3"/>
+      <rect x="340" y="50" width="200" height="110" rx="8" fill="rgba(255,255,255,.7)" stroke="#5856d6" stroke-width="1.5"/>
+      <text x="440" y="78" text-anchor="middle" font-size="11" font-weight="600" fill="#0f0f12">Sửa: đọc usage lượt cuối</text>
+      <text x="440" y="96" text-anchor="middle" font-size="10" fill="#4a4a55">input + cache_read + cache_creation</text>
+      <text x="440" y="114" text-anchor="middle" font-size="10" fill="#4a4a55">= 32 + 606 145 + 7 069</text>
+      <text x="440" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#5856d6">= 613 246 token</text>
+      <text x="440" y="148" text-anchor="middle" font-size="10" fill="#4a4a55">so với 1M × 0.85 = 850k</text>
+      <line x1="540" y1="105" x2="630" y2="105" stroke="#5856d6" stroke-width="2" marker-end="url(#arrow2)" class="flow"/>
+      <rect x="630" y="70" width="220" height="70" rx="8" fill="rgba(52,199,89,.12)" stroke="#34c759" stroke-width="1.5"/>
+      <text x="740" y="96" text-anchor="middle" font-size="11" font-weight="600" fill="#28a745">Gác context_window_tokens</text>
+      <text x="740" y="112" text-anchor="middle" font-size="10" fill="#4a4a55">đọc transcript lượt cuối</text>
+      <text x="740" y="128" text-anchor="middle" font-size="10" fill="#4a4a55">bắn ở ~850k → tự xoay phiên</text>
+    </svg>
+  </div>
+  <div class="content-grid">
+    <div class="card">
+      <h4>Triệu chứng</h4>
+      <ul>
+        <li>self-report ghi "bàn giao tự động 0" trên phiên dài 367 lượt</li>
+        <li>Context thật lượt cuối = 613 246 token nhưng cơ chế không bao giờ kích hoạt</li>
+        <li>Chỉ 3 866 ra từ phép tính cũ → luôn ~15% trần 2 000 000</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Gốc (đã đo)</h4>
+      <ul>
+        <li>Cơ chế gác cũ chỉ cộng input_tokens (3 866)</li>
+        <li>Với prompt cache, độ đầy context nằm ở cache_read (606 145) — đã bị bỏ</li>
+        <li>Bỏ cache_read là ĐÚNG khi tính tiền, nhưng SAI khi tính context</li>
+      </ul>
+      <div class="detail">Giới hạn: cơ chế chỉ bắn ở ~850k. Nếu Claude Code tự nén context trước mốc đó thì vẫn im.</div>
+    </div>
+    <div class="card">
+      <h4>Sửa</h4>
+      <ul>
+        <li>trigger context_window_tokens đọc usage lượt cuối trong transcript</li>
+        <li>Cộng: input_tokens + cache_read_input_tokens + cache_creation_input_tokens</li>
+        <li>So với cửa sổ 1 000 000 × ngưỡng 0.85 = 850 000</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Bằng chứng</h4>
+      <ul>
+        <li>Phiên 367 lượt: 32 + 606 145 + 7 069 = 613 246 token</li>
+        <li>Cũ: 3 866 / 2M ≈ 15% → không kích hoạt</li>
+        <li>Mới: 613 246 / 850k ≈ 72% → sẵn sàng kích hoạt khi chạm ngưỡng</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="sec-3" class="section-bg s-bg0">
+  <div class="section-header">
+    <span class="tag">04 · Sơ đồ</span>
+    <h2>Vòng đời ba hook — vì sao #151 xảy ra</h2>
+    <p>Luồng ba hook và điều kiện gác của từng hook — cho thấy sự khác biệt dẫn đến recall bỏ qua.</p>
+  </div>
+  <div class="diagram-box" style="min-height:280px">
+    <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowA" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#0a84ff"/></marker>
+        <marker id="arrowB" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#30b0c7"/></marker>
+        <marker id="arrowC" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#ff9500"/></marker>
+        <style>@keyframes flowArrow{0%{stroke-dashoffset:20}100%{stroke-dashoffset:0}}.flowA{stroke-dasharray:6 4;animation:flowArrow 1.2s linear infinite}.flowB{stroke-dasharray:6 4;animation:flowArrow 1.6s linear infinite}.flowC{stroke-dasharray:6 4;animation:flowArrow 1s linear infinite}</style>
+      </defs>
+      <!-- Session lifecycle -->
+      <text x="450" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#0f0f12">Vòng đời phiên Claude Code</text>
+      <!-- Timeline -->
+      <line x1="60" y1="45" x2="840" y2="45" stroke="rgba(30,90,170,.15)" stroke-width="2"/>
+      <circle cx="60" cy="45" r="6" fill="#0a84ff"/><text x="60" y="68" text-anchor="middle" font-size="10" font-weight="600" fill="#0a84ff">Bắt đầu</text>
+      <circle cx="840" cy="45" r="6" fill="#ff2d55"/><text x="840" y="68" text-anchor="middle" font-size="10" font-weight="600" fill="#ff2d55">Kết thúc</text>
+
+      <!-- Hook 1: SessionStart -->
+      <rect x="60" y="90" width="250" height="120" rx="10" fill="rgba(255,255,255,.7)" stroke="#0a84ff" stroke-width="1.5"/>
+      <text x="185" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#0a84ff">SessionStart</text>
+      <text x="185" y="130" text-anchor="middle" font-size="10" fill="#4a4a55">Gác: .template-manifest.json</text>
+      <line x1="80" y1="140" x2="290" y2="140" stroke="rgba(30,90,170,.1)"/>
+      <text x="185" y="158" text-anchor="middle" font-size="10" fill="#4a4a55">Có manifest → recall() + output_style</text>
+      <text x="185" y="174" text-anchor="middle" font-size="10" fill="#e0264b">KHÔNG có manifest → sys.exit(0)</text>
+      <text x="185" y="192" text-anchor="middle" font-size="10" fill="#e0264b">→ okf-scan KHÔNG chạy</text>
+
+      <!-- Hook 2: UserPromptSubmit -->
+      <rect x="340" y="90" width="250" height="120" rx="10" fill="rgba(255,255,255,.7)" stroke="#30b0c7" stroke-width="1.5"/>
+      <text x="465" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#30b0c7">UserPromptSubmit</text>
+      <text x="465" y="130" text-anchor="middle" font-size="10" fill="#4a4a55">Gác: find_wiki_dir</text>
+      <line x1="360" y1="140" x2="570" y2="140" stroke="rgba(30,90,170,.1)"/>
+      <text x="465" y="158" text-anchor="middle" font-size="10" fill="#34c759">Thấy wiki → ghi số đo</text>
+      <text x="465" y="174" text-anchor="middle" font-size="10" fill="#34c759">→ 11 phiên có số đo</text>
+      <text x="465" y="192" text-anchor="middle" font-size="10" fill="#4a4a55">KHÔNG ghi biên lai</text>
+
+      <!-- Hook 3: Stop -->
+      <rect x="620" y="90" width="250" height="120" rx="10" fill="rgba(255,255,255,.7)" stroke="#ff9500" stroke-width="1.5"/>
+      <text x="745" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#ff9500">Stop</text>
+      <text x="745" y="130" text-anchor="middle" font-size="10" fill="#4a4a55">Gác: find_wiki_dir</text>
+      <line x1="640" y1="140" x2="850" y2="140" stroke="rgba(30,90,170,.1)"/>
+      <text x="745" y="158" text-anchor="middle" font-size="10" fill="#34c759">Thấy wiki → ghi số đo</text>
+      <text x="745" y="174" text-anchor="middle" font-size="10" fill="#34c759">→ 11 phiên có số đo</text>
+      <text x="745" y="192" text-anchor="middle" font-size="10" fill="#4a4a55">KHÔNG ghi biên lai</text>
+
+      <!-- Arrows between hooks -->
+      <line x1="310" y1="150" x2="340" y2="150" stroke="#0a84ff" stroke-width="1.5" marker-end="url(#arrowA)" class="flowA"/>
+      <line x1="590" y1="150" x2="620" y2="150" stroke="#30b0c7" stroke-width="1.5" marker-end="url(#arrowB)" class="flowB"/>
+
+      <!-- Problem box -->
+      <rect x="100" y="240" width="700" height="80" rx="10" fill="rgba(255,45,85,.08)" stroke="#ff2d55" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="450" y="265" text-anchor="middle" font-size="12" font-weight="700" fill="#e0264b">Vấn đề: Hai tiêu chí khác nhau cho cùng một câu hỏi</text>
+      <text x="450" y="285" text-anchor="middle" font-size="10.5" fill="#4a4a55">SessionStart gác bằng .template-manifest → downstream thiếu manifest → recall() bị bỏ qua</text>
+      <text x="450" y="302" text-anchor="middle" font-size="10.5" fill="#34c759">Sửa: cả ba hook dùng chung find_wiki_dir → recall() luôn chạy khi có wiki</text>
+    </svg>
+  </div>
+</section>
+
+<footer>
+  <p>File: /Users/giatran/orca/setup/setup/llmwiki/html/100926-harness-fixes.html</p>
+</footer>
+
+</main>
+
+<script>
+(function(){var nav=document.querySelector('nav');if(!nav)return;
+var btn=document.createElement('button');btn.className='nav-toggle';btn.textContent='☰';document.body.appendChild(btn);
+var close=document.createElement('button');close.className='nav-close';close.textContent='✕';nav.appendChild(close);
+var apply=function(c){document.body.classList.toggle('nav-collapsed',c);try{localStorage.setItem('navCollapsed',c?'1':'0')}catch(e){}};
+btn.addEventListener('click',function(){apply(false)});close.addEventListener('click',function(){apply(true)});
+try{var s=localStorage.getItem('navCollapsed');if(s==='1'||(s!=='0'&&matchMedia('(max-width:640px)').matches))apply(true)}catch(e){}})();
+
+(function(){function attach(el){el.addEventListener('pointerdown',function(e){var r=el.getBoundingClientRect();var x=e.clientX-r.left,y=e.clientY-r.top;var rad=Math.hypot(Math.max(x,r.width-x),Math.max(y,r.height-y));var ink=document.createElement('span');ink.className='ripple-ink';ink.style.width=ink.style.height=rad*2+'px';ink.style.left=(x-rad)+'px';ink.style.top=(y-rad)+'px';el.appendChild(ink);ink.addEventListener('animationend',function(){ink.remove()})})}
+document.querySelectorAll('nav a,.nav-toggle,.nav-close').forEach(attach)})();
+
+(function(){var K='100926-harness-fixes-theme',d=document.documentElement,nav=document.querySelector('nav');if(!nav)return;
+function isDark(){var t=d.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme:dark)').matches}
+var sw=document.createElement('div');sw.className='theme-switch';sw.setAttribute('role','switch');sw.setAttribute('tabindex','0');
+sw.innerHTML='<span class="track"><span style="font-size:11px">☀️</span><span class="knob"></span><span style="font-size:11px">🌙</span></span>';
+var row=document.createElement('div');row.className='theme-row';
+var lb=document.createElement('span');lb.className='lbl';lb.textContent='Giao diện';row.appendChild(lb);row.appendChild(sw);nav.appendChild(row);
+function paint(){var dk=isDark();sw.classList.toggle('on',dk);sw.setAttribute('aria-checked',dk?'true':'false');
+sw.setAttribute('aria-label',dk?'Nút gạt giao diện: đang tối — gạt sang sáng':'Nút gạt giao diện: đang sáng — gạt sang tối')}
+function flip(){var n=isDark()?'light':'dark';d.setAttribute('data-theme',n);try{localStorage.setItem(K,n)}catch(e){}paint()}
+sw.addEventListener('click',flip);sw.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}});paint()})();
+
+(function(){var flash=function(el){var t;return function(){el.classList.add('scrolling');clearTimeout(t);t=setTimeout(function(){el.classList.remove('scrolling')},900)}};var root=document.documentElement;window.addEventListener('scroll',flash(root),{passive:true});var nav=document.querySelector('nav');if(nav)nav.addEventListener('scroll',flash(nav),{passive:true})})();
+
+(function(){var sections=document.querySelectorAll('section[id]');var links=document.querySelectorAll('nav a[href^="#sec-"]');
+var observer=new IntersectionObserver(function(entries){var active='';for(var i=0;i<entries.length;i++){if(entries[i].isIntersecting)active=entries[i].target.id}
+links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+active)})},{rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(function(s){observer.observe(s)})})();
+
+(function(){var mm=document.querySelector('.mm');if(!mm)return;var NS='http://www.w3.org/2000/svg';
+function colorOf(n){return n.classList.contains('b-0')?'#30b0c7':n.classList.contains('b-1')?'#5856d6':n.classList.contains('b-2')?'#ff9500':n.classList.contains('b-3')?'#34c759':n.classList.contains('b-4')?'#ff2d55':'#9aa4b2'}
+function draw(){var canvas=mm.querySelector('.mm-canvas'),svg=mm.querySelector('.mm-links');if(!canvas||!svg)return;var w=canvas.offsetWidth,h=canvas.offsetHeight;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox','0 0 '+w+' '+h);while(svg.firstChild)svg.removeChild(svg.firstChild);var cR=canvas.getBoundingClientRect();[].slice.call(canvas.querySelectorAll('.node.has-children')).forEach(function(p){var row=p.parentElement,kids=null,ch=row.children;for(var i=0;i<ch.length;i++){if(ch[i].classList.contains('children'))kids=ch[i];}if(!kids||kids.classList.contains('collapsed'))return;var pr=p.getBoundingClientRect(),px=pr.right-cR.left,py=pr.top+pr.height/2-cR.top;[].slice.call(kids.children).forEach(function(crow){var cn=crow.querySelector(':scope > .node');if(!cn)return;var rr=cn.getBoundingClientRect(),cx=rr.left-cR.left,cy=rr.top+rr.height/2-cR.top,dx=Math.max(22,(cx-px)*0.55);var pa=document.createElementNS(NS,'path');pa.setAttribute('d','M'+px+' '+py+' C'+(px+dx)+' '+py+' '+(cx-dx)+' '+cy+' '+cx+' '+cy);pa.setAttribute('stroke',colorOf(cn));svg.appendChild(pa);});});}
+[].slice.call(mm.querySelectorAll('.node.has-children')).forEach(function(n){var row=n.parentElement,kids=null,c=row.children;for(var i=0;i<c.length;i++){if(c[i].classList.contains('children'))kids=c[i];}if(!kids)return;if(n.classList.contains('cat')){kids.classList.add('collapsed');n.classList.add('collapsed-parent');}n.addEventListener('click',function(e){e.stopPropagation();var open=kids.classList.toggle('collapsed');n.classList.toggle('collapsed-parent',open);draw();});});
+draw();addEventListener('load',function(){setTimeout(draw,60)});addEventListener('resize',function(){clearTimeout(window.__mmt);window.__mmt=setTimeout(draw,120)},{passive:true});})();
+
+function initDraggableDiagrams(){var NS='http://www.w3.org/2000/svg';var nearest=function(nodes,x,y){var best=null,bd=1e9;nodes.forEach(function(n){var cx=Math.max(n.x,Math.min(x,n.x+n.w)),cy=Math.max(n.y,Math.min(y,n.y+n.h));var d=Math.hypot(x-cx,y-cy);if(d<bd){bd=d;best=n}});return bd<=42?best:null};
+document.querySelectorAll('.diagram-box').forEach(function(box){var svg=box.querySelector('svg');if(!svg||box.dataset.draggable)return;box.dataset.draggable='1';
+var vp=document.createElement('div');vp.className='diagram-viewport';box.insertBefore(vp,svg);vp.appendChild(svg);
+var hint=document.createElement('div');hint.className='diagram-hint';hint.textContent='✥ kéo từng ô · kéo nền để pan · cuộn để zoom · kéo mép dưới để mở rộng';box.appendChild(hint);
+var reset=document.createElement('button');reset.className='diagram-reset';reset.textContent='⟲ reset';box.appendChild(reset);
+var allRects=[].slice.call(svg.querySelectorAll('rect'));var nodes=allRects.filter(function(r){return(+r.getAttribute('width'))>=70&&(+r.getAttribute('height'))>=30}).map(function(r){return{rect:r,x:+r.getAttribute('x'),y:+r.getAttribute('y'),w:+r.getAttribute('width'),h:+r.getAttribute('height'),els:[r],tx:0,ty:0}});
+var inNode=function(px,py){return nodes.find(function(n){return px>=n.x-1&&px<=n.x+n.w+1&&py>=n.y-1&&py<=n.y+n.h+1})};
+[].slice.call(svg.querySelectorAll('text')).forEach(function(t){var x=parseFloat(t.getAttribute('x')),y=parseFloat(t.getAttribute('y'));if(isNaN(x)||isNaN(y))return;var n=inNode(x,y);if(n)n.els.push(t)});
+allRects.forEach(function(r){if(nodes.some(function(n){return n.rect===r}))return;var x=+r.getAttribute('x'),y=+r.getAttribute('y'),w=+r.getAttribute('width')||0,h=+r.getAttribute('height')||0;var n=inNode(x+w/2,y+h/2);if(n)n.els.push(r)});
+nodes.forEach(function(n){var g=document.createElementNS(NS,'g');g.setAttribute('class','dnode');n.rect.parentNode.insertBefore(g,n.rect);n.els.forEach(function(el){g.appendChild(el)});n.g=g});
+var links=[].slice.call(svg.querySelectorAll('line')).filter(function(l){return l.hasAttribute('x1')&&l.hasAttribute('x2')});
+links.forEach(function(l){l._x1=+l.getAttribute('x1');l._y1=+l.getAttribute('y1');l._x2=+l.getAttribute('x2');l._y2=+l.getAttribute('y2');l._n1=nearest(nodes,l._x1,l._y1);l._n2=nearest(nodes,l._x2,l._y2)});
+var reroute=function(){links.forEach(function(l){if(l._n1){l.setAttribute('x1',l._x1+l._n1.tx);l.setAttribute('y1',l._y1+l._n1.ty)}if(l._n2){l.setAttribute('x2',l._x2+l._n2.tx);l.setAttribute('y2',l._y2+l._n2.ty)}})};
+var vbBase=(svg.getAttribute('viewBox')||'0 0 900 200').split(/\s+/).map(Number);
+var fitViewBox=function(){var pad=16;var minX=vbBase[0],minY=vbBase[1],maxX=vbBase[0]+vbBase[2],maxY=vbBase[1]+vbBase[3];nodes.forEach(function(n){minX=Math.min(minX,n.x+n.tx-pad);minY=Math.min(minY,n.y+n.ty-pad);maxX=Math.max(maxX,n.x+n.w+n.tx+pad);maxY=Math.max(maxY,n.y+n.h+n.ty+pad)});svg.setAttribute('viewBox',minX+' '+minY+' '+(maxX-minX)+' '+(maxY-minY))};
+var ptx=0,pty=0,scale=1;var applyCanvas=function(){svg.style.transform='translate('+ptx+'px,'+pty+'px) scale('+scale+')'};
+var toSvg=function(cx,cy){var p=svg.createSVGPoint();p.x=cx;p.y=cy;return p.matrixTransform(svg.getScreenCTM().inverse())};
+var mode=null,node=null,start=null,t0=null,p0=null;
+vp.addEventListener('pointerdown',function(e){vp.setPointerCapture(e.pointerId);var g=e.target.closest&&e.target.closest('g.dnode');if(g){mode='node';node=nodes.find(function(n){return n.g===g});start=toSvg(e.clientX,e.clientY);t0={x:node.tx,y:node.ty}}else{mode='pan';p0={x:e.clientX-ptx,y:e.clientY-pty};vp.classList.add('grabbing')}});
+vp.addEventListener('pointermove',function(e){if(mode==='node'){var c=toSvg(e.clientX,e.clientY);node.tx=t0.x+(c.x-start.x);node.ty=t0.y+(c.y-start.y);node.g.setAttribute('transform','translate('+node.tx+','+node.ty+')');reroute()}else if(mode==='pan'){ptx=e.clientX-p0.x;pty=e.clientY-p0.y;applyCanvas()}});
+var end=function(){if(mode==='node')fitViewBox();mode=null;node=null;vp.classList.remove('grabbing')};
+vp.addEventListener('pointerup',end);vp.addEventListener('pointercancel',end);
+vp.addEventListener('wheel',function(e){e.preventDefault();var r=vp.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;var ns=Math.min(4,Math.max(0.5,scale*(e.deltaY<0?1.1:0.9)));ptx=mx-(mx-ptx)*(ns/scale);pty=my-(my-pty)*(ns/scale);scale=ns;applyCanvas()},{passive:false});
+var doReset=function(){ptx=0;pty=0;scale=1;svg.style.transition='transform .3s cubic-bezier(.4,0,.2,1)';applyCanvas();setTimeout(function(){svg.style.transition=''},320);nodes.forEach(function(n){n.tx=0;n.ty=0;n.g.setAttribute('transform','translate(0,0)')});reroute();fitViewBox()};
+reset.addEventListener('click',doReset);vp.addEventListener('dblclick',doReset)});}
+initDraggableDiagrams();
+</script>
+</body>
+</html>

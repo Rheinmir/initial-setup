@@ -33,6 +33,9 @@
 <!-- index:auto:start -->
 | [r2-origin-section](sources/evals/r2-origin-section.md) | eval | Golden: R2 origin-required |
 | [sql-active-users](sources/evals/sql-active-users.md) | eval | Golden: SQL active users |
+| [context-guard-cache-read](sources/evals/context-guard-cache-read.md) | eval | Golden: gác đầy context phải đo input + cache_read + cache_creation của lượt cuối |
+| [hook-gate-consistency](sources/evals/hook-gate-consistency.md) | eval | Golden: SessionStart thoát trước recall() khi thiếu manifest — GH#151 |
+| [r3-index-sync-gate](sources/evals/r3-index-sync-gate.md) | eval | Golden: draft quên dòng index bị chặn ở pre-commit wiki-index-sync — GH#150 |
 | [feature-catalog](concepts/feature-catalog.md) | concept | Feature Catalog — và VÌ SAO mỗi cái phải có |
 | [ADR-005-logger-and-capabilities-travel-downstream](sources/adr/ADR-005-logger-and-capabilities-travel-downstream.md) | decision | ADR-005: logger + capability-map đi xuống cùng dự án (scoped) |
 | [harness-enforcement-floor](concepts/harness-enforcement-floor.md) | concept | Harness enforcement floor — vì sao CI mới là sàn thật |

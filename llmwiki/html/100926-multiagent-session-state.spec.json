@@ -136,6 +136,26 @@
   ],
   "transitions": [
     {
+      "id": "pending-ready",
+      "from": "pending",
+      "to": "ready"
+    },
+    {
+      "id": "ready-dispatched",
+      "from": "ready",
+      "to": "dispatched"
+    },
+    {
+      "id": "dispatched-settle",
+      "from": "dispatched",
+      "to": "settle"
+    },
+    {
+      "id": "settle-completed",
+      "from": "settle",
+      "to": "completed"
+    },
+    {
       "id": "dispatched-sessionend",
       "from": "dispatched",
       "to": "sessionend",

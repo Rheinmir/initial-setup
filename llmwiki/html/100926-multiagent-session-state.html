@@ -5256,9 +5256,13 @@
         <path d="M 154 157 L 748 157" class="a-emphasis" stroke-width="2.2" marker-end="url(#arrowhead-emphasis)"/>
 
         <!-- Transition paths -->
-        <path data-edge-from="dispatched" data-edge-to="sessionend" data-edge-label="coordinator dừng" data-edge-key="0" data-edge-id="dispatched-sessionend" data-composition-points="402,184;402,278" d="M 402 184 L 402 278" class="a-dashed" stroke-width="1.1" marker-end="url(#arrowhead-dashed)"/>
-        <path data-edge-from="sessionend" data-edge-to="recall" data-edge-label="bản bàn giao .md" data-edge-key="1" data-edge-id="sessionend-recall" data-composition-points="465,307;647,307" d="M 465 307 L 647 307" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="recall" data-edge-to="ready" data-edge-label="task-list vẫn còn, nhặt lại" data-edge-key="2" data-edge-id="recall-ready" data-composition-points="647,307;647,370;307,370;307,155" d="M 647 307 L 647 360 Q 647 370 637 370 L 317 370 Q 307 370 307 360 L 307 155" class="a-emphasis" stroke-width="2" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="pending" data-edge-to="ready" data-edge-key="0" data-edge-id="pending-ready" data-composition-points="153,155;189,155" d="M 153 155 L 189 155" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="ready" data-edge-to="dispatched" data-edge-key="1" data-edge-id="ready-dispatched" data-composition-points="307,155;343,155" d="M 307 155 L 343 155" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="dispatched" data-edge-to="settle" data-edge-key="2" data-edge-id="dispatched-settle" data-composition-points="461,155;497,155" d="M 461 155 L 497 155" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="settle" data-edge-to="completed" data-edge-key="3" data-edge-id="settle-completed" data-composition-points="615,155;651,155" d="M 615 155 L 651 155" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="dispatched" data-edge-to="sessionend" data-edge-label="coordinator dừng" data-edge-key="4" data-edge-id="dispatched-sessionend" data-composition-points="402,184;402,278" d="M 402 184 L 402 278" class="a-dashed" stroke-width="1.1" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="sessionend" data-edge-to="recall" data-edge-label="bản bàn giao .md" data-edge-key="5" data-edge-id="sessionend-recall" data-composition-points="465,307;647,307" d="M 465 307 L 647 307" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="recall" data-edge-to="ready" data-edge-label="task-list vẫn còn, nhặt lại" data-edge-key="6" data-edge-id="recall-ready" data-composition-points="647,307;647,370;307,370;307,155" d="M 647 307 L 647 360 Q 647 370 637 370 L 317 370 Q 307 370 307 360 L 307 155" class="a-emphasis" stroke-width="2" marker-end="url(#arrowhead-emphasis)"/>
 
         <!-- States -->
         <g id="node-pending" data-node-id="pending" data-node-label="pending" tabindex="0" role="button" aria-label="Focus pending, task-create, Trạng thái task — sống trong Run của Orca" aria-pressed="false" data-node-kind="start" data-node-sublabel="task-create" data-node-tag="chưa đủ điều kiện" data-node-context="Trạng thái task — sống trong Run của Orca">
@@ -5355,15 +5359,19 @@
         </g>
 
         <!-- Transition labels -->
-        <g data-detail="context" data-edge-from="dispatched" data-edge-to="sessionend" data-edge-label="coordinator dừng" data-edge-key="0" data-edge-id="dispatched-sessionend">
+
+
+
+
+        <g data-detail="context" data-edge-from="dispatched" data-edge-to="sessionend" data-edge-label="coordinator dừng" data-edge-key="4" data-edge-id="dispatched-sessionend">
           <rect x="356.8" y="215" width="90.4" height="16" rx="4" class="c-mask"/>
           <text x="402" y="226" class="t-messagebus" font-size="8" text-anchor="middle">coordinator dừng</text>
         </g>
-        <g data-detail="context" data-edge-from="sessionend" data-edge-to="recall" data-edge-label="bản bàn giao .md" data-edge-key="1" data-edge-id="sessionend-recall">
+        <g data-detail="context" data-edge-from="sessionend" data-edge-to="recall" data-edge-label="bản bàn giao .md" data-edge-key="5" data-edge-id="sessionend-recall">
           <rect x="510.8" y="286" width="90.4" height="16" rx="4" class="c-mask"/>
           <text x="556" y="297" class="t-muted" font-size="8" text-anchor="middle">bản bàn giao .md</text>
         </g>
-        <g data-detail="context" data-edge-from="recall" data-edge-to="ready" data-edge-label="task-list vẫn còn, nhặt lại" data-edge-key="2" data-edge-id="recall-ready">
+        <g data-detail="context" data-edge-from="recall" data-edge-to="ready" data-edge-label="task-list vẫn còn, nhặt lại" data-edge-key="6" data-edge-id="recall-ready">
           <rect x="404.85" y="349" width="144.3" height="16" rx="4" class="c-mask"/>
           <text x="477" y="360" class="t-backend" font-size="8" text-anchor="middle">task-list vẫn còn, nhặt lại</text>
         </g>

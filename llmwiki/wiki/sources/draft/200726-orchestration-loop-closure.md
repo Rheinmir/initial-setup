@@ -57,7 +57,7 @@ Việc xong trong vài giây, shell đã về prompt, mà `wait` **timeout sau 9
 
 ### So Orca ↔ herdr (đã clone và đọc code, không đoán)
 
-`herdr` — `github.com/ogulcancelik/herdr`, Rust, ~233k LOC, **AGPL-3.0**, "agent multiplexer sống trong terminal".
+`herdr` — `github.com/herdrdev/herdr`, Rust, ~233k LOC, **AGPL-3.0** (đo lại 10/09/2026: nay là **Apache-2.0** ở v0.9.0, 266k LOC, có trên Homebrew — tiền đề "tránh AGPL" của quyết định dưới đây đã hết hiệu lực), "agent multiplexer sống trong terminal".
 
 | | Orca | herdr |
 |---|---|---|

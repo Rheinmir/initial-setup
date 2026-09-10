@@ -16,7 +16,10 @@ Vì sao tồn tại (đo 2026-07-20, T-260720-01):
   ⇒ Chuỗi nhân quả: giao được → KHÔNG biết lúc nào xong → giám sát thành cực hình
   → coordinator bỏ cuộc, tự làm inline → 78% việc không bao giờ được giao.
 
-Cách giải (mode HÒA TAN, chưng cất từ herdr — github.com/ogulcancelik/herdr, AGPL-3.0):
+Cách giải (mode HÒA TAN, chưng cất từ herdr — github.com/herdrdev/herdr, Apache-2.0):
+  [cập nhật 10/09/2026: repo đã chuyển ogulcancelik→herdrdev và ĐỔI GIẤY PHÉP AGPL-3.0→
+   Apache-2.0 ở v0.9.0. Lý do 'tránh ràng buộc AGPL' trong quyết định gốc KHÔNG CÒN ĐÚNG;
+   nếu xét lại chuyện KÉO NGOÀI/vendor thì rào cản giờ chỉ còn 266k LOC, không còn giấy phép.]
   herdr giải bài này bằng cách QUAN SÁT pane để suy ra agent_status, thay vì TIN vào
   việc agent tự khai báo. Ta lấy đúng cái ý đó, cài bằng đồ Orca sẵn có, KHÔNG chép
   code và KHÔNG nuốt 233k dòng hạ tầng:

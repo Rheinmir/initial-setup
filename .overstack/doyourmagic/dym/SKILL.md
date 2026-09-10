@@ -1,6 +1,6 @@
 ---
 name: dym
-description: "Tool ngoài ĐÃ KIỂM CHỨNG, chọn theo domain: agent · architecture · browser · chart · copy · design-audit · diagram · frontend · playwright · qa · report · research · science · security · skill-authoring · threat-intel · writing. Gọi khi việc thuộc một domain đó (vd vẽ chart → lieflat-charts, frontend → impeccable) và skill canonical chưa phủ; gõ /dym <domain> hoặc /dym."
+description: "Tool ngoài ĐÃ KIỂM CHỨNG, chọn theo domain: agent · architecture · browser · chart · computer-use · copy · design-audit · desktop · diagram · frontend · macos · playwright · qa · report · research · science · security · skill-authoring · threat-intel · writing. Gọi khi việc thuộc một domain đó (vd vẽ chart → lieflat-charts, frontend → impeccable) và skill canonical chưa phủ; gõ /dym <domain> hoặc /dym."
 ---
 
 # Skill: dym — định tuyến domain → bundle tool ngoài
@@ -19,10 +19,13 @@ Sinh bởi `harness/scripts/dym-sync.py index` từ `domains:` trong hub của t
 | architecture | `dym-archify` |
 | browser | `dym-browser-use` |
 | chart | `dym-lieflat-charts` |
+| computer-use | `dym-agent-desktop` |
 | copy | `dym-humanizer` |
 | design-audit | `dym-impeccable` |
+| desktop | `dym-agent-desktop` |
 | diagram | `dym-archify` · `dym-diagram-design` |
 | frontend | `dym-diagram-design` · `dym-impeccable` |
+| macos | `dym-agent-desktop` |
 | playwright | `dym-browser-use` |
 | qa | `dym-browser-use` |
 | report | `dym-lieflat-charts` |
@@ -36,6 +39,7 @@ Sinh bởi `harness/scripts/dym-sync.py index` từ `domains:` trong hub của t
 ## Bảng 2 — hub → slug
 | hub | bundle | domains | slugs |
 |---|---|---|---|
+| `dym-agent-desktop` | agent-desktop | computer-use, desktop, macos | drive · install · route · session |
 | `dym-archify` | archify | diagram, architecture | agent-chat-authoring · ci-diagram-gate · cli-authoring-loop · compare-architecture-delta · contributor-build-and-test · install-and-verify · migrate-workflow-v2 · repository-evidence · visual-check-and-preview |
 | `dym-arex-skill` | arex-skill | skill-authoring, agent | cai-dat-disco · cai-thu-vien-skill · chay-viec-researcher · contributor-dong-gop-skill · contributor-phat-trien-cli · creator-paper-to-skills · creator-tao-repo-skill · lenh-chat-trong-tui · tich-hop-ci · xuat-skill-sang-agent-khac |
 | `dym-browser-use` | browser-use | browser, qa, playwright | cloud · qa · repl |

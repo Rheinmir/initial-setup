@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>agent-desktop — luồng skill</title>
+<script>(function(){try{var t=localStorage.getItem('ad-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<style>
+:root{
+ --bg1:#eef4ff; --bg2:#f7fbff; --orb1:#8fb8ff; --orb2:#bcd6ff;
+ --glass:rgba(255,255,255,.62); --glass-2:rgba(255,255,255,.42); --glass-3:rgba(255,255,255,.28);
+ --edge:rgba(255,255,255,.75); --line:rgba(20,50,100,.14);
+ --fg:#14243d; --fg-dim:#4d6a94; --accent:#1f6feb;
+ --ok:#0f8a5f; --warn:#b06a00; --bad:#c0392b;
+ --shadow:0 8px 30px rgba(20,50,100,.10);
+}
+[data-theme="dark"]{
+ --bg1:#0b1220; --bg2:#111a2b; --orb1:#1e3a6b; --orb2:#16305c;
+ --glass:rgba(255,255,255,.07); --glass-2:rgba(255,255,255,.05); --glass-3:rgba(255,255,255,.035);
+ --edge:rgba(255,255,255,.14); --line:rgba(255,255,255,.14);
+ --fg:#e6edf7; --fg-dim:#9db0c9; --accent:#6ea8ff;
+ --ok:#3fbf8f; --warn:#e0a33a; --bad:#ff7a6b;
+ --shadow:0 8px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+ font:13px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,sans-serif;
+ color:var(--fg); background:linear-gradient(160deg,var(--bg1),var(--bg2)); min-height:100vh;
+ -webkit-font-smoothing:antialiased;
+}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.5;pointer-events:none;z-index:0}
+.orb.a{width:420px;height:420px;background:var(--orb1);top:-120px;left:-90px}
+.orb.b{width:360px;height:360px;background:var(--orb2);bottom:-140px;right:-80px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--glass);padding:8px 12px;border-radius:8px;z-index:99}
+.skip:focus{left:12px;top:12px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.layout{position:relative;z-index:1;display:grid;grid-template-columns:236px 1fr;gap:22px;max-width:1240px;margin:0 auto;padding:22px}
+aside{
+ position:sticky;top:22px;align-self:start;max-height:calc(100vh - 44px);overflow:auto;
+ background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+ border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow);padding:14px
+}
+.chrome{display:flex;gap:6px;margin-bottom:12px}
+.chrome i{width:10px;height:10px;border-radius:50%;display:block}
+.chrome i:nth-child(1){background:#ff5f57}.chrome i:nth-child(2){background:#febc2e}.chrome i:nth-child(3){background:#28c840}
+aside h1{font-size:14px;margin:0 0 2px}
+aside .sub{font-size:11px;color:var(--fg-dim);margin-bottom:12px}
+nav a{display:block;padding:6px 9px;border-radius:8px;color:var(--fg);text-decoration:none;font-size:12px}
+nav a:hover{background:var(--glass-2)}
+.footbar{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px}
+button.toggle{font:inherit;font-size:12px;cursor:pointer;background:var(--glass-2);border:1px solid var(--edge);color:var(--fg);border-radius:9px;padding:6px 10px}
+main{min-width:0}
+section{
+ background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+ border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow);padding:18px 20px;margin-bottom:20px
+}
+h2{font-size:16px;margin:0 0 4px}
+h3{font-size:13px;margin:16px 0 6px}
+.lead{color:var(--fg-dim);margin:0 0 14px;font-size:12px}
+code,kbd{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:11.5px;background:var(--glass-3);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--glass-3);border:1px solid var(--line);border-radius:10px;padding:10px 12px;overflow-x:auto;font-size:11.5px;margin:8px 0}
+pre code{background:none;border:0;padding:0}
+table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--fg-dim);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.wrap{overflow-x:auto}
+/* flow */
+#flow{position:relative;padding:6px 0}
+#flow svg.conn{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.row{display:grid;grid-template-columns:1fr 150px 1fr;align-items:center;gap:10px;margin:0 0 6px}
+.node{
+ background:var(--glass-2);border:1px solid var(--edge);border-radius:13px;padding:11px 13px;position:relative;
+}
+.node .k{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-dim)}
+.node .t{font-weight:600;font-size:13px;margin:2px 0 5px}
+.node .cmd{display:block;margin:4px 0}
+.node .trap{font-size:11.5px;color:var(--warn);margin-top:6px}
+.prod{
+ justify-self:center;text-align:center;font-size:11.5px;color:var(--fg-dim);
+ background:var(--glass-3);border:1px dashed var(--line);border-radius:999px;padding:6px 10px;min-width:130px
+}
+.spacer{height:34px}
+/* mind map */
+details.mm{border:1px solid var(--line);border-radius:11px;padding:8px 11px;margin:7px 0;background:var(--glass-3)}
+details.mm>summary{cursor:pointer;font-weight:600;font-size:12.5px;list-style:none}
+details.mm>summary::-webkit-details-marker{display:none}
+details.mm>summary::before{content:"▸";display:inline-block;width:14px;color:var(--fg-dim)}
+details.mm[open]>summary::before{content:"▾"}
+details.mm .body{padding:6px 0 2px 14px;font-size:12px;color:var(--fg-dim)}
+.badge{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--line);margin-right:5px}
+.b-ok{color:var(--ok)}.b-warn{color:var(--warn)}.b-bad{color:var(--bad)}
+footer{font-size:11px;color:var(--fg-dim);padding:0 22px 26px;max-width:1240px;margin:0 auto;position:relative;z-index:1;word-break:break-all}
+@media (max-width:820px){.layout{grid-template-columns:1fr}aside{position:static;max-height:none}.row{grid-template-columns:1fr}.prod{justify-self:start}}
+</style>
+</head>
+<body>
+<div class="orb a"></div><div class="orb b"></div>
+<a class="skip" href="#main">Bỏ qua tới nội dung</a>
+<div class="layout">
+<aside>
+  <div class="chrome"><i></i><i></i><i></i></div>
+  <h1>agent-desktop</h1>
+  <div class="sub">bundle doyourmagic · 0.8.5 · đo 09/09/2026</div>
+  <nav>
+    <a href="#flow-sec">Luồng skill</a>
+    <a href="#verdict">Verdict hấp thụ</a>
+    <a href="#cmp">So sánh đã đo</a>
+    <a href="#mm">Bản đồ khái niệm</a>
+    <a href="#proof">Bảng kiểm chứng</a>
+  </nav>
+  <div class="footbar">
+    <button class="toggle" id="tg" aria-label="Đổi sáng tối">🌗 Sáng/Tối</button>
+  </div>
+</aside>
+
+<main id="main">
+<section id="flow-sec">
+  <h2>Luồng skill → sản phẩm → skill kế</h2>
+  <p class="lead">Mỗi node là một skill gọi được. Nhãn giữa hai node là <em>sản phẩm</em> (thứ node trước để lại cho node sau dùng).</p>
+  <div id="flow">
+    <svg class="conn" aria-hidden="true"></svg>
+
+    <div class="row">
+      <div class="node" id="n-route">
+        <div class="k">bước 1 · quyết định</div>
+        <div class="t">route — chọn tool</div>
+        <code class="cmd">/dym-agent-desktop route</code>
+        <div>Web → playwright/CDP. Desktop macOS → tiếp. Linux/Windows → <code>orca computer</code>, dừng ở đây.</div>
+        <div class="trap">Bẫy: Electron chưa bật AX (accessibility tree — cây phần tử giao diện OS phơi ra) thì mọi tool AX đều mù.</div>
+      </div>
+      <div class="prod" id="p1">verdict: dùng hay không</div>
+      <div></div>
+    </div>
+    <div class="spacer"></div>
+
+    <div class="row">
+      <div></div>
+      <div class="prod" id="p2">binary + quyền TCC</div>
+      <div class="node" id="n-install">
+        <div class="k">bước 2 · một lần mỗi máy</div>
+        <div class="t">install — cài pin scope</div>
+        <code class="cmd">/dym-agent-desktop install</code>
+        <div>npm có <code>--prefix</code> + <code>HOME</code> cô lập; <code>AGENT_DESKTOP_HOME</code> tuyệt đối để state không rơi vào <code>~</code>.</div>
+        <div class="trap">Bẫy: cấp quyền cho <em>terminal</em>, rồi phải mở lại terminal — TCC (hệ cấp quyền của macOS) chỉ đọc lúc khởi động tiến trình.</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+
+    <div class="row">
+      <div class="node" id="n-drive">
+        <div class="k">bước 3 · vòng việc</div>
+        <div class="t">drive — quan sát &amp; hành động</div>
+        <code class="cmd">/dym-agent-desktop drive</code>
+        <div>skeleton (bản đồ nông) → drill (bung một vùng) → act → verify bằng cách drill lại đúng vùng đó.</div>
+        <div class="trap">Bẫy: ref phải bọc nháy <code>"@${SID}:e1"</code>; shell nuốt dấu hai chấm là ra <code>INVALID_ARGS</code>.</div>
+      </div>
+      <div class="prod" id="p3">ref <code>@snapshot:eN</code></div>
+      <div></div>
+    </div>
+    <div class="spacer"></div>
+
+    <div class="row">
+      <div></div>
+      <div class="prod" id="p4">trace JSONL + HTML</div>
+      <div class="node" id="n-session">
+        <div class="k">bước 4 · khi cần biên lai</div>
+        <div class="t">session — bằng chứng &amp; nhiều agent</div>
+        <code class="cmd">/dym-agent-desktop session</code>
+        <div>Một session mỗi lượt việc; <code>trace export</code> ra HTML cho người đọc, JSONL cho máy. Nhiều agent → mỗi agent một <code>AGENT_DESKTOP_AGENT_ID</code>.</div>
+        <div class="trap">Bẫy: trace hậu-hành-động là best-effort — thiếu dòng KHÔNG chứng minh không có hành động.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="verdict">
+  <h2>Verdict hấp thụ</h2>
+  <p class="lead">Câu hỏi của user: có nên hấp thụ hoàn toàn để thay toàn bộ kiểu computer use không.</p>
+  <p><span class="badge b-warn">KÉO NGOÀI</span> — pointer + pin version, <strong>không</strong> thay thế toàn bộ.</p>
+  <table>
+    <tr><th>lý do</th><th>bằng chứng</th></tr>
+    <tr><td>Không thay được về nền tảng</td><td><code>SUPPORTED_PLATFORMS = ['darwin']</code>; crate windows/linux 76 dòng stub</td></tr>
+    <tr><td>Không hoà tan được: 107k dòng Rust, 5 crate, helper ký riêng</td><td><code>core</code> 57.6k · <code>macos</code> 34.5k · <code>ffi</code> 14.9k dòng</td></tr>
+    <tr><td>Không cần vendor: tool tự mang doc</td><td><code>agent-desktop skills get desktop --full</code> in SKILL + 5 references từ binary</td></tr>
+    <tr><td>Chưa đủ ổn định để khoá vào nền</td><td>36 version trong 6.5 tháng, bản mới nhất cách 3 ngày</td></tr>
+    <tr><td>Nhưng thắng rõ ở việc nhiều bước có mutation</td><td>ref bền qua tiến trình · <code>STALE_REF</code>/<code>AMBIGUOUS_TARGET</code> tường minh · headless mặc định · trace</td></tr>
+  </table>
+</section>
+
+<section id="cmp">
+  <h2>So sánh đã đo — <code>orca computer</code> vs <code>agent-desktop</code></h2>
+  <div class="wrap"><table>
+    <tr><th>trục</th><th>orca computer</th><th>agent-desktop</th></tr>
+    <tr><td>Nền tảng</td><td>macOS + Linux</td><td class="b-bad">darwin only</td></tr>
+    <tr><td>Chi phí cài</td><td>0 (đi kèm Orca)</td><td>3.0M binary + 498K helper</td></tr>
+    <tr><td>Định danh phần tử</td><td>element-index, sống một lượt</td><td class="b-ok">ref ghi đĩa, sống qua tiến trình</td></tr>
+    <tr><td>Cửa sổ nhập nhằng (Teams, 2 cửa sổ)</td><td class="b-bad">im lặng chọn w-9249</td><td class="b-ok">AMBIGUOUS_TARGET + liệt kê</td></tr>
+    <tr><td>Token, System Settings</td><td class="b-ok">3313 ký tự cả cây</td><td>full 24185 B · skeleton 4630 B</td></tr>
+    <tr><td>Bề mặt lệnh</td><td>~15</td><td class="b-ok">55 chạy được / 59 tên</td></tr>
+    <tr><td>Headless (không cướp chuột/focus)</td><td>không khai</td><td class="b-ok">mặc định</td></tr>
+    <tr><td>Biên lai</td><td>không có</td><td class="b-ok">JSONL + HTML</td></tr>
+    <tr><td>Electron chưa bật AX (Teams)</td><td>5 node</td><td>ref_count 4 — cùng mù</td></tr>
+  </table></div>
+</section>
+
+<section id="mm">
+  <h2>Bản đồ khái niệm</h2>
+  <details class="mm" open><summary>Ref &amp; snapshot</summary><div class="body">
+    Ref là <code>@&lt;snapshot_id&gt;:e&lt;N&gt;</code>, gán theo thứ tự duyệt sâu. Chỉ phần tử <em>hành động được</em> mới có ref. Refmap ghi xuống <code>$AGENT_DESKTOP_HOME/snapshots/&lt;id&gt;/refmap.json</code>, nên lệnh CLI sau vẫn resolve được. Drill lại một vùng chỉ thay ref của vùng đó (scoped invalidation).
+  </div></details>
+  <details class="mm"><summary>Headless vs headed</summary><div class="body">
+    Headless = đi API accessibility ngữ nghĩa, không di chuột, không cướp focus, không tổng hợp phím — an toàn khi user đang dùng máy. <code>--headed</code> mới gửi sự kiện vật lý; double/triple-click, hover, drag <em>chỉ</em> có ở headed.
+  </div></details>
+  <details class="mm"><summary>Surface (bề mặt)</summary><div class="body">
+    Menu, sheet, alert, popover là cây riêng, không nằm trong cây cửa sổ. <code>--surface menu</code> để chụp chúng; đừng dùng <code>--skeleton</code> cho surface vì chúng đã đủ hẹp. Sau mỗi hành động, đọc <code>data.surfaces</code> để biết cái gì vừa bung ra.
+  </div></details>
+  <details class="mm"><summary>Actionability (khả-thao-tác)</summary><div class="body">
+    Trước mỗi hành động, tool kiểm hiển thị, ổn định, enabled, sửa được, chính sách, hành động hỗ trợ, và hit-test — trong một ngân sách thời gian. Bị che thì trả <code>receives_events</code> + <code>occluder</code> thay vì bấm nhầm.
+  </div></details>
+  <details class="mm"><summary>Session · trace · multi-agent</summary><div class="body">
+    Session = một namespace snapshot + một thư mục trace. Trace tự che trường nhạy cảm. Nhiều agent dùng chung session ID, mỗi agent một <code>AGENT_DESKTOP_AGENT_ID</code>, lease tuần tự hoá con trỏ OS dùng chung. <span class="b-warn">Phần multi-agent chưa kiểm chứng bằng chạy thật.</span>
+  </div></details>
+</section>
+
+<section id="proof">
+  <h2>Bảng kiểm chứng (rút gọn)</h2>
+  <div class="wrap"><table>
+    <tr><th>khẳng định</th><th>ca chạy</th><th>kết quả</th></tr>
+    <tr><td>Mã thoát 0/1/2</td><td><code>version</code> · <code>get @sdeadbeef:e1</code> · <code>get</code></td><td>0 · 1 (SNAPSHOT_NOT_FOUND) · 2 (INVALID_ARGS)</td></tr>
+    <tr><td>Ref sống qua tiến trình</td><td>snapshot lúc T, <code>get</code> ở lệnh sau</td><td>rc=0, trả property</td></tr>
+    <tr><td>Ref sai → STALE_REF</td><td><code>get "@s23de9t04j589e:e9999"</code></td><td>rc=1, có <code>recovery.strategy</code></td></tr>
+    <tr><td>Cài không bẩn HOME</td><td><code>HOME=$S/home npm i -g --prefix …</code></td><td>rc=0, chỉ mọc <code>.npm/</code></td></tr>
+    <tr><td>batch</td><td>2 lệnh, <code>--stop-on-error</code></td><td>rc=0, 629 ms, max_entries 64</td></tr>
+    <tr><td>session + trace</td><td><code>session start</code> → snapshot → <code>trace show</code></td><td>JSONL đủ start/saved/end kèm duration_ms</td></tr>
+  </table></div>
+  <p class="lead">Bảng đầy đủ 20 dòng ở <code>workflows.md</code> cạnh file này.</p>
+</section>
+</main>
+</div>
+<footer id="ft"></footer>
+<script>
+(function(){
+  var tg=document.getElementById('tg');
+  tg.addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',cur);
+    try{localStorage.setItem('ad-theme',cur);}catch(e){}
+    draw();
+  });
+  var pairs=[['n-route','p1'],['p1','n-install'],['n-install','p2'],['p2','n-drive'],
+             ['n-drive','p3'],['p3','n-session']];
+  var flow=document.getElementById('flow'), svg=flow.querySelector('svg.conn');
+  function draw(){
+    var fb=flow.getBoundingClientRect();
+    svg.setAttribute('viewBox','0 0 '+fb.width+' '+fb.height);
+    var stroke=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    var out='';
+    pairs.forEach(function(p){
+      var a=document.getElementById(p[0]),b=document.getElementById(p[1]);
+      if(!a||!b)return;
+      var ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();
+      var x1=ra.left-fb.left+ra.width/2, y1=ra.top-fb.top+ra.height;
+      var x2=rb.left-fb.left+rb.width/2, y2=rb.top-fb.top;
+      if(y2<y1){y1=ra.top-fb.top+ra.height/2; y2=rb.top-fb.top+rb.height/2;
+        x1=ra.left-fb.left+(x2>x1?ra.width:0); x2=rb.left-fb.left+(x2>x1?0:rb.width);}
+      var mx=(x1+x2)/2,my=(y1+y2)/2;
+      out+='<path d="M'+x1+','+y1+' C'+x1+','+my+' '+x2+','+my+' '+x2+','+y2+'" fill="none" stroke="'+stroke+'" stroke-width="1.6" opacity=".55"/>';
+      out+='<circle cx="'+x2+'" cy="'+y2+'" r="3" fill="'+stroke+'" opacity=".75"/>';
+    });
+    svg.innerHTML=out;
+  }
+  window.addEventListener('resize',draw);
+  document.querySelectorAll('details.mm').forEach(function(d){d.addEventListener('toggle',draw)});
+  document.getElementById('ft').textContent='/Users/giatran/orca/setup/setup/.overstack/doyourmagic/agent-desktop/flow.html · sinh bởi /doyourmagic, đo thật 2026-09-09 trên agent-desktop 0.8.5';
+  draw(); setTimeout(draw,120);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "State của việc multi-agent khi đi qua nhiều phiên",
+    "output": "100926-multiagent-session-state.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      566
+    ],
+    "views": [
+      {
+        "id": "duong-chinh",
+        "label": "Đường chính của task",
+        "focus": [
+          "pending",
+          "ready",
+          "dispatched",
+          "settle",
+          "completed"
+        ],
+        "note": "Năm chặng này dùng đúng enum của orca orchestration task-update."
+      },
+      {
+        "id": "phien-dut",
+        "label": "Khi phiên đứt giữa chừng",
+        "focus": [
+          "dispatched",
+          "sessionend",
+          "recall"
+        ],
+        "note": "Phiên đóng không đổi trạng thái task — thứ mất là context của coordinator."
+      },
+      {
+        "id": "bang-chuyen",
+        "label": "Băng chuyền qua phiên",
+        "focus": [
+          "sessionend",
+          "recall",
+          "ready"
+        ],
+        "note": "Biên lai máy đọc, bản bàn giao người đọc, rồi hook nạp lại ở phiên sau."
+      }
+    ],
+    "legend": {
+      "mode": "hidden"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Trạng thái task — sống trong Run của Orca"
+    },
+    {
+      "id": "endsess",
+      "label": "Băng chuyền qua phiên — sống trong repo"
+    }
+  ],
+  "states": [
+    {
+      "id": "pending",
+      "type": "start",
+      "label": "pending",
+      "sublabel": "task-create",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "tag": "chưa đủ điều kiện",
+      "height": 58
+    },
+    {
+      "id": "ready",
+      "type": "active",
+      "label": "ready",
+      "sublabel": "đủ điều kiện, chờ giao",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "tag": "78% kẹt ở đây",
+      "height": 58
+    },
+    {
+      "id": "dispatched",
+      "type": "active",
+      "label": "dispatched",
+      "sublabel": "worker-start · sentinel",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "tag": "agent đang chạy",
+      "height": 58
+    },
+    {
+      "id": "settle",
+      "type": "decision",
+      "label": "chốt kết quả",
+      "sublabel": "worker_done · outcome",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "tag": "cổng",
+      "height": 58
+    },
+    {
+      "id": "completed",
+      "type": "success",
+      "label": "completed",
+      "sublabel": "task-update --status",
+      "lane": "main",
+      "col": 4,
+      "tag": "xong",
+      "height": 58,
+      "step": "05"
+    },
+    {
+      "id": "sessionend",
+      "type": "waiting",
+      "label": "phiên đóng",
+      "sublabel": "Stop hook ghi biên lai",
+      "lane": "endsess",
+      "col": 0,
+      "tag": "task KHÔNG đổi state",
+      "height": 58
+    },
+    {
+      "id": "recall",
+      "type": "neutral",
+      "label": "phiên sau mở",
+      "sublabel": "SessionStart nạp lại",
+      "lane": "endsess",
+      "col": 2,
+      "tag": "context dựng lại",
+      "height": 58
+    }
+  ],
+  "transitions": [
+    {
+      "id": "dispatched-sessionend",
+      "from": "dispatched",
+      "to": "sessionend",
+      "label": "coordinator dừng",
+      "variant": "dashed",
+      "labelDy": 52
+    },
+    {
+      "id": "sessionend-recall",
+      "from": "sessionend",
+      "to": "recall",
+      "label": "bản bàn giao .md"
+    },
+    {
+      "id": "recall-ready",
+      "from": "recall",
+      "to": "ready",
+      "label": "task-list vẫn còn, nhặt lại",
+      "variant": "emphasis",
+      "route": "bottom-channel"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Hai thứ hay bị lẫn",
+      "items": [
+        "Task sống trong Run của Orca — phiên đóng không đụng tới nó"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Ba băng chuyền",
+      "items": [
+        "provenance-log + memory.jsonl, bàn giao .md, SessionStart recall"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Đo 20/07/2026",
+      "items": [
+        "59 task, chỉ 13 từng dispatch; 46 chưa bao giờ được giao"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Không vẽ ở đây",
+      "items": [
+        "blocked: chờ ask/reply hoặc decision gate, vẫn nằm trong phiên"
+      ]
+    }
+  ]
+}

@@ -488,14 +488,20 @@ if [ -d "$ROOT/llmwiki" ]; then MODE="migrate"; else MODE="new"; fi
 SAME_BUNDLE=0; [ "$SRC" = "$ROOT" ] && SAME_BUNDLE=1
 log "Project: $ROOT — mode: $MODE$([ $SAME_BUNDLE = 1 ] && echo ' (project chính là bundle — merge missing từ remote)')"
 
-# ---------- 2. Khung llmwiki (mode new) ----------
-if [ "$MODE" = "new" ]; then
-  mkdir -p "$ROOT/llmwiki/wiki"/{concepts,entities,sources/adr,sources/draft,draft/orca} \
-           "$ROOT/llmwiki"/{raw,html,skills}
-  touch "$ROOT/llmwiki/raw/.gitkeep"
-  [ -f "$ROOT/llmwiki/wiki/index.md" ] || printf '# Wiki Index\n\n| File | Type | Summary |\n|------|------|---------|\n' > "$ROOT/llmwiki/wiki/index.md"
-  [ -f "$ROOT/llmwiki/wiki/log.md" ]   || printf '# Operation Log\n' > "$ROOT/llmwiki/wiki/log.md"
-fi
+# ---------- 2. Khung llmwiki (MỌI mode) ----------
+# MODE chỉ hỏi "llmwiki/ đã tồn tại chưa". Một project cần đúng MỘT thư mục con
+# có sẵn (vd bước khác tạo llmwiki/wiki/sources/draft để chứa BRD) là mọi lần
+# chạy sau đều rơi vào migrate — và khi khối này còn nằm trong `if MODE = new`,
+# thư mục còn thiếu KHÔNG BAO GIỜ được bổ sung, chạy lại bao nhiêu lần cũng vậy.
+# Đo thật 2026-09-10: rhein-farm/walleye thiếu cả inbox tài liệu lẫn skills/,
+# đúng hai thứ chỉ khối này tạo ra.
+# mkdir -p và touch đều idempotent, index/log đã có guard `[ -f ] ||`, nên chạy
+# ở migrate không đè gì của project đang có.
+mkdir -p "$ROOT/llmwiki/wiki"/{concepts,entities,sources/adr,sources/draft,draft/orca} \
+         "$ROOT/llmwiki"/{raw,html,skills}
+touch "$ROOT/llmwiki/raw/.gitkeep"
+[ -f "$ROOT/llmwiki/wiki/index.md" ] || printf '# Wiki Index\n\n| File | Type | Summary |\n|------|------|---------|\n' > "$ROOT/llmwiki/wiki/index.md"
+[ -f "$ROOT/llmwiki/wiki/log.md" ]   || printf '# Operation Log\n' > "$ROOT/llmwiki/wiki/log.md"
 
 # ---------- 3. L0 + validators + scripts + evals (vendor-neutral core) ----------
 if [ "$SAME_BUNDLE" = "0" ]; then

@@ -46,7 +46,8 @@ except Exception:           # bản global cũ thiếu file → fallback đườ
 
 COST_FILE = "harness/metrics/cost-by-session.json"   # shortcut: cùng đường cứng với code-logger — đổi cùng lúc khi code-logger qua overstack_paths
 DEFAULT_THRESHOLD = 0.85
-DEFAULT_TRIGGERS = ["per_session_tokens", "per_session_model_calls"]   # per_task_usd: opt-in
+DEFAULT_CONTEXT_WINDOW = 1_000_000   # ponytail: một số cho mọi model; model 200k thì đặt budgets.context_window_tokens
+DEFAULT_TRIGGERS = ["context_window_tokens", "per_session_tokens", "per_session_model_calls"]   # per_task_usd: opt-in
 
 
 # ── config + dữ liệu ─────────────────────────────────────────────────────────────────────
@@ -81,8 +82,35 @@ def load_cfg(root: Path) -> dict:
     return cfg
 
 
-def session_usage(root: Path, sid: str) -> dict:
-    """Số đo của phiên từ cost-by-session.json (code-logger ghi ở Stop) — cùng nguồn với --report."""
+def _context_now(transcript: str) -> int:
+    """Độ chiếm cửa sổ context ở call CUỐI = input + cache_read + cache_creation của assistant cuối.
+    KHÔNG cộng dồn và KHÔNG lấy từ cost-by-session: sổ đó bỏ cache_read (đúng cho $), mà với prompt
+    cache thì input_tokens ≈ 0 — phiên 619k context chỉ ghi được 4k input (đo 2026-09-10)."""
+    try:
+        with open(transcript, "rb") as f:     # ponytail: chỉ đọc 2MB đuôi; một dòng >2MB → 0 (fail-open, không kích hoạt)
+            f.seek(0, 2); f.seek(max(0, f.tell() - 2_000_000))
+            lines = f.read().decode("utf-8", "ignore").splitlines()
+    except Exception:
+        return 0
+    for ln in reversed(lines):
+        if '"usage"' not in ln:
+            continue
+        try:
+            o = json.loads(ln)
+        except Exception:
+            continue
+        msg = o.get("message")
+        if o.get("type") != "assistant" or o.get("isSidechain") or not isinstance(msg, dict):
+            continue
+        u = msg.get("usage") or {}
+        if u:
+            return sum(int(u.get(k) or 0) for k in ("input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"))
+    return 0
+
+
+def session_usage(root: Path, sid: str, transcript: str = "") -> dict:
+    """Số đo của phiên từ cost-by-session.json (code-logger ghi ở Stop) — cùng nguồn với --report;
+    riêng 'ctx' (độ đầy context hiện tại) đọc từ transcript."""
     try:
         d = json.loads((root / COST_FILE).read_text(encoding="utf-8"))
         rec = d.get(sid) if isinstance(d, dict) else next((r for r in d if r.get("session") == sid), None)
@@ -92,7 +120,8 @@ def session_usage(root: Path, sid: str) -> dict:
     tk = rec.get("tokens") or {}
     return {"turns": int(rec.get("turns") or 0),
             "in": int(tk.get("input_tokens") or 0), "out": int(tk.get("output_tokens") or 0),
-            "usd": float(rec.get("cost_usd") or 0.0), "models": rec.get("models") or []}
+            "usd": float(rec.get("cost_usd") or 0.0), "models": rec.get("models") or [],
+            "ctx": _context_now(transcript) if transcript else 0}
 
 
 def evaluate(usage: dict, cfg: dict) -> dict:
@@ -101,6 +130,7 @@ def evaluate(usage: dict, cfg: dict) -> dict:
     th = cfg["_auto"]["threshold"]
     turns = max(usage["turns"], 1)
     metrics = {
+        "context_window_tokens": usage.get("ctx", 0),   # trạng thái, không cộng dồn → chỉ so threshold
         "per_session_tokens": usage["in"] + usage["out"],
         "per_task_usd": usage["usd"],
         "per_session_model_calls": usage["turns"],   # cùng xấp xỉ với token-budget sync: calls = turns
@@ -110,13 +140,17 @@ def evaluate(usage: dict, cfg: dict) -> dict:
         if key not in cfg["_auto"]["triggers"]:
             continue                       # trần vẫn ghi sổ (--report), chỉ không kích hoạt bàn giao
         cap = b.get(key)
+        if cap is None and key == "context_window_tokens":
+            cap = DEFAULT_CONTEXT_WINDOW       # config cũ/fallback chưa có key → vẫn gác đầy context
         try:
             cap = float(cap)
         except (TypeError, ValueError):
             continue
         if cap <= 0:
             continue
-        step = cur / turns                 # tốc độ trung bình một lượt → dự đoán lượt kế
+        # tốc độ trung bình một lượt → dự đoán lượt kế. Context bỏ qua: turns lấy từ sổ Stop, phiên
+        # chưa có sổ thì turns=1 → step=cur → báo "sắp đầy" ngay ở 50%.
+        step = 0 if key == "context_window_tokens" else cur / turns
         ratio = cur / cap
         if cur > cap:
             over.append(f"{key}: {cur:g} > {cap:g}")
@@ -187,8 +221,8 @@ def write_handover(root: Path, sid: str, transcript: str, ev: dict, prompt: str,
     body = f"""# Continue from the previous session — automatic handover
 
 Session `{sid[:8]}` ({agent}) in `{root}` {('exceeded' if ev['status'] == 'over' else 'is about to exceed')} its token-budget cap, so it was handed over to this session at {now:%Y-%m-%d %H:%M}.
-Trigger (measured from `{COST_FILE}`): {why}
-Previous session: {u['turns']} turns · {u['in']:,} in / {u['out']:,} out tokens · ≈ ${u['usd']:.2f} (illustrative rates from `token-budget.config.yaml`, not a bill).
+Trigger (context from the transcript's last call, the rest from `{COST_FILE}`): {why}
+Previous session: {u['turns']} turns · context {u.get('ctx', 0):,} tokens · {u['in']:,} in / {u['out']:,} out tokens · ≈ ${u['usd']:.2f} (illustrative rates from `token-budget.config.yaml`, not a bill).
 
 The prior provider session is read-only context; do not resume or modify it.
 
@@ -272,7 +306,7 @@ def run(root: Path, sid: str, transcript: str, prompt: str, agent_opt: str, dry_
     cfg = load_cfg(root)
     if not cfg["_auto"]["enabled"]:
         return 0
-    ev = evaluate(session_usage(root, sid), cfg)
+    ev = evaluate(session_usage(root, sid, transcript), cfg)
     if ev["status"] == "ok":
         return 0
     marker = handover_dir(root) / f".done-{sid[:8]}"
@@ -324,6 +358,21 @@ def self_test() -> int:
         cfg_usd = dict(cfg); cfg_usd["_auto"] = dict(cfg["_auto"], triggers=["per_task_usd", "per_session_model_calls"])
         cost("s1", 12, 100, 100, 6.0); e = evaluate(session_usage(root, "s1"), cfg_usd)
         ok &= e["status"] == "over" and len(e["over"]) == 2; print(("  ✓ " if e["status"] == "over" else "  ✗ ") + f"bật trigger usd: vượt $ + calls → over ({e['over']})")
+        # context đo từ transcript: cache_read là phần lớn, input_tokens ≈ 0 (đúng hình dạng phiên thật)
+        def ctx_tr(name, cache_read):
+            p = root / name
+            p.write_text(json.dumps({"type": "assistant", "message": {"usage": {"input_tokens": 5, "cache_read_input_tokens": cache_read,
+                         "cache_creation_input_tokens": 1000, "output_tokens": 50}}}) + "\n", encoding="utf-8")
+            return str(p)
+        cfg_ctx = dict(cfg); cfg_ctx["budgets"] = dict(cfg["budgets"], context_window_tokens=1000000)
+        cost("s1", 3, 5, 50, 0.1); e = evaluate(session_usage(root, "s1", ctx_tr("c1.jsonl", 880000)), cfg_ctx)
+        hit = e["status"] == "near" and any("context_window_tokens" in x for x in e["near"]); ok &= hit
+        print(("  ✓ " if hit else "  ✗ ") + f"context 881k/1M (input_tokens=5) → near ({e['near']})")
+        e = evaluate(session_usage(root, "s1", ctx_tr("c3.jsonl", 880000)), cfg)   # cfg KHÔNG có key context
+        hit = e["status"] == "near" and any("context_window_tokens" in x for x in e["near"]); ok &= hit
+        print(("  ✓ " if hit else "  ✗ ") + "config thiếu context_window_tokens → vẫn gác bằng mặc định 1M")
+        e = evaluate(session_usage(root, "chua-co-so", ctx_tr("c2.jsonl", 500000)), cfg_ctx)
+        ok &= e["status"] == "ok"; print(("  ✓ " if e["status"] == "ok" else "  ✗ ") + f"context 50% + phiên chưa có sổ cost → ok, không dự đoán nhầm ({e['status']})")
         tr = root / "t.jsonl"
         tr.write_text('{"type":"user","message":{"content":"làm tiếp việc A"}}\n{"type":"assistant","message":{"content":[{"type":"text","text":"đã xong bước 1"}]}}\n', encoding="utf-8")
         hf = write_handover(root, "s1abcdef0000", str(tr), e, "", "", "claude")
@@ -367,11 +416,11 @@ def main() -> None:
     root = Path(_opt(args, "--root") or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()).resolve()
     try:
         if args and args[0] == "near":
-            ev = evaluate(session_usage(root, args[1]), load_cfg(root))
+            ev = evaluate(session_usage(root, args[1], _opt(args, "--transcript", "")), load_cfg(root))
             print(json.dumps(ev, ensure_ascii=False)); sys.exit(0 if ev["status"] == "ok" else 2)
         if args and args[0] == "handover":
-            cfg = load_cfg(root); ev = evaluate(session_usage(root, args[1]), cfg)
             tr = _opt(args, "--transcript", "")
+            cfg = load_cfg(root); ev = evaluate(session_usage(root, args[1], tr), cfg)
             print(write_handover(root, args[1], tr, ev, _opt(args, "--prompt", ""), _opt(args, "--reason", ""),
                                  _opt(args, "--agent") or detect_agent(cfg, tr))); sys.exit(0)
         if args and args[0] == "spawn":

@@ -236,9 +236,30 @@ def rule_freshness(fm, root):
     return []
 
 
+def _run_log(fm, root):
+    """Run-log của frame (dict rỗng nếu chưa chạy / hỏng)."""
+    ref = fm.get("run_log_ref")
+    if not ref:
+        return {}
+    try:
+        return json.loads((Path(root) / ref).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def _frame_done(fm, root):
+    """Frame XONG = run-log có verdict SUCCESS. Quyền giữ file của R6/R8 là HỢP ĐỒNG
+    THUÊ: chỉ frame CHƯA xong mới giữ độc quyền. Không có lease thì frame xanh cũ giữ
+    file mãi, và điểm nối (main.ts/state.ts) không frame mới nào chạm được — đo thật
+    2026-09-10 ở walleye: 4 frame xanh mà người chơi không thấy gì. Truy vết bug→frame
+    vẫn một chủ: manifest trao file cho người thuê SAU CÙNG (xem build_manifest)."""
+    return _run_log(fm, root).get("verdict") == "SUCCESS"
+
+
 def rule_exclusive_scope(frame_scopes, root):
     """R6: frames own EXCLUSIVE code territory — the whole point of 'bug ở đâu → đúng
-    MỘT frame phụ trách'. Two frames whose scope_code match the same real file = FAIL."""
+    MỘT frame phụ trách'. Two frames whose scope_code match the same real file = FAIL.
+    Chỉ nhận frame CHƯA xong — caller lọc bằng _frame_done (lease)."""
     fails = []
     matched = [(fid, _matches(globs, root)) for fid, globs in frame_scopes]
     for i in range(len(matched)):
@@ -383,8 +404,10 @@ def check(target, root, skip_verify=False, ship=False, soft_off=False):
             all_ok = False
             continue
         frames_for_dag.append((fid, deps))
-        frame_scopes.append((fid, fm.get("scope_code") or []))
-        frame_records.append((fid, fm.get("kind") or "frame", fm.get("scope_code") or []))
+        # Lease: frame đã XONG nhả quyền giữ file cho R6/R8 — xem _frame_done.
+        if not _frame_done(fm, root):
+            frame_scopes.append((fid, fm.get("scope_code") or []))
+            frame_records.append((fid, fm.get("kind") or "frame", fm.get("scope_code") or []))
         if fails:
             all_ok = False
             print(f"  [FAIL] {f.name} ({fid}):")
@@ -414,18 +437,24 @@ def build_manifest(target, root):
     target = Path(target)
     files = sorted(target.glob("*.md")) if target.is_dir() else [target]
     files = [f for f in files if f.name != "index.md"]
-    manifest, collisions = {}, []
-    for f in files:
-        fm = parse_frontmatter(f.read_text(encoding="utf-8"))
+    manifest, collisions, pending_owner = {}, [], {}
+    frames = [parse_frontmatter(f.read_text(encoding="utf-8")) for f in files]
+    # Lease: frame xong xếp trước theo lúc chạy xong, frame chưa xong xếp sau → người
+    # thuê SAU CÙNG giữ file. Chỉ hai frame cùng CHƯA xong mới là va chạm thật.
+    frames.sort(key=lambda fm: (0, str(_run_log(fm, root).get("ended_at", "")))
+                if _frame_done(fm, root) else (1, ""))
+    for fm in frames:
         fid = fm.get("frame_id")
         clauses = fm.get("clause_ids") or []
+        pending = not _frame_done(fm, root)
         for p in sorted(_matches(fm.get("scope_code") or [], root)):
             rel = p.relative_to(root).as_posix()
             owner = manifest.get(rel)
-            if owner and owner["frame_id"] != fid:
+            if owner and owner["frame_id"] != fid and pending and pending_owner.get(rel):
                 collisions.append((rel, owner["frame_id"], fid))
                 continue
             manifest[rel] = {"frame_id": fid, "clause_ids": clauses}
+            pending_owner[rel] = pending
     return manifest, collisions
 
 
@@ -578,6 +607,18 @@ def selftest():
             'scope_code: ["src/**"]', 'scope_code: ["src2/**"]')
         (g6 / "b.md").write_text(f_b)
         record("GOOD R6 disjoint", "ALL PASS", False, g6, root, skip=True)
+
+        # GOOD R6 lease — frame đã XONG (run-log SUCCESS) nhả file cho frame mới
+        g6l = root / "good6lease"; g6l.mkdir()
+        (root / "done.run.json").write_text('{"verdict": "SUCCESS", "ended_at": "2026-01-01T00:00:00Z"}')
+        (g6l / "a.md").write_text(_GOOD_FRAME.format(fid="l6a", brhash=brhash, deps="", atest=red)
+                                  .replace("guards:", "run_log_ref: done.run.json\nguards:"))
+        _write_frame(g6l, "b.md", fid="l6b", brhash=brhash, deps="", atest=red)  # cùng src/**
+        record("GOOD R6 lease", "ALL PASS", False, g6l, root, skip=True)
+        m_l, c_l = build_manifest(g6l, root)
+        lease_ok = (not c_l) and m_l.get("src/x.py", {}).get("frame_id") == "l6b-luu-so-cai"
+        results.append(("T1 manifest lease", "PASS" if lease_ok else "FAIL", 0, "người thuê sau giữ file"))
+        ok = ok and lease_ok
 
         # T1 manifest — disjoint frames produce a clean spine; overlap refuses to write
         m_ok, m_col = build_manifest(g6, root)

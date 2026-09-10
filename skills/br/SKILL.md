@@ -36,7 +36,7 @@ description: >-
 | `skills/br/assets/spec-template.md` | bộ specs chuẩn S1–S10 (khung tham chiếu mọi project) | — |
 | `skills/br/assets/frame-template.md` | template TẤT ĐỊNH cho mọi frame (frontmatter + 4 section body người-đọc-hiểu) | — |
 | `skills/br/assets/design-template.md` | template thiết kế tái dùng (khung Google design-doc + design system nạp từ `/high-end-visual-design`) → copy thành `br/DESIGN.md` | — |
-| `fdk/tools/frame-lint.py` | gác frame 7 luật (schema · scope · test-first · freshness · DAG · exclusive-scope · **content**) | `frame-lint.py selftest` |
+| `fdk/tools/frame-lint.py` | gác frame 7 luật (schema · scope · test-first · freshness · DAG · exclusive-scope **có lease** · **content**) | `frame-lint.py selftest` |
 | `harness/scripts/loop-runner.py` | loop 6 phanh (max_iter·budget·no_progress·escalate·**diff-jail**·**test-hash**) | `loop-runner.py selftest` |
 | `fdk/tools/build-line-status.py` | monitor tất định (frame·run-log·BR → json+html, `--check`) | `build-line-status.py selftest` |
 
@@ -68,7 +68,9 @@ Runtime artifacts sống ở `br/` tại gốc project (không phải trong skil
    - **`depends_on` là bắt buộc nghĩ, không bắt buộc có** (GH#75, distill Atomic Task Graph): dây chuyền là ĐỒ THỊ chứ không phải danh sách. Frame B khai `depends_on: [frame-A]` khi B *không thể xanh* nếu A chưa xanh (B gọi API/store/schema A dựng). Không dựa ai → `depends_on: []`. Khai đúng thì được ba thứ miễn phí ở mode 4: thứ tự chạy tự đúng, frame đỏ tự chặn nhánh dưới, và sửa một frame chỉ phải chạy lại đúng nhánh của nó. Khai bừa (nối cho "có vẻ hợp lý") thì mất song song và tạo chờ giả — chỉ nối khi có phụ thuộc THẬT.
 2. Ghi `br/frames/frame-NNN-<slug>.md` **THEO TEMPLATE `skills/br/assets/frame-template.md`** (schema v0 + 5 section body bắt buộc: Nghiệp vụ · Input/Output · **Spec (FR/SC)** · Tiêu chí nghiệm thu · Ngoài phạm vi — viết cho NGƯỜI VỀ SAU đọc-hiểu, frame-lint R7 gác cứng: frame_id phải có slug nghiệp vụ, muc_tieu không được generic, mỗi frame có FR-id/SC-id rõ, section không được rỗng) + `parent_br_hash = sha256(br/BR.md)`.
 3. Sinh registry `br/frames/index.md` (bảng frame_id · clause_ids · scope_code · status · run_log_ref) từ frontmatter các frame.
-4. Gác: `python3 fdk/tools/frame-lint.py check br/frames --root . ` — xanh hết mới coi là slice xong (gồm R6 exclusive-scope: 2 frame không được giẫm cùng file).
+4. Gác: `python3 fdk/tools/frame-lint.py check br/frames --root . ` — xanh hết mới coi là slice xong (gồm R6 exclusive-scope: 2 frame **chưa xong** không được giẫm cùng file).
+   - **R6 là HỢP ĐỒNG THUÊ, không phải sổ đỏ:** frame đã xong (run-log `verdict: SUCCESS`) nhả quyền giữ file. Nhờ vậy frame mới được nối vào điểm khởi động (`main.ts`, `state.ts`, `server.ts`…) mà frame cũ từng giữ — không có lease thì code mới xanh mà không tới tay người dùng (walleye 2026-09-10: 4 frame xanh, người chơi không thấy gì). Hai frame chưa xong cùng giữ một file vẫn ĐỎ; `_manifest.json` trao file cho người thuê sau cùng.
+   - **Mỗi tính năng phải có một lát NỐI DÂY** tới điểm khởi động, và frame UI phải nghiệm thu bằng test đi qua giao diện thật (e2e/route-shots), không bằng unit test của module đứng riêng.
 5. `python3 fdk/tools/br-prompts.py sync` — bổ sung mục prompt cho các frame mới vào sổ `br/prompts.md` (user sửa tay được ngay).
 
 ## Mode 4 — `/br run <frame>`
@@ -125,7 +127,7 @@ Luồng người thường: bật app → thấy lỗi → trỏ vào khúc đó
 python3 fdk/tools/br-find.py "src/auth/login.py"     # theo file
 python3 fdk/tools/br-find.py "đăng nhập"              # theo từ khoá / clause
 ```
-In ra: frame phụ trách (khớp theo file THẬT đã đổi > scope_code > từ khoá) · điều khoản BR · **prompt nằm ở đâu** (inline trong queue.yaml / prompt_file / template mặc định) · lệnh chạy lại ĐÚNG frame đó sau khi sửa prompt. Hoạt động được vì R6 exclusive-scope (frame-lint) ép mỗi file chỉ thuộc MỘT frame.
+In ra: frame phụ trách (khớp theo file THẬT đã đổi > scope_code > từ khoá) · điều khoản BR · **prompt nằm ở đâu** (inline trong queue.yaml / prompt_file / template mặc định) · lệnh chạy lại ĐÚNG frame đó sau khi sửa prompt. Hoạt động được vì R6 exclusive-scope (frame-lint) ép mỗi file chỉ thuộc MỘT frame tại một thời điểm — file đã đổi chủ qua lease thì frame phụ trách là người thuê sau cùng (`_manifest.json`), còn lịch sử thì `git blame` theo commit `frame(<id>)`.
 
 ## Mode 4c — `/br qc [frame]` — audit senior QC (LLM 4-mục) trên mockup/frame
 Sau khi có mockup/frame xanh, chạy CẶP MẮT SENIOR (đắt=LLM, gọi tay — phần rẻ tất định đã tự chạy sau mỗi `/br run`):

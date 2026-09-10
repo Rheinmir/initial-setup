@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4 tầng điều phối agent — so sánh</title>
+<script>(function(){try{var t=localStorage.getItem('orch-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<style>
+:root{
+ --bg1:#eef4ff;--bg2:#f8fbff;--orb1:#8fb8ff;--orb2:#bcd6ff;
+ --glass:rgba(255,255,255,.66);--glass-2:rgba(255,255,255,.46);--glass-3:rgba(255,255,255,.3);
+ --edge:rgba(255,255,255,.8);--line:rgba(20,50,100,.14);
+ --fg:#14243d;--fg-dim:#4d6a94;--accent:#1f6feb;
+ --ok:#0f8a5f;--warn:#b06a00;--bad:#c0392b;--shadow:0 8px 30px rgba(20,50,100,.10);
+}
+[data-theme="dark"]{
+ --bg1:#0b1220;--bg2:#111a2b;--orb1:#1e3a6b;--orb2:#16305c;
+ --glass:rgba(255,255,255,.07);--glass-2:rgba(255,255,255,.05);--glass-3:rgba(255,255,255,.035);
+ --edge:rgba(255,255,255,.14);--line:rgba(255,255,255,.14);
+ --fg:#e6edf7;--fg-dim:#9db0c9;--accent:#6ea8ff;
+ --ok:#3fbf8f;--warn:#e0a33a;--bad:#ff7a6b;--shadow:0 8px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font:13px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,sans-serif;
+ color:var(--fg);background:linear-gradient(160deg,var(--bg1),var(--bg2));min-height:100vh;-webkit-font-smoothing:antialiased}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.5;pointer-events:none;z-index:0}
+.orb.a{width:420px;height:420px;background:var(--orb1);top:-130px;left:-90px}
+.orb.b{width:360px;height:360px;background:var(--orb2);bottom:-140px;right:-80px}
+.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;z-index:99;background:var(--glass);padding:8px 12px;border-radius:8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{position:relative;z-index:1;max-width:1460px;margin:0 auto;padding:22px}
+header.top{background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+ border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:18px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.chrome{display:flex;gap:6px;margin-bottom:8px}.chrome i{width:10px;height:10px;border-radius:50%;display:block}
+.chrome i:nth-child(1){background:#ff5f57}.chrome i:nth-child(2){background:#febc2e}.chrome i:nth-child(3){background:#28c840}
+h1{font-size:17px;margin:0 0 3px}.sub{font-size:12px;color:var(--fg-dim);margin:0;max-width:74ch}
+button.toggle{margin-left:auto;font:inherit;font-size:12px;cursor:pointer;background:var(--glass-2);border:1px solid var(--edge);color:var(--fg);border-radius:9px;padding:6px 10px;align-self:center}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start}
+.col{background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+ border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow);padding:13px;min-width:0}
+.colhead{border-bottom:1px solid var(--line);padding-bottom:9px;margin-bottom:10px}
+.colhead h2{font-size:14px;margin:0 0 3px}
+.colhead .who{font-size:11px;color:var(--fg-dim);display:block;margin-bottom:7px}
+.chip{display:inline-block;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:var(--glass-3)}
+.chip.ok{color:var(--ok)}.chip.warn{color:var(--warn)}.chip.bad{color:var(--bad)}.chip.acc{color:var(--accent)}
+.card{background:var(--glass-2);border:1px solid var(--edge);border-radius:11px;padding:9px 11px;margin-bottom:9px}
+.card .k{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-dim);display:block;margin-bottom:3px}
+.card .v{font-size:12.5px}
+.card.hl{border-color:var(--accent)}
+code{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:11px;background:var(--glass-3);border:1px solid var(--line);border-radius:5px;padding:1px 4px;word-break:break-word}
+section.note{background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+ border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow);padding:16px 20px;margin-top:18px}
+section.note h3{font-size:14px;margin:0 0 8px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-dim);font-weight:600}
+.tblwrap{overflow-x:auto}
+footer{font-size:11px;color:var(--fg-dim);padding:16px 22px 26px;max-width:1460px;margin:0 auto;position:relative;z-index:1;word-break:break-all}
+@media (max-width:1180px){.board{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:720px){.board{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="orb a"></div><div class="orb b"></div>
+<a class="skip" href="#board">Bỏ qua tới bảng</a>
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="chrome"><i></i><i></i><i></i></div>
+    <h1>4 tầng điều phối agent — chúng KHÔNG thay thế nhau</h1>
+    <p class="sub">Đo thật 10/09/2026 trên macOS 24.6 arm64. Đọc theo CỘT để hiểu một công cụ, đọc theo HÀNG (thứ tự thẻ giống nhau ở mọi cột) để so một trục. Cột tô viền xanh là thứ ta đang có.</p>
+  </div>
+  <button class="toggle" id="tg">🌗 Sáng/Tối</button>
+</header>
+
+<div class="board" id="board">
+
+  <div class="col">
+    <div class="colhead">
+      <h2>crew-tmux</h2><span class="who">đề xuất của tôi hôm nay</span>
+      <span class="chip bad">RÚT ĐỀ XUẤT</span>
+    </div>
+    <div class="card"><span class="k">Tầng</span><span class="v">Nhiều phiên CLI trên một máy, mỗi agent một tmux pane.</span></div>
+    <div class="card"><span class="k">Biết agent xong bằng cách nào</span><span class="v">Định làm: sentinel trong shell + đọc pane.</span></div>
+    <div class="card"><span class="k">Phụ thuộc</span><span class="v">tmux + git worktree.</span></div>
+    <div class="card"><span class="k">Chi phí</span><span class="v">Viết mới + tự bảo trì mãi mãi.</span></div>
+    <div class="card"><span class="k">Giấy phép</span><span class="v">—</span></div>
+    <div class="card"><span class="k">Trạng thái ở ta</span><span class="v">Chưa viết dòng nào.</span></div>
+    <div class="card hl"><span class="k">Verdict</span><span class="v"><b>Đừng viết.</b> Đúng làn của herdr, và phần cốt lõi ta ĐÃ có trong <code>orca-dispatch.py</code>. Viết nữa là tự đẻ nợ.</span></div>
+  </div>
+
+  <div class="col">
+    <div class="colhead">
+      <h2>herdr</h2><span class="who">herdrdev/herdr · v0.9.0 · Rust</span>
+      <span class="chip warn">XÉT LẠI</span>
+    </div>
+    <div class="card"><span class="k">Tầng</span><span class="v">Terminal workspace manager — server nền giữ pane sống, client rời ra vẫn chạy; gộp nhiều máy qua ssh vào một cửa sổ.</span></div>
+    <div class="card"><span class="k">Biết agent xong bằng cách nào</span><span class="v"><b>Quan sát</b>: <code>DetectionInput{screen, osc_title}</code> + manifest regex theo từng agent → <code>AgentState</code> working / blocked / idle. Không cần agent hợp tác.</span></div>
+    <div class="card"><span class="k">Phụ thuộc</span><span class="v">Một binary Rust, không Electron. Có Homebrew. Chạy claude/codex/cursor/opencode/grok nguyên trạng.</span></div>
+    <div class="card"><span class="k">Chi phí</span><span class="v">266k dòng Rust, 379 file — nếu vendor.</span></div>
+    <div class="card"><span class="k">Giấy phép</span><span class="v"><b>Apache-2.0</b> — repo ta đang ghi AGPL-3.0, đã sai từ 07/2026.</span></div>
+    <div class="card"><span class="k">Trạng thái ở ta</span><span class="v">Đã HÒA TAN ý tưởng vào <code>orca-dispatch.py</code> (07/2026), không cài.</span></div>
+    <div class="card hl"><span class="k">Verdict</span><span class="v"><b>Mở lại hồ sơ.</b> Lý do từ chối gốc là "tránh ràng buộc AGPL" — lý do đó nay không còn. Có API socket cho agent tự spawn pane và <i>chờ agent khác xong</i>, thứ <code>orca-dispatch</code> chưa có.</span></div>
+  </div>
+
+  <div class="col">
+    <div class="colhead">
+      <h2>orca-dispatch.py</h2><span class="who">của ta · 07/2026 · ~300 dòng Python</span>
+      <span class="chip ok">ĐANG DÙNG</span>
+    </div>
+    <div class="card"><span class="k">Tầng</span><span class="v">Giao một lệnh cho CLI bất kỳ qua terminal Orca và biết chắc lúc nó kết thúc.</span></div>
+    <div class="card"><span class="k">Biết agent xong bằng cách nào</span><span class="v">Bọc lệnh <code>&lt;cmd&gt; ; echo __ORCA_DONE__&lt;id&gt;:$?</code> rồi poll <code>orca terminal read</code> tìm sentinel. Cơ chế ở tầng SHELL nên đúng với mọi vendor.</span></div>
+    <div class="card"><span class="k">Phụ thuộc</span><span class="v">Orca.app (dùng <code>orca terminal</code>). Trên máy trần thì không chạy.</span></div>
+    <div class="card"><span class="k">Chi phí</span><span class="v">Đã trả xong. Stdlib, không dep.</span></div>
+    <div class="card"><span class="k">Giấy phép</span><span class="v">Của ta.</span></div>
+    <div class="card"><span class="k">Trạng thái ở ta</span><span class="v">Sống trong <code>harness/scripts/</code>. Bối cảnh: 78% task orchestration chưa từng được giao vì không biết lúc nào agent xong.</span></div>
+    <div class="card hl"><span class="k">Verdict</span><span class="v"><b>Giữ, và thêm một transport tmux.</b> Đó mới là "crew-tmux" đúng cách: một hàm thay <code>orca terminal read</code> bằng <code>tmux capture-pane</code>. <b>Giới hạn đã biết:</b> đo LỆNH kết thúc, không đo AGENT nghĩ xong — agent TUI tương tác thì sai.</span></div>
+  </div>
+
+  <div class="col">
+    <div class="colhead">
+      <h2>ruflo</h2><span class="who">ruvnet/ruflo = claude-flow 3.40.0</span>
+      <span class="chip bad">KHÔNG LẤY</span>
+    </div>
+    <div class="card"><span class="k">Tầng</span><span class="v">Bên trong MỘT phiên Claude Code: MCP dựng swarm/memory, hook tự học, 108 agent định nghĩa sẵn.</span></div>
+    <div class="card"><span class="k">Biết agent xong bằng cách nào</span><span class="v">Không herding tiến trình. <code>CLAUDE.md:88</code>: <i>"Never use MCP tools alone for execution — Task tool agents do the actual work"</i> — vòng đời do Claude Code giữ.</span></div>
+    <div class="card"><span class="k">Phụ thuộc</span><span class="v"><b>Claude Code</b>. Bỏ nó ra thì không còn gì chạy.</span></div>
+    <div class="card"><span class="k">Chi phí</span><span class="v"><b>1.5 GB</b> prefix npm; ghi <code>.claude-flow/</code> + <code>Library/</code> vào <code>$HOME</code>; 2280 file nguồn, 25 gói workspace.</span></div>
+    <div class="card"><span class="k">Giấy phép</span><span class="v">MIT (npm), nhưng vấn đề không nằm ở giấy phép.</span></div>
+    <div class="card"><span class="k">Trạng thái ở ta</span><span class="v">Chưa cài. Đã đo trong hộp cát.</span></div>
+    <div class="card hl"><span class="k">Verdict</span><span class="v"><b>Đụng đầu overstack.</b> <code>ruflo init</code> ghi <b>241 file</b> vào <code>.claude/</code> và chiếm <code>settings.json</code>: 13 hook trên 10 loại, thay <code>statusLine</code>·<code>permissions</code>·<code>model</code>·<code>env</code>. Không hỏi, không backup.</span></div>
+  </div>
+
+</div>
+
+<section class="note">
+  <h3>Trả lời thẳng câu hỏi: crew-tmux có giống herdr không?</h3>
+  <p class="sub" style="max-width:none">Giống — đến mức không nên viết. herdr <i>là</i> "crew-tmux" ở dạng đã chín 266k dòng: đánh dấu từng pane working/blocked/idle, có socket API để agent tự spawn pane và chờ agent khác xong. Ta lại đã chưng cất đúng phần lõi của nó vào <code>orca-dispatch.py</code> từ 07/2026. Thứ ta THỰC SỰ thiếu chỉ là <b>một transport không cần Orca</b> — thay <code>orca terminal read</code> bằng <code>tmux capture-pane -p -t</code>. Một hàm, không phải một skill mới.</p>
+</section>
+
+<section class="note">
+  <h3>Đo được gì (mọi con số ở trên đều từ đây)</h3>
+  <div class="tblwrap"><table>
+    <tr><th>khẳng định</th><th>ca chạy</th><th>kết quả</th></tr>
+    <tr><td>ruflo cài được, dấu chân</td><td><code>HOME=$S/home npm i -g --prefix $S/prefix ruflo</code></td><td>rc=0 · prefix 1.5 GB · home mọc <code>.npm/</code>, <code>.claude-flow/</code>, <code>Library/</code></td></tr>
+    <tr><td>ruflo mã thoát</td><td><code>--version</code> · <code>status</code> chưa init · lệnh sai</td><td>0 · 1 · 1</td></tr>
+    <tr><td>ruflo init dấu chân</td><td><code>ruflo init --no-signup</code> trong git repo rỗng</td><td>241 file <code>.claude/</code> (148 command · 44 helper · 30 skill · 18 agent) · 6.0 MB</td></tr>
+    <tr><td>ruflo chiếm settings.json</td><td>đọc <code>.claude/settings.json</code></td><td>13 hook / 10 loại + <code>statusLine</code>, <code>permissions</code>, <code>model=claude-sonnet-5</code>, <code>env</code>, <code>claudeFlow</code></td></tr>
+    <tr><td>ruflo <code>--skip-claude</code> in sai</td><td><code>init --minimal --skip-claude</code></td><td><code>.claude/</code> 4 thư mục rỗng, 0 file, KHÔNG có settings.json — nhưng vẫn in "Hooks: 4 hook types enabled in settings.json"</td></tr>
+    <tr><td>ruflo không trùng tên skill</td><td><code>comm</code> 30 skill ruflo ↔ 86 overstack ↔ 8 Orca</td><td>0 trùng — rủi ro nằm ở settings.json, không ở tên</td></tr>
+    <tr><td>herdr giấy phép + quy mô</td><td>clone <code>herdrdev/herdr</code>, đọc <code>Cargo.toml</code>/<code>LICENSE</code></td><td>v0.9.0 · <b>Apache-2.0</b> · 379 file .rs · 266 072 dòng</td></tr>
+    <tr><td>herdr phát hiện trạng thái</td><td><code>src/detect/mod.rs</code></td><td><code>DetectionInput{screen, osc_title}</code> → <code>AgentState</code>, manifest regex theo agent</td></tr>
+    <tr><td>orca-dispatch phụ thuộc Orca</td><td>đọc <code>harness/scripts/orca-dispatch.py</code></td><td>dùng <code>orca terminal create/read</code>; sentinel <code>__ORCA_DONE__</code></td></tr>
+  </table></div>
+</section>
+</div>
+<footer id="ft"></footer>
+<script>
+document.getElementById('tg').addEventListener('click',function(){
+  var cur=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',cur);
+  try{localStorage.setItem('orch-theme',cur);}catch(e){}
+});
+document.getElementById('ft').textContent='/Users/giatran/orca/setup/setup/llmwiki/html/100926-orchestration-kanban.html · đo thật 10/09/2026 · ruflo 3.40.0 · herdr 0.9.0 · orca-dispatch (harness)';
+</script>
+</body>
+</html>

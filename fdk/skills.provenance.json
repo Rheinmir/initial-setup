@@ -127,7 +127,7 @@
     },
     "br": {
       "files": {
-        "SKILL.md": "963b50d07dc627a85a92109df405e630c58ca7c56daa813867bc0d109bd0ebdf",
+        "SKILL.md": "2d299b6923fa4244f3f1e84ee4d188d88cca00a9c5b1ccdb27e63f17e5453655",
         "assets/defaults.yaml": "8753bb2b49dbe53c8d1ec5df9ed22eccb643a07238dbfdd06737be665cfa353e",
         "assets/design-template.md": "830734ed57b5f2b504204bec3c7d0958e8f5dcc91faee74708a80959c4eaad89",
         "assets/frame-template.md": "253427bbec120ea572ff2f0dbe3ff442b928f18854f86916cac5dbf45443f00d",
@@ -135,7 +135,7 @@
         "assets/revise-prompt.md": "f088c244213d969ae0282f9ce737f605f4468732406251f6e1b1219d12b9f6c1",
         "assets/spec-template.md": "c1a0f3bbf30d8d98c81b5cbdd5ea4c1be30f5a910150f1b9446d1e624c8a10b4"
       },
-      "recorded": "2026-09-09",
+      "recorded": "2026-09-11",
       "source": "local-authored"
     },
     "brandkit": {

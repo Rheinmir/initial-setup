@@ -36,6 +36,9 @@
 | [context-guard-cache-read](sources/evals/context-guard-cache-read.md) | eval | Golden: gác đầy context phải đo input + cache_read + cache_creation của lượt cuối |
 | [hook-gate-consistency](sources/evals/hook-gate-consistency.md) | eval | Golden: SessionStart thoát trước recall() khi thiếu manifest — GH#151 |
 | [r3-index-sync-gate](sources/evals/r3-index-sync-gate.md) | eval | Golden: draft quên dòng index bị chặn ở pre-commit wiki-index-sync — GH#150 |
+| [teach-me-engineer-wikieval](sources/evals/teach-me-engineer-wikieval.md) | eval | Golden: teach-me cho engineer — bảy phần đúng thứ tự, sơ đồ, bằng chứng runtime |
+| [teach-me-manager-syncskill](sources/evals/teach-me-manager-syncskill.md) | eval | Golden: teach-me cho manager — không code/backtick, nói bằng rủi ro, chốt đề xuất |
+| [teach-me-eli5-merge-conflict](sources/evals/teach-me-eli5-merge-conflict.md) | eval | Golden: teach-me ELI5 — git merge conflict cho trẻ 5 tuổi, có so sánh, không jargon |
 | [feature-catalog](concepts/feature-catalog.md) | concept | Feature Catalog — và VÌ SAO mỗi cái phải có |
 | [ADR-005-logger-and-capabilities-travel-downstream](sources/adr/ADR-005-logger-and-capabilities-travel-downstream.md) | decision | ADR-005: logger + capability-map đi xuống cùng dự án (scoped) |
 | [harness-enforcement-floor](concepts/harness-enforcement-floor.md) | concept | Harness enforcement floor — vì sao CI mới là sàn thật |

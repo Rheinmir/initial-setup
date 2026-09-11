@@ -256,14 +256,40 @@ def _frame_done(fm, root):
     return _run_log(fm, root).get("verdict") == "SUCCESS"
 
 
-def rule_exclusive_scope(frame_scopes, root):
+def _ancestors(graph):
+    """{frame_id: tập mọi frame nó phụ thuộc, bắc cầu}. Chu trình để R5 báo."""
+    memo = {}
+
+    def walk(n, seen):
+        if n in memo:
+            return memo[n]
+        out = set()
+        for m in graph.get(n) or []:
+            if m not in seen:
+                out |= {m} | walk(m, seen | {n})
+        memo[n] = out
+        return out
+
+    for n in graph:
+        walk(n, frozenset())
+    return memo
+
+
+def rule_exclusive_scope(frame_scopes, root, deps=None):
     """R6: frames own EXCLUSIVE code territory — the whole point of 'bug ở đâu → đúng
     MỘT frame phụ trách'. Two frames whose scope_code match the same real file = FAIL.
-    Chỉ nhận frame CHƯA xong — caller lọc bằng _frame_done (lease)."""
+    Chỉ nhận frame CHƯA xong — caller lọc bằng _frame_done (lease). Ngoại lệ: hai
+    frame mà depends_on đã xếp NỐI TIẾP (một frame là tổ tiên của frame kia) được
+    chung file — không bao giờ cùng sửa một lúc, và frame sau thuê lại khi frame trước
+    xong. Cần cho điểm khởi động (main.ts) mà nhiều tính năng lần lượt phải nối vào."""
     fails = []
+    anc = _ancestors(deps or {})
     matched = [(fid, _matches(globs, root)) for fid, globs in frame_scopes]
     for i in range(len(matched)):
         for j in range(i + 1, len(matched)):
+            a, b = matched[i][0], matched[j][0]
+            if a in anc.get(b, ()) or b in anc.get(a, ()):
+                continue
             overlap = matched[i][1] & matched[j][1]
             if overlap:
                 rel = sorted(str(p.relative_to(root)) for p in list(overlap)[:5])
@@ -415,7 +441,7 @@ def check(target, root, skip_verify=False, ship=False, soft_off=False):
                 print(f"          - {x}")
         else:
             print(f"  [ok]   {f.name} ({fid})")
-    dag_fails = (rule_dag(frames_for_dag) + rule_exclusive_scope(frame_scopes, root)
+    dag_fails = (rule_dag(frames_for_dag) + rule_exclusive_scope(frame_scopes, root, dict(frames_for_dag))
                  + rule_assemble_scope(frame_records, root))
     if dag_fails:
         all_ok = False
@@ -443,6 +469,7 @@ def build_manifest(target, root):
     # thuê SAU CÙNG giữ file. Chỉ hai frame cùng CHƯA xong mới là va chạm thật.
     frames.sort(key=lambda fm: (0, str(_run_log(fm, root).get("ended_at", "")))
                 if _frame_done(fm, root) else (1, ""))
+    anc = _ancestors({fm.get("frame_id"): fm.get("depends_on") or [] for fm in frames})
     for fm in frames:
         fid = fm.get("frame_id")
         clauses = fm.get("clause_ids") or []
@@ -451,8 +478,11 @@ def build_manifest(target, root):
             rel = p.relative_to(root).as_posix()
             owner = manifest.get(rel)
             if owner and owner["frame_id"] != fid and pending and pending_owner.get(rel):
-                collisions.append((rel, owner["frame_id"], fid))
-                continue
+                if fid in anc.get(owner["frame_id"], ()):
+                    continue  # frame này là tổ tiên: hậu duệ đang giữ file giữ tiếp
+                if owner["frame_id"] not in anc.get(fid, ()):
+                    collisions.append((rel, owner["frame_id"], fid))
+                    continue
             manifest[rel] = {"frame_id": fid, "clause_ids": clauses}
             pending_owner[rel] = pending
     return manifest, collisions
@@ -619,6 +649,16 @@ def selftest():
         lease_ok = (not c_l) and m_l.get("src/x.py", {}).get("frame_id") == "l6b-luu-so-cai"
         results.append(("T1 manifest lease", "PASS" if lease_ok else "FAIL", 0, "người thuê sau giữ file"))
         ok = ok and lease_ok
+
+        # GOOD R6 serial — hai frame CHƯA xong chung file nhưng depends_on xếp nối tiếp
+        g6s = root / "good6serial"; g6s.mkdir()
+        _write_frame(g6s, "a.md", fid="s6a", brhash=brhash, deps="", atest=red)
+        _write_frame(g6s, "b.md", fid="s6b", brhash=brhash, deps="s6a-luu-so-cai", atest=red)
+        record("GOOD R6 serial", "ALL PASS", False, g6s, root, skip=True)
+        m_s, c_s = build_manifest(g6s, root)
+        serial_ok = (not c_s) and m_s.get("src/x.py", {}).get("frame_id") == "s6b-luu-so-cai"
+        results.append(("T1 manifest serial", "PASS" if serial_ok else "FAIL", 0, "hậu duệ giữ file"))
+        ok = ok and serial_ok
 
         # T1 manifest — disjoint frames produce a clean spine; overlap refuses to write
         m_ok, m_col = build_manifest(g6, root)

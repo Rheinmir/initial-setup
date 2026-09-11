@@ -12,7 +12,9 @@ Output-report (không có Plan) và draft đã implemented/done tự miễn.
 Nhánh SPEC:
   (a) Bảng '## Agent Task Assignment' ≥1 data row, không ô Agent nào trống
   (b) Link '**Sequence diagram**' trỏ tới file .html TỒN TẠI
-  (c) Số '<div class="diagram-box"' trong html ≥ số task '- [ ]' trong '## Plan'
+  (c) Mỗi task '- [ ]' trong '## Plan' có một sơ đồ THẬT. Draft đặt tên từ 100926: đếm artifact
+      archify trang nhúng/trỏ tới (iframe/a/embed) — khung list vẽ tay không còn được tính.
+      Draft cũ hơn giữ luật cũ: số '<div class="diagram-box"' ≥ số task.
   (d) html KHÔNG ẩn nhãn message bằng 'opacity:0' (.msg phải hiện sẵn — bài học 130626).
       CHỈ quét trong khối <style> — trước đây quét cả trang nên cắn nhầm văn xuôi nào
       nhắc tới chính chuỗi CSS bị cấm (dính lúc soạn draft 140726).
@@ -38,6 +40,7 @@ Contract chung: stdin JSON {"action":"write","file_path":...} hoặc argv files.
 import json
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 DRAFT_RE = re.compile(r"(?:^|/)wiki/(?:draft|sources/draft)(?:/|$)")
@@ -56,6 +59,36 @@ ARCHIFY_RE = re.compile(r"\barchify \d+\.\d+")  # chữ ký viewer archify nhún
 
 def is_archify_artifact(html_text):
     return bool(ARCHIFY_RE.search(html_text)) and "<svg" in html_text
+
+
+# Từ 100926 sơ đồ trong seq html phải do ENGINE vẽ (/diagram → archify). Khung list vẽ tay
+# (diagram-box + chip .lifeline + dòng .msg) lọt (c) vì (c) chỉ đếm class — trang ticket-composer
+# 7 task, 0 sơ đồ vẫn qua. Draft đặt tên ngày trước mốc giữ luật cũ: không đỏ hồi tố.
+ENGINE_CUTOFF = date(2026, 9, 10)
+DRAFT_DATE_RE = re.compile(r"^(\d{2})(\d{2})(\d{2})-")
+EMBED_RE = re.compile(r'<(?:iframe|a|embed|object)\b[^>]*?\b(?:src|href|data)="([^"#?]+\.html)"', re.IGNORECASE)
+
+
+def needs_engine_diagrams(path):
+    m = DRAFT_DATE_RE.match(Path(path).name)
+    if not m:
+        return True                    # không đọc được ngày → áp luật mới (fail-closed)
+    try:
+        return date(2000 + int(m[3]), int(m[2]), int(m[1])) >= ENGINE_CUTOFF
+    except ValueError:
+        return True
+
+
+def embedded_archify(html_path, html_text):
+    """Số artifact archify KHÁC NHAU trang seq nhúng/trỏ tới: file tồn tại + chữ ký archify + <svg>."""
+    found = set()
+    for rel in EMBED_RE.findall(html_text):
+        p = (html_path.parent / rel).resolve()
+        if p in found or p == html_path.resolve() or not p.is_file():
+            continue
+        if is_archify_artifact(p.read_text(encoding="utf-8", errors="replace")):
+            found.add(p)
+    return len(found)
 
 # --- nhánh PLAN ---
 PLAN_FILE_SUFFIX = "-PLAN.md"
@@ -237,12 +270,21 @@ def check(path):
             if is_archify_artifact(html_text):
                 n_tasks = 0  # archify: hình học đã được gác bằng máy — miễn (c)(d)(e)
                 html_text = ""
-            n_diagrams = len(DIAGRAM_RE.findall(html_text))
-            if n_tasks and n_diagrams < n_tasks:
-                problems.append(
-                    f"(c) Plan co {n_tasks} task nhung seq html chi co {n_diagrams} diagram-box — "
-                    f"MOI task phai co sequence diagram rieng"
-                )
+            if needs_engine_diagrams(path):
+                n_diagrams = embedded_archify(html_path, html_text) if html_text else 0
+                if n_tasks and n_diagrams < n_tasks:
+                    problems.append(
+                        f"(c) Plan co {n_tasks} task nhung seq html chi nhung {n_diagrams} so do archify — "
+                        f"MOI task phai co sequence diagram do /diagram (archify) ve, nhung bang <iframe src=...html>. "
+                        f"Khung list 'diagram-box' + chip .lifeline ve tay KHONG phai sequence diagram (bai hoc 100926)"
+                    )
+            else:
+                n_diagrams = len(DIAGRAM_RE.findall(html_text))
+                if n_tasks and n_diagrams < n_tasks:
+                    problems.append(
+                        f"(c) Plan co {n_tasks} task nhung seq html chi co {n_diagrams} diagram-box — "
+                        f"MOI task phai co sequence diagram rieng"
+                    )
             # (d) khong duoc an nhan message — doc ra phai thay chu ngay, khong cho animation reveal.
             #     Chi quet trong <style>: quet ca trang thi can nham van xuoi nhac toi chuoi CSS bi cam.
             css = "\n".join(STYLE_BLOCK_RE.findall(html_text))
@@ -346,7 +388,45 @@ def self_test():
     assert not is_archify_artifact("<html>archify 2.17.0 no svg</html>")
     assert not is_archify_artifact('<div class="diagram-box"><svg></svg></div>')
     assert is_archify_artifact("x archify 3.0 y <svg viewBox='0 0 1 1'/>")
-    print("proposal_complete --self-test: 4/4 ok")
+
+    # Ca đã cháy thật 100926: seq html dạng list (diagram-box + chip .lifeline) qua (c) dù 0 sơ đồ.
+    import contextlib
+    import io
+    import tempfile
+    draft = ("---\ntype: source\n---\n# F\n**Status:** proposed\n"
+             "**Sequence diagram:** [seq](../../../html/p-seq.html)\n"
+             "## Context\nĐã query wiki về luồng owner auth và đính kèm.\n"
+             "## Global constraints\nDevice API giữ nguyên như bản trước.\n"
+             "## Plan\n- [ ] T1 auth\n- [ ] T2 schema\n"
+             "## Agent Task Assignment\n| Task | Agent |\n|---|---|\n| T1 | Claude |\n| T2 | Claude |\n")
+    listing = ('<div class="diagram-box"><span class="lifeline">Owner</span><div class="msg add">Owner → API</div></div>'
+               '<p class="desc">Mô tả T1.</p>' * 2)
+    archify = "<html>archify 2.17.0 <svg viewBox='0 0 1 1'></svg></html>"
+    shell = '<iframe src="p-t1.html"></iframe><p class="desc">T1.</p><iframe src="p-t2.html"></iframe><p class="desc">T2.</p>'
+
+    def rc(name, page, extra=None):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t) / "wiki" / "sources" / "draft"; d.mkdir(parents=True)
+            h = Path(t) / "html"; h.mkdir()
+            (h / "p-seq.html").write_text(page, encoding="utf-8")
+            for fn, body in (extra or {}).items():
+                (h / fn).write_text(body, encoding="utf-8")
+            (d / name).write_text(draft, encoding="utf-8")
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                try:
+                    check(str(d / name))
+                    return 0, err.getvalue()
+                except SystemExit as e:
+                    return e.code, err.getvalue()
+
+    code, err = rc("100926-f.md", listing)
+    assert code == 2 and "(c)" in err, err                       # list vẽ tay từ mốc → đỏ
+    assert rc("080926-f.md", listing)[0] == 0                    # draft cũ: luật cũ, không đỏ hồi tố
+    assert rc("100926-f.md", shell, {"p-t1.html": archify, "p-t2.html": archify})[0] == 0
+    code, err = rc("100926-f.md", shell, {"p-t1.html": archify, "p-t2.html": "<html>list</html>"})
+    assert code == 2 and "1 so do archify" in err, err           # 2 task mà chỉ 1 sơ đồ thật → đỏ
+    print("proposal_complete --self-test: 8/8 ok")
 
 
 def main():

@@ -204,12 +204,17 @@ def build_r5(base):
 def build_r7(base):
     # bad = proposed draft missing the Agent table + sequence link; good = complete.
     draft = base / "wiki" / "sources" / "draft"
+    # Tu 100926 moi task can mot so do THAT do archify ve, trang seq nhung bang iframe (R7-c);
+    # khung list diagram-box ve tay khong con duoc tinh.
+    for n in ("t1", "t2"):
+        _w(draft / f"feature-{n}.html", "<!doctype html><html><body>archify 2.17.0 "
+                                        "<svg viewBox='0 0 10 10'></svg></body></html>\n")
     seq_html = (
         "<!doctype html><html><head><style>.msg{opacity:1}</style></head><body>\n"
-        '<div class="diagram-box"><p class="desc">Task one: claude distills the raw '
-        "file into a concept on a safe branch.</p></div>\n"
-        '<div class="diagram-box"><p class="desc">Task two: codex updates wiki/index.md '
-        "for the new concept.</p></div>\n"
+        '<iframe src="feature-t1.html"></iframe><p class="desc">Task one: claude distills the raw '
+        "file into a concept on a safe branch.</p>\n"
+        '<iframe src="feature-t2.html"></iframe><p class="desc">Task two: codex updates wiki/index.md '
+        "for the new concept.</p>\n"
         "</body></html>\n"
     )
     _w(draft / "feature-seq.html", seq_html)

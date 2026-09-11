@@ -1082,6 +1082,32 @@
     "date": "2026-09-09",
     "session": "proposal 090926-docs-curate-threshold-gate",
     "solvedBy": "harness/scripts/tidy.py + session_start.draft_threshold + skill /tidy + validator/engine miễn archive/ (proposal 090926-docs-curate-threshold-gate, test tidy-test.sh 11/11)"
+  },
+  {
+    "id": "p-auto-24",
+    "parent": null,
+    "title": "Thẻ ghi-tạm tự động: phiên chạm framework, chưa vào sổ",
+    "desc": "Bề mặt bị chạm: harness/metrics/.stop-debounce.json, harness/metrics/provenance-log.jsonl, harness/metrics/scratch-log.jsonl, harness/metrics/sync-log.jsonl, llmwiki/html/wiki-graph.html, llmwiki/raw/3-lang-compare.jpeg, llmwiki/raw/agent-ai-toolkit.jpg, llmwiki/raw/loop-engineering-by-addyosmani.md …. Thẻ do hook SessionEnd tự ghi (flush — xả sổ trước khi thoát); lần /fdk kế tiếp sẽ chưng lọc về đúng nhánh.",
+    "status": "open",
+    "scope": [],
+    "date": "10/09/26",
+    "session": "95e2c1ee",
+    "pending": true
+  },
+  {
+    "id": "p-52",
+    "parent": "p-01",
+    "title": "Seq html của /propose chỉ là danh sách bước mà cổng R7/R11 vẫn cho qua — cổng mang tên 'sơ đồ' không soi hình",
+    "desc": "Trang 100926-ticket-composer-a-seq.html (7 task, 0 sơ đồ) qua R7 rc 0 và R11 rc 0. R7(c) đếm chuỗi diagram-box, R7(e) đếm class desc, R11 soi marker CSS glass; khung *-seq.html được clone vốn là chip .lifeline + dòng .msg. Cổng hình học duy nhất (archify) chỉ chạy khi đi qua /diagram.",
+    "status": "solved",
+    "scope": [
+      "harness",
+      "skills",
+      "llmwiki"
+    ],
+    "date": "2026-09-11",
+    "session": "incident 110926-seq-html-slop-gate",
+    "solvedBy": "bda0fc6: R7(c) chỉ tính artifact archify nhúng trong trang (draft từ 100926) · /propose bước 7 vẽ qua /diagram, gộp 1 lệnh shell, tối đa 2 vòng sửa · harness-doctor fixture mới · wiki 110926-seq-html-slop-gate"
   }
 ]
 </script>
